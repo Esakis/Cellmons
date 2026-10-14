@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+// Koperta wiadomości WebSocket: jedna ramka binarna to jedna wiadomość
+// (docs/07-protokol-sieciowy.md, rozdz. 1 i 3). Pozostałe wiadomości z katalogu
+// (rozdz. 4) dochodzą razem z obsługującymi je funkcjami.
+package game.v1;
+
+import "game/v1/session.proto";
+
+// Wiadomość klienta.
+message ClientMessage {
+  // Numer żądania klienta (korelacja odpowiedzi).
+  uint32 seq = 1;
+
+  oneof body {
+    Ping ping = 2;
+  }
+}
+
+// Wiadomość serwera.
+message ServerMessage {
+  // Rosnący numer wiadomości serwera w sesji.
+  uint32 seq = 1;
+  // seq żądania, jeśli to odpowiedź; 0 dla powiadomień.
+  uint32 reply_to = 2;
+
+  oneof body {
+    Pong pong = 3;
+  }
+}

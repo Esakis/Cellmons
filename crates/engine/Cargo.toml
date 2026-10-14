@@ -1,0 +1,10 @@
+[package]
+name = "engine"
+description = "Silnik reguł: czysty, deterministyczny, bez wejścia/wyjścia (docs/06-silnik-gry.md)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true

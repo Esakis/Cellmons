@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+// Wiadomości sesji (docs/07-protokol-sieciowy.md, rozdz. 4.1).
+package game.v1;
+
+// Pomiar opóźnienia i synchronizacja zegara. Puls połączenia zapewniają ramki
+// ping protokołu WebSocket, nie ta wiadomość.
+message Ping {}
+
+// Odpowiedź na Ping.
+message Pong {
+  // Czas serwera w milisekundach od początku epoki Unix (UTC).
+  int64 server_time_ms = 1;
+}

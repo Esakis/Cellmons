@@ -1,0 +1,24 @@
+/* Tymczasowe kolory szkieletu; docelowe tokeny stylu powstają w krokach F3.6 i F5.1. */
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  --color-bg: #f6f4ef;
+  --color-text: #1d1b22;
+  --color-text-muted: #5d5868;
+  --color-border: #d9d4ca;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #15131a;
+    --color-text: #ece8f2;
+    --color-text-muted: #a7a1b4;
+    --color-border: #39343f;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+}

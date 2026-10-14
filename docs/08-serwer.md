@@ -216,6 +216,7 @@ Każda operacja administracyjna trafia do `audit_log` (kto, co, kiedy, przed i p
 | `FEATURES` | flagi funkcji, np. `trading,tournaments` | wszystkie włączone |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | eksport śladów | puste (wyłączone) |
 | `LOG_LEVEL` | poziom logów | `info` |
+| `LOG_FORMAT` | format logów: `json` (produkcja) albo `text` (czytelny przy pracy lokalnej) | `json` |
 | `ADMIN_IP_ALLOWLIST` | adresy z dostępem do panelu | puste (brak dostępu) |
 
 Sekrety (hasło bazy, klucze) tylko w zmiennych środowiskowych lub plikach Docker secrets, nigdy w repozytorium.

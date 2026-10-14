@@ -1,0 +1,13 @@
+# Zakazy dla crate'ów silnika (06-silnik-gry.md, rozdz. 7). Domyślnie są ostrzeżeniami, a CI
+# uruchamia clippy z -D warnings. Serwer i narzędzia wyłączają je w swoim Cargo.toml.
+disallowed-types = [
+    { path = "std::collections::HashMap", reason = "kolejność iteracji nie jest deterministyczna; użyj BTreeMap albo Vec" },
+    { path = "std::collections::HashSet", reason = "kolejność iteracji nie jest deterministyczna; użyj BTreeSet albo Vec" },
+    { path = "std::time::Instant", reason = "silnik nie korzysta z czasu systemowego" },
+    { path = "std::time::SystemTime", reason = "silnik nie korzysta z czasu systemowego" },
+]
+disallowed-methods = [
+    { path = "rand::thread_rng", reason = "losowość tylko z jawnych strumieni ChaCha8 (ADR-007)", allow-invalid = true },
+    { path = "rand::rng", reason = "losowość tylko z jawnych strumieni ChaCha8 (ADR-007)", allow-invalid = true },
+    { path = "rand::random", reason = "losowość tylko z jawnych strumieni ChaCha8 (ADR-007)", allow-invalid = true },
+]

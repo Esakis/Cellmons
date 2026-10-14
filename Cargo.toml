@@ -1,0 +1,47 @@
+[workspace]
+resolver = "3"
+members = ["crates/*"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.99"
+publish = false
+
+[workspace.dependencies]
+engine = { path = "crates/engine" }
+engine-ai = { path = "crates/engine-ai" }
+engine-cards = { path = "crates/engine-cards" }
+engine-content = { path = "crates/engine-content" }
+
+anyhow = "1.0.104"
+axum = "0.8.9"
+dotenvy = "0.15.7"
+http-body-util = "0.1.5"
+serde = "1.0.229"
+serde_json = "1.0.154"
+sqlx = { version = "0.9.0", default-features = false }
+tokio = "1.53.3"
+tower = "0.5.3"
+tracing = "0.1.44"
+tracing-subscriber = "0.3.23"
+wasm-bindgen = "0.2.129"
+
+# Domyślne reguły to reguły silnika (06-silnik-gry.md, rozdz. 1 i 7): tylko liczby całkowite,
+# deterministyczne kolekcje, brak czasu systemowego i losowości spoza jawnych strumieni.
+# Zakazane typy i funkcje są w clippy.toml. Serwer i narzędzia luzują te zakazy we własnym Cargo.toml.
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+float_arithmetic = "deny"
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+
+# Silnik w przeglądarce (06-silnik-gry.md, rozdz. 10): najmniejszy rozmiar WASM.
+[profile.wasm-release]
+inherits = "release"
+opt-level = "z"
+panic = "abort"

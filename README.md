@@ -2,7 +2,14 @@
 
 Projekt gry karcianej z elementami RPG (przeglądarka i Android), odtwarzającej zasady polskiej gry sieciowej **Cellmons** (Pogram, 2004–2009). Mechanika pochodzi z oryginału, a nazwy, teksty, fabuła i grafiki są własne. „Cellmons” zostaje tylko nazwą repozytorium. Nazwę produktu, znak towarowy i domeny opisuje `docs/20-nazwa-i-znak-towarowy.md`.
 
-**Status:** dokumentacja i plan wdrożenia. Kod jeszcze nie powstał; pierwszy krok to faza F0 z `docs/16-plan-wdrozenia.md`.
+**Status:** faza F0 z `docs/16-plan-wdrozenia.md` (przygotowanie): szkielety projektów, lokalne środowisko i CI. Następna faza to F1, rdzeń silnika walki.
+
+## Uruchomienie lokalne
+
+Potrzebne są: Rust (rustup), Node.js 24 LTS z pnpm (`corepack enable pnpm`) i Docker Desktop. Szczegóły są w [CONTRIBUTING.md](CONTRIBUTING.md).
+
+- `run.bat` uruchamia bazę danych, serwer gry i klienta, a potem otwiera przeglądarkę na http://localhost:5173.
+- `check.bat` wykonuje wszystkie kontrole z CI i kończy się podsumowaniem.
 
 ## Najważniejsze decyzje
 

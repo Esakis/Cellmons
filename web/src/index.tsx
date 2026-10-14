@@ -1,0 +1,22 @@
+import { lazy } from 'solid-js';
+import { render } from 'solid-js/web';
+import { App } from './app/App';
+import './styles/global.css';
+
+// Panel stanu serwera tylko w wersji deweloperskiej; w buildzie produkcyjnym znika razem z importem.
+const DevStatus = import.meta.env.DEV ? lazy(() => import('./dev/DevStatus')) : null;
+
+const root = document.getElementById('root');
+if (!root) {
+  throw new Error('Brak elementu #root w index.html');
+}
+
+render(
+  () => (
+    <>
+      <App />
+      {DevStatus && <DevStatus />}
+    </>
+  ),
+  root,
+);

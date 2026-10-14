@@ -1,0 +1,41 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "helpers:pinGitHubActionDigests",
+    ":semanticCommits",
+    ":semanticCommitTypeAll(chore)"
+  ],
+  "timezone": "Europe/Warsaw",
+  "schedule": ["before 6am on monday"],
+  "minimumReleaseAge": "3 days",
+  "lockFileMaintenance": {
+    "enabled": true
+  },
+  "packageRules": [
+    {
+      "description": "Drobne aktualizacje zależności Rust w jednym PR",
+      "matchManagers": ["cargo"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "zależności Rust (minor i patch)"
+    },
+    {
+      "description": "Drobne aktualizacje zależności npm w jednym PR",
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "zależności npm (minor i patch)"
+    },
+    {
+      "description": "Akcje GitHub w jednym PR",
+      "matchManagers": ["github-actions"],
+      "groupName": "akcje GitHub"
+    },
+    {
+      "description": "Nowa główna wersja PostgreSQL wymaga migracji danych, więc tylko ręcznie",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["postgres"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    }
+  ]
+}

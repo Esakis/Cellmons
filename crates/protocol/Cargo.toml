@@ -1,0 +1,15 @@
+[package]
+name = "protocol"
+description = "Typy wiadomości z plików proto/ (docs/07-protokol-sieciowy.md)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+# Zakazy z clippy.toml dotyczą tylko silnika.
+disallowed_types = "allow"
+disallowed_methods = "allow"

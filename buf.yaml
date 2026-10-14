@@ -1,0 +1,10 @@
+# Schematy Protobuf protokołu sieciowego (docs/07-protokol-sieciowy.md).
+version: v2
+modules:
+  - path: proto
+lint:
+  use:
+    - STANDARD
+breaking:
+  use:
+    - FILE

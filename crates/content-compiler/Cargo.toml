@@ -1,0 +1,15 @@
+[package]
+name = "content-compiler"
+description = "Walidacja treści gry i generowanie engine-content (docs/03-tresc-gry.md, rozdz. 8)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+# Zakazy z clippy.toml dotyczą tylko silnika.
+disallowed_types = "allow"
+disallowed_methods = "allow"

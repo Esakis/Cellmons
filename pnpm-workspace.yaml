@@ -1,0 +1,11 @@
+packages:
+  - web
+  - e2e
+
+# Wersje zależności zapisywane dokładnie; aktualizacje przez Renovate (04-architektura.md, rozdz. 8).
+saveExact: true
+
+# Skrypty instalacyjne zależności są domyślnie blokowane; tu tylko sprawdzone wyjątki.
+allowBuilds:
+  # podpina plik binarny buf dla bieżącej platformy
+  '@bufbuild/buf': true
