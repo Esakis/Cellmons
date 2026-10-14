@@ -1,0 +1,25 @@
+# Parametry zasad gry (docs/02-zasady-gry.md, rozdz. 13). Silnik czyta sekcje [duel] i [deck];
+# sekcje dla serwera (ranking, doświadczenie, ekonomia) dojdą w kolejnych fazach.
+# Nieznany klucz w [duel] albo [deck] jest błędem, żeby literówka nie przeszła niezauważona.
+
+[duel]
+rounds = 5                              # R-RUN: najwyżej 5 rund
+attacks_per_round = 3                   # R-RUN-04: sloty ataku i obrony (silnik obsługuje tylko 3)
+focus_per_round = 4                     # R-RUN-01: przyrost K na początku rundy
+# focus_cap = 12                        # R-RUN-02: limit K przy przyroście; brak klucza = bez limitu
+change_cost = 1                         # R-RUN-05: K za każdy zmieniony slot
+hand_size = 5                           # R-POJ-04: karty w ręce
+combo_multipliers = [1, 2, 4]           # R-ATK-04: mnożniki 1., 2. i 3. trafienia serii
+block_min_stamina = 1                   # R-ATK-02: W obrońcy potrzebna do bloku
+default_settings = "highest_stat"       # R-POJ-06: ustawienia odniesienia w 1. rundzie
+counter_resolution = "initiative_first" # R-CZA-05: rozstrzyganie przeciwzaklęć (faza F2)
+move_timeout_after_opponent_s = 60      # R-RUN-08: czas na ruch po ruchu przeciwnika (serwer)
+round_timeout_s = 90                    # R-RUN-08: limit całej fazy decyzji (serwer)
+max_consecutive_timeouts = 3            # R-RUN-09: kolejne braki ruchu do walkowera (serwer)
+reconnect_grace_s = 60                  # R-KON-05: czas na powrót po rozłączeniu (serwer)
+
+[deck]
+size = 20                               # R-TAL-01: karty w talii
+max_copies = 4                          # R-TAL-02: kopie tej samej karty
+fill_missing_with_random = true         # R-TAL-05: uzupełnianie talii losowymi kartami
+saved_presets_max = 10                  # R-TAL-06: zapisane zestawy talii (serwer)

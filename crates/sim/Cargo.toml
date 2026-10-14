@@ -6,6 +6,10 @@ edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
 
+[dependencies]
+# Na razie losowe pojedynki z narzędzi testowych silnika; boty dojdą w kroku F2.6.
+engine = { workspace = true, features = ["testkit"] }
+
 [lints.rust]
 unsafe_code = "forbid"
 

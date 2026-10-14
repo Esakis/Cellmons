@@ -10,8 +10,11 @@ Jak przygotować komputer, uruchomić grę lokalnie, sprawdzić zmiany i zgłosi
 | Node.js | 24 LTS (`.nvmrc`) | https://nodejs.org |
 | pnpm | z pola `packageManager` w `package.json` (12.11.2) | polecenie `corepack enable pnpm` |
 | Docker Desktop | aktualna | https://www.docker.com/products/docker-desktop |
+| wasm-bindgen-cli | taka jak crate `wasm-bindgen` w `Cargo.lock` (0.2.129) | `cargo install wasm-bindgen-cli --version 0.2.129 --locked` |
 
 Na Windowsie Rust potrzebuje narzędzi C++ z Visual Studio (Build Tools, składnik „Desktop development with C++”).
+
+`wasm-bindgen-cli` dostarcza `wasm-bindgen-test-runner`, który uruchamia testy silnika w WebAssembly (Node). Bez niego `check.bat` pomija krok „natywne = WASM”, ale CI wykonuje go zawsze. Po zmianie wersji crate'a `wasm-bindgen` trzeba zainstalować tę samą wersję narzędzia.
 
 ## 2. Uruchomienie i sprawdzanie zmian
 
@@ -20,8 +23,10 @@ Na Windowsie Rust potrzebuje narzędzi C++ z Visual Studio (Build Tools, składn
 | `run.bat` | uruchamia bazę (PostgreSQL w Dockerze), serwer gry i klienta, potem otwiera przeglądarkę na http://localhost:5173 |
 | `run.bat -NoBrowser` | to samo bez otwierania przeglądarki |
 | `run.bat -Stop` | zatrzymuje bazę; dane zostają w woluminie Dockera |
-| `check.bat` | wszystkie kontrole z CI: Rust, silnik do WebAssembly, klient, proto, testy e2e i serwer z bazą |
+| `check.bat` | wszystkie kontrole z CI: Rust, silnik do WebAssembly z testem natywne = WASM, klient, proto, testy e2e i serwer z bazą |
 | `check.bat -Quick` | szybsze sprawdzenie, bez testów e2e i testu serwera z bazą |
+| `cargo run -p sim -- duel [ziarno]` | losowy pojedynek silnikiem, opisany runda po rundzie |
+| `cargo bench -p engine` | pomiar rozstrzygania rundy i całego pojedynku (`docs/06-silnik-gry.md`, rozdz. 10) |
 
 - Serwer i klient działają w osobnych oknach; zamknięcie okna zatrzymuje usługę.
 - W wersji deweloperskiej panel „Środowisko lokalne” w rogu strony pokazuje, czy działają serwer gry i baza.

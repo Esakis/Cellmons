@@ -42,27 +42,29 @@ flowchart LR
 | F0.6 Konwencje | konwencja commitów, szablon PR z checklistą (`14-testy-i-jakosc.md`), ADR w repo | szablony w `.github/` |
 | F0.7 Marka | zadanie firmy, równolegle z F0.1–F0.6: domeny spellgambit.pl, .eu i .gg; zgłoszenie znaku słownego SPELLGAMBIT w EUIPO w kl. 9 i 41 (`20-nazwa-i-znak-towarowy.md`, rozdz. 6; termin: P-13) | domeny zarejestrowane na firmę; numer zgłoszenia EUIPO wpisany do P-13 |
 
-## F1. Silnik: rdzeń walki bez kart (≈ 2 tydz.)
+## F1. Silnik: rdzeń walki, karty bez efektów (≈ 2 tydz.)
 
 | Krok | Zadania | Kryteria akceptacji |
 |---|---|---|
 | F1.1 Typy i konfiguracja | typy z `06-silnik-gry.md`, rozdz. 3; `RulesConfig` wczytywany z TOML | testy deserializacji `rules.toml` |
 | F1.2 Przygotowanie pojedynku | snapshot, stan początkowy, tasowanie (strumienie RNG), ręka, inicjatywa, ustawienia domyślne (R-POJ-01…06) | testy jednostkowe dla każdej reguły R-POJ |
-| F1.3 Runda bez czarów | koszty zmian, faza ataków, blok, combo, koszt W, brak W (R-RUN-01…10, R-ATK-01…07) | przykład z `02-zasady-gry.md`, rozdz. 14 jako test; wszystkie reguły R-ATK mają testy |
+| F1.3 Runda z kartami bez efektów | koszty zmian; rzucanie kart z opłatą K i W, wymaganiami szkół i limitem interwencji; odrzucanie i dobieranie kart w kolejności inicjatywy; faza ataków, blok, combo, koszt W, brak W (R-RUN-01…06, R-RUN-09…12, R-RUN-14, R-RUN-15, R-ATK-01…07) | przykład z `02-zasady-gry.md`, rozdz. 14 jako test (czar „+2 do AM” jako karta bez efektu); rundy 1–2 testu TR-01; wszystkie reguły R-ATK mają testy |
 | F1.4 Koniec pojedynku | nokaut, remis, procent życia, ucieczka, timeout (R-KON-01…05) | testy wszystkich ścieżek końca |
 | F1.5 Walidacja i podgląd | `validate_move`, `preview`, `default_move`, kody `MoveError` | testy błędów dla każdego kodu |
 | F1.6 Determinizm i powtórki | `state_hash`, `ReplayRecord`, `replay()`; test natywne = WASM | 10 000 losowych pojedynków: ten sam hash natywnie i w WASM |
 | F1.7 Testy właściwościowe i benchmark | `proptest` (niezmienniki), `criterion` | `resolve_round` ≤ 5 µs (mediana) natywnie |
 
+**Korekta zakresu (2026-10-14).** Kryteria F1.3 (przykład z rozdz. 14 zawiera rzucenie czaru) i F1.5 (kody błędów o wymaganiach szkół i interwencjach) potrzebują podstaw obsługi kart. Dlatego w F1 są koszty kart, wymagania szkół, interwencje, ręka, odrzucanie i dobieranie. W F2 zostają efekty, umagicznienia i pozostałe słowa kluczowe.
+
 ## F2. Silnik: system kart (≈ 3 tydz.)
 
 | Krok | Zadania | Kryteria akceptacji |
 |---|---|---|
-| F2.1 Faza czarów | rzucanie, opłaty, odrzucanie, dobieranie, kolejność inicjatywy (R-RUN-11…14, R-CZA-01) | testy reguł |
+| F2.1 Efekty czarów | wykonanie efektu przy rzuceniu i trwałe zmiany statystyk (R-CZA-01), czar przepadający przy rozpatrzeniu (Z-SPW), efekty na koniec rundy (R-RUN-13); rzucanie, opłaty, odrzucanie i dobieranie są od F1.3 | testy reguł |
 | F2.2 Rodziny efektów | `stat_mod`, `stat_set`, `swap_stats`, `heal`, `damage`, `stamina`, `focus`, `drain`, `force_hit`, `force_miss`, `unblockable`, `swap_choices`, `damage_taken_mult`, `school_mod`, `hand`, `dispel` | test każdej rodziny |
 | F2.3 Umagicznienia | rejestracja, wyzwalacze, kolejność, rozpraszanie (R-CZA-02) | testy wyzwalaczy |
-| F2.4 Słowa kluczowe | interwencja, przeciwzaklęcie, sprzężenie, karta losowa, warunki, specjalizacje (R-CZA-03…09) | testy reguł; Z-CNT i Z-ENG-1…3 zatwierdzone |
-| F2.5 Test referencyjny | TR-01 (walka #26519, rundy 1–3) | TR-01 zielony |
+| F2.4 Słowa kluczowe | przeciwzaklęcie, sprzężenie, karta losowa, warunki, specjalizacje (R-CZA-04…09; interwencja od F1.3) | testy reguł; Z-CNT i Z-ENG-1…4 zatwierdzone |
+| F2.5 Test referencyjny | TR-01 (walka #26519, rundy 1–3; rundy 1–2 z kartami bez efektu są testowane od F1.3) | TR-01 zielony |
 | F2.6 Boty L0–L1 i CLI | bot losowy i heurystyczny; `sim` rozgrywa pojedynki w konsoli | **M1:** 100 000 pojedynków botów bez paniki; raport z CLI |
 
 ## F3. Treść, narzędzia i pierwsze grafiki (≈ 3 tydz.)

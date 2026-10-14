@@ -1,0 +1,5 @@
+# Testy WebAssembly (`cargo test --target wasm32-unknown-unknown`) uruchamia w Node program
+# wasm-bindgen-test-runner z pakietu wasm-bindgen-cli w tej samej wersji co crate wasm-bindgen
+# (CONTRIBUTING.md).
+[target.wasm32-unknown-unknown]
+runner = "wasm-bindgen-test-runner"

@@ -73,6 +73,12 @@ $steps = @(
     @{ Name = 'Rust: lint (clippy)'; Run = { cargo clippy --workspace --all-targets --locked -- -D warnings } }
     @{ Name = 'Rust: testy'; Run = { cargo test --workspace --locked } }
     @{ Name = 'Rust: silnik do WebAssembly'; Run = { cargo build -p engine-wasm --target wasm32-unknown-unknown --locked } }
+    @{
+        Name = 'Silnik: natywne = WASM (Node)'
+        Needs = 'Rust: silnik do WebAssembly'
+        Skip = { if (-not (Get-Command wasm-bindgen-test-runner -ErrorAction SilentlyContinue)) { 'brak wasm-bindgen-test-runner, zob. CONTRIBUTING.md' } }
+        Run = { cargo test -p engine-wasm --target wasm32-unknown-unknown --locked }
+    }
     @{ Name = 'Node: instalacja zależności'; Run = { pnpm install --frozen-lockfile } }
     @{ Name = 'Web: format i lint (Biome)'; Run = { pnpm exec biome check } }
     @{ Name = 'Web: typy (tsc)'; Run = { pnpm --recursive --if-present typecheck } }

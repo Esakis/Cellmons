@@ -82,21 +82,28 @@ enum Outcome { Win(Side, Reason), Draw(Reason) }
 enum Reason { Knockout, Rounds, Forfeit, Disconnect, Timeout, ConditionalWin }
 ```
 
-## 4. Publiczne API (szkic)
+## 4. Publiczne API
+
+Stan po fazie F1 (`crates/engine/src/lib.rs`). Treść gry (`Content`) jest jawnym parametrem, bo silnik nie przechowuje definicji kart w stanie. Niepoprawne wejście daje błąd, a stan się wtedy nie zmienia.
 
 ```rust
 fn new_duel(setup: &DuelSetup, content: &Content) -> Result<DuelState, SetupError>;
-fn validate_move(s: &DuelState, side: Side, mv: &Move) -> Result<MoveCost, MoveError>;  // R-RUN-06
-fn preview(s: &DuelState, side: Side, mv: &Move) -> Preview;    // K po ruchu, koszt W czaru, maks. zużycie W
+fn validate_move(s: &DuelState, content: &Content, side: Side, mv: &Move)
+    -> Result<MoveCost, MoveError>;                                // R-RUN-06
+fn preview(s: &DuelState, content: &Content, side: Side, mv: &Move) -> Preview;
+                                    // koszty, K po ruchu, maks. zużycie W, wynik walidacji
 fn default_move(s: &DuelState, side: Side) -> Move;             // „bez zmian” (R-RUN-09)
-fn resolve_round(s: &mut DuelState, moves: [Move; 2], out: &mut EventBuf) -> RoundSummary;
-fn end_by(s: &mut DuelState, side: Side, reason: Reason, out: &mut EventBuf); // ucieczka, rozłączenie, timeout
-fn view(s: &DuelState, side: Side) -> PlayerView;               // stan widoczny dla gracza (rozdz. 8)
+fn resolve_round(s: &mut DuelState, content: &Content, moves: &[Move; 2], out: &mut EventBuf)
+    -> Result<RoundSummary, DuelError>;
+fn end_by(s: &mut DuelState, loser: Side, t: Termination, out: &mut EventBuf)
+    -> Result<Outcome, DuelError>;                               // ucieczka, rozłączenie, walkower
 fn state_hash(s: &DuelState) -> u64;                            // do porównań natywne/WASM i testów
-fn replay(r: &ReplayRecord, content: &Content) -> Result<ReplayResult, ReplayError>;
+fn replay(r: &ReplayRecord, content: &Content, out: &mut EventBuf)
+    -> Result<DuelState, ReplayError>;
+fn view(s: &DuelState, side: Side) -> PlayerView;               // faza F5: stan widoczny dla gracza (rozdz. 8)
 ```
 
-Kody `MoveError` (przekazywane do protokołu): `NotEnoughFocus`, `NotEnoughStamina`, `RequirementsNotMet`, `InterventionUsed`, `InvalidHandIndex`, `WrongPhase`, `AlreadySubmitted`.
+Kody `MoveError` (przekazywane do protokołu): `NotEnoughFocus`, `NotEnoughStamina`, `RequirementsNotMet`, `InterventionUsed`, `InvalidHandIndex`, `WrongPhase` oraz `UnknownCard` (karta z ręki nie istnieje w przekazanej treści, czyli błąd wywołującego). Kod `AlreadySubmitted` (ruch już wysłany) zwraca serwer, nie silnik (faza F7).
 
 ## 5. Potok rundy
 
@@ -171,6 +178,7 @@ attack(state, a, slot):
 - **Z-ENG-1:** wymuszone chybienie (efekt obrońcy) ma pierwszeństwo przed wymuszonym trafieniem (efekt atakującego).
 - **Z-ENG-2:** statystyki efektywne nie spadają poniżej 0. Ujemne modyfikatory mogą obniżyć AF, OF, AM i OM najwyżej do 0, a Ż_max i W_max najwyżej do 1.
 - **Z-ENG-3:** leczenie nie podnosi Ż ponad `hp_max` (zgodne z walką #26519), chyba że efekt jawnie zwiększa `hp_max`.
+- **Z-ENG-4:** limit K (`duel.focus_cap`, w zasadach klasycznych brak limitu) ogranicza tylko przyrost z R-RUN-01. K zdobyta ponad limitem, np. z efektu karty, zostaje.
 
 ## 6. System efektów
 
@@ -252,10 +260,11 @@ Każda zmiana stanu emituje zdarzenie z polem widoczności. Zdarzenia są jedyny
 ## 7. Losowość i determinizm
 
 - Ziarno pojedynku (32 bajty) losuje serwer z systemowego źródła entropii (`getrandom`).
-- Strumienie: `deck[A]`, `deck[B]`, `effects`, `fill` (dobieranie brakujących kart, R-TAL-05). Każdy powstaje z `ChaCha8Rng::from_seed(BLAKE3(seed ‖ etykieta))`.
-- Tasowanie: algorytm Fishera–Yatesa na strumieniu talii gracza.
+- Strumienie: `deck/A` i `deck/B` (uzupełnienie brakujących kart, R-TAL-05, a potem tasowanie talii gracza), `initiative` (R-POJ-05) i od fazy F2 `effects`. Każdy powstaje z `ChaCha8Rng::from_seed(K)`, gdzie `K` to BLAKE3 w trybie wyprowadzania klucza (stały kontekst silnika) z `seed ‖ etykieta`. Osobny strumień na zadanie sprawia, że dodatkowe losowanie w jednym miejscu nie przesuwa pozostałych.
+- Tasowanie: algorytm Fishera–Yatesa na strumieniu talii gracza. Losowanie liczby z przedziału (metoda Lemire'a, bez obciążenia) i tasowanie są w kodzie silnika, a nie w bibliotece `rand`, żeby jej aktualizacja nie zmieniała przebiegu zapisanych pojedynków.
 - Zakazane w crate'ach silnika (sprawdzane przez `clippy` i CI): typy zmiennoprzecinkowe (`clippy::float_arithmetic`), `HashMap`/`HashSet` (`clippy::disallowed_types`), `std::time`, `thread_rng`.
-- Test **natywne = WASM**: losowe pojedynki (ziarna z listy) rozgrywane natywnie i w WASM (Node + `wasm-bindgen-test`) muszą dać ten sam `state_hash` po każdej rundzie.
+- Test **natywne = WASM** (`crates/engine-wasm/tests/native_wasm.rs`): 10 000 losowych pojedynków z `engine::testkit` daje ten sam skrót wszystkich wartości `state_hash` po każdej rundzie natywnie i w WASM (Node + `wasm-bindgen-test-runner`). Oczekiwany skrót jest zapisany w teście; zmienia się razem z zasadami, kodowaniem stanu albo losowaniem w `testkit`.
+- Przypięte wartości w testach silnika (`stream_derivation_is_pinned`, `state_hash_is_pinned`) wykrywają zmianę strumieni lub kodowania stanu, np. po aktualizacji `rand_chacha` albo `blake3`.
 
 ## 8. Widoki i ukryte informacje
 
@@ -273,17 +282,16 @@ Każda zmiana stanu emituje zdarzenie z polem widoczności. Zdarzenia są jedyny
 
 ```rust
 struct ReplayRecord {
-    engine_version: SemVer, content_version: [u8; 32],
-    rules: RulesConfig, seed: [u8; 32],
-    players: [PlayerSetup; 2],
-    moves: ArrayVec<[Move; 2], 5>,
-    end: Option<(Side, Reason)>,       // ucieczka, rozłączenie, timeout
+    engine_version: Version, content_version: [u8; 32],
+    setup: DuelSetup,                   // zasady, ziarno, postacie i talie
+    moves: ArrayVec<[Move; 2], MAX_ROUNDS>,
+    end: Option<(Side, Termination)>,   // przegrywający i powód: ucieczka, rozłączenie, walkower
 }
 ```
 
 - **Rozmiar:** ok. 200–400 B w Protobuf. Dodatkowo serwer zapisuje skompresowaną listę zdarzeń (ok. 0,5–1 KB), żeby stare powtórki dało się wyświetlić nawet po zmianie silnika.
 - **Odtworzenie:** `replay()` buduje stan z `DuelSetup` i aplikuje ruchy. Wynik musi się zgadzać z zapisanym (test regresji na korpusie powtórek, `14-testy-i-jakosc.md`).
-- **Zgodność:** zmiana zasad, która zmienia wynik istniejących powtórek, podbija główną wersję silnika. Serwer przechowuje powtórki z wersją i wyświetla stare z zapisanych zdarzeń.
+- **Zgodność:** zmiana zasad, która zmienia wynik istniejących powtórek, podbija główną wersję silnika. Powtórkę odtwarza silnik zgodny według reguł Cargo: przy wersji 0.x z tą samą częścią minor, od 1.0 z tą samą częścią major (`Version::can_replay`). Serwer przechowuje powtórki z wersją i wyświetla stare z zapisanych zdarzeń.
 
 ## 10. Wydajność
 
@@ -300,7 +308,9 @@ Techniki:
 - ponownie używany bufor zdarzeń (`EventBuf::clear`);
 - profil `release` z `lto = "fat"`, `codegen-units = 1`; dla WASM dodatkowo `opt-level = "z"`, `panic = "abort"`, bez formatowania tekstów w silniku (kody zamiast komunikatów).
 
-Pomiary: `criterion` (natywnie), benchmark w przeglądarce przez Playwright (`13-wydajnosc.md`).
+Pomiary: `criterion` (natywnie, `cargo bench -p engine`), benchmark w przeglądarce przez Playwright (`13-wydajnosc.md`).
+
+Pomiar po fazie F1 (2026-10-14, natywnie, Windows 10, karty bez efektów): mediana `resolve_round` 58 ns, pełny pojedynek 5 rund razem z `new_duel` 1,3 µs.
 
 ## 11. Testowalność
 
@@ -320,6 +330,8 @@ scenario()
 ```
 
 Inicjatywa nie wpływa na wyniki rund 1–3 tej walki, więc test przyjmuje ją arbitralnie.
+
+Implementacja: `engine::testkit::Scenario` (cecha `testkit`) buduje stan początkowy z jawnie podaną inicjatywą, ręką i talią, bez losowania. Testy rozgrywają rundy przez `resolve_round` i porównują `RoundSummary` oraz zdarzenia. Ten sam moduł ma losowe pojedynki dla testów determinizmu i symulatora.
 
 Rodzaje testów silnika (szczegóły w `14-testy-i-jakosc.md`): jednostkowe dla każdej reguły `R-…`, scenariuszowe (co najmniej jeden na kartę), właściwościowe (niezmienniki), fuzzing, porównanie natywne = WASM, regresja na korpusie powtórek.
 
