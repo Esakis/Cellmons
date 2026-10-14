@@ -70,7 +70,7 @@ pub fn resolve_round(
     Ok(finish_round(state, events))
 }
 
-/// Początek rundy: przyrost K (R-RUN-01, R-RUN-02) i wyzerowanie serii trafień (R-RUN-03).
+/// Początek rundy: przyrost K (R-RUN-01, R-RUN-02).
 pub(crate) fn begin_round(state: &mut DuelState) {
     let income = state.rules.duel.focus_per_round;
     let cap = state.rules.duel.focus_cap;
@@ -78,7 +78,6 @@ pub(crate) fn begin_round(state: &mut DuelState) {
         let raised = player.focus + income;
         // Limit ogranicza tylko przyrost; K już ponad limitem zostaje.
         player.focus = cap.map_or(raised, |cap| raised.min(cap).max(player.focus));
-        player.combo = 0;
     }
 }
 
@@ -153,18 +152,27 @@ fn spell_phase(
 }
 
 /// Faza ataków: 6 ataków naprzemiennie, zaczyna strona z inicjatywą (R-ATK-01). Wykonują się
-/// zawsze wszystkie, także gdy Ż spadnie do 0 lub niżej (R-ATK-06).
+/// zawsze wszystkie, także gdy Ż spadnie do 0 lub niżej (R-ATK-06). Seria trafień każdej strony
+/// zaczyna się od zera w każdej rundzie (R-RUN-03).
 fn attack_phase(state: &mut DuelState, events: &mut EventBuf) {
     let order = state.initiative_order();
+    let mut combo = [0u8; 2];
     for slot in 0..SLOTS {
         for attacker in order {
-            attack(state, attacker, slot, events);
+            attack(state, attacker, slot, &mut combo[attacker.index()], events);
         }
     }
 }
 
-/// Atak strony `attacker` w slocie `slot` (R-ATK-02…05, R-ATK-07).
-fn attack(state: &mut DuelState, attacker: Side, slot: usize, events: &mut EventBuf) {
+/// Atak strony `attacker` w slocie `slot` (R-ATK-02…05, R-ATK-07); `combo` to jej seria
+/// trafień w tej rundzie.
+fn attack(
+    state: &mut DuelState,
+    attacker: Side,
+    slot: usize,
+    combo: &mut u8,
+    events: &mut EventBuf,
+) {
     let block_min_stamina = state.rules.duel.block_min_stamina;
     let multipliers = state.rules.duel.combo_multipliers;
     let (striker, target) = state.pair_mut(attacker);
@@ -175,7 +183,7 @@ fn attack(state: &mut DuelState, attacker: Side, slot: usize, events: &mut Event
     // trafia niezależnie od obrony (R-ATK-03).
     if target.defenses[slot] == kind && target.stamina >= block_min_stamina {
         // R-ATK-05: blok zeruje serię i nic nie kosztuje.
-        striker.combo = 0;
+        *combo = 0;
         events.push(Event::AttackBlocked {
             attacker,
             slot: slot_number,
@@ -185,8 +193,8 @@ fn attack(state: &mut DuelState, attacker: Side, slot: usize, events: &mut Event
     }
 
     // R-ATK-04: seria liczy trafienia atakującego w tej rundzie, niezależnie od typu ataku.
-    striker.combo += 1;
-    let multiplier = multipliers[usize::from(striker.combo).min(SLOTS) - 1];
+    *combo += 1;
+    let multiplier = multipliers[usize::from(*combo).min(SLOTS) - 1];
     let value = striker.stats.attack(kind);
     let damage = (value * multiplier - target.stats.defense(kind)).max(0);
     // R-ATK-07: Ż może spaść poniżej 0, W nie.

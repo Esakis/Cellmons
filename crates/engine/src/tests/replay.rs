@@ -74,28 +74,33 @@ fn version_compatibility_follows_cargo_rules() {
 fn replay_rejects_actions_after_the_end_of_the_duel() {
     let cards = sample_cards();
     let content = content(&cards);
-    let (state, record, _) = (0..)
+    let (state, record, earlier) = (0..)
         .map(recorded_duel)
         .find(|(_, record, _)| record.end.is_none())
         .expect("pojedynek");
     let rounds = record.moves.len() as u8;
+
+    // Bufor z wcześniejszymi zdarzeniami: po błędzie ma zostać bez zmian.
+    let mut events = earlier.clone();
 
     let mut extra_round = record.clone();
     extra_round
         .moves
         .push(Side::BOTH.map(|side| default_move(&state, side)));
     assert_eq!(
-        replay(&extra_round, &content, &mut EventBuf::new()),
+        replay(&extra_round, &content, &mut events),
         Err(ReplayError::Round {
             round: rounds + 1,
             error: DuelError::Finished
         })
     );
+    assert_eq!(events, earlier);
 
     let mut late_end = record;
     late_end.end = Some((Side::A, Termination::Forfeit));
     assert_eq!(
-        replay(&late_end, &content, &mut EventBuf::new()),
+        replay(&late_end, &content, &mut events),
         Err(ReplayError::End(DuelError::Finished))
     );
+    assert_eq!(events, earlier);
 }

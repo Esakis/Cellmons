@@ -71,7 +71,6 @@ struct PlayerState {
     attacks: [Kind; 3], defenses: [Kind; 3],   // ustawienia z poprzedniej rundy
     hand: ArrayVec<CardId, 5>,
     deck: ArrayVec<CardId, 20>,     // pozostałe karty, wierzch na końcu
-    combo: u8,                      // seria trafień w bieżącej rundzie
     flags: PlayerFlags,             // np. podwójne obrażenia, pierwsze trafienie F chybia
 }
 
@@ -130,10 +129,10 @@ resolve_round(state, moves):
           None       -> ()
 
   # Faza ataków (R-ATK-01..07)
-  reset combo for both
+  combo = [0, 0]                       # seria trafień istnieje tylko w fazie ataków (R-RUN-03)
   for slot in 0..3:
       for side in initiative_order(state):
-          attack(state, side, slot)
+          attack(state, side, slot, combo[side])
 
   # Koniec rundy
   for ench in enchantments: ench.on_round_end(ctx)                   # R-RUN-13
@@ -148,7 +147,7 @@ resolve_round(state, moves):
 ### 5.2. Atak
 
 ```
-attack(state, a, slot):
+attack(state, a, slot, combo):
   d = other(a)
   kind = players[a].attacks[slot]
   ov = collect_overrides(state, a, d, slot, kind)    # efekty: ForceMiss / ForceHit / Unblockable
@@ -159,7 +158,7 @@ attack(state, a, slot):
       Normal      -> players[d].stamina < rules.block_min_stamina       # R-ATK-03
                      or players[d].defenses[slot] != kind               # R-ATK-02
   if hit:
-      players[a].combo += 1
+      combo += 1
       mult = rules.combo_multipliers[min(combo, len) - 1]               # R-ATK-04
       atk  = eff_atk(a, kind); def = eff_def(d, kind)
       dmg  = max(0, atk * mult - def)
@@ -169,7 +168,7 @@ attack(state, a, slot):
       emit AttackHit{a, slot, kind, mult, dmg}
       triggers: on_hit(a), on_damage_taken(d, source=Attack)
   else:
-      players[a].combo = 0                                              # R-ATK-05
+      combo = 0                                                         # R-ATK-05
       emit AttackBlocked{a, slot, kind}
       triggers: on_blocked(d)
 ```
@@ -242,13 +241,14 @@ Wyzwalacze: `OnRound` (faza czarów, R-CZA-02), `BeforeAttack`, `OnHit`, `OnBloc
 
 ### 6.5. Zdarzenia
 
-Każda zmiana stanu emituje zdarzenie z polem widoczności. Zdarzenia są jedynym materiałem dla animacji klienta i dla zapisu powtórki „do wyświetlenia”.
+Każda zmiana stanu emituje zdarzenie. Zdarzenia są jedynym materiałem dla animacji klienta i dla zapisu powtórki „do wyświetlenia”. Silnik zapisuje w nich pełne dane; to, co widzi każdy gracz (kolumna „Widoczność”), wybiera warstwa widoków (faza F5) i protokół (faza F7).
 
 | Zdarzenie | Pola | Widoczność |
 |---|---|---|
 | `RoundStarted` | runda, K obu stron | publiczne |
-| `MovesRevealed` | ustawienia obu stron, akcje kart | publiczne |
-| `SpellCast` / `SpellCountered` / `SpellFizzled` | strona, karta, koszty | publiczne |
+| `MovesRevealed` | ustawienia obu stron, akcje kart, K pobrana za zmiany | publiczne |
+| `SpellCast` / `SpellCountered` | strona, karta, koszty | publiczne |
+| `SpellFizzled` | strona, karta (czar przepada bez kosztów, Z-SPW) | publiczne |
 | `CardDiscarded` | strona, karta | publiczne |
 | `StatChanged` | strona, statystyka, stara → nowa, źródło | publiczne |
 | `EnchantmentAdded` / `EnchantmentRemoved` | strona, karta | publiczne |

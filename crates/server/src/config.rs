@@ -4,6 +4,7 @@ use std::net::SocketAddr;
 use std::num::NonZeroUsize;
 
 use anyhow::{Context as _, bail};
+use tracing::level_filters::LevelFilter;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LogFormat {
@@ -52,6 +53,7 @@ impl Config {
             .with_context(|| format!("invalid LISTEN_ADDR: {listen_addr}"))?;
 
         let log_level = var("LOG_LEVEL").unwrap_or_else(|| "info".to_owned());
+        check_log_level(&log_level)?;
 
         let log_format = match var("LOG_FORMAT").as_deref() {
             None | Some("json") => LogFormat::Json,
@@ -67,6 +69,21 @@ impl Config {
             log_format,
         })
     }
+}
+
+/// Element bez `=` i `[` musi być poziomem logów. `EnvFilter` uznałby inne słowo (np. literówkę
+/// `warning` albo ` warn` ze spacją po przecinku) za nazwę modułu i bez żadnego błędu wyłączyłby
+/// wszystkie pozostałe logi.
+fn check_log_level(value: &str) -> anyhow::Result<()> {
+    for directive in value.split(',').filter(|directive| !directive.is_empty()) {
+        if !directive.contains(['=', '[']) && directive.parse::<LevelFilter>().is_err() {
+            bail!(
+                "invalid LOG_LEVEL: {directive:?} is not a log level \
+                 (use error, warn, info, debug, trace or off, and target=level for a module)"
+            );
+        }
+    }
+    Ok(())
 }
 
 /// Domyślnie dwa połączenia na rdzeń procesora.
@@ -132,5 +149,21 @@ mod tests {
         assert!(config(&[DB, ("DB_POOL_SIZE", "many")]).is_err());
         assert!(config(&[DB, ("LISTEN_ADDR", "localhost")]).is_err());
         assert!(config(&[DB, ("LOG_FORMAT", "xml")]).is_err());
+    }
+
+    #[test]
+    fn log_level_typos_are_rejected() {
+        for typo in ["warning", "inf", "info,warning", "info, warn"] {
+            assert!(config(&[DB, ("LOG_LEVEL", typo)]).is_err(), "{typo}");
+        }
+        for valid in [
+            "WARN",
+            "off",
+            "info,",
+            "info,sqlx=warn",
+            "server[duel]=debug",
+        ] {
+            assert!(config(&[DB, ("LOG_LEVEL", valid)]).is_ok(), "{valid}");
+        }
     }
 }

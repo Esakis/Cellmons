@@ -53,13 +53,17 @@ function Wait-HttpOk([string] $Url, [int] $TimeoutSeconds) {
     return $null
 }
 
-# Odczytuje wartość z pliku .env w katalogu głównym repozytorium.
+# Odczytuje wartość z pliku .env w katalogu głównym repozytorium tak jak serwer (dotenvy): wartość
+# w cudzysłowach albo apostrofach, a bez nich do pierwszej spacji, po której może być tylko
+# komentarz (#). Pusta wartość oznacza wartość domyślną.
 function Get-DotEnvValue([string] $Name, [string] $Default) {
     $file = Join-Path $RepoRoot '.env'
+    $pattern = '^\s*' + [regex]::Escape($Name) + '\s*=\s*(?:"([^"]*)"|''([^'']*)''|(\S*))'
     if (Test-Path $file) {
         foreach ($line in Get-Content -Encoding UTF8 $file) {
-            if ($line -match "^\s*$Name\s*=\s*(.*?)\s*$" -and $Matches[1]) {
-                return $Matches[1].Trim('"')
+            if ($line -match $pattern) {
+                $value = "$($Matches[1])$($Matches[2])$($Matches[3])"
+                if ($value) { return $value }
             }
         }
     }

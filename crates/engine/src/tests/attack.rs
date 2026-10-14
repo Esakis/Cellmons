@@ -125,6 +125,21 @@ fn r_atk_04_hits_build_a_combo_and_deal_multiplied_damage() {
 }
 
 #[test]
+fn r_atk_04_combo_multipliers_come_from_the_rules() {
+    let content = content(&[]);
+    let mut rules = classic_rules();
+    rules.duel.combo_multipliers = [1, 3, 9];
+    let mut state = Scenario::new(A, B).rules(rules).build();
+    let (_, events) = play(
+        &mut state,
+        &content,
+        [mv("FFF", "MMM", NO_CARD), mv("MMM", "MMM", NO_CARD)],
+    );
+    // Obrażenia: AF 6 × mnożnik − OF 2.
+    assert_eq!(hits(&events, Side::A), [(1, 4, 6), (3, 16, 6), (9, 52, 6)]);
+}
+
+#[test]
 fn r_atk_04_zero_damage_hit_still_costs_stamina_and_counts() {
     let content = content(&[]);
     let weak = stats(1, 1, 0, 2, 100, 50);

@@ -84,6 +84,10 @@ impl EventBuf {
     pub(crate) fn push(&mut self, event: Event) {
         self.events.push(event);
     }
+
+    pub(crate) fn truncate(&mut self, len: usize) {
+        self.events.truncate(len);
+    }
 }
 
 impl Default for EventBuf {

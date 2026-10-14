@@ -31,7 +31,6 @@ pub struct PlayerState {
     pub(crate) deck: ArrayVec<CardId, MAX_DECK_SIZE>,
     pub(crate) discard: ArrayVec<CardId, MAX_DECK_SIZE>,
     pub(crate) used_interventions: ArrayVec<CardId, { MAX_ROUNDS as usize }>,
-    pub(crate) combo: u8,
 }
 
 impl PlayerState {
@@ -103,12 +102,6 @@ impl PlayerState {
     pub fn used_interventions(&self) -> &[CardId] {
         &self.used_interventions
     }
-
-    /// Seria trafień w bieżącej rundzie (R-ATK-04).
-    #[must_use]
-    pub const fn combo(&self) -> u8 {
-        self.combo
-    }
 }
 
 /// Stan pojedynku.
@@ -127,7 +120,8 @@ impl DuelState {
         &self.rules
     }
 
-    /// Bieżąca runda, od 1; po zakończeniu pojedynku ostatnia rozegrana.
+    /// Bieżąca runda, od 1. Po zakończeniu pojedynku: runda, w której się zakończył; przy
+    /// ucieczce, rozłączeniu i walkowerze (`end_by`) to runda, na którą czekano na ruchy.
     #[must_use]
     pub const fn round(&self) -> u8 {
         self.round

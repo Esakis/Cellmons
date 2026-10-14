@@ -169,7 +169,6 @@ impl Encoder {
             deck,
             discard,
             used_interventions,
-            combo,
         } = player;
         let Stats {
             phys_atk,
@@ -193,6 +192,5 @@ impl Encoder {
         self.cards(deck);
         self.cards(discard);
         self.cards(used_interventions);
-        self.u8(*combo);
     }
 }

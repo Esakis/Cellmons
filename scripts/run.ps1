@@ -80,7 +80,16 @@ if (Wait-HttpOk "$serverUrl/healthz" 1) {
     # Budowanie w tym oknie, żeby błędy kompilacji były od razu widoczne.
     cargo build -p server
     if ($LASTEXITCODE -ne 0) { Exit-WithError 'Budowanie serwera nie powiodło się. Szczegóły są wyżej.' }
-    Start-ServiceWindow 'Spellgambit: serwer gry' '& .\target\debug\server.exe'
+    # Działa kopia programu: Windows blokuje plik uruchomionego programu, a check.bat buduje
+    # serwer w target\debug także wtedy, gdy ten serwer działa.
+    $runDir = Join-Path $RepoRoot 'target\run'
+    try {
+        New-Item -ItemType Directory -Force -Path $runDir -ErrorAction Stop | Out-Null
+        Copy-Item -Force -Path (Join-Path $RepoRoot 'target\debug\server.exe') -Destination $runDir -ErrorAction Stop
+    } catch {
+        Exit-WithError "Nie można skopiować serwera do $runDir ($($_.Exception.Message)). Zamknij okno 'Spellgambit: serwer gry' i spróbuj ponownie."
+    }
+    Start-ServiceWindow 'Spellgambit: serwer gry' '& .\target\run\server.exe'
     if (-not (Wait-HttpOk "$serverUrl/healthz" 30)) {
         Exit-WithError "Serwer nie odpowiada na $serverUrl/healthz. Sprawdź okno 'Spellgambit: serwer gry'."
     }

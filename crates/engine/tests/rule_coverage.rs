@@ -9,7 +9,7 @@ use std::path::Path;
 const FAMILIES: &[&str] = &["R-POJ-", "R-RUN-", "R-ATK-", "R-KON-"];
 
 /// Reguły spoza tych rodzin, które silnik też sprawdza.
-const EXTRA: &[&str] = &["R-TAL-01", "R-TAL-02", "R-TAL-05"];
+const EXTRA: &[&str] = &["R-TAL-01", "R-TAL-02", "R-TAL-05", "R-CZA-03"];
 
 /// Reguły z tych rodzin realizowane później albo poza silnikiem.
 const DEFERRED: &[(&str, &str)] = &[

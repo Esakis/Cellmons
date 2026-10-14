@@ -23,6 +23,9 @@ dist/
 *.p12
 *.pem
 
+# Lokalne ustawienia Claude Code (każda osoba ma własne)
+.claude/settings.local.json
+
 # Edytory i system
 .idea/
 .vscode/*

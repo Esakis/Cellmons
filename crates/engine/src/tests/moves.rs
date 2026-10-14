@@ -96,25 +96,28 @@ fn r_run_06_schools_must_meet_the_card_requirements() {
 }
 
 #[test]
-fn r_run_06_intervention_can_be_cast_once_per_duel() {
+fn r_cza_03_intervention_can_be_cast_once_per_duel_by_each_player() {
     let cards = [intervention(1), intervention(2)];
     let content = content(&cards);
     let mut state = Scenario::new(A, B)
         .hand(Side::A, &[1, 1, 2])
         .hand(Side::B, &[1])
         .build();
-    // Ta sama interwencja u przeciwnika nie jest zablokowana: limit dotyczy gracza.
+    // Runda 1: interwencję 1 rzuca tylko A.
     play(
         &mut state,
         &content,
-        [mv("FFF", "MMM", Cast(0)), mv("MMM", "FFF", Cast(0))],
+        [mv("FFF", "MMM", Cast(0)), mv("MMM", "FFF", NO_CARD)],
     );
     assert_eq!(state.player(Side::A).used_interventions(), [1]);
 
     // Ręka A: [1, 2]. Druga kopia karty 1 jest zablokowana, inna interwencja nie (Z-INT).
-    let check = |card| validate_move(&state, &content, Side::A, &mv("FFF", "MMM", card));
-    assert_eq!(check(Cast(0)), Err(MoveError::InterventionUsed));
-    assert!(check(Cast(1)).is_ok());
+    let a = |card| validate_move(&state, &content, Side::A, &mv("FFF", "MMM", card));
+    assert_eq!(a(Cast(0)), Err(MoveError::InterventionUsed));
+    assert!(a(Cast(1)).is_ok());
+    // Limit dotyczy gracza: B nadal może rzucić tę samą interwencję.
+    let b = validate_move(&state, &content, Side::B, &mv("MMM", "FFF", Cast(0)));
+    assert!(b.is_ok());
 }
 
 #[test]

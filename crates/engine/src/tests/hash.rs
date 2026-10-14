@@ -57,7 +57,7 @@ fn every_part_of_the_state_changes_the_hash() {
 /// zapisanych pojedynkach (`docs/06-silnik-gry.md`, rozdz. 9).
 #[test]
 fn state_hash_is_pinned() {
-    assert_eq!(state_hash(&scenario().build()), 0x5c57_9d81_d08c_1217);
+    assert_eq!(state_hash(&scenario().build()), 0x0ef4_b5a6_fba5_9646);
 }
 
 #[test]

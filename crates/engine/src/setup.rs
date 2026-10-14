@@ -139,7 +139,6 @@ fn new_player(
         deck,
         discard: ArrayVec::new(),
         used_interventions: ArrayVec::new(),
-        combo: 0,
     }
 }
 

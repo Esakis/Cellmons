@@ -116,8 +116,22 @@ impl fmt::Display for ReplayError {
 
 impl std::error::Error for ReplayError {}
 
-/// Odtwarza pojedynek z zapisu; zdarzenia trafiają do `events`.
+/// Odtwarza pojedynek z zapisu; zdarzenia trafiają do `events`. Przy błędzie bufor wraca do stanu
+/// sprzed wywołania.
 pub fn replay(
+    record: &ReplayRecord,
+    content: &Content<'_>,
+    events: &mut EventBuf,
+) -> Result<DuelState, ReplayError> {
+    let start = events.len();
+    let result = replay_into(record, content, events);
+    if result.is_err() {
+        events.truncate(start);
+    }
+    result
+}
+
+fn replay_into(
     record: &ReplayRecord,
     content: &Content<'_>,
     events: &mut EventBuf,

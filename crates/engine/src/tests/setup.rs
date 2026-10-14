@@ -77,7 +77,6 @@ fn r_poj_02_players_start_with_full_hp_and_stamina_and_no_focus() {
         assert_eq!(player.hp_start(), stats.hp_max);
         assert_eq!(player.stamina(), stats.stamina_max);
         assert_eq!(player.focus(), 0);
-        assert_eq!(player.combo(), 0);
         assert!(player.discard().is_empty());
         assert!(player.used_interventions().is_empty());
     }

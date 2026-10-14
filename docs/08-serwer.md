@@ -215,7 +215,7 @@ Każda operacja administracyjna trafia do `audit_log` (kto, co, kiedy, przed i p
 | `RUN_MIGRATIONS` | migracje przy starcie | `false` w produkcji |
 | `FEATURES` | flagi funkcji, np. `trading,tournaments` | wszystkie włączone |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | eksport śladów | puste (wyłączone) |
-| `LOG_LEVEL` | poziom logów | `info` |
+| `LOG_LEVEL` | poziom logów (`error`, `warn`, `info`, `debug`, `trace`, `off`), opcjonalnie z poziomami modułów, np. `info,sqlx=warn`; nieznane słowo albo spacja po przecinku zatrzymują start z błędem | `info` |
 | `LOG_FORMAT` | format logów: `json` (produkcja) albo `text` (czytelny przy pracy lokalnej) | `json` |
 | `ADMIN_IP_ALLOWLIST` | adresy z dostępem do panelu | puste (brak dostępu) |
 
