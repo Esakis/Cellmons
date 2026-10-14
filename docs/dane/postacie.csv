@@ -1,0 +1,32 @@
+id_2010,nazwa_pl,nazwa_en,kategoria_klasyczna,postac_startowa_szkoly,szkoly_poziom_1,atak_fiz,obrona_fiz,atak_mag,obrona_mag,zycie,wytrzymalosc
+3,Czarodziej,Wizard,pospolita,magia,magia:1,2,0,3,3,30,45
+20,Doc,Doc,pospolita,technologia,technologia:1,3,1,3,2,30,40
+4,Draco,Draco,pospolita,elementalizm,elementalizm:1,3,0,4,2,35,30
+61,Elektrykus,Electricus,pospolita,,elementalizm:1 technologia:1,3,0,3,2,30,40
+6,Gorylla,Gorilla,pospolita,,walka:1,4,1,3,1,40,25
+8,Lady Kruk,Lady Raven,pospolita,nekromancja,nekromancja:1,3,0,4,2,30,40
+5,Mnich,Monk,pospolita,kaplanstwo,kaplanstwo:1,3,2,3,2,30,40
+12,Nomad,Nomad,pospolita,walka,walka:1,4,3,3,0,30,30
+13,Pani Jeziora,Lady Lake,pospolita,,kaplanstwo:1 elementalizm:1,3,1,4,1,30,40
+15,Skorpia,Scorpia,pospolita,,nekromancja:1,3,1,3,2,30,35
+1,Blob,Blob,niepospolita,,elementalizm:1,2,4,2,3,30,30
+19,Masakrator,Massacrator,niepospolita,,walka:1,6,0,3,0,45,25
+14,Ripper,Ripper,niepospolita,,walka:1,5,0,4,0,40,30
+16,Sokrates,Socrates,niepospolita,,walka:1 elementalizm:1,4,2,2,1,40,30
+17,Spiddy,Spiddy,niepospolita,,walka:1,3,2,4,1,30,30
+2,Szkieletor,Skeletor,niepospolita,,walka:1,4,2,3,1,40,30
+18,Szpieg,Spy,niepospolita,,magia:1 walka:1,6,0,3,0,30,30
+64,Alchemik,Alchemist,rzadka,,magia:1 technologia:1,3,0,3,2,30,45
+7,Hiena,Hyena,rzadka,,magia:1 nekromancja:1,3,1,3,2,30,35
+9,Lambert,Lambert,rzadka,,walka:1 kaplanstwo:1,5,1,2,2,35,30
+10,Magus,Magus,rzadka,,magia:2,2,0,4,1,25,45
+11,Mandaryn,Mandarin,rzadka,,magia:1 walka:1,5,0,3,3,25,25
+91,Dżin,Djinn,wysypisko,,walka:1,5,0,3,0,25,25
+85,Hum,Hum,wysypisko,,technologia:1,5,1,4,1,25,25
+88,Pustelnik,Hermit,wysypisko,,elementalizm:1,3,3,3,3,25,25
+69,Cień Czasu,Shade: Time,cien,,magia:1,2,2,2,2,35,40
+71,Cień Geniuszu,Shade: Genius,cien,,technologia:1,2,2,2,2,35,40
+68,Cień Prawdy,Shade: Truth,cien,,kaplanstwo:1,2,2,2,2,35,40
+70,Cień Smierci,Shade: Death,cien,,nekromancja:1,2,2,2,2,35,40
+67,Cień Wojny,Shade: War,cien,,walka:1,2,2,2,2,35,40
+72,Cień Żywiołów,Shade: Elements,cien,,elementalizm:1,2,2,2,2,35,40

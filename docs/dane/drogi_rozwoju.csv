@@ -1,0 +1,63 @@
+postac,grupa,droga,specjalizacje,dary
+Hum,wysypisko,Droga Krwi,Esencja lub Koncentracja,Wzmocnienie Technologii lub Optymalizacja Kapłaństwa
+Hum,wysypisko,Droga Stali,Esencja lub Koncentracja,Plugawa Wymiana lub Inhibitor Agresji
+Pustelnik,wysypisko,Droga Puszczy,Esencja lub Koncentracja,Laska Arcymaga lub Energia Natury
+Pustelnik,wysypisko,Droga Szczytu,Esencja lub Koncentracja,Katalizator Agresji lub Pole Esencji
+Dżin,wysypisko,Droga Woli,Esencja lub Koncentracja,Elixir Życia lub Rykoszet
+Dżin,wysypisko,Droga Ciała,Esencja lub Koncentracja,Żywioł lub Ostrożny Taktyk
+Cień Czasu,cien,Droga Obłędu,Esencja lub Koncentracja,Laska Arcymaga lub Aura Czasu
+Cień Czasu,cien,Droga Perfekcji,Esencja lub Koncentracja,Laska Arcymaga lub Aura Czasu
+Cień Geniuszu,cien,Droga Obłędu,Esencja lub Koncentracja,Inhibitor Agresji lub Wzmacniacz Esencji III
+Cień Geniuszu,cien,Droga Perfekcji,Esencja lub Koncentracja,Inhibitor Agresji lub Wzmacniacz Esencji III
+Cień Prawdy,cien,Droga Obłędu,Esencja lub Koncentracja,Awatar lub Nieznane
+Cień Prawdy,cien,Droga Perfekcji,Esencja lub Koncentracja,Elixir Życia lub Awatar
+Cień Śmierci,cien,Droga Obłędu,Esencja lub Koncentracja,Aura Śmierci lub Wampiryzm
+Cień Śmierci,cien,Droga Perfekcji,Esencja lub Koncentracja,Aura Śmierci lub Wampiryzm
+Cień Wojny,cien,Droga Obłędu,Esencja lub Koncentracja,Ostrożny Taktyk lub Nieznane
+Cień Wojny,cien,Droga Perfekcji,Esencja lub Koncentracja,nieznane
+Cień Żywiołu,cien,Droga Obłędu,Esencja lub Koncentracja,Wilkołactwo lub Laska Druida
+Cień Żywiołu,cien,Droga Perfekcji,Esencja lub Koncentracja,Wilkołactwo lub Laska Druida
+Alchemik,zwykla,Droga Światła,Esencja lub Koncentracja,Wzmacniacz Esencji III lub Kamień Filozoficzny
+Alchemik,zwykla,Droga Mroku,Esencja lub Koncentracja,Wzmacniacz Esencji III lub Kamień Filozoficzny
+Blob,zwykla,Droga Energii,Elementalizm lub Koncentracja,Droga Miecza lub Regeneracja
+Blob,zwykla,Droga Wzrostu,Walka lub Koncentracja,Droga Miecza lub Ostrożny Taktyk
+Czarodziej,zwykla,Droga Natury,Elementalizm lub Magia,Regeneracja lub Laboratorium
+Czarodziej,zwykla,Droga Wiary,Kapłaństwo lub Magia,Błogosławieństwo lub Laboratorium
+Doc,zwykla,Droga Teologii,Kapłaństwo lub Technologia,Błogosławieństwo lub Lecznicza Aura
+Doc,zwykla,Droga Metafizyki,Magia lub Technologia,Laboratorium lub Temporalna Nicość
+Draco,zwykla,Droga Światła,Kapłaństwo lub Elementalizm,Błogosławieństwo lub Regeneracja
+Draco,zwykla,Droga Ciemności,Nekromancja lub Elementalizm,Przekleństwo lub Ognisty Deszcz
+Elektrykus,zwykla,Droga Energii,Elementalizm lub Technologia,Regeneracja lub Matryca Obrony III
+Elektrykus,zwykla,Droga Konstrukcji,Walka lub Technologia,Droga Miecza lub Matryca Ataku III
+Gorylla,zwykla,Droga Animacji,Nekromancja lub Walka,Przekleństwo lub Droga Miecza
+Gorylla,zwykla,Droga Życia,Elementalizm lub Walka,Regeneracja lub Wilkołak
+Hiena,zwykla,Droga Sztuki,Esencja lub Koncentracja,Wampiryzm lub Laska Arcymaga
+Hiena,zwykla,Droga Szponu,Esencja lub Koncentracja,Laska Mnicha lub Laska Arcymaga
+Lady Kruk,zwykla,Droga Przemiany,Elementalizm lub Nekromancja,Wilkołactwo lub Przekleństwo
+Lady Kruk,zwykla,Droga Wiedzy,Magia lub Nekromancja,Laboratorium lub Przekleństwo
+Lambert,zwykla,Droga Pychy,Nekromancja lub Walka,Wampiryzm lub Tancerz Miecza
+Lambert,zwykla,Droga Pokory,Kapłaństwo lub Walka,Awatar lub Tancerz Miecza
+Magus,zwykla,Droga Jasnej Strony,Esencja lub Koncentracja,Awatar lub Laska Arcymaga
+Magus,zwykla,Droga Ciemnej Strony,Esencja lub Koncentracja,Zaklęty Strach lub Laska Arcymaga
+Mandaryn,zwykla,Droga Chi,Esencja lub Koncentracja,Awatar lub Droga Esencji
+Mandaryn,zwykla,Droga Fu,Walka lub Koncentracja,Laska Mnicha lub Tancerz Miecza
+Masakrator,zwykla,Droga Przetwarzania,Technologia lub Walka,Matryca Ataku III lub Katalizator Agresji
+Masakrator,zwykla,Droga Pojemności,Koncentracja lub Walka,Droga Miecza lub Tancerz Miecza
+Mnich,zwykla,Droga Pokuty,Walka lub Kapłaństwo,Błogosławieństwo lub Lecznicza Aura
+Mnich,zwykla,Droga Broni,Walka lub Kapłaństwo,Błogosławieństwo lub Lecznicza Aura
+Nomad,zwykla,Droga Oazy,Elementalizm lub Walka,Regeneracja lub Tancerz Miecza
+Nomad,zwykla,Droga Pustyni,Elementalizm lub Walka,Pustynia lub Tancerz Miecza
+Pani Jeziora,zwykla,Droga Duszy,Kapłaństwo lub Elementalizm,Laska Arcykapłana lub Laska Druida
+Pani Jeziora,zwykla,Droga Czaru,Magia lub Elementalizm,Laska Arcymaga lub Laska Druida
+Ripper,zwykla,Droga Ostrza,Koncentracja lub Walka,Droga Miecza lub Tancerz Miecza
+Ripper,zwykla,Droga Rytuału,Nekromancja lub Walka,Mroczny Rytuał lub Tancerz Miecza
+Skorpia,zwykla,Droga Wody,Walka lub Nekromancja,Przekleństwo lub Zaklęty Strach
+Skorpia,zwykla,Droga Ognia,Elementalizm lub Nekromancja,Wilkołactwo lub Zaklęty Strach
+Sokrates,zwykla,Droga Zgody,Kapłaństwo lub Elementalizm,Błogosławieństwo lub Laska Druida
+Sokrates,zwykla,Droga Sporu,Walka lub Elementalizm,Droga Miecza lub Laska Druida
+Spiddy,zwykla,Droga Sieci,Magia lub Walka,Droga Miecza lub Tancerz Miecza
+Spiddy,zwykla,Droga Jadu,Elementalizm lub Walka,Wilkołactwo lub Regeneracja
+Szkieletor,zwykla,Droga Kości,Walka lub Nekromancja,Droga Miecza lub Zaklęty Strach
+Szkieletor,zwykla,Droga Stali,Walka lub Koncentracja,Tancerz Miecza lub Przekleństwo
+Szpieg,zwykla,Droga Płaszcza,Magia lub Walka,Laboratorium lub Tancerz Miecza
+Szpieg,zwykla,Droga Szpady,Koncentracja lub Walka,Droga Miecza lub Tancerz Miecza

@@ -1,0 +1,74 @@
+szkola,ilosc,karta
+kaplanstwo,4,altruizm
+kaplanstwo,4,duchowa tarcza
+kaplanstwo,4,duchowy miecz
+kaplanstwo,1,imadło prawdy
+kaplanstwo,4,kleryk
+kaplanstwo,3,modlitwa weterana
+kaplanstwo,4,ocalenie
+kaplanstwo,4,psalm
+kaplanstwo,4,rękawica prawdy
+kaplanstwo,4,uleczenie
+nekromancja,3,beznadzieja
+nekromancja,3,choroba
+nekromancja,1,mroczne ożywienie
+nekromancja,4,mroczny posłaniec
+nekromancja,4,nekromanta
+nekromancja,3,osłabienie
+nekromancja,3,podatność
+nekromancja,3,przeklęty hełm
+nekromancja,1,przeklęty pakt
+nekromancja,4,strach
+nekromancja,4,wir esencji
+nekromancja,3,zamroczenie
+nekromancja,4,zdradliwe ostrze
+walka,2,bójka
+walka,2,katana
+walka,4,miecz z brązu
+walka,4,napój leczący
+walka,4,naramiennik
+walka,2,nierozerwany bój
+walka,3,okrągła tarcza
+walka,2,pacyfizm
+walka,2,pancerzownica
+walka,4,stalowy miecz
+walka,4,szczęście nowicjusza
+walka,4,unik
+walka,2,wyprzedzający atak
+walka,1,zapadnia
+elementalizm,2,brutal
+elementalizm,2,burza piaskowa
+elementalizm,4,błotna kąpiel
+elementalizm,4,ciernie
+elementalizm,2,duszący gaz
+elementalizm,2,głód krwi
+elementalizm,4,kolec
+elementalizm,4,rozpaczliwy atak
+elementalizm,4,tarcza natury
+elementalizm,4,trucizna
+elementalizm,4,uderzenie pioruna
+elementalizm,4,wzmocnienie
+magia,3,antyczar
+magia,4,kapelusz maga
+magia,4,magiczny napój
+magia,4,mniejsze pole siłowe
+magia,3,niebezpieczny czar
+magia,3,projekcja bólu
+magia,4,prztyczek
+magia,4,umysł nad miecz
+magia,3,wzmocnienie
+magia,4,zatrute wino
+magia,4,zemsta ucznia
+technologia,3,krótkie spięcie
+technologia,1,matematyczny dylemat
+technologia,4,matryca ataku I
+technologia,4,matryca obrony I
+technologia,2,temporalna zmiana
+technologia,4,usprawnienie ataku
+technologia,4,usprawnienie obrony
+technologia,3,wzmocnienie elementalizmu
+technologia,3,wzmocnienie kapłaństwa
+technologia,3,wzmocnienie magii
+technologia,3,wzmocnienie nekromancji
+technologia,3,wzmocnienie technologii
+technologia,3,wzmocnienie walki

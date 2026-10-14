@@ -1,0 +1,339 @@
+postac,poziom,atak_fiz,obrona_fiz,atak_mag,obrona_mag,wytrzymalosc,zycie,punkty_rozwoju,szkoly
+lambert,1,5,1,2,2,30,35,0,kaplanstwo:1 walka:1
+lambert,2,0,0,+1,0,+3,+6,0,
+lambert,3,+1,0,0,0,+3,+3,0,
+lambert,4,0,+1,0,0,+3,+3,0,
+lambert,5,0,0,0,0,+3,+4,+1,kaplanstwo:1 walka:2
+lambert,6,0,0,+1,0,+3,+4,0,
+lambert,7,0,0,+1,0,+3,+4,0,
+lambert,8,0,+1,0,0,+3,+4,0,
+lambert,9,0,0,0,0,+2,+4,0,kaplanstwo:2 walka:2
+lambert,10,+1,0,0,0,+3,+4,+2,
+lambert,11,0,0,0,+1,+3,+4,0,
+lambert,12,+1,0,0,0,+3,+4,0,
+lambert,13,0,+1,0,0,+3,+4,0,
+lambert,14,0,+1,0,0,+3,+4,0,
+lambert,15,0,0,0,0,+3,+4,+1,kaplanstwo:2 walka:3
+lambert,16,+1,0,0,0,+4,+4,0,
+lambert,17,+1,0,0,+1,+4,+6,0,
+lambert,18,0,0,+1,0,+4,+4,0,
+lambert,19,+1,0,0,0,+4,+5,0,
+lambert,20,0,0,0,+1,+3,+5,+2,
+lambert,Suma,11,5,6,5,90,115,6,kaplanstwo:2 walka:3
+masakrator,1,6,0,3,0,25,45,0,walka:1
+masakrator,2,0,+1,0,0,+4,+5,0,
+masakrator,3,+1,0,0,0,+2,+5,0,
+masakrator,4,0,+1,0,0,+3,+5,0,
+masakrator,5,+1,0,0,0,+3,+5,+1,
+masakrator,6,0,0,0,+1,+3,+4,0,
+masakrator,7,+1,0,0,0,+3,+4,0,
+masakrator,8,0,0,0,0,+2,+3,0,
+masakrator,9,0,0,+1,0,+4,+6,0,
+masakrator,10,0,+1,0,0,+3,+4,+2,walka:2
+masakrator,11,0,0,0,+1,+3,+4,0,
+masakrator,12,+1,0,0,0,+3,+5,0,
+masakrator,13,0,0,0,+1,+3,+5,0,
+masakrator,14,0,+1,+1,0,+2,+5,0,
+masakrator,15,0,0,+1,0,+3,+5,+1,
+masakrator,16,+1,0,0,0,+3,+5,0,
+masakrator,17,+1,0,0,0,+3,+5,0,
+masakrator,18,0,0,+1,0,+3,+5,0,walka:3
+masakrator,19,0,+1,0,0,+3,+5,0,
+masakrator,20,+1,0,0,0,+2,+5,+2,
+masakrator,Suma,13,5,7,3,80,135,6,walka:3
+mnich,1,3,2,3,2,40,30,0,kaplanstwo:1
+mnich,2,0,0,+1,0,+2,+3,0,
+mnich,3,+1,0,0,0,+3,+3,0,
+mnich,4,0,0,0,+1,+3,+3,0,kaplanstwo:1 walka:1
+mnich,5,0,0,+1,0,+2,+1,+1,
+mnich,6,0,0,0,0,+5,+1,0,kaplanstwo:2 walka:1
+mnich,7,0,+1,0,0,+4,+4,0,
+mnich,8,0,0,+1,0,+3,+2,0,
+mnich,9,0,0,0,+1,+3,+4,0,
+mnich,10,+1,0,0,0,+3,+4,+2,
+mnich,11,0,0,0,0,+4,+3,0,kaplanstwo:2 walka:2
+mnich,12,0,0,+1,0,+7,+2,0,
+mnich,13,+1,0,0,0,+3,+5,0,
+mnich,14,+1,0,0,0,+5,+1,0,
+mnich,15,0,0,0,0,+3,+3,+1,kaplanstwo:3 walka:2
+mnich,16,0,+1,0,0,+3,+2,0,
+mnich,17,0,0,+1,0,+3,+4,0,
+mnich,18,+1,0,0,0,+2,+4,0,
+mnich,19,0,0,+1,0,+8,+8,0,
+mnich,20,0,+1,0,0,+3,+2,+2,
+mnich,Suma,8,5,9,4,109,89,6,kaplanstwo:3 walka:2
+ripper,1,5,0,4,0,30,40,0,walka:1
+ripper,2,1,0,0,0,+2,+4,0,
+ripper,3,0,0,+1,0,+3,+4,0,
+ripper,4,0,0,+1,0,+3,+4,0,
+ripper,5,+1,0,0,0,+3,+4,+1,
+ripper,6,0,0,0,0,+3,+4,0,walka:2
+ripper,7,+1,0,0,0,+3,+4,0,
+ripper,8,0,0,0,0,+4,+4,0,
+ripper,9,+1,0,0,0,+2,+4,0,
+ripper,10,0,0,0,0,+3,+4,+2,nekromancja:1 walka:2
+ripper,11,0,0,+1,0,+4,+6,0,
+ripper,12,+1,0,0,0,+4,+4,0,
+ripper,13,0,0,0,0,+4,+4,0,nekromancja:1 walka:3
+ripper,14,0,0,+1,0,+4,+4,0,
+ripper,15,0,0,+1,0,+4,+4,+1,
+ripper,16,+1,0,0,0,+6,+4,0,
+ripper,17,+1,0,0,0,+4,+4,0,
+ripper,18,0,0,0,0,+4,+4,0,nekromancja:2 walka:3
+ripper,19,+1,0,0,0,+5,+5,0,
+ripper,20,0,0,+1,0,+5,+5,+2,
+ripper,Suma,13,0,10,0,100,120,6,nekromancja:2 walka:3
+szkieletor,1,4,2,3,1,30,40,0,walka:1
+szkieletor,2,+1,0,0,0,+3,+4,0,
+szkieletor,3,0,0,0,0,+3,+4,0,nekromancja:1 walka:1
+szkieletor,4,0,0,+1,0,+3,+4,0,
+szkieletor,5,0,0,0,0,+3,+4,+1,nekromancja:1 walka:2
+szkieletor,6,0,0,0,0,+3,+4,0,
+szkieletor,7,+1,0,0,0,+3,+4,0,
+szkieletor,8,0,0,0,+1,+3,+4,0,
+szkieletor,9,+1,0,0,0,+2,+4,0,
+szkieletor,10,0,0,+1,0,+3,+4,+2,
+szkieletor,11,0,+1,0,0,+1,+6,0,
+szkieletor,12,0,0,0,0,+5,+4,0,nekromancja:2 walka:2
+szkieletor,13,+1,0,0,+1,+3,+4,0,
+szkieletor,14,+1,0,0,0,+3,+4,0,
+szkieletor,15,0,0,+1,0,+3,+4,+1,
+szkieletor,16,0,0,0,0,+4,+4,0,nekromancja:2 walka:3
+szkieletor,17,+1,0,0,0,+4,+4,0,
+szkieletor,18,0,+1,0,0,+4,+4,0,
+szkieletor,19,0,0,+1,0,+4,+5,0,
+szkieletor,20,0,+1,0,+1,+3,+5,+2,
+szkieletor,Suma,10,5,7,4,90,120,6,nekromancja:2 walka:3
+dżin,1,5,0,3,0,25,25,0,walka:1
+dżin,2,0,+1,0,0,+4,+4,+1,
+dżin,3,+1,0,0,0,+2,+2,0,
+dżin,4,0,+1,0,0,+3,+3,+1,
+dżin,5,+1,0,0,0,+3,+3,0,walka:2
+dżin,6,0,0,0,+1,+3,+3,+1,elementalizm:1 walka:2
+dżin,7,+1,0,0,0,+3,+3,0,
+dżin,8,0,0,0,0,+2,+2,+1,
+dżin,9,0,0,+1,0,+4,+4,0,
+dżin,10,0,+1,0,0,+3,+3,+1,elementalizm:1 kaplanstwo:1 walka:2
+dżin,11,0,0,0,+1,+3,+3,0,
+dżin,12,+1,0,0,0,+3,+3,+1,
+dżin,13,0,0,0,+1,+3,+3,0,elementalizm:2 kaplanstwo:1 walka:2
+dżin,14,+1,+1,0,0,+3,+3,+1,elementalizm:2 kaplanstwo:1 walka:3
+dżin,15,0,0,+1,0,+3,+3,0,
+dżin,16,+1,0,0,0,+2,+2,+1,elementalizm:2 kaplanstwo:2 walka:3
+dżin,17,+1,0,0,0,+3,+3,0,
+dżin,18,0,0,+1,0,+3,+3,+1,
+dżin,19,0,+1,0,0,+3,+3,0,
+dżin,20,+1,0,0,0,+2,+2,+1,
+dżin,Suma,13,5,6,3,80,80,10,elementalizm:2 kaplanstwo:2 walka:3
+gorylla droga życia,1,4,1,3,2,30,40,0,elementalizm:1 walka:1
+gorylla droga życia,2,0,0,+1,0,+3,+5,0,
+gorylla droga życia,3,0,+1,0,0,+3,+5,0,
+gorylla droga życia,4,+1,0,0,0,+3,+5,0,
+gorylla droga życia,5,0,0,0,0,+1,+5,+1,elementalizm:2 walka:1
+gorylla droga życia,6,0,+1,0,0,+1,+5,0,
+gorylla droga życia,7,0,0,0,0,+4,+5,0,elementalizm:2 walka:2
+gorylla droga życia,8,0,0,0,+1,+2,+5,0,
+gorylla droga życia,9,+1,0,0,0,+4,+3,0,
+gorylla droga życia,10,+1,0,0,0,+4,+4,+2,
+gorylla droga życia,11,0,0,+1,0,+3,+4,0,
+gorylla droga życia,12,0,0,0,+1,+2,+4,0,
+gorylla droga życia,13,+1,0,0,0,+5,+5,0,
+gorylla droga życia,14,+1,0,+1,0,+5,+5,0,
+gorylla droga życia,15,0,0,0,0,+3,+5,+1,elementalizm:3 walka:2
+gorylla droga życia,16,0,0,+1,0,+3,+5,0,
+gorylla droga życia,17,+1,0,0,0,+4,+5,0,elementalizm:3 walka:3
+gorylla droga życia,18,0,+1,0,0,+3,+5,0,
+gorylla droga życia,19,0,0,+1,0,+4,+5,0,
+gorylla droga życia,20,+1,0,0,0,+3,+5,+2,
+gorylla droga życia,Suma,11,4,8,4,90,130,6,elementalizm:3 walka:3
+hiena droga sztuki,1,3,1,4,2,40,30,0,magia:1 nekromancja:1
+hiena droga sztuki,2,0,0,+1,0,+4,+3,0,
+hiena droga sztuki,3,+1,0,0,0,+4,+3,0,
+hiena droga sztuki,4,0,0,0,+1,+4,+3,0,
+hiena droga sztuki,5,0,0,0,0,+4,+1,+1,magia:1 nekromancja:2
+hiena droga sztuki,6,0,0,+1,0,+4,+1,0,
+hiena droga sztuki,7,0,+1,0,+1,+4,+4,0,
+hiena droga sztuki,8,0,0,+1,0,+4,+2,0,
+hiena droga sztuki,9,0,0,0,0,+4,+4,0,magia:2 nekromancja:2
+hiena droga sztuki,10,+1,0,0,0,+4,+4,+2,
+hiena droga sztuki,11,0,0,+1,0,+6,+3,0,magia:2 nekromancja:2 walka:1
+hiena droga sztuki,12,0,0,+1,0,+4,+2,0,
+hiena droga sztuki,13,+1,0,0,0,+4,+5,0,
+hiena droga sztuki,14,0,+1,0,0,+4,+1,0,magia:2 nekromancja:3 walka:1
+hiena droga sztuki,15,+1,0,0,0,+4,+3,+1,
+hiena droga sztuki,16,0,0,0,+1,+4,+2,0,magia:2 nekromancja:3 walka:2
+hiena droga sztuki,17,0,0,+1,0,+4,+4,0,
+hiena droga sztuki,18,0,0,0,0,+4,+4,0,magia:3 nekromancja:3 walka:2
+hiena droga sztuki,19,0,0,+1,0,+5,+8,0,
+hiena droga sztuki,20,0,0,0,+1,+5,+3,+2,
+hiena droga sztuki,Suma,7,3,11,6,120,90,6,magia:3 nekromancja:3 walka:2
+lambert droga pychy,1,4,1,3,2,35,35,0,nekromancja:1 walka:1
+lambert droga pychy,2,0,0,+1,0,+4,+6,0,
+lambert droga pychy,3,+1,0,0,0,+4,+3,0,
+lambert droga pychy,4,0,+1,0,0,+4,+3,0,
+lambert droga pychy,5,0,0,0,0,+4,+4,+1,nekromancja:1 walka:2
+lambert droga pychy,6,0,0,+1,0,+4,+4,0,
+lambert droga pychy,7,0,0,0,0,+4,+4,0,nekromancja:2 walka:2
+lambert droga pychy,8,0,+1,0,0,+2,+4,0,
+lambert droga pychy,9,0,0,+1,0,+5,+4,0,
+lambert droga pychy,10,+1,0,0,+1,+3,+4,+2,
+lambert droga pychy,11,0,0,+1,0,+4,+4,0,
+lambert droga pychy,12,+1,0,0,0,+4,+4,0,
+lambert droga pychy,13,0,0,0,0,+4,+4,0,nekromancja:3 walka:2
+lambert droga pychy,14,0,+1,0,0,+4,+4,0,
+lambert droga pychy,15,0,+1,0,0,+3,+4,+1,nekromancja:3 walka:3
+lambert droga pychy,16,+1,0,0,0,+3,+4,0,
+lambert droga pychy,17,+1,0,0,+1,+4,+6,0,
+lambert droga pychy,18,0,0,+1,0,+4,+4,0,
+lambert droga pychy,19,+1,0,0,0,+4,+5,0,
+lambert droga pychy,20,0,0,0,+1,+3,+5,+2,
+lambert droga pychy,Suma,10,5,8,5,115,115,6,nekromancja:3 walka:3
+magus droga ciemnej strony,1,2,0,4,1,50,25,0,elementalizm:1 magia:2
+magus droga ciemnej strony,2,0,0,+1,0,+5,+3,0,
+magus droga ciemnej strony,3,0,+1,0,0,+5,+3,0,
+magus droga ciemnej strony,4,0,0,0,+1,+5,+3,0,
+magus droga ciemnej strony,5,0,0,0,0,+5,+3,+1,elementalizm:1 magia:3
+magus droga ciemnej strony,6,0,0,+1,0,+5,+3,0,elementalizm:1 magia:3 nekromancja:1
+magus droga ciemnej strony,7,+1,0,0,0,+3,+3,0,
+magus droga ciemnej strony,8,0,0,+1,0,+4,+3,0,
+magus droga ciemnej strony,9,0,0,0,+1,+4,+3,0,
+magus droga ciemnej strony,10,0,0,+1,0,+4,+3,+2,
+magus droga ciemnej strony,11,+1,0,0,0,+5,+3,0,
+magus droga ciemnej strony,12,0,0,0,+1,+5,+3,0,elementalizm:2 magia:3 nekromancja:1
+magus droga ciemnej strony,13,0,+1,0,0,+5,+3,0,
+magus droga ciemnej strony,14,0,0,0,0,+5,+3,0,elementalizm:2 magia:3 nekromancja:2
+magus droga ciemnej strony,15,0,0,0,+1,+5,+3,+1,
+magus droga ciemnej strony,16,0,0,+1,+1,+5,+3,0,
+magus droga ciemnej strony,17,0,0,0,0,+5,+3,0,elementalizm:3 magia:3 nekromancja:2
+magus droga ciemnej strony,18,0,0,+1,0,+5,+2,0,
+magus droga ciemnej strony,19,0,0,0,0,+5,+2,0,elementalizm:3 magia:3 nekromancja:3
+magus droga ciemnej strony,20,+1,0,0,0,+5,+3,+2,
+magus droga ciemnej strony,Suma,5,2,10,6,140,80,6,elementalizm:3 magia:3 nekromancja:3
+mandaryn droga fu,1,6,1,3,3,25,25,0,magia:1 walka:1
+mandaryn droga fu,2,0,0,0,0,+4,+5,0,magia:1 walka:2
+mandaryn droga fu,3,+1,0,0,0,+4,+5,0,
+mandaryn droga fu,4,0,+1,0,0,+4,+5,0,
+mandaryn droga fu,5,0,+1,0,0,+4,+5,+1,
+mandaryn droga fu,6,+1,0,0,0,+4,+5,0,
+mandaryn droga fu,7,0,0,+1,0,+4,+5,0,
+mandaryn droga fu,8,0,+1,0,0,+4,+5,0,
+mandaryn droga fu,9,0,0,0,+1,+4,+5,0,
+mandaryn droga fu,10,0,0,0,0,+4,+5,+2,magia:2 walka:2
+mandaryn droga fu,11,0,0,+1,0,+4,+5,0,
+mandaryn droga fu,12,0,0,0,+1,+4,+5,0,
+mandaryn droga fu,13,0,0,0,0,+4,+5,0,magia:2 walka:3
+mandaryn droga fu,14,+1,0,0,0,+4,+5,0,
+mandaryn droga fu,15,0,+1,0,0,+4,+5,+1,
+mandaryn droga fu,16,+1,0,0,0,+4,+5,0,
+mandaryn droga fu,17,0,0,0,+1,+4,+5,0,
+mandaryn droga fu,18,0,0,+1,0,+6,+5,0,
+mandaryn droga fu,19,0,0,0,0,+5,+5,0,magia:3 walka:3
+mandaryn droga fu,20,0,0,0,+1,+5,+5,+2,
+mandaryn droga fu,Suma,10,5,6,7,105,120,6,magia:3 walka:3
+elektrykus,1,3,0,3,2,40,30,0,elementalizm:1 technologia:1
+elektrykus,2,0,0,0,0,+4,+3,0,
+mnich droga broni,1,4,2,3,2,35,35,0,kaplanstwo:1 walka:1
+mnich droga broni,2,0,0,+1,0,+4,+4,0,
+mnich droga broni,3,+1,0,0,0,+4,+4,0,
+mnich droga broni,4,0,0,0,+1,+4,+4,0,
+mnich droga broni,5,0,0,+1,0,+4,+4,+1,
+mnich droga broni,6,0,0,0,0,+4,+4,0,kaplanstwo:2 walka:1
+mnich droga broni,7,0,+1,0,+1,+3,+3,0,
+mnich droga broni,8,0,0,+1,0,+2,+2,0,
+mnich droga broni,9,0,0,0,0,+5,+5,0,kaplanstwo:2 walka:2
+mnich droga broni,10,+1,0,0,0,+3,+1,+2,
+mnich droga broni,11,+1,0,0,0,+3,+3,0,
+mnich droga broni,12,0,0,+1,0,+3,+2,0,
+mnich droga broni,13,+1,0,0,0,+5,+4,0,
+mnich droga broni,14,0,+1,0,0,+5,+4,0,
+mnich droga broni,15,0,0,0,0,+3,+8,+1,kaplanstwo:3 walka:2
+mnich droga broni,16,0,+1,0,0,+3,+3,0,
+mnich droga broni,17,0,0,+1,0,+4,+4,0,
+mnich droga broni,18,0,+1,0,0,+4,+4,0,kaplanstwo:3 walka:3
+mnich droga broni,19,0,0,+1,0,+4,+4,0,
+mnich droga broni,20,+1,0,0,0,+3,+3,+2,
+mnich droga broni,Suma,9,6,9,4,105,105,6,kaplanstwo:3 walka:3
+pustelnik droga puszczy,1,3,4,3,4,30,30,0,elementalizm:1 magia:1
+pustelnik droga puszczy,2,0,0,+1,0,+3,+3,+1,
+pustelnik droga puszczy,3,0,0,0,+1,+3,+3,0,
+pustelnik droga puszczy,4,+1,0,0,0,+3,+3,+1,
+pustelnik droga puszczy,5,0,+1,0,0,+1,+1,0,elementalizm:2 magia:1
+pustelnik droga puszczy,6,+1,0,0,0,+1,+1,+1,
+pustelnik droga puszczy,7,0,+1,0,0,+4,+4,0,
+pustelnik droga puszczy,8,0,0,0,+1,+2,+2,+1,elementalizm:2 magia:2
+pustelnik droga puszczy,9,0,0,+1,0,+4,+4,0,
+pustelnik droga puszczy,10,0,0,+1,0,+4,+4,+1,elementalizm:2 magia:2 technologia:1
+pustelnik droga puszczy,11,0,+1,0,0,+3,+3,0,
+pustelnik droga puszczy,12,0,0,0,+1,+2,+2,+1,
+pustelnik droga puszczy,13,+1,0,0,0,+5,+5,0,
+pustelnik droga puszczy,14,0,0,+1,0,+1,+1,+1,elementalizm:3 magia:2 technologia:1
+pustelnik droga puszczy,15,0,+1,0,0,+3,+3,0,elementalizm:3 magia:2 technologia:2
+pustelnik droga puszczy,16,0,0,0,+1,+2,+2,+1,elementalizm:3 magia:3 technologia:2
+pustelnik droga puszczy,17,+1,0,0,0,+4,+4,0,
+pustelnik droga puszczy,18,0,0,+1,0,+4,+4,+1,
+pustelnik droga puszczy,19,0,+1,0,0,+8,+8,0,
+pustelnik droga puszczy,20,+1,0,0,+1,+3,+3,+1,
+pustelnik droga puszczy,Suma,8,9,8,9,90,90,10,elementalizm:3 magia:3 technologia:2
+spiddy droga jadu,1,4,2,4,1,30,30,0,elementalizm:1 walka:1
+spiddy droga jadu,2,0,0,+1,0,+3,+5,0,
+spiddy droga jadu,3,0,0,0,+1,+3,+5,0,
+spiddy droga jadu,4,0,0,+1,0,+3,+5,0,
+spiddy droga jadu,5,0,0,0,0,+3,+5,+1,elementalizm:1 walka:2
+spiddy droga jadu,6,+1,0,0,0,+3,+5,0,
+spiddy droga jadu,7,0,+1,0,0,+3,+5,0,
+spiddy droga jadu,8,+1,0,0,0,+3,+5,0,
+spiddy droga jadu,9,0,0,0,0,+2,+5,0,elementalizm:2 walka:2
+spiddy droga jadu,10,+1,0,0,0,+3,+5,+2,
+spiddy droga jadu,11,0,0,+1,0,+4,+3,0,
+spiddy droga jadu,12,+1,0,0,0,+4,+4,0,
+spiddy droga jadu,13,0,0,0,+1,+4,+4,0,elementalizm:2 walka:3
+spiddy droga jadu,14,0,0,+1,0,+4,+4,0,
+spiddy droga jadu,15,+1,+1,0,0,+4,+5,+1,
+spiddy droga jadu,16,0,0,0,+1,+6,+5,0,
+spiddy droga jadu,17,0,0,0,0,+4,+5,0,elementalizm:3 walka:3
+spiddy droga jadu,18,0,+1,0,0,+4,+5,0,
+spiddy droga jadu,19,0,0,+1,0,+5,+5,0,
+spiddy droga jadu,20,0,0,0,+1,+5,+5,+2,
+spiddy droga jadu,Suma,9,5,9,5,100,120,6,elementalizm:3 walka:3
+szpieg droga płaszcza,1,5,0,5,0,30,30,0,magia:1 walka:1
+szpieg droga płaszcza,2,+1,0,0,0,+4,+3,0,
+szpieg droga płaszcza,3,0,+1,0,0,+4,+3,0,magia:2 walka:1
+szpieg droga płaszcza,4,0,0,+1,0,+4,+3,0,
+szpieg droga płaszcza,5,0,0,0,+1,+4,+3,+1,
+szpieg droga płaszcza,6,0,0,+1,0,+4,+3,0,
+szpieg droga płaszcza,7,+1,0,0,+1,+4,+3,0,
+szpieg droga płaszcza,8,0,0,+1,0,+4,+2,0,magia:2 walka:2
+szpieg droga płaszcza,9,0,+1,0,0,+4,+2,0,
+szpieg droga płaszcza,10,0,0,0,0,+4,+3,+2,magia:3 walka:2
+szpieg droga płaszcza,11,0,0,+1,0,+4,+4,0,
+szpieg droga płaszcza,12,+1,0,0,0,+4,+4,0,
+szpieg droga płaszcza,13,0,0,+1,0,+4,+4,0,
+szpieg droga płaszcza,14,0,0,0,+1,+4,+4,0,
+szpieg droga płaszcza,15,0,+1,0,0,+4,+4,+1,
+szpieg droga płaszcza,16,0,0,+1,0,+6,+6,0,
+szpieg droga płaszcza,17,0,0,+1,0,+4,+4,0,
+szpieg droga płaszcza,18,+1,0,0,0,+4,+4,0,
+szpieg droga płaszcza,19,0,0,0,0,+5,+5,0,magia:3 walka:3
+szpieg droga płaszcza,20,+1,0,0,0,+5,+5,+2,
+szpieg droga płaszcza,Suma,10,3,12,3,110,100,6,magia:3 walka:3
+lady kruk,1,3,0,4,2,40,30,0,nekromancja:1
+lady kruk,2,0,+1,0,0,+4,+3,0,
+lady kruk,3,0,0,0,0,+4,+3,0,nekromancja:2
+lady kruk,4,0,0,+1,0,+4,+3,0,
+lady kruk,5,0,0,0,0,+4,+3,+1,magia:1 nekromancja:2
+lady kruk,6,+1,0,0,0,+4,+3,0,
+lady kruk,7,0,0,+1,+1,+4,+3,0,
+lady kruk,8,0,+1,0,0,+4,+3,0,
+lady kruk,9,0,0,0,0,+4,+2,0,magia:2 nekromancja:2
+lady kruk,10,0,0,+1,0,+4,+3,+2,
+lady kruk,11,+1,0,0,0,+6,+3,0,
+lady kruk,12,0,0,0,+1,+4,+3,0,
+lady kruk,13,0,0,+1,0,+4,+3,0,
+lady kruk,14,0,0,0,0,+4,+3,0,magia:2 nekromancja:3
+lady kruk,15,0,+1,0,0,+4,+3,+1,
+lady kruk,16,0,0,+1,0,+4,+4,0,
+lady kruk,17,0,0,0,+1,+4,+4,0,
+lady kruk,18,0,0,+1,0,+4,+4,0,
+lady kruk,19,+1,0,0,0,+5,+4,0,
+lady kruk,20,0,0,+1,0,+5,+3,+2,
+lady kruk,Suma,6,3,11,5,120,90,6,magia:2 nekromancja:3

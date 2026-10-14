@@ -1,0 +1,339 @@
+id,nazwa,rzadkosc,wymagania,koszt_koncentracji_2010,koszt_wytrzymalosci_2010
+1,Miecz z Brązu,brazowa,walka:1,2,4
+2,Magiczny Napój,brazowa,magia:1,1,4
+3,Naramiennik,brazowa,walka:1,2,4
+4,Mniejsze Pole Siłowe,brazowa,magia:1,1,4
+5,Proste Orzeźwienie,zlota,walka:1,4,4
+6,Napój Leczący,brazowa,walka:1,2,8
+7,Odpoczynek,zlota,walka:1,3,5
+8,Unik,brazowa,walka:1,2,4
+9,Dar Zaklęć,srebrna,magia:1 walka:2,2,8
+10,Transformacja,srebrna,magia:2 walka:1,1,10
+11,Klon,srebrna,magia:3,2,8
+12,Siłacz,srebrna,magia:1,2,6
+13,Kapelusz Maga,brazowa,magia:2,2,6
+14,Prztyczek,brazowa,magia:1,1,6
+15,Kamikadze,zlota,walka:3,4,5
+16,Uleczenie,brazowa,kaplanstwo:1,2,10
+17,Stalowy Miecz,brazowa,walka:2,2,8
+18,Eliksir Magii,brazowa,magia:2,1,8
+19,Okragła Tarcza,brazowa,walka:2,2,6
+20,Pole Siłowe,brazowa,magia:2,1,12
+21,Zamroczenie,brazowa,nekromancja:1,1,6
+22,Osłabienie,brazowa,nekromancja:1,1,6
+23,Pancerzownica,brazowa,walka:1,2,4
+24,Podatność,brazowa,nekromancja:1,1,6
+25,Antyczar,brazowa,magia:2,3,12
+26,Mgła,zlota,elementalizm:2,4,16
+27,Kolec,brazowa,elementalizm:1,2,6
+28,Ognisty Pocisk,brazowa,elementalizm:2,2,12
+29,Kula Ognia,srebrna,elementalizm:3,2,24
+30,Szaleństwo,srebrna,elementalizm:1 walka:2,2,8
+31,Wyssanie Życia,srebrna,nekromancja:2,3,18
+32,Wyssanie Witalności,srebrna,nekromancja:2,3,24
+33,Pomylenie,srebrna,elementalizm:2,2,12
+34,Koło Fortuny,zlota,elementalizm:2 magia:1,3,12
+35,Wzmocnienie,brazowa,elementalizm:1 magia:2,2,8
+36,Zaraza,srebrna,nekromancja:2,2,8
+37,Nieumarły,zlota,nekromancja:3,5,36
+38,Wskrzeszenie,zlota,kaplanstwo:3,5,36
+39,Zagięcie Czasu,zlota,magia:3,4,24
+40,Skupienie Umysłu,srebrna,magia:2,1,10
+41,Szał,srebrna,elementalizm:1 walka:1,2,12
+42,Błotna Kąpiel,brazowa,elementalizm:1,2,6
+43,Fortyfikacja,srebrna,walka:2,2,6
+44,Wojenne Łupy,zlota,walka:3,6,24
+45,Puszka Pandory,srebrna,,,4
+46,Duchowy Miecz,brazowa,kaplanstwo:2,2,6
+47,Duchowa Tarcza,brazowa,kaplanstwo:2,2,6
+48,Psalm,brazowa,kaplanstwo:1,1,6
+49,Modlitwa,srebrna,kaplanstwo:2,3,12
+50,Połączone Dusze,zlota,kaplanstwo:3,3,16
+51,Młot Zagłady,srebrna,elementalizm:1 nekromancja:1,2,10
+52,Wampiryczne Ostrze,zlota,nekromancja:3,3,16
+53,Mroczna Modlitwa,srebrna,nekromancja:2,3,12
+54,Ognista Ściana,srebrna,elementalizm:2,3,16
+55,Litość,zlota,kaplanstwo:1,1,6
+56,Droga tygrysa,srebrna,magia:2 walka:3,2,12
+57,Brutal,brazowa,elementalizm:1 walka:1,2,6
+58,Duszący gaz,brazowa,elementalizm:1,,16
+59,Demoniczny Doradca,zlota,nekromancja:3,4,24
+60,Choroba,brazowa,nekromancja:1,2,6
+61,Paraliżujący Cios,srebrna,walka:2,3,6
+62,Wykrwawienie,zlota,walka:3,2,16
+63,Wszechstronność,brazowa,magia:2 walka:1,3,16
+64,Moc Wszechstronności,brazowa,elementalizm:1 magia:2,4,20
+65,Trucizna,brazowa,elementalizm:1,2,8
+66,Jad,brazowa,nekromancja:2,2,12
+67,Przekleństwo Różnic,srebrna,magia:2 nekromancja:1,3,16
+68,Wspomnienie Strachu,zlota,nekromancja:3,3,24
+69,Boskie Schronienie,zlota,kaplanstwo:1,3,12
+70,Egzorcyzm,srebrna,kaplanstwo:2,4,16
+71,Równowaga,zlota,kaplanstwo:3,3,24
+72,Wyrównianie,zlota,nekromancja:3,3,24
+73,Boskie Światło,srebrna,kaplanstwo:1,4,20
+74,Wyprzedzający Atak,brazowa,walka:1,2,8
+75,Zepsucie,zlota,nekromancja:2,4,24
+76,Ożywienie,brazowa,kaplanstwo:1,2,8
+77,Beznadzieja,brazowa,nekromancja:1,2,6
+78,Rzut Nożem,brazowa,walka:2,3,8
+79,Pacyfizm,brazowa,walka:1,,1
+80,Wyczerpanie,zlota,nekromancja:2,4,32
+81,Kamienny Deszcz,zlota,elementalizm:3,3,16
+82,Uniki,zlota,walka:3,5,16
+83,Ołowiane Stopy,zlota,elementalizm:3,3,14
+84,Wigor,zlota,kaplanstwo:3,5,14
+85,Uwięzienie Esencji,zlota,nekromancja:2,2,16
+86,Niewidzialność,zlota,magia:3,4,24
+87,Transmisja Bólu,zlota,nekromancja:3,3,24
+88,Mniejsze Ożywienie,zlota,kaplanstwo:1,3,1
+89,Walka Chaosu,zlota,elementalizm:3,3,8
+90,Rytuał Esencji,zlota,nekromancja:3,2,16
+91,Negacja Umiejętności,srebrna,walka:2,3,8
+92,Absorbcja Magii,brazowa,magia:2,2,8
+93,Szczęście Myśliwego,srebrna,walka:1,3,12
+94,Skromność,srebrna,kaplanstwo:1,2,6
+95,Dominacja,srebrna,walka:2,3,10
+96,Nierozwiązany Bój,brazowa,walka:1,1,4
+97,Nieoczekiwany Opór,srebrna,kaplanstwo:2,2,8
+98,Kolczy Pancerz,brazowa,walka:1,2,4
+99,Projekcja Bólu,brazowa,magia:1,,6
+100,Nova,srebrna,elementalizm:2,4,24
+101,Implozja Umysłu,srebrna,elementalizm:2 magia:2,2,4
+102,Uszkodzenie Umysłu,brazowa,elementalizm:1 magia:1,2,12
+103,Zemsta Ucznia,brazowa,magia:1,2,8
+104,Tancerz Miecza,zlota,walka:3,4,24
+105,Lustrzana Tarcza,srebrna,elementalizm:2 walka:1,3,16
+106,Imadło Prawdy,brazowa,kaplanstwo:2,2,8
+107,Imadło Czystości,srebrna,kaplanstwo:3,2,16
+108,Odpowiedź Mistrza,zlota,magia:3,3,20
+109,Szczęscie Nowicjusza,brazowa,walka:1,2,6
+110,Niestabilna Mutacja,zlota,magia:3,2,12
+111,Przeciążenie Umysłu,zlota,walka:3,,
+112,Przeładowanie,srebrna,elementalizm:2,,
+113,Szał Krwi,srebrna,elementalizm:2,3,8
+114,Niebezpieczny Czar,brazowa,magia:2,2,8
+115,Zmiażdż Pancerz,srebrna,walka:3,3,18
+116,Zniszczenie Woli,zlota,magia:3 nekromancja:1,3,20
+117,Zatrucie Woli,srebrna,magia:2 nekromancja:1,2,12
+118,Uderzenie Pioruna,brazowa,elementalizm:1,1,4
+119,Uderzenie Gromu,srebrna,elementalizm:2 walka:1,1,6
+120,Wyssanie Myśli,brazowa,nekromancja:2,,
+121,Młyn Myśli,zlota,nekromancja:3,3,18
+122,Głód Krwi,brazowa,elementalizm:1,1,
+123,Zapadnia,brazowa,walka:2,2,8
+124,Zatrute Ostrze,srebrna,elementalizm:2,2,12
+125,Zadra w Esencji,brazowa,magia:2,,
+126,Trująca Esencja,srebrna,elementalizm:2,2,12
+127,Zabójczo Proste,brazowa,elementalizm:2,,
+128,Miecz z Mithrilu,srebrna,walka:3,2,12
+129,Modlitwa Weterana,brazowa,kaplanstwo:2,3,
+130,Przeklęty Pancerz,srebrna,nekromancja:2,,
+131,Przeklęty Miecz,srebrna,nekromancja:2 walka:1,,
+132,Przeklęty Hełm,brazowa,nekromancja:1,,
+133,Przeklęty Amulet,zlota,nekromancja:3,,
+134,Amulet Gryzonia,zlota,walka:2,2,10
+135,Kumulacja Szału,srebrna,elementalizm:2,2,8
+136,Utwardzanie Bojowe,srebrna,walka:2,2,6
+137,Doświadczenie Bojowe,srebrna,walka:3,3,16
+138,Znajdź Słabość,srebrna,walka:3,,
+139,Płaszcz Maga,brazowa,magia:1,,
+140,Mroczne Ożywienie,brazowa,nekromancja:1,,
+141,Przeklęty Pakt,brazowa,nekromancja:1,1,
+142,Bezlitosny Cios,srebrna,walka:2,3,8
+143,Kończ Waść,zlota,walka:3,4,12
+144,Ocalenie,brazowa,kaplanstwo:2,2,5
+145,Idealny Ruch,srebrna,kaplanstwo:1 walka:2,3,12
+146,Zniszczenie Umysłu,zlota,elementalizm:3 magia:3,5,
+147,Uderzenie Burzy,zlota,elementalizm:3 walka:1,1,12
+148,Burza Piaskowa,brazowa,elementalizm:1,2,6
+149,Opary,srebrna,elementalizm:1,1,8
+150,Słabość,srebrna,nekromancja:2,,
+151,Klątwa,brazowa,nekromancja:2,,
+152,Tchnienie Śmierci,zlota,nekromancja:3,2,12
+153,Martwica Mózgu,srebrna,nekromancja:3,,
+154,Wir Esencji,brazowa,nekromancja:1,,10
+155,Strach,brazowa,nekromancja:1,,
+156,Ciernie,brazowa,elementalizm:1,2,6
+157,Bójka,brazowa,walka:1,3,8
+158,Rękawica Prawdy,brazowa,kaplanstwo:1,2,6
+159,Boska Interwencja,srebrna,kaplanstwo:3,4,32
+160,Zatrute Wino,brazowa,magia:1,,
+161,Sanktuarium,zlota,kaplanstwo:3,,
+162,Głupota Tarczą,zlota,walka:3,4,12
+163,Narkotyk,srebrna,nekromancja:2,,
+164,Altruizm,brazowa,kaplanstwo:2,3,12
+165,Smoczy Oddech,srebrna,elementalizm:2,,
+166,Zdradliwe Ostrze,brazowa,nekromancja:1,,
+167,Piekielna Brama,zlota,nekromancja:3,,
+168,Mroczny Posłaniec,brazowa,nekromancja:1,,
+169,Czarna Pieczęć,srebrna,nekromancja:2,3,18
+170,Lustrzane odbicie,srebrna,magia:3,3,16
+171,Monolit,zlota,elementalizm:3,,
+172,Strzyga,zlota,nekromancja:2,,
+173,Absorpcja Ciszy,srebrna,magia:2,,12
+174,Włócznia Słabości,srebrna,walka:2,,
+175,Wchłonięcie Spokoju,zlota,magia:3,,
+176,Fechmistrz,srebrna,walka:2,2,16
+177,Droga Krzyżowa,zlota,kaplanstwo:2,1,16
+178,Trujący Bluszcz,zlota,elementalizm:3,3,24
+179,Odwrócenie Uwagi,srebrna,magia:2,,
+180,Wir Czasu,zlota,magia:3,,
+181,Wizerunek Anioła,zlota,kaplanstwo:3,,
+182,Tornado,zlota,elementalizm:3,4,32
+183,Pokusa,zlota,kaplanstwo:3,2,
+184,Opętanie,zlota,nekromancja:3,,
+185,Oślepiające Piękno,zlota,kaplanstwo:3,,
+186,Samobójczy atak,srebrna,walka:2,,
+187,Ewolucja,zlota,elementalizm:1 magia:2,3,16
+188,Splątanie myśli,srebrna,magia:2,,
+189,Tarcza Natury,brazowa,elementalizm:1,2,8
+190,Eteryczna Szata,srebrna,magia:2,2,8
+191,Szata z Esencji,zlota,magia:3,,
+192,Umysł nad miecz,brazowa,magia:1,2,5
+193,Wehikuł Czasu,zlota,magia:3,,
+194,Asceza,srebrna,kaplanstwo:3,3,24
+195,Uzdrowiciel,srebrna,kaplanstwo:3,,
+196,Lustro Życia,zlota,magia:3,3,30
+197,Absorpcja Esencji,zlota,elementalizm:1 kaplanstwo:1 magia:3,3,30
+198,Apokalipsa,zlota,elementalizm:3,1,12
+199,Kara Boska,zlota,kaplanstwo:3,,
+200,Poświęcenie Zaklęć,zlota,magia:3,,
+201,Antymagiczne Pole,brazowa,,3,24
+202,Błogosławieństwo,srebrna,kaplanstwo:2,3,16
+203,Droga Miecza,zlota,walka:3,3,16
+204,Katana,brazowa,walka:1,,
+205,Tachi,srebrna,walka:2,2,10
+206,Naginata,srebrna,walka:3,,
+207,Droga Esencji,zlota,magia:3,,
+208,Kleryk,brazowa,kaplanstwo:1,,
+209,Przekleństwo,srebrna,nekromancja:2,,
+210,Nekromanta,brazowa,nekromancja:1,,
+211,Wilkołactwo,zlota,elementalizm:3,,
+212,Regeneracja,srebrna,elementalizm:2,3,16
+213,Laska Druida,zlota,elementalizm:3,4,24
+214,Laska Arcykapłana,zlota,kaplanstwo:3,4,24
+215,Laska Nieumarłego,zlota,nekromancja:3,4,24
+216,Laska Arcymaga,zlota,magia:3,4,24
+217,Laska Mnicha,zlota,walka:3,,12
+218,Laboratorium,zlota,magia:2,2,16
+219,Wampiryzm,zlota,nekromancja:3,,
+220,Awatar,zlota,kaplanstwo:3,,
+221,Mroczny Rytuał,zlota,nekromancja:1,,
+222,Lecznicza Aura,zlota,kaplanstwo:1,,
+223,Szczęście Goblina,zlota,elementalizm:2,,
+224,Napój Energetyczny,brazowa,,1,
+225,Amulet Esencji,brazowa,,,6
+226,Demon Obrony,srebrna,nekromancja:2,,
+227,Demon Ataku,srebrna,nekromancja:2,,
+228,Skupienie Esencji,srebrna,magia:2,,
+229,Jądro Esencji,zlota,magia:3,1,32
+230,Ognisty Deszcz,zlota,elementalizm:3,,
+231,Anielska Aura,srebrna,kaplanstwo:2,,
+232,Boska Aura,zlota,kaplanstwo:3,,
+233,Eteryczna Bariera,srebrna,magia:3,3,16
+234,Pustynia,zlota,elementalizm:3,,
+235,Szarża,zlota,walka:3,,
+236,Dwa Nagie Miecze,srebrna,walka:3,,
+237,Wilcze Doły,srebrna,walka:3,,
+238,Zaklęty Strach,zlota,nekromancja:3,,
+239,Armaggeddon,zlota,kaplanstwo:3,,
+240,Esencja Chaosu,zlota,elementalizm:3,4,12
+241,Krótkie Spięcie,brazowa,technologia:1,,
+242,Demoniczny Pakt,zlota,nekromancja:3,,
+243,Mroczna Ziemia,srebrna,nekromancja:1,,
+244,Wrażliwość,zlota,technologia:3,,
+245,Temporalna zmiana,brazowa,technologia:1,,
+246,Duma,zlota,walka:3,,
+247,Awaria,srebrna,technologia:1,,
+248,Medytacja,srebrna,magia:2,,
+249,Kawaleria,zlota,walka:3,,
+250,Sen Zimowy,zlota,elementalizm:3,,
+251,Entropia,zlota,technologia:3,3,24
+252,Pole Esencji,zlota,magia:3,,
+253,Zaburzone działanie,srebrna,technologia:3,,
+254,Przygotowanie Czaru,zlota,,,
+255,Tutaj i Teraz,srebrna,,,
+256,Proch,srebrna,technologia:2,,
+257,Dynamit,zlota,technologia:3,,
+258,Matryca Ataku I,brazowa,technologia:1,,
+259,Matryca Ataku II,srebrna,technologia:2,,
+260,Matryca Ataku III,zlota,technologia:3,,
+261,Matryca Obrony I,brazowa,technologia:1,,
+262,Matryca Obrony II,srebrna,technologia:2,,
+263,Matryca Obrony III,zlota,technologia:3,,
+264,Usprawnienie Ataku,brazowa,technologia:1,,
+265,Optymalizacja Ataku,srebrna,technologia:2,,
+266,Rekompilacja Ataku,zlota,technologia:3,2,12
+267,Usprawnienie Obrony,brazowa,technologia:1,,
+268,Optymalizacja Obrony,srebrna,technologia:2,,
+269,Rekompilacja Obrony,zlota,technologia:3,2,12
+270,Stasis,srebrna,technologia:3,,
+271,Naprawa,zlota,technologia:3,,
+272,Blokada Magii,srebrna,technologia:3,,
+273,Negacja Esencji,zlota,magia:3,,
+274,Transmisja Esencji,srebrna,technologia:1,,
+275,Intelekt,srebrna,technologia:2,2,12
+276,Duplikacja,zlota,technologia:3,,
+277,Matematyczny Dylemat,brazowa,technologia:2,,
+278,Rozpaczliwy Atak,brazowa,elementalizm:1,3,8
+279,Furia Natury,zlota,elementalizm:3,4,32
+280,Mordercze Uderzenie,zlota,walka:3,,
+281,Temporalna Dziura,srebrna,technologia:2,,
+282,Temporalna Nicość,zlota,technologia:3,,
+283,Wzmocnienie Walki,brazowa,technologia:1,,
+284,Wzmocnienie Kapłaństwa,brazowa,technologia:1,,
+285,Wzmocnienie Elementalne,brazowa,technologia:1,,
+286,Wzmocnienie Nekromancji,brazowa,technologia:1,,
+287,Wzmocnienie Magii,brazowa,technologia:1,,
+288,Wzmocnienie Technologii,brazowa,technologia:1,,
+289,Optymalizacja Walki,srebrna,technologia:2,,
+290,Optymalizacja Kapłaństwa,srebrna,technologia:2,,
+291,Optymalizacja Elementalna,srebrna,technologia:2,,
+292,Optymalizacja Nekromancji,srebrna,technologia:2,,
+293,Optymalizacja Magii,srebrna,technologia:2,,
+294,Optymalizacja Technologii,srebrna,technologia:2,,
+295,Kamień Filozoficzny,zlota,technologia:3,,
+296,Siła Koncentracji,zlota,,4,
+297,Czysta Walka,zlota,walka:3,4,32
+298,Cios w Plecy,zlota,walka:2,4,12
+299,Zgnilizna,srebrna,nekromancja:2,,
+300,Elixir Życia,zlota,kaplanstwo:3,5,32
+301,Wzmacniacz Esencji I,brazowa,technologia:1,,
+302,Wzmacniacz Esencji II,srebrna,technologia:2,,
+303,Wzmacniacz Esencji III,zlota,technologia:3,,
+304,Nexus,srebrna,magia:2,,
+305,Inhibitor Agresji,zlota,technologia:3,4,32
+306,Katalizator Agresji,zlota,technologia:3,,
+307,Niewolnik Systemu,srebrna,technologia:2,,
+308,Odbicie,brazowa,technologia:1,,
+309,Recycling,brazowa,technologia:2,2,10
+310,Asymilacja,srebrna,technologia:2,,
+311,Tarcza Energetyczna I,brazowa,technologia:1,,
+312,Tarcza Energetyczna II,srebrna,technologia:2,,
+313,Tarcza Energetyczna III,zlota,technologia:3,,
+314,Masochistyczny Trans,zlota,nekromancja:1,,
+315,Ostrożny Taktyk,zlota,walka:2,,
+316,Przekierowanie Siły,brazowa,technologia:1,,
+317,Przekierowanie Mocy,brazowa,technologia:1,,
+318,Rozproszenie Esencji,zlota,,3,16
+319,Czarna Dziura,zlota,technologia:3,3,12
+320,Optymizm,brazowa,kaplanstwo:1,,
+321,Rykoszet,srebrna,elementalizm:2,,
+322,Negatywne Emocje,zlota,walka:3,,
+323,Opary Absurdu,srebrna,magia:2,,
+324,Magiczne Ostrze,zlota,walka:1,,
+325,Mordercza Obsesja,srebrna,nekromancja:1,,
+326,Odkształcenie,srebrna,walka:3,,
+327,Krystalizacja Przewagi,zlota,magia:2,,
+328,Przeklęta Presja,zlota,walka:1,,
+329,Imadło Defensywy,srebrna,walka:2,4,16
+330,Imadło Ofensywy,srebrna,magia:2,3,24
+331,Pochłonięcie Magii,brazowa,magia:1,,
+332,Ostateczny Atak,brazowa,walka:1,,
+333,Szata Natury,brazowa,elementalizm:1,,
+334,Berserker,zlota,walka:3,,
+335,Absolutna Równość,brazowa,kaplanstwo:1,,
+336,Mądry Po Szkodzie,brazowa,elementalizm:1,,
+337,Zemsta Technologa,zlota,technologia:3,,
+338,Odmóżdżający Rytuał,zlota,nekromancja:1,,
