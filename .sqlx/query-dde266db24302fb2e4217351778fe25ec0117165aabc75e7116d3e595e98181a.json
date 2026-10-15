@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT cards FROM decks WHERE avatar_id=$1 FOR UPDATE",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "cards",
+        "type_info": "Int2Array",
+        "origin": {
+          "Table": {
+            "table": "decks",
+            "name": "cards"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid"]
+    },
+    "nullable": [false]
+  },
+  "hash": "dde266db24302fb2e4217351778fe25ec0117165aabc75e7116d3e595e98181a"
+}

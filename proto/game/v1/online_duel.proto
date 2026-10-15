@@ -1,0 +1,95 @@
+syntax = "proto3";
+package game.v1;
+
+import "game/v1/lobby.proto";
+import "game/v1/training.proto";
+
+message DuelTarget {
+  string duel_id = 1;
+}
+message DuelSubmitMove {
+  string duel_id = 1;
+  uint32 round = 2;
+  DuelMove move = 3;
+}
+message DuelPreviewMove {
+  string duel_id = 1;
+  uint32 round = 2;
+  DuelMove move = 3;
+}
+message DuelMovePreview {
+  MovePreview preview = 1;
+  repeated MovePreview cast_options = 2;
+}
+message DuelMoveAccepted {
+  string duel_id = 1;
+  uint32 round = 2;
+}
+message DuelSnapshot {
+  string duel_id = 1;
+  string kind = 2;
+  PublicPlayer you = 3;
+  PublicPlayer opponent = 4;
+  TrainingView view = 5;
+  int64 deadline_ms = 6;
+  bool submitted = 7;
+  bool opponent_ready = 8;
+  bool opponent_connected = 9;
+  int64 grace_until_ms = 10;
+  bytes seed_commitment = 11;
+  repeated DuelEvent events = 12;
+  bytes state_hash = 13;
+  uint32 revision = 14;
+  DuelMove your_move = 15;
+  DuelEnd result = 16;
+}
+message DuelEnd {
+  string duel_id = 1;
+  DuelOutcome outcome = 2;
+  uint32 xp_gained = 3;
+  sint32 rating_delta = 4;
+  sint32 rating_new = 5;
+  bytes seed = 6;
+  uint32 unlocked_template = 7;
+  uint32 ducats_gained = 8;
+}
+message TrainingChallengeBot {
+  string bot_id = 1;
+}
+message TrainingBots {
+  repeated PublicPlayer bots = 1;
+}
+message RankingGet {
+  uint32 offset = 1;
+  uint32 limit = 2;
+}
+message RankingSnapshot {
+  repeated PublicPlayer players = 1;
+  uint32 next_offset = 2;
+}
+message MatchHistoryGet {
+  string player = 1;
+  string before_id = 2;
+  uint32 limit = 3;
+}
+message MatchSummary {
+  string id = 1;
+  string kind = 2;
+  string first = 3;
+  string second = 4;
+  uint32 winner = 5;
+  string reason = 6;
+  int64 at_ms = 7;
+}
+message MatchHistory {
+  repeated MatchSummary matches = 1;
+  string next_cursor = 2;
+}
+message MatchReplay {
+  string match_id = 1;
+}
+message MatchReplayData {
+  string match_id = 1;
+  repeated DuelSnapshot rounds = 2;
+  bytes seed = 3;
+}

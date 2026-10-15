@@ -1,0 +1,30 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT u.id,u.login::text AS \"login!\" FROM ignores i JOIN users u ON u.id=i.ignored_id WHERE i.user_id=$1 AND u.status='active' ORDER BY u.login LIMIT 100",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "login!",
+        "type_info": "Text",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid"]
+    },
+    "nullable": [false, null]
+  },
+  "hash": "03fe24f4e97c60a2e46afcf7454c89665d34b4be1f2c2550eb8ae970ced80de1"
+}

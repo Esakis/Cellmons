@@ -344,10 +344,10 @@ flowchart LR
   B --> F["raport walidacji + content_version"]
 ```
 
-- `content_version` to skrót BLAKE3 (tryb wyprowadzania klucza) treści dla klienta w JSON i plików tekstów wszystkich języków, więc zmienia go także poprawka samego tekstu. Serwer podaje go w powitaniu protokołu (`07-protokol-sieciowy.md`), a klient pobiera plik `content.<hash>.json` cache'owany na stałe.
+- `content_version` to skrót BLAKE3 (tryb wyprowadzania klucza) kanonicznych, pełnych definicji treści i plików tekstów wszystkich języków, więc zmienia go także poprawka samego tekstu. Serwer podaje go w powitaniu protokołu (`07-protokol-sieciowy.md`), a klient pobiera plik `content.<hash>.json` cache'owany na stałe.
 - Każdy zapis walki przechowuje `content_version` i `engine_version`, co umożliwia odtworzenie powtórek.
 - Treść w produkcji zmienia się tylko przez wdrożenie (bez edycji „na żywo”). Upraszcza to determinizm i testy.
-- Pliki klienta (F3.2): `content.json` (te same pola co w TOML, bez `ref`, z polem `version`) i `i18n.pl.ftl`, `i18n.en.ftl` w `target/content/`. Nazwy z hashem i włączenie do pakietu klienta dojdą w fazie F5.
+- Pliki klienta (F3.2): `content.json` (dane do prezentacji, bez `ref`, z polem `version`; efekty są zastąpione liczbowymi `params` dla Fluent, krzywe i PR pozostają w silniku WASM) i `i18n.pl.ftl`, `i18n.en.ftl` w `target/content/`. Nazwy z hashem i włączenie do pakietu klienta dojdą w fazie F5.
 - `engine-content` udostępnia `content()`, `rules()`, `AVATARS` (z `at_level` i `snapshot`), `STARTERS` i `CARD_KEYS`. Karty są budowane raz, przy pierwszym użyciu.
 
 ## 9. Grafika i dźwięk

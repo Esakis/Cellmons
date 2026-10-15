@@ -1,0 +1,74 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT a.tier,a.xp,a.level,a.path_id,a.template_id,u.email_verified_at IS NOT NULL AS \"verified!\" FROM avatars a JOIN users u ON u.id=a.user_id WHERE a.id=$1 AND a.user_id=$2 FOR UPDATE OF a",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "tier",
+        "type_info": "Int2",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "tier"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "xp",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "xp"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "level",
+        "type_info": "Int2",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "level"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "path_id",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "path_id"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "template_id",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "template_id"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "verified!",
+        "type_info": "Bool",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid", "Uuid"]
+    },
+    "nullable": [false, false, false, true, false, null]
+  },
+  "hash": "afe9acf40c6581fc37b2ed05e161a67ece48d6d6869f5b0d31429bb3c8c1a37b"
+}

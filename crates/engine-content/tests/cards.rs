@@ -210,6 +210,416 @@ fn check(key: &str) {
     let c = card(key);
     let name = key.trim_start_matches("card.");
     match name {
+        "shield_line" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.stat_delta(Side::A, Stat::PhysDef), 3);
+            assert_eq!(run.resource(Side::B, Resource::Stamina), -3);
+        }
+        "war_drum" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.stat_changes(Side::A, Stat::PhysAtk), vec![2]);
+            assert_eq!(run.stat_delta(Side::A, Stat::PhysAtk), 0);
+            assert_eq!(run.resource(Side::A, Resource::Stamina), 6);
+        }
+        "measured_strike" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.hit(Side::A), vec![1]);
+        }
+        "shoulder_turn" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.stat_changes(Side::A, Stat::MagDef), vec![3]);
+            assert_eq!(run.stat_delta(Side::A, Stat::MagDef), 0);
+            assert_eq!(run.stat_delta(Side::A, Stat::PhysDef), 1);
+        }
+        "iron_sun" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(
+                (
+                    run.stat_delta(Side::A, Stat::PhysAtk),
+                    run.stat_delta(Side::A, Stat::PhysDef)
+                ),
+                (4, -1)
+            );
+        }
+        "last_standard" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.healed(Side::A), 16);
+            assert_eq!(run.resource(Side::A, Resource::Focus), 1);
+        }
+        "oathbreaker" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(
+                (
+                    run.stat_delta(Side::B, Stat::PhysDef),
+                    run.stat_delta(Side::B, Stat::MagDef)
+                ),
+                (-3, -1)
+            );
+        }
+        "razors_arc" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.damaged(Side::B), 10);
+            assert_eq!(run.resource(Side::A, Resource::Stamina), -4);
+        }
+        "sanctuary_bell" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.stat_changes(Side::A, Stat::PhysDef), vec![2]);
+            assert_eq!(run.stat_changes(Side::A, Stat::MagDef), vec![2]);
+            assert_eq!(run.healed(Side::A), 4);
+            assert_eq!(run.stat_delta(Side::A, Stat::PhysDef), 0);
+        }
+        "ember_liturgy" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.damaged(Side::B), 5);
+            assert_eq!(run.healed(Side::A), 5);
+        }
+        "pilgrim_scrip" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.resource(Side::A, Resource::Focus), 2);
+            assert_eq!(run.resource(Side::A, Resource::Stamina), 6);
+        }
+        "broken_vow" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(
+                (
+                    run.stat_delta(Side::B, Stat::PhysAtk),
+                    run.stat_delta(Side::B, Stat::MagAtk)
+                ),
+                (-1, -1)
+            );
+        }
+        "radiant_bastion" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(
+                (
+                    run.stat_delta(Side::A, Stat::PhysDef),
+                    run.stat_delta(Side::A, Stat::MagDef),
+                    run.stat_delta(Side::A, Stat::PhysAtk)
+                ),
+                (3, 3, -1)
+            );
+        }
+        "absolving_flame" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.damaged(Side::B), 10);
+            assert_eq!(run.healed(Side::A), 8);
+        }
+        "borrowed_dawn" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.healed(Side::A), 18);
+            assert_eq!(run.resource(Side::A, Resource::Stamina), 8);
+        }
+        "suns_judgment" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.hit(Side::A), vec![0, 1, 2]);
+            assert_eq!(run.hit(Side::B), vec![0, 1, 2]);
+            assert_eq!(run.healed(Side::A), 6);
+        }
+        "rainwall" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.stat_changes(Side::A, Stat::MagDef), vec![3]);
+            assert_eq!(run.stat_delta(Side::A, Stat::MagDef), 0);
+            assert_eq!(run.resource(Side::B, Resource::Stamina), -3);
+        }
+        "frost_needles" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.damaged(Side::B), 6);
+            assert_eq!(run.stat_changes(Side::B, Stat::PhysAtk), vec![-1]);
+            assert_eq!(run.stat_delta(Side::B, Stat::PhysAtk), 0);
+        }
+        "ashfall" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!((run.damaged(Side::A), run.damaged(Side::B)), (7, 7));
+            assert_eq!(run.stat_delta(Side::B, Stat::MagDef), -1);
+        }
+        "lodestone" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.has(|e| matches!(*e, Event::ChoicesSwapped { side: Side::B, .. })));
+            assert_eq!(run.resource(Side::B, Resource::Stamina), -3);
+        }
+        "glacier_heart" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(
+                (
+                    run.stat_delta(Side::A, Stat::PhysDef),
+                    run.stat_delta(Side::A, Stat::MagDef)
+                ),
+                (3, 2)
+            );
+            assert_eq!(run.resource(Side::B, Resource::Stamina), -4);
+        }
+        "thunderhead" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.damaged(Side::B), 12);
+            assert_eq!(run.stat_changes(Side::A, Stat::MagAtk), vec![-1]);
+            assert_eq!(run.stat_delta(Side::A, Stat::MagAtk), 0);
+        }
+        "volcanic_accord" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.resource(Side::A, Resource::Stamina), 14);
+            assert_eq!((run.damaged(Side::A), run.damaged(Side::B)), (6, 6));
+        }
+        "eye_of_storm" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.state.stats(Side::A).phys_atk, 0);
+            assert_eq!(run.state.stats(Side::A).mag_atk, 0);
+            assert_eq!(run.resource(Side::A, Resource::Stamina), 40);
+        }
+        "mirror_ink" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.stat_changes(Side::A, Stat::MagAtk), vec![2]);
+            assert_eq!(run.stat_delta(Side::A, Stat::MagAtk), 0);
+            assert_eq!(run.stat_delta(Side::A, Stat::MagDef), 2);
+        }
+        "splintered_second" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.resource(Side::B, Resource::Focus), -2);
+            assert_eq!(run.resource(Side::B, Resource::Stamina), -5);
+        }
+        "apprentice_sigil" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.stat_delta(Side::A, Stat::MagAtk), 2);
+            assert_eq!(run.resource(Side::A, Resource::Focus), 1);
+        }
+        "quiet_proof" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.stat_changes(Side::B, Stat::PhysAtk), vec![-2]);
+            assert_eq!(run.stat_changes(Side::A, Stat::PhysDef), vec![2]);
+            assert_eq!(run.stat_delta(Side::B, Stat::PhysAtk), 0);
+        }
+        "ninefold_lens" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(
+                (
+                    run.stat_delta(Side::A, Stat::MagAtk),
+                    run.stat_delta(Side::A, Stat::MagDef)
+                ),
+                (4, -1)
+            );
+        }
+        "hourglass_sand" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.resource(Side::B, Resource::Focus), -3);
+            assert_eq!(run.damaged(Side::B), 6);
+        }
+        "memory_vault" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.resource(Side::A, Resource::Stamina), 20);
+            assert_eq!(run.resource(Side::A, Resource::Focus), 2);
+        }
+        "sealed_horizon" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(
+                (
+                    run.stat_delta(Side::B, Stat::MagAtk),
+                    run.stat_delta(Side::B, Stat::MagDef)
+                ),
+                (-3, -1)
+            );
+        }
+        "blood_pledge" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.damaged(Side::A), 5);
+            assert_eq!(run.healed(Side::A), 14);
+        }
+        "lantern_of_ashes" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.resource(Side::B, Resource::Stamina), -10);
+            assert_eq!(run.resource(Side::A, Resource::Stamina), 10);
+            assert_eq!(run.stat_changes(Side::A, Stat::MagAtk), vec![1]);
+        }
+        "carrion_wind" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.damaged(Side::B), 6);
+            assert_eq!(run.resource(Side::B, Resource::Stamina), -4);
+        }
+        "marrow_buckler" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.stat_delta(Side::A, Stat::PhysDef), 3);
+            assert_eq!(run.resource(Side::A, Resource::Stamina), -3);
+        }
+        "silent_court" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(
+                (
+                    run.stat_delta(Side::B, Stat::PhysAtk),
+                    run.stat_delta(Side::B, Stat::MagAtk)
+                ),
+                (-2, -2)
+            );
+        }
+        "raven_feast" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.damaged(Side::B), 10);
+            assert_eq!(run.healed(Side::A), 10);
+            assert_eq!(run.stat_delta(Side::A, Stat::PhysDef), -1);
+        }
+        "debt_of_dust" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.resource(Side::A, Resource::Stamina), 24);
+            assert_eq!(run.damaged(Side::A), 6);
+        }
+        "hollow_crown" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(
+                (
+                    run.stat_delta(Side::A, Stat::MagAtk),
+                    run.stat_delta(Side::A, Stat::MagDef),
+                    run.stat_delta(Side::A, Stat::HpMax)
+                ),
+                (3, 2, -7)
+            );
+        }
+        "pressure_seal" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(
+                (
+                    run.stat_delta(Side::A, Stat::PhysDef),
+                    run.stat_delta(Side::A, Stat::MagDef)
+                ),
+                (2, 2)
+            );
+            assert_eq!(run.resource(Side::A, Resource::Stamina), -2);
+        }
+        "spark_lattice" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.damaged(Side::B), 6);
+            assert_eq!(run.resource(Side::A, Resource::Stamina), 4);
+        }
+        "copper_memory" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.resource(Side::A, Resource::Focus), 2);
+            assert_eq!(run.stat_changes(Side::A, Stat::PhysDef), vec![1]);
+            assert_eq!(run.stat_delta(Side::A, Stat::PhysDef), 0);
+        }
+        "lockstep_gear" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(
+                (
+                    run.stat_delta(Side::B, Stat::PhysAtk),
+                    run.stat_delta(Side::A, Stat::PhysAtk)
+                ),
+                (-1, 1)
+            );
+        }
+        "furnace_core" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(
+                (
+                    run.stat_delta(Side::A, Stat::PhysAtk),
+                    run.stat_delta(Side::A, Stat::MagAtk)
+                ),
+                (2, 3)
+            );
+            assert_eq!(run.resource(Side::A, Resource::Stamina), -5);
+        }
+        "prism_cuirass" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(
+                (
+                    run.stat_delta(Side::A, Stat::PhysDef),
+                    run.stat_delta(Side::A, Stat::MagDef),
+                    run.stat_delta(Side::A, Stat::PhysAtk)
+                ),
+                (4, 2, -1)
+            );
+        }
+        "zero_point_coil" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.resource(Side::B, Resource::Stamina), -14);
+            assert_eq!(run.resource(Side::A, Resource::Stamina), 14);
+            assert_eq!(run.stat_changes(Side::A, Stat::MagAtk), vec![-1]);
+        }
+        "reset_lever" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(run.stat_changes(Side::A, Stat::PhysAtk), vec![3]);
+            assert_eq!(run.stat_changes(Side::A, Stat::MagDef), vec![3]);
+            assert_eq!(run.damaged(Side::A), 4);
+            assert_eq!(run.stat_delta(Side::A, Stat::PhysAtk), 0);
+        }
+        "tactical_reserve" => assert_eq!(
+            play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv)
+                .resource(Side::A, Resource::Stamina),
+            14
+        ),
+        "oath_of_steel" => {
+            let run = cast(c);
+            assert_eq!(
+                (
+                    run.stat_delta(Side::A, Stat::PhysAtk),
+                    run.stat_delta(Side::A, Stat::PhysDef),
+                    run.stat_delta(Side::A, Stat::MagDef)
+                ),
+                (2, 2, 1)
+            );
+        }
+        "shared_vigil" => {
+            let run = cast(c);
+            assert_eq!(run.healed(Side::A), 10);
+            assert_eq!(run.stat_changes(Side::A, Stat::MagDef), [1]);
+        }
+        "dawn_reprieve" => {
+            let run = cast(c);
+            assert_eq!(
+                (
+                    run.healed(Side::A),
+                    run.resource(Side::A, Resource::Stamina)
+                ),
+                (12, 8)
+            );
+        }
+        "cinder_volley" => assert_eq!(cast(c).damaged(Side::B), 8),
+        "storm_braid" => {
+            let run = cast(c);
+            assert_eq!((run.damaged(Side::A), run.damaged(Side::B)), (12, 12));
+            assert_eq!(run.stat_changes(Side::A, Stat::MagAtk), [2]);
+        }
+        "measured_thought" => assert_eq!(cast(c).resource(Side::A, Resource::Focus), 3),
+        "still_hour" => {
+            let run = cast(c);
+            assert_eq!(run.stat_changes(Side::B, Stat::PhysAtk), [-2]);
+            assert_eq!(run.stat_changes(Side::B, Stat::MagAtk), [-2]);
+            assert_eq!(
+                (
+                    run.stat_delta(Side::B, Stat::PhysAtk),
+                    run.stat_delta(Side::B, Stat::MagAtk)
+                ),
+                (0, 0)
+            );
+        }
+        "ash_tether" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert_eq!(
+                (
+                    run.resource(Side::A, Resource::Stamina),
+                    run.resource(Side::B, Resource::Stamina)
+                ),
+                (8, -8)
+            );
+        }
+        "grave_bloom" => {
+            let run = cast(c);
+            assert_eq!((run.damaged(Side::B), run.healed(Side::A)), (7, 7));
+        }
+        "brass_casing" => {
+            let run = cast(c);
+            assert_eq!(
+                (
+                    run.stat_delta(Side::A, Stat::PhysDef),
+                    run.stat_delta(Side::A, Stat::MagDef)
+                ),
+                (2, 1)
+            );
+        }
+        "overdrive_valve" => {
+            let mut run = cast(c);
+            assert!(run.enchanted());
+            assert_eq!(run.resource(Side::A, Resource::Stamina), 4);
+            let before = engine::view(&run.state, Side::A).me.stamina;
+            let moves = Side::BOTH.map(|s| default_move(&run.state, s));
+            resolve_round(&mut run.state, &content(), &moves, &mut EventBuf::new()).unwrap();
+            assert_eq!(engine::view(&run.state, Side::A).me.stamina, before + 4);
+        }
         // Walka
         "bronze_blade" | "tempered_blade" => {
             let amount = if name == "bronze_blade" { 2 } else { 3 };

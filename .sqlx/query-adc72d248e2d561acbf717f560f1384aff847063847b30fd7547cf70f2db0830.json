@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO decks(avatar_id,cards,revision) VALUES ($1,$2,1) ON CONFLICT(avatar_id) DO UPDATE SET cards=$2,revision=decks.revision+1,updated_at=now()",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Int2Array"]
+    },
+    "nullable": []
+  },
+  "hash": "adc72d248e2d561acbf717f560f1384aff847063847b30fd7547cf70f2db0830"
+}

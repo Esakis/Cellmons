@@ -1,4 +1,5 @@
 import { create, fromBinary, toBinary } from '@bufbuild/protobuf';
+import { trainingPlayer } from '../app/trainingPlayer';
 import {
   type TrainingReply,
   TrainingReplySchema,
@@ -43,6 +44,22 @@ export class TrainingClient {
 
   request(body: TrainingRequest['body']) {
     if (this.unavailable) return Promise.reject<TrainingReply>(new Error('worker_failed'));
+    if (body.case === 'start') {
+      const player = trainingPlayer(body.value.avatarId);
+      if (player)
+        body = {
+          case: 'start',
+          value: {
+            ...body.value,
+            custom: {
+              $typeName: 'game.v1.TrainingCustomPlayer',
+              level: player.level,
+              spent: player.spent,
+              deck: player.deck,
+            },
+          },
+        };
+    }
     const seq = ++this.seq;
     const bytes = toBinary(TrainingRequestSchema, create(TrainingRequestSchema, { seq, body }));
     return new Promise<TrainingReply>((resolve, reject) => {

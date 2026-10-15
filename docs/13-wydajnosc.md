@@ -130,3 +130,11 @@ Ogólne kryteria: odsetek błędów < 0,1%, CPU ≤ 60% przy docelowym obciąże
 - Wyniki S1–S2 wyznaczają **przetestowaną pojemność** jednej instancji.
 - Alerty (`15-infrastruktura-i-wdrozenie.md`, rozdz. 8): CPU > 60% przez 15 min, liczba połączeń > 70% przetestowanej pojemności, p95 wyniku rundy > 100 ms.
 - Pierwszy krok przy zbliżaniu się do progów: większy VPS (skalowanie pionowe jest najprostsze). Kolejny: etap 2 z `04-architektura.md`, rozdz. 11.
+
+## Pomiar F6.3–F7.1
+
+Test integracyjny `f63_thousand_authenticated_connections_and_binary_pong` utrzymuje 1000 równoczesnych, uwierzytelnionych połączeń na prawdziwym HTTP/WebSocket/PostgreSQL i weryfikuje skorelowany Protobuf Pong dla każdego. Lokalny przebieg debug: około 4,3 s na utworzenie kont testowych, otwarcie połączeń i odpowiedzi. To test przyjęcia połączeń; nie stanowi pomiaru 1000 aktywnych rozmów ani limitu produkcyjnego sprzętu.
+
+Budżet 200 KiB Brotli dotyczy całego pakietu treningu offline bez ilustracji kart. Ekrany konta i lobby wymagają sieci i są osobnymi zasobami na żądanie (limit 45 KiB). Lista `dist/online-assets.json` powstaje z grafu manifestu Vite; współdzielone zależności nadal wliczają się do offline. Service Worker nie zapisuje API, WebSocket ani danych użytkownika. Build kontroluje obie grupy bez podnoszenia limitu 200 KiB.
+
+Wynik po zmianach F6.3–F7.1 i równoległej rozbudowie ekranu treningu: 199,9 / 200 KiB offline, 14,5 / 45 KiB konta/lobby na żądanie. Vite skraca nazwy wynikowe CSS Modules do wspólnego prefiksu pliku i lokalnego indeksu; opisowe nazwy w kodzie pozostają czytelne.

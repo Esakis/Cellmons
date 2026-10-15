@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT EXISTS(SELECT 1 FROM matches WHERE id=$1) AS \"found!\"",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "found!",
+        "type_info": "Bool",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid"]
+    },
+    "nullable": [null]
+  },
+  "hash": "2b97680d3ea287604bc9bde5f1bcd3c5a6252627792428d5bb78c8667e1a44f7"
+}

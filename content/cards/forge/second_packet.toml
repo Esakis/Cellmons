@@ -1,0 +1,481 @@
+# Second beta packet: 48 individually specified Forge cards, IDs 85–132.
+
+[[card]]
+id = 85
+key = "card.shield_line"
+set = "forge"
+rarity = "silver"
+requires = { combat = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_def", amount = 3, duration = "duel" }, { family = "stamina", target = "opponent", amount = -3 }]
+
+[[card]]
+id = 86
+key = "card.war_drum"
+set = "forge"
+rarity = "silver"
+requires = { combat = 2 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_atk", amount = 2, duration = "round" }, { family = "stamina", target = "self", amount = 6 }]
+
+[[card]]
+id = 87
+key = "card.measured_strike"
+set = "forge"
+rarity = "silver"
+requires = { combat = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "instant"
+effects = [{ family = "force_hit", target = "self", kind = "phys", slot = 2 }]
+
+[[card]]
+id = 88
+key = "card.shoulder_turn"
+set = "forge"
+rarity = "silver"
+requires = { combat = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "mag_def", amount = 3, duration = "round" }, { family = "stat_mod", target = "self", stat = "phys_def", amount = 1, duration = "duel" }]
+
+[[card]]
+id = 89
+key = "card.iron_sun"
+set = "forge"
+rarity = "gold"
+requires = { combat = 3 }
+cost = { focus = 4, stamina = 18 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_atk", amount = 4, duration = "duel" }, { family = "stat_mod", target = "self", stat = "phys_def", amount = -1, duration = "duel" }]
+
+[[card]]
+id = 90
+key = "card.last_standard"
+set = "forge"
+rarity = "gold"
+requires = { combat = 3 }
+cost = { focus = 4, stamina = 18 }
+kind = "instant"
+effects = [{ family = "heal", target = "self", amount = 16 }, { family = "focus", target = "self", amount = 1 }]
+
+[[card]]
+id = 91
+key = "card.oathbreaker"
+set = "forge"
+rarity = "gold"
+requires = { combat = 3 }
+cost = { focus = 4, stamina = 18 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "opponent", stat = "phys_def", amount = -3, duration = "duel" }, { family = "stat_mod", target = "opponent", stat = "mag_def", amount = -1, duration = "duel" }]
+
+[[card]]
+id = 92
+key = "card.razors_arc"
+set = "forge"
+rarity = "gold"
+requires = { combat = 3 }
+cost = { focus = 3, stamina = 14 }
+kind = "instant"
+effects = [{ family = "damage", target = "opponent", amount = 10 }, { family = "stamina", target = "self", amount = -4 }]
+
+[[card]]
+id = 93
+key = "card.sanctuary_bell"
+set = "forge"
+rarity = "silver"
+requires = { divine = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_def", amount = 2, duration = "round" }, { family = "stat_mod", target = "self", stat = "mag_def", amount = 2, duration = "round" }, { family = "heal", target = "self", amount = 4 }]
+
+[[card]]
+id = 94
+key = "card.ember_liturgy"
+set = "forge"
+rarity = "silver"
+requires = { divine = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "instant"
+effects = [{ family = "damage", target = "opponent", amount = 5 }, { family = "heal", target = "self", amount = 5 }]
+
+[[card]]
+id = 95
+key = "card.pilgrim_scrip"
+set = "forge"
+rarity = "silver"
+requires = { divine = 2 }
+cost = { focus = 1, stamina = 10 }
+kind = "instant"
+effects = [{ family = "focus", target = "self", amount = 2 }, { family = "stamina", target = "self", amount = 6 }]
+
+[[card]]
+id = 96
+key = "card.broken_vow"
+set = "forge"
+rarity = "silver"
+requires = { divine = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "opponent", stat = "phys_atk", amount = -1, duration = "duel" }, { family = "stat_mod", target = "opponent", stat = "mag_atk", amount = -1, duration = "duel" }]
+
+[[card]]
+id = 97
+key = "card.radiant_bastion"
+set = "forge"
+rarity = "gold"
+requires = { divine = 3 }
+cost = { focus = 4, stamina = 18 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_def", amount = 3, duration = "duel" }, { family = "stat_mod", target = "self", stat = "mag_def", amount = 3, duration = "duel" }, { family = "stat_mod", target = "self", stat = "phys_atk", amount = -1, duration = "duel" }]
+
+[[card]]
+id = 98
+key = "card.absolving_flame"
+set = "forge"
+rarity = "gold"
+requires = { divine = 3 }
+cost = { focus = 4, stamina = 20 }
+kind = "instant"
+effects = [{ family = "damage", target = "opponent", amount = 10 }, { family = "heal", target = "self", amount = 8 }]
+
+[[card]]
+id = 99
+key = "card.borrowed_dawn"
+set = "forge"
+rarity = "gold"
+requires = { divine = 3 }
+cost = { focus = 4, stamina = 18 }
+kind = "instant"
+effects = [{ family = "heal", target = "self", amount = 18 }, { family = "stamina", target = "self", amount = 8 }]
+
+[[card]]
+id = 100
+key = "card.suns_judgment"
+set = "forge"
+rarity = "gold"
+requires = { divine = 3 }
+cost = { focus = 4, stamina = 14 }
+kind = "instant"
+effects = [{ family = "force_hit", target = "both" }, { family = "heal", target = "self", amount = 6 }]
+
+[[card]]
+id = 101
+key = "card.rainwall"
+set = "forge"
+rarity = "silver"
+requires = { element = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "mag_def", amount = 3, duration = "round" }, { family = "stamina", target = "opponent", amount = -3 }]
+
+[[card]]
+id = 102
+key = "card.frost_needles"
+set = "forge"
+rarity = "silver"
+requires = { element = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "instant"
+effects = [{ family = "damage", target = "opponent", amount = 6 }, { family = "stat_mod", target = "opponent", stat = "phys_atk", amount = -1, duration = "round" }]
+
+[[card]]
+id = 103
+key = "card.ashfall"
+set = "forge"
+rarity = "silver"
+requires = { element = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "instant"
+effects = [{ family = "damage", target = "both", amount = 7 }, { family = "stat_mod", target = "opponent", stat = "mag_def", amount = -1, duration = "duel" }]
+
+[[card]]
+id = 104
+key = "card.lodestone"
+set = "forge"
+rarity = "silver"
+requires = { element = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "instant"
+effects = [{ family = "swap_choices", target = "opponent" }, { family = "stamina", target = "opponent", amount = -3 }]
+
+[[card]]
+id = 105
+key = "card.glacier_heart"
+set = "forge"
+rarity = "gold"
+requires = { element = 3 }
+cost = { focus = 4, stamina = 18 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_def", amount = 3, duration = "duel" }, { family = "stat_mod", target = "self", stat = "mag_def", amount = 2, duration = "duel" }, { family = "stamina", target = "opponent", amount = -4 }]
+
+[[card]]
+id = 106
+key = "card.thunderhead"
+set = "forge"
+rarity = "gold"
+requires = { element = 3 }
+cost = { focus = 4, stamina = 18 }
+kind = "instant"
+effects = [{ family = "damage", target = "opponent", amount = 12 }, { family = "stat_mod", target = "self", stat = "mag_atk", amount = -1, duration = "round" }]
+
+[[card]]
+id = 107
+key = "card.volcanic_accord"
+set = "forge"
+rarity = "gold"
+requires = { element = 3 }
+cost = { focus = 3, stamina = 12 }
+kind = "instant"
+effects = [{ family = "stamina", target = "both", amount = 14 }, { family = "damage", target = "both", amount = 6 }]
+
+[[card]]
+id = 108
+key = "card.eye_of_storm"
+set = "forge"
+rarity = "gold"
+requires = { element = 3 }
+cost = { focus = 4, stamina = 18 }
+kind = "instant"
+effects = [{ family = "stat_set", target = "self", stat = "phys_atk", value = 0 }, { family = "stat_set", target = "self", stat = "mag_atk", value = 0 }, { family = "stamina", target = "self", amount = 40 }]
+
+[[card]]
+id = 109
+key = "card.mirror_ink"
+set = "forge"
+rarity = "silver"
+requires = { arcane = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "mag_atk", amount = 2, duration = "round" }, { family = "stat_mod", target = "self", stat = "mag_def", amount = 2, duration = "duel" }]
+
+[[card]]
+id = 110
+key = "card.splintered_second"
+set = "forge"
+rarity = "silver"
+requires = { arcane = 2 }
+cost = { focus = 2, stamina = 12 }
+kind = "instant"
+effects = [{ family = "focus", target = "opponent", amount = -2 }, { family = "stamina", target = "opponent", amount = -5 }]
+
+[[card]]
+id = 111
+key = "card.apprentice_sigil"
+set = "forge"
+rarity = "silver"
+requires = { arcane = 2 }
+cost = { focus = 2, stamina = 10 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "mag_atk", amount = 2, duration = "duel" }, { family = "focus", target = "self", amount = 1 }]
+
+[[card]]
+id = 112
+key = "card.quiet_proof"
+set = "forge"
+rarity = "silver"
+requires = { arcane = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "opponent", stat = "phys_atk", amount = -2, duration = "round" }, { family = "stat_mod", target = "self", stat = "phys_def", amount = 2, duration = "round" }]
+
+[[card]]
+id = 113
+key = "card.ninefold_lens"
+set = "forge"
+rarity = "gold"
+requires = { arcane = 3 }
+cost = { focus = 4, stamina = 18 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "mag_atk", amount = 4, duration = "duel" }, { family = "stat_mod", target = "self", stat = "mag_def", amount = -1, duration = "duel" }]
+
+[[card]]
+id = 114
+key = "card.hourglass_sand"
+set = "forge"
+rarity = "gold"
+requires = { arcane = 3 }
+cost = { focus = 3, stamina = 16 }
+kind = "instant"
+effects = [{ family = "focus", target = "opponent", amount = -3 }, { family = "damage", target = "opponent", amount = 6 }]
+
+[[card]]
+id = 115
+key = "card.memory_vault"
+set = "forge"
+rarity = "gold"
+requires = { arcane = 3 }
+cost = { focus = 2, stamina = 18 }
+kind = "instant"
+effects = [{ family = "stamina", target = "self", amount = 20 }, { family = "focus", target = "self", amount = 2 }]
+
+[[card]]
+id = 116
+key = "card.sealed_horizon"
+set = "forge"
+rarity = "gold"
+requires = { arcane = 3 }
+cost = { focus = 4, stamina = 18 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "opponent", stat = "mag_atk", amount = -3, duration = "duel" }, { family = "stat_mod", target = "opponent", stat = "mag_def", amount = -1, duration = "duel" }]
+
+[[card]]
+id = 117
+key = "card.blood_pledge"
+set = "forge"
+rarity = "silver"
+requires = { necro = 2 }
+cost = { focus = 2, stamina = 10 }
+kind = "instant"
+effects = [{ family = "damage", target = "self", amount = 5 }, { family = "heal", target = "self", amount = 14 }]
+
+[[card]]
+id = 118
+key = "card.lantern_of_ashes"
+set = "forge"
+rarity = "silver"
+requires = { necro = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "instant"
+effects = [{ family = "drain", pool = "stamina", amount = 10 }, { family = "stat_mod", target = "self", stat = "mag_atk", amount = 1, duration = "round" }]
+
+[[card]]
+id = 119
+key = "card.carrion_wind"
+set = "forge"
+rarity = "silver"
+requires = { necro = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "instant"
+effects = [{ family = "damage", target = "opponent", amount = 6 }, { family = "stamina", target = "opponent", amount = -4 }]
+
+[[card]]
+id = 120
+key = "card.marrow_buckler"
+set = "forge"
+rarity = "silver"
+requires = { necro = 2 }
+cost = { focus = 2, stamina = 10 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_def", amount = 3, duration = "duel" }, { family = "stamina", target = "self", amount = -3 }]
+
+[[card]]
+id = 121
+key = "card.silent_court"
+set = "forge"
+rarity = "gold"
+requires = { necro = 3 }
+cost = { focus = 4, stamina = 20 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "opponent", stat = "phys_atk", amount = -2, duration = "duel" }, { family = "stat_mod", target = "opponent", stat = "mag_atk", amount = -2, duration = "duel" }]
+
+[[card]]
+id = 122
+key = "card.raven_feast"
+set = "forge"
+rarity = "gold"
+requires = { necro = 3 }
+cost = { focus = 4, stamina = 16 }
+kind = "instant"
+effects = [{ family = "drain", pool = "hp", amount = 10 }, { family = "stat_mod", target = "self", stat = "phys_def", amount = -1, duration = "duel" }]
+
+[[card]]
+id = 123
+key = "card.debt_of_dust"
+set = "forge"
+rarity = "gold"
+requires = { necro = 3 }
+cost = { focus = 3, stamina = 14 }
+kind = "instant"
+effects = [{ family = "stamina", target = "self", amount = 24 }, { family = "damage", target = "self", amount = 6 }]
+
+[[card]]
+id = 124
+key = "card.hollow_crown"
+set = "forge"
+rarity = "gold"
+requires = { necro = 3 }
+cost = { focus = 4, stamina = 18 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "mag_atk", amount = 3, duration = "duel" }, { family = "stat_mod", target = "self", stat = "mag_def", amount = 2, duration = "duel" }, { family = "stat_mod", target = "self", stat = "hp_max", amount = -7, duration = "duel" }]
+
+[[card]]
+id = 125
+key = "card.pressure_seal"
+set = "forge"
+rarity = "silver"
+requires = { tech = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_def", amount = 2, duration = "duel" }, { family = "stat_mod", target = "self", stat = "mag_def", amount = 2, duration = "duel" }, { family = "stamina", target = "self", amount = -2 }]
+
+[[card]]
+id = 126
+key = "card.spark_lattice"
+set = "forge"
+rarity = "silver"
+requires = { tech = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "instant"
+effects = [{ family = "damage", target = "opponent", amount = 6 }, { family = "stamina", target = "self", amount = 4 }]
+
+[[card]]
+id = 127
+key = "card.copper_memory"
+set = "forge"
+rarity = "silver"
+requires = { tech = 2 }
+cost = { focus = 1, stamina = 10 }
+kind = "instant"
+effects = [{ family = "focus", target = "self", amount = 2 }, { family = "stat_mod", target = "self", stat = "phys_def", amount = 1, duration = "round" }]
+
+[[card]]
+id = 128
+key = "card.lockstep_gear"
+set = "forge"
+rarity = "silver"
+requires = { tech = 2 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "opponent", stat = "phys_atk", amount = -1, duration = "duel" }, { family = "stat_mod", target = "self", stat = "phys_atk", amount = 1, duration = "duel" }]
+
+[[card]]
+id = 129
+key = "card.furnace_core"
+set = "forge"
+rarity = "gold"
+requires = { tech = 3 }
+cost = { focus = 4, stamina = 18 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_atk", amount = 2, duration = "duel" }, { family = "stat_mod", target = "self", stat = "mag_atk", amount = 3, duration = "duel" }, { family = "stamina", target = "self", amount = -5 }]
+
+[[card]]
+id = 130
+key = "card.prism_cuirass"
+set = "forge"
+rarity = "gold"
+requires = { tech = 3 }
+cost = { focus = 4, stamina = 20 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_def", amount = 4, duration = "duel" }, { family = "stat_mod", target = "self", stat = "mag_def", amount = 2, duration = "duel" }, { family = "stat_mod", target = "self", stat = "phys_atk", amount = -1, duration = "duel" }]
+
+[[card]]
+id = 131
+key = "card.zero_point_coil"
+set = "forge"
+rarity = "gold"
+requires = { tech = 3 }
+cost = { focus = 3, stamina = 16 }
+kind = "instant"
+effects = [{ family = "drain", pool = "stamina", amount = 14 }, { family = "stat_mod", target = "self", stat = "mag_atk", amount = -1, duration = "round" }]
+
+[[card]]
+id = 132
+key = "card.reset_lever"
+set = "forge"
+rarity = "gold"
+requires = { tech = 3 }
+cost = { focus = 3, stamina = 14 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_atk", amount = 3, duration = "round" }, { family = "stat_mod", target = "self", stat = "mag_def", amount = 3, duration = "round" }, { family = "damage", target = "self", amount = 4 }]

@@ -107,6 +107,24 @@ fn r_kon_04_forfeit_is_a_loss() {
 }
 
 #[test]
+fn simultaneous_timeouts_finish_once_as_a_draw() {
+    let mut state = Scenario::new(A, B).build();
+    let mut events = EventBuf::new();
+    let result = crate::end_draw(&mut state, Termination::Timeout, &mut events).unwrap();
+    assert_eq!(
+        result,
+        Outcome::Draw {
+            reason: Reason::Timeout
+        }
+    );
+    assert_eq!(events.as_slice(), [Event::DuelEnded { outcome: result }]);
+    assert!(crate::end_draw(&mut state, Termination::Disconnect, &mut events).is_err());
+    assert!(end_by(&mut state, Side::A, Termination::Forfeit, &mut events).is_err());
+    assert_eq!(state.outcome(), Some(result));
+    assert_eq!(events.len(), 1);
+}
+
+#[test]
 fn r_kon_05_disconnect_without_return_is_a_loss() {
     let content = content(&[]);
     let mut state = Scenario::new(A, B).build();

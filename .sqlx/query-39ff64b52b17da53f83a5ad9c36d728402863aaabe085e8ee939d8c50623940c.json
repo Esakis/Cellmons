@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM mail WHERE deleted_by_sender AND deleted_by_recipient",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "39ff64b52b17da53f83a5ad9c36d728402863aaabe085e8ee939d8c50623940c"
+}

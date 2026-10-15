@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT template_id FROM unlocked_templates WHERE user_id=$1 ORDER BY template_id",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "template_id",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "unlocked_templates",
+            "name": "template_id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid"]
+    },
+    "nullable": [false]
+  },
+  "hash": "0d44e8fbe955aea1968f57d82c9b721392d0b0031aec40e029db81db39e54939"
+}

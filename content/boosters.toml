@@ -1,0 +1,22 @@
+# Prices are virtual Ducats. Slot pools are frozen at purchase; draws happen on opening.
+max_unopened = 200
+
+[[booster]]
+id = "basic"
+price = 40
+slots = [{rarity="gold",count=1},{rarity="silver",count=3},{rarity="bronze",count=8}]
+
+[[booster]]
+id = "bronze"
+price = 30
+slots = [{rarity="bronze",count=8}]
+
+[[booster]]
+id = "silver"
+price = 40
+slots = [{rarity="silver",count=4}]
+
+[[booster]]
+id = "gold"
+price = 60
+slots = [{rarity="gold",count=2}]

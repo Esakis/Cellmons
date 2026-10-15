@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO ignores(user_id,ignored_id) VALUES ($1,$2) ON CONFLICT DO NOTHING",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Uuid"]
+    },
+    "nullable": []
+  },
+  "hash": "94c9b870185e34054f9deb72bccf10068ae31a03a96494468ab5bb3ff4b2635c"
+}

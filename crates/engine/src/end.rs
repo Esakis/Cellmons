@@ -74,6 +74,23 @@ pub fn end_by(
     Ok(outcome)
 }
 
+/// Simultaneous walkovers are draws; the server supplies the termination cause.
+pub fn end_draw(
+    state: &mut DuelState,
+    termination: Termination,
+    events: &mut EventBuf,
+) -> Result<Outcome, DuelError> {
+    if state.is_finished() {
+        return Err(DuelError::Finished);
+    }
+    let outcome = Outcome::Draw {
+        reason: termination.reason(),
+    };
+    state.phase = Phase::Finished(outcome);
+    events.push(Event::DuelEnded { outcome });
+    Ok(outcome)
+}
+
 /// Czy warunek karty jest spełniony dla strony `side` (R-CZA-08, R-KON-06).
 pub(crate) fn holds(state: &DuelState, side: Side, condition: Condition) -> bool {
     match condition {

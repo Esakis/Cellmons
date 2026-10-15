@@ -1,4 +1,4 @@
-import { A, useNavigate } from '@solidjs/router';
+import { A, useLocation, useNavigate } from '@solidjs/router';
 import { createEffect, createSignal, For, onCleanup, onMount, Show } from 'solid-js';
 import {
   ApiError,
@@ -68,6 +68,7 @@ function Captcha(props: {
 
 export function AccountPage() {
   const navigate = useNavigate();
+  const route = useLocation();
   const query = new URLSearchParams(location.hash.split('?')[1] ?? '');
   const action = query.get('action');
   const [mode, setMode] = createSignal<Mode>(
@@ -99,6 +100,23 @@ export function AccountPage() {
         `${location.pathname}${location.search}#/account?action=${mode()}`,
       );
     void restoreAccount();
+  });
+  createEffect(() => {
+    // Hash-only email navigation reuses this page instead of remounting it.
+    const query = new URLSearchParams(route.search);
+    if (!query.has('token')) return;
+    const action = query.get('action');
+    if (action === 'verify' || action === 'reset') {
+      setMode(action);
+      setToken(query.get('token') ?? '');
+      setNotice('');
+      setError('');
+    }
+    history.replaceState(
+      null,
+      '',
+      `${location.pathname}${location.search}#/account?action=${action === 'reset' ? 'reset' : 'verify'}`,
+    );
   });
   createEffect(() => {
     const id = profile()?.id;
@@ -217,6 +235,9 @@ export function AccountPage() {
         {(user) => (
           <div>
             <h2>{user.login}</h2>
+            <A class="button primary" href="/lobby">
+              {t('lobby')}
+            </A>
             <p>
               {user.email} · {t(user.email_verified ? 'auth-confirmed' : 'auth-unconfirmed')}
             </p>
@@ -303,7 +324,7 @@ export function AccountPage() {
                 required
                 minLength={3}
                 maxLength={20}
-                pattern="[A-Za-z0-9_-]+"
+                pattern={String.raw`[A-Za-z0-9_\-]+`}
               />
             </label>
           </Show>

@@ -114,6 +114,7 @@ pub fn compile(source: &Source) -> Result<Compiled, Vec<Diagnostic>> {
     // Odwołania rozwiązuje się po wszystkich elementach z plików, także błędnych, żeby błąd
     // karty albo postaci nie dawał dodatkowo mylącego „nieznana karta”.
     let starters = compile_starters(source, &mut errors);
+    check_paths(&avatars, &cards, &mut errors);
     check_texts(&source.texts, &expected, &mut errors);
 
     if errors.is_empty() {
@@ -128,6 +129,89 @@ pub fn compile(source: &Source) -> Result<Compiled, Vec<Diagnostic>> {
         })
     } else {
         Err(errors)
+    }
+}
+
+fn check_paths(avatars: &[CompiledAvatar], cards: &[CompiledCard], errors: &mut Vec<Diagnostic>) {
+    let mut paths = BTreeSet::new();
+    let mut any = false;
+    for avatar in avatars {
+        let Some(path) = &avatar.src.path else {
+            continue;
+        };
+        any = true;
+        let mut report =
+            |message: &str| errors.push(Diagnostic::new("avatars", Some(&avatar.src.key), message));
+        let Some(base) = avatars
+            .iter()
+            .find(|a| a.src.id == path.base_avatar && a.src.path.is_none())
+        else {
+            report("droga musi wskazywać istniejący szablon bazowy, nie inną drogę");
+            continue;
+        };
+        if path.variant > 1 || !paths.insert((path.base_avatar, path.variant)) {
+            report("droga musi mieć unikalny wariant 0 albo 1 dla szablonu");
+        }
+        if avatar.src.starter_for.is_some() || avatar.src.rarity != base.src.rarity {
+            report("droga dziedziczy rzadkość szablonu i nie może być postacią startową");
+        }
+        if path.specializations[0] == path.specializations[1]
+            || path.specializations.iter().any(|s| {
+                !matches!(
+                    s.as_str(),
+                    "combat"
+                        | "divine"
+                        | "element"
+                        | "arcane"
+                        | "necro"
+                        | "tech"
+                        | "essence"
+                        | "concentration"
+                )
+            })
+        {
+            report("droga musi mieć dwie różne, znane specjalizacje");
+        }
+        let final_schools = avatar.growth.iter().fold(avatar.schools, |current, step| {
+            step.schools.unwrap_or(current)
+        });
+        for name in &path.specializations {
+            if let Some((index, _)) = ["combat", "divine", "element", "arcane", "necro", "tech"]
+                .iter()
+                .enumerate()
+                .find(|(_, s)| **s == name.as_str())
+                && final_schools.level(engine::SCHOOLS[index]) == 0
+            {
+                report("specjalizacja szkolna musi należeć do profilu drogi");
+            }
+        }
+        if matches!(
+            base.src.rarity,
+            AvatarRarity::Junkyard | AvatarRarity::Shade
+        ) && path.specializations != ["essence", "concentration"]
+        {
+            report("wysypisko i cienie mają specjalizacje essence/concentration");
+        }
+        if path.gifts[0] == path.gifts[1]
+            || path.gifts.iter().any(|key| {
+                !cards
+                    .iter()
+                    .any(|c| c.src.key == *key && matches!(c.def.kind, CardKind::Enchantment(_)))
+            })
+        {
+            report("droga musi wskazywać dwa różne istniejące umagicznienia jako dary");
+        }
+    }
+    if any {
+        for base in avatars.iter().filter(|a| a.src.path.is_none()) {
+            if !paths.contains(&(base.src.id, 0)) || !paths.contains(&(base.src.id, 1)) {
+                errors.push(Diagnostic::new(
+                    "avatars",
+                    Some(&base.src.key),
+                    "każdy szablon musi mieć dokładnie dwie drogi",
+                ));
+            }
+        }
     }
 }
 
@@ -349,6 +433,9 @@ fn compile_card(
     let mut report =
         |message: String| errors.push(Diagnostic::new(&located.file, Some(&card.key), message));
 
+    if card.id > i16::MAX as u16 {
+        report("identyfikator karty musi mieścić się w zakresie bazy: 1–32767".into());
+    }
     if !is_key(&format!("set.{}", card.set), "set.") {
         report(format!(
             "nazwa zestawu „{}” może mieć tylko małe litery, cyfry i _",

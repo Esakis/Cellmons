@@ -47,6 +47,14 @@ impl Auth {
         ticket: &str,
         origin: &str,
     ) -> Result<Uuid> {
+        Ok(self.consume_ws_session(state, ticket, origin).await?.user)
+    }
+    pub(crate) async fn consume_ws_session(
+        &self,
+        state: &AppState,
+        ticket: &str,
+        origin: &str,
+    ) -> Result<super::Session> {
         if !self
             .0
             .config
@@ -78,6 +86,6 @@ impl Auth {
                 return Err(Error::unauthorized());
             }
         }
-        Ok(security::session_hash(state, &hash, "app").await?.user)
+        security::session_hash(state, &hash, "app").await
     }
 }

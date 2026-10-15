@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE boosters SET status='opened',contents=$2,opened_at=now() WHERE id=$1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Int2Array"]
+    },
+    "nullable": []
+  },
+  "hash": "d2809e2f2d1f185c130b086c5921962461108b036a09935c356701221c8dfaf3"
+}

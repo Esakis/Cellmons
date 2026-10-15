@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT EXISTS(SELECT 1 FROM duel_locks WHERE user_id=$1) OR EXISTS(SELECT 1 FROM activity_locks WHERE user_id=$1) AS \"busy!\"",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "busy!",
+        "type_info": "Bool",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid"]
+    },
+    "nullable": [null]
+  },
+  "hash": "98933b3f2dc805680e0dc7ab28197a3846f67495a5a958dc827387edd20e2434"
+}

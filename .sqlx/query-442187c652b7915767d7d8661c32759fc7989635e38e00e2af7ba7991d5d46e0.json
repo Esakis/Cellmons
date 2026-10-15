@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT r.user_id FROM ratings r JOIN users u ON u.id=r.user_id WHERE u.status='active' AND u.email_verified_at IS NOT NULL ORDER BY r.rating DESC,r.user_id LIMIT $1 OFFSET $2",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "ratings",
+            "name": "user_id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": ["Int8", "Int8"]
+    },
+    "nullable": [false]
+  },
+  "hash": "442187c652b7915767d7d8661c32759fc7989635e38e00e2af7ba7991d5d46e0"
+}

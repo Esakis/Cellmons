@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM deck_presets WHERE id=$1 AND user_id=$2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Uuid"]
+    },
+    "nullable": []
+  },
+  "hash": "6896d358a26f10dbffe58ebbb7326062231327543a3398beec4fbef8a1e4dc7b"
+}

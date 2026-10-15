@@ -10,13 +10,22 @@ use sqlx::PgPool;
 pub struct AppState {
     pub db: PgPool,
     pub auth: crate::auth::Auth,
+    pub online: std::sync::Arc<crate::online::ws::Online>,
 }
 
 impl AppState {
     pub fn local(db: PgPool) -> Self {
-        Self {
+        Self::new(
             db,
-            auth: crate::auth::Auth::local(),
+            crate::auth::Auth::local(),
+            crate::online::Settings::default(),
+        )
+    }
+    pub fn new(db: PgPool, auth: crate::auth::Auth, settings: crate::online::Settings) -> Self {
+        Self {
+            online: std::sync::Arc::new(crate::online::ws::Online::new(db.clone(), settings)),
+            db,
+            auth,
         }
     }
 }
@@ -33,5 +42,6 @@ pub fn router(state: AppState) -> Router {
         .merge(auth)
         .route("/healthz", get(health::healthz))
         .route("/readyz", get(health::readyz))
+        .route("/ws", get(crate::online::ws::upgrade))
         .with_state(state)
 }

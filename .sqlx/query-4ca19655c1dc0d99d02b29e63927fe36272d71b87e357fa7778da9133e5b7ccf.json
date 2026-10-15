@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE duel_journal SET status='finished',updated_at=now() WHERE id=$1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid"]
+    },
+    "nullable": []
+  },
+  "hash": "4ca19655c1dc0d99d02b29e63927fe36272d71b87e357fa7778da9133e5b7ccf"
+}

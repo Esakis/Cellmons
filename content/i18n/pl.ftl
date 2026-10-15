@@ -216,3 +216,204 @@ card-necro_amplifier-name = Wzmacniacz: Nekromancja
 card-necro_amplifier-text = +{ $amount } do poziomu szkoły „Nekromancja” do końca pojedynku.
 card-tech_amplifier-name = Wzmacniacz: Runotechnika
 card-tech_amplifier-text = +{ $amount } do poziomu szkoły „Runotechnika” do końca pojedynku.
+
+## Forge: first beta packet
+
+card-tactical_reserve-name = Rezerwa taktyczna
+card-tactical_reserve-text = Odzyskaj { $amount } W.
+
+card-oath_of_steel-name = Przysięga stali
+card-oath_of_steel-text = Do końca walki: +{ $amount } AF, +{ $amount_2 } OF i +{ $amount_3 } OM.
+
+card-shared_vigil-name = Wspólne czuwanie
+card-shared_vigil-text = Odzyskaj { $amount } życia. W tej rundzie +{ $amount_2 } OM.
+
+card-dawn_reprieve-name = Wytchnienie świtu
+card-dawn_reprieve-text = Odzyskaj { $amount } życia i { $amount_2 } W.
+
+card-cinder_volley-name = Salwa żaru
+card-cinder_volley-text = Zadaj przeciwnikowi { $amount } obrażeń.
+
+card-storm_braid-name = Warkocz burzy
+card-storm_braid-text = Obie strony tracą { $amount } życia. W tej rundzie +{ $amount_2 } AM.
+
+card-measured_thought-name = Wyważona myśl
+card-measured_thought-text = Zyskaj { $amount } koncentracji.
+
+card-still_hour-name = Zatrzymana godzina
+card-still_hour-text = W tej rundzie zmień AF przeciwnika o { $amount }, a AM o { $amount_2 }.
+
+card-ash_tether-name = Więź popiołu
+card-ash_tether-text = Odbierz przeciwnikowi do { $amount } W i przejmij ją.
+
+card-grave_bloom-name = Grobowy rozkwit
+card-grave_bloom-text = Zadaj { $amount } obrażeń przeciwnikowi i odzyskaj { $amount_2 } życia.
+
+card-brass_casing-name = Mosiężna osłona
+card-brass_casing-text = Do końca walki: +{ $amount } OF i +{ $amount_2 } OM.
+
+card-overdrive_valve-name = Zawór przeciążenia
+card-overdrive_valve-text = Umagicznienie, interwencja: na końcu każdej rundy odzyskujesz { $amount } W.
+
+avatar-cinder_knight-name = Rycerz żużlu
+
+avatar-copper_distiller-name = Destylator
+
+avatar-ruin_keeper-name = Strażnik ruin
+
+## Forge beta packet two
+card-shield_line-name = Mur tarcz
+card-shield_line-text = Zmienia OF twojej postaci o { $amount } do końca pojedynku. Zmienia W przeciwnika o { $amount_2 }.
+
+card-war_drum-name = Bęben wojenny
+card-war_drum-text = Zmienia AF twojej postaci o { $amount } do końca tej rundy. Zmienia W twojej postaci o { $amount_2 }.
+
+card-measured_strike-name = Wymierzony cios
+card-measured_strike-text = Atak fizyczny twojej postaci w pozycji { $slot } trafia w tej rundzie.
+
+card-shoulder_turn-name = Zwrot ramienia
+card-shoulder_turn-text = Zmienia OM twojej postaci o { $amount } do końca tej rundy. Zmienia OF twojej postaci o { $amount_2 } do końca pojedynku.
+
+card-iron_sun-name = Żelazne słońce
+card-iron_sun-text = Zmienia AF twojej postaci o { $amount } do końca pojedynku. Zmienia OF twojej postaci o { $amount_2 } do końca pojedynku.
+
+card-last_standard-name = Ostatni sztandar
+card-last_standard-text = Leczy { $amount } Ż twojej postaci. Zmienia K twojej postaci o { $amount_2 }.
+
+card-oathbreaker-name = Łamacz przysięgi
+card-oathbreaker-text = Zmienia OF przeciwnika o { $amount } do końca pojedynku. Zmienia OM przeciwnika o { $amount_2 } do końca pojedynku.
+
+card-razors_arc-name = Łuk brzytwy
+card-razors_arc-text = Zadaje { $amount } obrażeń przeciwnikowi. Zmienia W twojej postaci o { $amount_2 }.
+
+card-sanctuary_bell-name = Dzwon schronienia
+card-sanctuary_bell-text = Zmienia OF twojej postaci o { $amount } do końca tej rundy. Zmienia OM twojej postaci o { $amount_2 } do końca tej rundy. Leczy { $amount_3 } Ż twojej postaci.
+
+card-ember_liturgy-name = Liturgia żaru
+card-ember_liturgy-text = Zadaje { $amount } obrażeń przeciwnikowi. Leczy { $amount_2 } Ż twojej postaci.
+
+card-pilgrim_scrip-name = Sakwa pielgrzyma
+card-pilgrim_scrip-text = Zmienia K twojej postaci o { $amount }. Zmienia W twojej postaci o { $amount_2 }.
+
+card-broken_vow-name = Złamany ślub
+card-broken_vow-text = Zmienia AF przeciwnika o { $amount } do końca pojedynku. Zmienia AM przeciwnika o { $amount_2 } do końca pojedynku.
+
+card-radiant_bastion-name = Bastion światła
+card-radiant_bastion-text = Zmienia OF twojej postaci o { $amount } do końca pojedynku. Zmienia OM twojej postaci o { $amount_2 } do końca pojedynku. Zmienia AF twojej postaci o { $amount_3 } do końca pojedynku.
+
+card-absolving_flame-name = Ogień rozgrzeszenia
+card-absolving_flame-text = Zadaje { $amount } obrażeń przeciwnikowi. Leczy { $amount_2 } Ż twojej postaci.
+
+card-borrowed_dawn-name = Pożyczony świt
+card-borrowed_dawn-text = Leczy { $amount } Ż twojej postaci. Zmienia W twojej postaci o { $amount_2 }.
+
+card-suns_judgment-name = Sąd słońca
+card-suns_judgment-text = Wszystkie ataki obu postaci trafiają w tej rundzie. Leczy { $amount_2 } Ż twojej postaci.
+
+card-rainwall-name = Ściana deszczu
+card-rainwall-text = Zmienia OM twojej postaci o { $amount } do końca tej rundy. Zmienia W przeciwnika o { $amount_2 }.
+
+card-frost_needles-name = Igły szronu
+card-frost_needles-text = Zadaje { $amount } obrażeń przeciwnikowi. Zmienia AF przeciwnika o { $amount_2 } do końca tej rundy.
+
+card-ashfall-name = Opad popiołu
+card-ashfall-text = Zadaje { $amount } obrażeń obu postaciom. Zmienia OM przeciwnika o { $amount_2 } do końca pojedynku.
+
+card-lodestone-name = Magnetyt
+card-lodestone-text = Zamienia ataki i obrony przeciwnika w tej rundzie. Zmienia W przeciwnika o { $amount_2 }.
+
+card-glacier_heart-name = Serce lodowca
+card-glacier_heart-text = Zmienia OF twojej postaci o { $amount } do końca pojedynku. Zmienia OM twojej postaci o { $amount_2 } do końca pojedynku. Zmienia W przeciwnika o { $amount_3 }.
+
+card-thunderhead-name = Chmura burzowa
+card-thunderhead-text = Zadaje { $amount } obrażeń przeciwnikowi. Zmienia AM twojej postaci o { $amount_2 } do końca tej rundy.
+
+card-volcanic_accord-name = Wulkaniczny układ
+card-volcanic_accord-text = Zmienia W obu postaci o { $amount }. Zadaje { $amount_2 } obrażeń obu postaciom.
+
+card-eye_of_storm-name = Oko burzy
+card-eye_of_storm-text = Ustawia AF twojej postaci na { $value } do końca pojedynku. Ustawia AM twojej postaci na { $value_2 } do końca pojedynku. Zmienia W twojej postaci o { $amount_3 }.
+
+card-mirror_ink-name = Lustrzany atrament
+card-mirror_ink-text = Zmienia AM twojej postaci o { $amount } do końca tej rundy. Zmienia OM twojej postaci o { $amount_2 } do końca pojedynku.
+
+card-splintered_second-name = Rozbita sekunda
+card-splintered_second-text = Zmienia K przeciwnika o { $amount }. Zmienia W przeciwnika o { $amount_2 }.
+
+card-apprentice_sigil-name = Pieczęć ucznia
+card-apprentice_sigil-text = Zmienia AM twojej postaci o { $amount } do końca pojedynku. Zmienia K twojej postaci o { $amount_2 }.
+
+card-quiet_proof-name = Cichy dowód
+card-quiet_proof-text = Zmienia AF przeciwnika o { $amount } do końca tej rundy. Zmienia OF twojej postaci o { $amount_2 } do końca tej rundy.
+
+card-ninefold_lens-name = Dziewięciokrotna soczewka
+card-ninefold_lens-text = Zmienia AM twojej postaci o { $amount } do końca pojedynku. Zmienia OM twojej postaci o { $amount_2 } do końca pojedynku.
+
+card-hourglass_sand-name = Piasek klepsydry
+card-hourglass_sand-text = Zmienia K przeciwnika o { $amount }. Zadaje { $amount_2 } obrażeń przeciwnikowi.
+
+card-memory_vault-name = Skarbiec pamięci
+card-memory_vault-text = Zmienia W twojej postaci o { $amount }. Zmienia K twojej postaci o { $amount_2 }.
+
+card-sealed_horizon-name = Zamknięty horyzont
+card-sealed_horizon-text = Zmienia AM przeciwnika o { $amount } do końca pojedynku. Zmienia OM przeciwnika o { $amount_2 } do końca pojedynku.
+
+card-blood_pledge-name = Krwawy zastaw
+card-blood_pledge-text = Zadaje { $amount } obrażeń twojej postaci. Leczy { $amount_2 } Ż twojej postaci.
+
+card-lantern_of_ashes-name = Latarnia popiołów
+card-lantern_of_ashes-text = Przenosi do { $amount } W przeciwnika do twojej postaci. Zmienia AM twojej postaci o { $amount_2 } do końca tej rundy.
+
+card-carrion_wind-name = Wiatr padliny
+card-carrion_wind-text = Zadaje { $amount } obrażeń przeciwnikowi. Zmienia W przeciwnika o { $amount_2 }.
+
+card-marrow_buckler-name = Puklerz szpiku
+card-marrow_buckler-text = Zmienia OF twojej postaci o { $amount } do końca pojedynku. Zmienia W twojej postaci o { $amount_2 }.
+
+card-silent_court-name = Milczący dwór
+card-silent_court-text = Zmienia AF przeciwnika o { $amount } do końca pojedynku. Zmienia AM przeciwnika o { $amount_2 } do końca pojedynku.
+
+card-raven_feast-name = Uczta kruków
+card-raven_feast-text = Przenosi do { $amount } Ż przeciwnika do twojej postaci. Zmienia OF twojej postaci o { $amount_2 } do końca pojedynku.
+
+card-debt_of_dust-name = Dług prochu
+card-debt_of_dust-text = Zmienia W twojej postaci o { $amount }. Zadaje { $amount_2 } obrażeń twojej postaci.
+
+card-hollow_crown-name = Pusta korona
+card-hollow_crown-text = Zmienia AM twojej postaci o { $amount } do końca pojedynku. Zmienia OM twojej postaci o { $amount_2 } do końca pojedynku. Zmienia maksymalne Ż twojej postaci o { $amount_3 } do końca pojedynku.
+
+card-pressure_seal-name = Uszczelka ciśnienia
+card-pressure_seal-text = Zmienia OF twojej postaci o { $amount } do końca pojedynku. Zmienia OM twojej postaci o { $amount_2 } do końca pojedynku. Zmienia W twojej postaci o { $amount_3 }.
+
+card-spark_lattice-name = Siatka iskier
+card-spark_lattice-text = Zadaje { $amount } obrażeń przeciwnikowi. Zmienia W twojej postaci o { $amount_2 }.
+
+card-copper_memory-name = Miedziana pamięć
+card-copper_memory-text = Zmienia K twojej postaci o { $amount }. Zmienia OF twojej postaci o { $amount_2 } do końca tej rundy.
+
+card-lockstep_gear-name = Tryb miarowego kroku
+card-lockstep_gear-text = Zmienia AF przeciwnika o { $amount } do końca pojedynku. Zmienia AF twojej postaci o { $amount_2 } do końca pojedynku.
+
+card-furnace_core-name = Rdzeń pieca
+card-furnace_core-text = Zmienia AF twojej postaci o { $amount } do końca pojedynku. Zmienia AM twojej postaci o { $amount_2 } do końca pojedynku. Zmienia W twojej postaci o { $amount_3 }.
+
+card-prism_cuirass-name = Pryzmatyczny kirys
+card-prism_cuirass-text = Zmienia OF twojej postaci o { $amount } do końca pojedynku. Zmienia OM twojej postaci o { $amount_2 } do końca pojedynku. Zmienia AF twojej postaci o { $amount_3 } do końca pojedynku.
+
+card-zero_point_coil-name = Cewka punktu zerowego
+card-zero_point_coil-text = Przenosi do { $amount } W przeciwnika do twojej postaci. Zmienia AM twojej postaci o { $amount_2 } do końca tej rundy.
+
+card-reset_lever-name = Dźwignia zerowania
+card-reset_lever-text = Zmienia AF twojej postaci o { $amount } do końca tej rundy. Zmienia OM twojej postaci o { $amount_2 } do końca tej rundy. Zadaje { $amount_3 } obrażeń twojej postaci.
+
+## Beta classes
+avatar-storm_surveyor-name = Burzomierz
+avatar-stoneguard-name = Strażnik kamienia
+avatar-tide_oracle-name = Wyrocznia przypływu
+avatar-venom_scout-name = Zwiadowca jadów
+avatar-iron_reaver-name = Żelazny żniwiarz
+avatar-rift_duelist-name = Szermierz szczelin
+avatar-root_sage-name = Mędrzec korzeni
+avatar-glass_alchemist-name = Szklany alchemik
+avatar-dusk_stalker-name = Tropiciel zmierzchu
+avatar-dawn_lancer-name = Kopijnik świtu

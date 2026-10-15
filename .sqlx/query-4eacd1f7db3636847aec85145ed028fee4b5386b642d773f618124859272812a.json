@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT count(*)+1 AS \"rank!\" FROM ratings r JOIN users u ON u.id=r.user_id WHERE u.status='active' AND u.email_verified_at IS NOT NULL AND (r.rating>$1 OR (r.rating=$1 AND r.user_id<$2))",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "rank!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": ["Int4", "Uuid"]
+    },
+    "nullable": [null]
+  },
+  "hash": "4eacd1f7db3636847aec85145ed028fee4b5386b642d773f618124859272812a"
+}

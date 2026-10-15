@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT count(*) AS \"count!\" FROM (SELECT t.id FROM ledger_transactions t LEFT JOIN ledger_entries e ON e.tx_id=t.id GROUP BY t.id HAVING count(e.account)<2 OR coalesce(sum(e.delta),0)<>0) bad",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [null]
+  },
+  "hash": "3a0d7dc834d7f1719d1382ce51bcc420eef9710702b69100b1df8b0648dba2a4"
+}

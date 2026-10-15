@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO collection(user_id,card_id,qty) VALUES ($1,$2,$3) ON CONFLICT(user_id,card_id) DO UPDATE SET qty=collection.qty+$3 WHERE collection.qty<=$4",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Int2", "Int4", "Int4"]
+    },
+    "nullable": []
+  },
+  "hash": "edc99dbf4fcce9e476cafc67087890b6b05f8d421a6f6bda50bf84216de9acf3"
+}

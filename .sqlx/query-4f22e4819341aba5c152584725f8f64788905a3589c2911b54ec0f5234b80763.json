@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT CASE WHEN m.first_user=$2 THEN p.first_snapshot ELSE p.second_snapshot END AS \"data!\" FROM match_projections p JOIN matches m ON m.id=p.match_id WHERE m.id=$1 AND (m.first_user=$2 OR m.second_user=$2)",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "data!",
+        "type_info": "Bytea",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid", "Uuid"]
+    },
+    "nullable": [null]
+  },
+  "hash": "4f22e4819341aba5c152584725f8f64788905a3589c2911b54ec0f5234b80763"
+}

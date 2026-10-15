@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE mail SET deleted_by_sender=deleted_by_sender OR from_user=$1,deleted_by_recipient=deleted_by_recipient OR to_user=$1 WHERE id=$2 AND (from_user=$1 OR to_user=$1)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Uuid"]
+    },
+    "nullable": []
+  },
+  "hash": "ff97a52b8ae4bfb30696eae18fc7914510719ca5ea25cc200122b1f53e6ff014"
+}

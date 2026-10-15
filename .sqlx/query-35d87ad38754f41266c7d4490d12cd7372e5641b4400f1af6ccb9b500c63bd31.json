@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO idempotency_keys(user_id,key,operation,request_hash,result) VALUES ($1,$2,$3,$4,$5)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Uuid", "Text", "Bytea", "Bytea"]
+    },
+    "nullable": []
+  },
+  "hash": "35d87ad38754f41266c7d4490d12cd7372e5641b4400f1af6ccb9b500c63bd31"
+}

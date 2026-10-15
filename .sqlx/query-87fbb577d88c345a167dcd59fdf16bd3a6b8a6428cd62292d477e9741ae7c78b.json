@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE collection SET qty=qty-$3 WHERE user_id=$1 AND card_id=$2 AND qty>=$3",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Int2", "Int4"]
+    },
+    "nullable": []
+  },
+  "hash": "87fbb577d88c345a167dcd59fdf16bd3a6b8a6428cd62292d477e9741ae7c78b"
+}

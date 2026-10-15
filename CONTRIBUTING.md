@@ -56,7 +56,7 @@ Android debug: `pnpm --filter mobile sync`, następnie `mobile/android/gradlew.b
 
 `run.bat` stosuje migracje przed startem serwera. Ręcznie: `cargo run -p server --locked -- migrate` (wczytuje `.env`). Zwykły start serwera nie wykonuje DDL; `/readyz` zwróci 503 do czasu zastosowania wymaganej migracji. Pliki `migrations/` są dopisywane; zastosowanych plików nie edytujemy.
 
-Pełny `check.bat` uruchamia migracje, testy PostgreSQL (10 bazy i 14 kont) i kontrolę metadanych SQLx; `-Quick` pomija ten krok. Testy korzystają z osobnych, tymczasowych baz SQLx. Nie czyszczą danych bazy deweloperskiej. Domyślne `cargo test --workspace` pomija te testy, więc działa bez PostgreSQL. Uruchomienie obu grup w PowerShell:
+Pełny `check.bat` uruchamia migracje, testy PostgreSQL (10 bazy, 14 kont i testy gateway/lobby) i kontrolę metadanych SQLx; `-Quick` pomija ten krok. Testy korzystają z osobnych, tymczasowych baz SQLx. Nie czyszczą danych bazy deweloperskiej. Domyślne `cargo test --workspace` pomija te testy, więc działa bez PostgreSQL. Uruchomienie obu grup w PowerShell:
 
 ```powershell
 docker compose -f deploy/docker-compose.dev.yml up -d --wait
@@ -88,6 +88,12 @@ Przy wdrożeniu publicznym ustaw dokładny `PUBLIC_ORIGIN=https://…`, `MAIL_MO
 Gość jest wyłącznie stanem w pamięci frontendu (ADR-018). Nie korzysta z API, nie dostaje tokenu ani ciasteczka, nie zapisuje wyborów i postępu w pamięci trwałej przeglądarki. Odświeżenie usuwa gościa. Statyczne zasoby PWA mogą pozostać w cache do gry offline.
 
 API Androida wymaga `client=android` przy logowaniu i `X-Native-Version: 1.0.0`; później `Authorization: Bearer …`. Do połączeń służy `/api/auth/ws-ticket`, do rotacji `/api/auth/rotate`. Przy budowaniu klienta Android podaj `VITE_API_ORIGIN` jako dokładny adres HTTPS API; trafi także do CSP. Aktualny klient przechowuje token tylko w RAM i rotuje go przed kolejnym żądaniem po 7 dniach. Trwały magazyn Android Keystore i pełny cykl życia powłoki należą do F12A. Procedurę i zakres weryfikacji opisuje [raport F6.2](docs/23-konta-i-gosc-testy.md).
+
+### Lobby i rzeczywiste E2E (F6.3–F7.1)
+
+`run.bat` przekazuje także WebSocket `/ws` przez Vite. Po rejestracji i zalogowaniu wybierz „Lobby”, a potem pomieszczenie. Gość nie otwiera WebSocket. Limity połączeń konfiguruje `.env.example`.
+
+`pnpm --filter e2e test` wymaga teraz lokalnego PostgreSQL z prawem `CREATEDB`. Domyślnie używa deweloperskiego klastra na 5433; opcjonalnie podaj `E2E_DATABASE_URL` (tylko loopback). Nie czyta aplikacyjnego `.env` ani `DATABASE_URL`. Playwright uruchamia przykład `browser_fixture`, który tworzy własną bazę `game_e2e_<uuid>`, stosuje migracje i przechwytuje pocztę w RAM. Backend słucha na 18092, preview na 4173. Teardown zamyka WebSocket, usuwa wyłącznie wygenerowaną bazę i czeka na zakończenie sprzątania. Zwykły serwer nie zawiera testowego endpointu `__shutdown`. Testy „rejestracja → lobby” i dwóch klientów korzystają z prawdziwego backendu, bez mocków. Pozostałe formularze nadal mają osobne testy kontraktu API.
 
 ## 3. Gałęzie, commity i PR
 

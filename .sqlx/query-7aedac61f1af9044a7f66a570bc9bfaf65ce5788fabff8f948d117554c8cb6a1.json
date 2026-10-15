@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO duel_journal_rounds(duel_id,round,moves,state_hash) VALUES ($1,$2,$3,$4)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Int2", "Bytea", "Bytea"]
+    },
+    "nullable": []
+  },
+  "hash": "7aedac61f1af9044a7f66a570bc9bfaf65ce5788fabff8f948d117554c8cb6a1"
+}

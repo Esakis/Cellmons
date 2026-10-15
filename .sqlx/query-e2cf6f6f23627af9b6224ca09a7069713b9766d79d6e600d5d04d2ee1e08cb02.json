@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT EXISTS(SELECT 1 FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.id_hash=$1 AND s.user_id=$2 AND s.expires_at>now() AND u.status='active') AS \"valid!\"",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "valid!",
+        "type_info": "Bool",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": ["Bytea", "Uuid"]
+    },
+    "nullable": [null]
+  },
+  "hash": "e2cf6f6f23627af9b6224ca09a7069713b9766d79d6e600d5d04d2ee1e08cb02"
+}

@@ -204,3 +204,12 @@ auth-error-FORBIDDEN = Żądanie zostało odrzucone. Odśwież stronę i spróbu
 auth-error-TRY_AGAIN = Usługa jest chwilowo zajęta. Spróbuj ponownie.
 auth-error-SERVER_UNAVAILABLE = Nie można połączyć się z serwerem. Tryb gościa i trening offline są nadal dostępne.
 
+
+lobby = Lobby
+lobby-gate = Lobby wymaga konta i połączenia z internetem. Gość korzysta z treningu offline.
+
+collection = Kolekcja
+
+store = Sklep
+store-ducats = Dukatów
+store-gate = Sklep wymaga zwykłego konta i połączenia z internetem.

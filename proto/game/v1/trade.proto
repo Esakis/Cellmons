@@ -1,0 +1,41 @@
+syntax = "proto3";
+package game.v1;
+
+message TradeInvite {
+  string target = 1;
+}
+message TradeTarget {
+  string trade_id = 1;
+}
+message TradeRespond {
+  string trade_id = 1;
+  bool accept = 2;
+}
+message TradeCard {
+  uint32 card_id = 1;
+  uint32 qty = 2;
+}
+message TradeOffer {
+  repeated TradeCard cards = 1;
+  int64 ducats = 2;
+}
+message TradeUpdate {
+  string trade_id = 1;
+  uint32 version = 2;
+  TradeOffer offer = 3;
+}
+message TradeConfirm {
+  string trade_id = 1;
+  uint32 version = 2;
+}
+message TradeSnapshot {
+  string trade_id = 1;
+  repeated string users = 2;
+  repeated string logins = 3;
+  string status = 4;
+  uint32 version = 5;
+  repeated TradeOffer offers = 6;
+  repeated bool accepted = 7;
+  int64 deadline_ms = 8;
+  uint64 revision = 9;
+}

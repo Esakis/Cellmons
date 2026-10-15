@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT count(*) AS \"count!\" FROM (SELECT COALESCE(w.balance,0) AS actual,COALESCE(l.recorded,0) AS recorded FROM wallets w FULL JOIN (SELECT account,sum(delta) AS recorded FROM ledger_entries WHERE account LIKE 'user:%' GROUP BY account) l ON l.account='user:'||w.user_id::text) balances WHERE actual<>recorded",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [null]
+  },
+  "hash": "080e1fed7160100481bf51c575b9381782c7938a11afd190355667fa677d3f0c"
+}

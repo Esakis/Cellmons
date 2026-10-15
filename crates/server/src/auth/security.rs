@@ -159,7 +159,7 @@ pub async fn session(state: &AppState, headers: &HeaderMap) -> Result<Session> {
     session_hash(state, &crypto::hash(&token), kind).await
 }
 
-pub(super) async fn session_hash(state: &AppState, hash: &[u8], kind: &str) -> Result<Session> {
+pub(crate) async fn session_hash(state: &AppState, hash: &[u8], kind: &str) -> Result<Session> {
     let row = sqlx::query!("UPDATE sessions AS s SET last_seen_at=now(), expires_at=now()+interval '30 days' FROM users AS u WHERE s.id_hash=$1 AND s.kind=$2 AND s.expires_at>now() AND u.id=s.user_id AND u.status='active' RETURNING s.id_hash, s.user_id, s.kind", hash, kind).fetch_optional(&state.db).await?.ok_or_else(Error::unauthorized)?;
     Ok(Session {
         hash: row.id_hash,

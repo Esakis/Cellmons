@@ -222,3 +222,11 @@ Cel: WCAG 2.2 poziom AA.
 ## 15. Aplikacja Android
 
 Ten sam klient działa w aplikacji Android (Capacitor). Różnice (logowanie tokenem, cykl życia, przycisk „wstecz”, wibracje, aktualizacje paczek) są zamknięte w `src/platform/`, a build dla aplikacji powstaje z `VITE_PLATFORM=android`. W aplikacji nie jest używany Service Worker, bo zasoby są w pakiecie. Szczegóły: `19-aplikacja-android.md`.
+
+## Lobby F6.5
+
+Trasa `#/lobby` ładuje osobny moduł z PL/EN: mapę, listę graczy i profil, czat/komendy, filtry, AFK, znajomych/ignorowanych, pocztę z paginacją i wyzwania. `net/client.ts` obsługuje binarny Protobuf, korelację odpowiedzi, reconnect z rozrzutem 0,5–8 s, resume i przejęcie sesji przez inne urządzenie. `net/commands.ts` zamienia komendy na typowane żądania. Tekst użytkownika jest renderowany jako tekst, bez HTML. Konto i lobby wymagają sieci i są pobierane na żądanie; podstawowy trening, ustawienia i gość pozostają offline. Utrata sieci podczas otwartego lobby zachowuje klienta i jego token wznowienia w RAM.
+
+## Walka online F7
+
+`features/lobby/OnlineDuel.tsx` renderuje widok otrzymany od serwera, wysyła podgląd i ruch przez istniejący WebSocket i odtwarza własny zapisany ruch po powrocie. `OnlineRecords.tsx` obsługuje ranking, historię i powtórki. Żaden z tych modułów nie jest potrzebny gościowi. Kod lobby/konta jest poza podstawowym precache; API i WebSocket nie trafiają do pamięci Service Workera. [Weryfikacja F7](25-pojedynki-online-testy.md).

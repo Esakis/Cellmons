@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO arena_progress(user_id,wins) VALUES ($1,1) ON CONFLICT(user_id) DO UPDATE SET wins=arena_progress.wins+1 RETURNING wins",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "wins",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "arena_progress",
+            "name": "wins"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid"]
+    },
+    "nullable": [false]
+  },
+  "hash": "0963f81c875dc163ca7e37b3f5a903c1dcf1255021e72e40245b5a25554647ae"
+}

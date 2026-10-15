@@ -8,18 +8,29 @@ export default defineConfig({
   testDir: './tests',
   forbidOnly: ci,
   retries: ci ? 2 : 0,
+  workers: ci ? 2 : undefined,
   reporter: ci ? [['github'], ['html', { open: 'never' }]] : 'list',
+  globalTeardown: './teardown.ts',
   use: {
     baseURL,
-    trace: 'on-first-retry',
+    trace: 'retain-on-failure',
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
     { name: 'mobile-chromium', use: { ...devices['Pixel 5'] } },
   ],
-  webServer: {
-    command: 'pnpm --filter web preview',
-    url: baseURL,
-    reuseExistingServer: !ci,
-  },
+  webServer: [
+    {
+      command: 'cargo run --quiet -p server --example browser_fixture --locked',
+      cwd: '..',
+      url: 'http://127.0.0.1:18092/healthz',
+      timeout: 180000,
+      reuseExistingServer: false,
+    },
+    {
+      command: 'pnpm --filter web exec vite preview --config vite.e2e.config.ts',
+      url: baseURL,
+      reuseExistingServer: false,
+    },
+  ],
 });

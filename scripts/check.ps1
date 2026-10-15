@@ -133,6 +133,7 @@ $steps = @(
     @{
         Name = 'E2E: Playwright'
         Slow = $true
+        Skip = { if (-not (Get-Command docker -ErrorAction SilentlyContinue)) { 'brak Dockera' } elseif (-not (Test-DockerRunning)) { 'Docker nie działa' } }
         # Testy e2e działają na zbudowanym kliencie; bez udanego budowania wynik byłby nieaktualny.
         Needs = 'Web: budowanie klienta'
         Run = { pnpm --filter e2e exec playwright install chromium; if ($LASTEXITCODE -eq 0) { pnpm --filter e2e test } }

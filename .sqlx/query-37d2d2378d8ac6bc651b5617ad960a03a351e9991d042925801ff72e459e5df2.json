@@ -1,0 +1,123 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT first_rating_delta,second_rating_delta,first_xp,second_xp,first_rating_new,second_rating_new,first_unlock,second_unlock,first_ducats,second_ducats FROM matches WHERE id=$1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "first_rating_delta",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "matches",
+            "name": "first_rating_delta"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "second_rating_delta",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "matches",
+            "name": "second_rating_delta"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "first_xp",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "matches",
+            "name": "first_xp"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "second_xp",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "matches",
+            "name": "second_xp"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "first_rating_new",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "matches",
+            "name": "first_rating_new"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "second_rating_new",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "matches",
+            "name": "second_rating_new"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "first_unlock",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "matches",
+            "name": "first_unlock"
+          }
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "second_unlock",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "matches",
+            "name": "second_unlock"
+          }
+        }
+      },
+      {
+        "ordinal": 8,
+        "name": "first_ducats",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "matches",
+            "name": "first_ducats"
+          }
+        }
+      },
+      {
+        "ordinal": 9,
+        "name": "second_ducats",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "matches",
+            "name": "second_ducats"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid"]
+    },
+    "nullable": [false, false, false, false, false, false, true, true, false, false]
+  },
+  "hash": "37d2d2378d8ac6bc651b5617ad960a03a351e9991d042925801ff72e459e5df2"
+}

@@ -1,6 +1,16 @@
 import { create } from '@bufbuild/protobuf';
 import { A, useBeforeLeave, useSearchParams } from '@solidjs/router';
-import { batch, createEffect, createSignal, For, Index, onCleanup, onMount, Show } from 'solid-js';
+import {
+  batch,
+  createEffect,
+  createSignal,
+  For,
+  Index,
+  onCleanup,
+  onMount,
+  type ParentProps,
+  Show,
+} from 'solid-js';
 import {
   avatars,
   type Card,
@@ -55,6 +65,89 @@ function dealtBy(list: DuelEvent[], side: number) {
   );
 }
 
+const hpPercent = (side: DuelSide) =>
+  `${Math.min(100, (Math.max(0, side.hp) / Math.max(1, side.hpStart)) * 100)}%`;
+const lowHp = (side: DuelSide) => side.hp * 10 < side.hpStart * 3;
+
+// Title plate on the window frame with a name plate for each side.
+function TitleBar(props: ParentProps<{ left: string; right: string }>) {
+  return (
+    <div class={styles.titleBar}>
+      <span class={styles.namePlate}>{props.left}</span>
+      {props.children}
+      <span class={styles.namePlate}>{props.right}</span>
+    </div>
+  );
+}
+
+// Strip with the character name; the badge in the corner marks initiative.
+function NameStrip(props: { avatar: number; owner: number; initiative: number; label: string }) {
+  return (
+    <>
+      <h2 class={styles.nameStrip}>{name(props.avatar)}</h2>
+      <Show when={props.initiative === props.owner}>
+        <span
+          class={styles.initiativeBadge}
+          role="img"
+          aria-label={t('initiative', { name: props.label })}
+          title={t('initiative', { name: props.label })}
+        >
+          ◆
+        </span>
+      </Show>
+    </>
+  );
+}
+
+// Vertical health gauge between a character panel and the centre.
+function HealthGauge(props: { side: DuelSide }) {
+  return (
+    <div
+      class={styles.gauge}
+      title={`${t('hp')}: ${Math.max(0, props.side.hp)} / ${props.side.hpStart}`}
+      aria-hidden="true"
+    >
+      <span style={{ height: hpPercent(props.side) }} data-low={lowHp(props.side)} />
+    </div>
+  );
+}
+
+// Card face shared by the hand and the played card: name with focus cost, illustration,
+// school requirements with stamina cost and the description.
+function CardFace(props: { card: Card; focus: number; stamina: number; hotkey?: string }) {
+  return (
+    <>
+      <span class={styles.cardTop}>
+        <Show when={props.hotkey}>
+          <kbd>{props.hotkey}</kbd>
+        </Show>
+        <strong>{cardName(props.card.id)}</strong>
+        <b class={styles.focusBadge}>
+          {props.focus}
+          <small>K</small>
+        </b>
+      </span>
+      <span class={styles.cardArt} data-picture={!!cardPicture(props.card.key)} aria-hidden="true">
+        <img
+          src={
+            cardPicture(props.card.key) ??
+            icon(`school-${Object.keys(props.card.requires)[0] ?? 'arcane'}`)
+          }
+          alt=""
+        />
+      </span>
+      <span class={styles.cardStrip}>
+        <Requirements card={props.card} />
+        <b class={styles.staminaBadge}>
+          {props.stamina}
+          <small>W</small>
+        </b>
+      </span>
+      <span class={styles.cardText}>{cardDescription(props.card)}</span>
+    </>
+  );
+}
+
 // One side of the board: framed portrait, health, schools, choices and the card it played.
 function Combatant(props: {
   side: DuelSide;
@@ -66,16 +159,14 @@ function Combatant(props: {
   fx?: Fx;
   portraitRef: (element: HTMLDivElement) => void;
 }) {
-  const percent = () =>
-    `${Math.min(100, (Math.max(0, props.side.hp) / Math.max(1, props.side.hpStart)) * 100)}%`;
   return (
     <section class={styles.combatant} aria-label={props.label} data-owner={props.owner}>
-      <div class={styles.nameplate}>
-        <span class={styles.ownerLabel}>
-          {props.label} {props.initiative === props.owner ? '◆' : ''}
-        </span>
-        <h2>{name(props.avatar)}</h2>
-      </div>
+      <NameStrip
+        avatar={props.avatar}
+        owner={props.owner}
+        initiative={props.initiative}
+        label={props.label}
+      />
       <div class={styles.portraitFrame} ref={props.portraitRef}>
         <img
           class={styles.portrait}
@@ -111,11 +202,11 @@ function Combatant(props: {
         aria-label={t('hp')}
       />
       <div class={styles.health} aria-hidden="true">
-        <span class={styles.healthGhost} style={{ width: percent() }} />
+        <span class={styles.healthGhost} style={{ width: hpPercent(props.side) }} />
         <span
           class={styles.healthFill}
-          style={{ width: percent() }}
-          data-low={props.side.hp * 10 < props.side.hpStart * 3}
+          style={{ width: hpPercent(props.side) }}
+          data-low={lowHp(props.side)}
         />
       </div>
       <PlayedCard id={props.played} />
@@ -148,12 +239,12 @@ function SideCard(props: {
   ];
   return (
     <section class={styles.sideCard} aria-label={props.label} data-owner={props.owner}>
-      <div class={styles.nameplate}>
-        <span class={styles.ownerLabel}>
-          {props.label} {props.initiative === props.owner ? '◆' : ''}
-        </span>
-        <h2>{name(props.avatar)}</h2>
-      </div>
+      <NameStrip
+        avatar={props.avatar}
+        owner={props.owner}
+        initiative={props.initiative}
+        label={props.label}
+      />
       <div class={styles.portraitFrame}>
         <img
           class={styles.sidePortrait}
@@ -241,11 +332,7 @@ function PlayedCard(props: { id: number }) {
       >
         {(card) => (
           <article class={styles.playedCard} data-rarity={card().rarity}>
-            <strong>{cardName(card().id)}</strong>
-            <Show when={cardPicture(card().key)}>
-              {(src) => <img class={styles.playedPicture} src={src()} alt="" />}
-            </Show>
-            <p>{cardDescription(card())}</p>
+            <CardFace card={card()} focus={card().cost.focus} stamina={card().cost.stamina} />
           </article>
         )}
       </Show>
@@ -262,6 +349,15 @@ function statValues(side: DuelSide) {
     `${side.stamina}`,
     `${side.focus}`,
   ];
+}
+// How a value such as "4/3" changed since the round start: every number grew, fell or both.
+function trend(value: string, before: string) {
+  if (value === before) return undefined;
+  const now = value.split('/').map(Number);
+  const then = before.split('/').map(Number);
+  if (now.every((n, i) => n >= (then[i] ?? n))) return 'up';
+  if (now.every((n, i) => n <= (then[i] ?? n))) return 'down';
+  return 'mixed';
 }
 
 function StatColumn(props: {
@@ -286,14 +382,14 @@ function StatColumn(props: {
       icon: statIcons[i] ?? '',
       label: labels()[i] ?? '',
       value,
-      changed: value !== before[i],
+      trend: trend(value, before[i] ?? value),
     }));
   };
   return (
     <dl class={styles.statColumn} data-owner={props.owner} aria-label={props.label}>
       <Index each={rows()}>
         {(row) => (
-          <div class={styles.statRow} title={row().label} data-changed={row().changed}>
+          <div class={styles.statRow} title={row().label} data-trend={row().trend}>
             <dt class={styles.medal}>
               <img
                 class={`${styles.panelIcon} ${styles.medalIcon}`}
@@ -956,20 +1052,23 @@ export function Duel() {
               when={animating()}
               fallback={
                 <section class={styles.table} aria-labelledby="round-title">
-                  <p class={styles.boardTitle}>
-                    {t('duel-title')} · {t(profile())} {demo() ? '· AI / AI' : ''}
-                  </p>
+                  <TitleBar left={demo() ? 'AI' : t('you')} right={t(profile())}>
+                    <p class={styles.boardTitle}>{t('duel-title')}</p>
+                  </TitleBar>
                   <div class={styles.tableGrid}>
                     <Show when={state().me}>
                       {(me) => (
-                        <SideCard
-                          side={me()}
-                          avatar={avatarId()}
-                          owner={0}
-                          initiative={state().initiative}
-                          enchanted={state().enchantments}
-                          label={t('you')}
-                        />
+                        <>
+                          <SideCard
+                            side={me()}
+                            avatar={avatarId()}
+                            owner={0}
+                            initiative={state().initiative}
+                            enchanted={state().enchantments}
+                            label={t('you')}
+                          />
+                          <HealthGauge side={me()} />
+                        </>
                       )}
                     </Show>
                     <div class={styles.command}>
@@ -1060,14 +1159,17 @@ export function Duel() {
                     </div>
                     <Show when={state().opponent}>
                       {(opponent) => (
-                        <SideCard
-                          side={opponent()}
-                          avatar={state().opponentAvatarId}
-                          owner={1}
-                          initiative={state().initiative}
-                          enchanted={state().enchantments}
-                          label={t('opponent')}
-                        />
+                        <>
+                          <HealthGauge side={opponent()} />
+                          <SideCard
+                            side={opponent()}
+                            avatar={state().opponentAvatarId}
+                            owner={1}
+                            initiative={state().initiative}
+                            enchanted={state().enchantments}
+                            label={t('opponent')}
+                          />
+                        </>
                       )}
                     </Show>
                   </div>
@@ -1087,6 +1189,7 @@ export function Duel() {
                                   data-selected={
                                     draft().action !== 0 && draft().handIndex === index()
                                   }
+                                  data-action={draft().handIndex === index() ? draft().action : 0}
                                   data-rarity={card().rarity}
                                 >
                                   <button
@@ -1113,38 +1216,14 @@ export function Duel() {
                                     onPointerLeave={() => clearTimeout(hold)}
                                     aria-label={`${cardName(id)}. ${cardFocus(index(), card())} K, ${castOptions()[index()]?.staminaCost ?? card().cost.stamina} W. ${cardDescription(card())}. ${castOptions()[index()]?.error ? errorText(castOptions()[index()]?.error ?? '') : t('cast')}`}
                                   >
-                                    <span class={styles.cardTop}>
-                                      <span class={styles.costBadges}>
-                                        <b>
-                                          {cardFocus(index(), card())}
-                                          <small>K</small>
-                                        </b>
-                                        <b>
-                                          {castOptions()[index()]?.staminaCost ??
-                                            card().cost.stamina}
-                                          <small>W</small>
-                                        </b>
-                                      </span>
-                                      <strong>{cardName(id)}</strong>
-                                      <kbd>{cardKeys[index()]?.toUpperCase()}</kbd>
-                                    </span>
-                                    <span
-                                      class={styles.cardArt}
-                                      data-picture={!!cardPicture(card().key)}
-                                      aria-hidden="true"
-                                    >
-                                      <img
-                                        src={
-                                          cardPicture(card().key) ??
-                                          icon(
-                                            `school-${Object.keys(card().requires)[0] ?? 'arcane'}`,
-                                          )
-                                        }
-                                        alt=""
-                                      />
-                                    </span>
-                                    <Requirements card={card()} />
-                                    <span class={styles.cardText}>{cardDescription(card())}</span>
+                                    <CardFace
+                                      card={card()}
+                                      focus={cardFocus(index(), card())}
+                                      stamina={
+                                        castOptions()[index()]?.staminaCost ?? card().cost.stamina
+                                      }
+                                      hotkey={cardKeys[index()]?.toUpperCase()}
+                                    />
                                   </button>
                                   <div class={styles.cardActions}>
                                     <button
@@ -1269,10 +1348,12 @@ export function Duel() {
               }
             >
               <section class={styles.board} aria-labelledby="board-title">
-                <h1 id="board-title" class={styles.boardTitle}>
-                  {t('duel-title')} ·{' '}
-                  {t('round', { round: state().round, total: state().totalRounds })}
-                </h1>
+                <TitleBar left={demo() ? 'AI' : t('you')} right={t(profile())}>
+                  <h1 id="board-title" class={styles.boardTitle}>
+                    {t('duel-title')} ·{' '}
+                    {t('round', { round: state().round, total: state().totalRounds })}
+                  </h1>
+                </TitleBar>
                 <div class={styles.fighters} ref={fighters}>
                   <Show when={strike()} keyed>
                     {(event) => (
@@ -1362,7 +1443,10 @@ export function Duel() {
                   </div>
                 </div>
                 <div class={styles.arena} ref={arena} aria-live="polite" role="status">
-                  <Show when={activeEvent()} fallback={<span>{t('round-over')}</span>}>
+                  <Show
+                    when={activeEvent()}
+                    fallback={<span class={styles.arenaIdle}>{t('round-over')}</span>}
+                  >
                     {(event) => (
                       <>
                         <Show when={strike()} keyed>

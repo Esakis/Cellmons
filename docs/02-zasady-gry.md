@@ -132,7 +132,7 @@ Serwer odrzuca niepoprawny ruch i odsyła błąd. Gracz może poprawić ruch prz
 
 **R-RUN-08. Limit czasu.** Od chwili, gdy przeciwnik zatwierdzi ruch, gracz ma **60 s** `[Ź:S2]` (`duel.move_timeout_after_opponent_s`). Dodatkowo cała faza decyzji trwa najwyżej 90 s `[Z-TMO]` (`duel.round_timeout_s`).
 
-**R-RUN-09. Brak ruchu.** Po upływie czasu przyjmuje się ruch „bez zmian”: ustawienia z poprzedniej rundy, bez akcji karty. Trzy kolejne braki ruchu tego samego gracza oznaczają walkower (przegrana, powód `timeout`) `[Z-TMO]` (`duel.max_consecutive_timeouts = 3`).
+**R-RUN-09. Brak ruchu.** Po upływie czasu przyjmuje się ruch „bez zmian”: ustawienia z poprzedniej rundy, bez akcji karty. Trzy kolejne braki ruchu tego samego gracza oznaczają walkower (przegrana, powód `timeout`) `[Z-TMO]` (`duel.max_consecutive_timeouts = 3`). Jeżeli obie strony osiągną trzeci kolejny brak ruchu jednocześnie, wynikiem jest remis `[D: rozstrzygnięcie jednoczesnego walkowera]`.
 
 ### 4.3. Ujawnienie i opłaty
 

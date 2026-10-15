@@ -13,6 +13,7 @@ export type Profile = {
 export type Account = { kind: 'guest' } | { kind: 'account'; profile: Profile } | null;
 export const [account, setAccount] = createSignal<Account>(null);
 let generation = 0;
+export const accountEpoch = () => generation;
 let controller = new AbortController();
 let appToken: string | undefined;
 let rotatedAt = 0;
@@ -120,6 +121,9 @@ export async function restoreAccount() {
 }
 
 export async function signIn(identity: string, password: string) {
+  controller.abort();
+  controller = new AbortController();
+  generation++;
   const epoch = generation;
   const result = await api<{ profile: Profile; token?: string }>('/api/auth/login', {
     identity,
@@ -139,9 +143,22 @@ export async function signOut() {
 }
 
 export function forgetAccount() {
+  controller.abort();
+  controller = new AbortController();
   generation++;
   appToken = undefined;
   setAccount(null);
 }
 
 export const authClient = () => (android ? 'android' : 'web');
+
+export async function websocketURL() {
+  if (account()?.kind !== 'account') throw new ApiError('UNAUTHENTICATED');
+  const url = new URL('/ws', android ? apiOrigin : location.origin);
+  url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
+  if (android) {
+    const { ticket } = await api<{ ticket: string }>('/api/auth/ws-ticket', {});
+    url.searchParams.set('ticket', ticket);
+  }
+  return url;
+}

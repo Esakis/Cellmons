@@ -19,6 +19,12 @@ message TrainingSetup {
   uint32 rotation = 4;
   bool autoplay = 5;
   string content_version = 6;
+  TrainingCustomPlayer custom = 7; // Optional RAM-only character/deck from the collection screen.
+}
+message TrainingCustomPlayer {
+  uint32 level = 1;
+  repeated uint32 spent = 2;
+  repeated uint32 deck = 3;
 }
 message TrainingForfeit {}
 message TrainingReplay {}

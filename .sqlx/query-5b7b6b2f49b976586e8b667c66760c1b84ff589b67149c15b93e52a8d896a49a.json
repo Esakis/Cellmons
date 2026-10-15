@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO match_projections(match_id,replay,first_snapshot,second_snapshot) VALUES ($1,$2,$3,$4)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Bytea", "Bytea", "Bytea"]
+    },
+    "nullable": []
+  },
+  "hash": "5b7b6b2f49b976586e8b667c66760c1b84ff589b67149c15b93e52a8d896a49a"
+}

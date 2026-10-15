@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO player_stats(user_id,games,wins,draws,losses,disconnects) VALUES ($1,1,$2,$3,$4,$5) ON CONFLICT(user_id) DO UPDATE SET games=player_stats.games+1,wins=player_stats.wins+$2,draws=player_stats.draws+$3,losses=player_stats.losses+$4,disconnects=player_stats.disconnects+$5",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Int4", "Int4", "Int4", "Int4"]
+    },
+    "nullable": []
+  },
+  "hash": "ecb546a59975c36e6ebcb5f4589758501cac7a1187a3f0d58964a2b89259feda"
+}

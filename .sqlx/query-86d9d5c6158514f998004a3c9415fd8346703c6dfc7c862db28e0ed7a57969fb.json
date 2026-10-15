@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT replay FROM match_projections WHERE match_id=$1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "replay",
+        "type_info": "Bytea",
+        "origin": {
+          "Table": {
+            "table": "match_projections",
+            "name": "replay"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid"]
+    },
+    "nullable": [false]
+  },
+  "hash": "86d9d5c6158514f998004a3c9415fd8346703c6dfc7c862db28e0ed7a57969fb"
+}

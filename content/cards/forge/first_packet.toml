@@ -1,0 +1,134 @@
+# First beta packet: resource management, dual effects and rare school spells.
+
+[[card]]
+id = 73
+key = "card.tactical_reserve"
+set = "forge"
+rarity = "silver"
+requires = { combat = 2 }
+cost = { focus = 3, stamina = 4 }
+kind = "instant"
+effects = [{ family = "stamina", target = "self", amount = 14 }]
+
+
+[[card]]
+id = 74
+key = "card.oath_of_steel"
+set = "forge"
+rarity = "gold"
+requires = { combat = 3 }
+cost = { focus = 4, stamina = 14 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_atk", amount = 2 }, { family = "stat_mod", target = "self", stat = "phys_def", amount = 2 }, { family = "stat_mod", target = "self", stat = "mag_def", amount = 1 }]
+
+
+[[card]]
+id = 75
+key = "card.shared_vigil"
+set = "forge"
+rarity = "silver"
+requires = { divine = 2 }
+cost = { focus = 3, stamina = 6 }
+kind = "instant"
+effects = [{ family = "heal", target = "self", amount = 10 }, { family = "stat_mod", target = "self", stat = "mag_def", amount = 1, duration = "round" }]
+
+
+[[card]]
+id = 76
+key = "card.dawn_reprieve"
+set = "forge"
+rarity = "gold"
+requires = { divine = 3 }
+cost = { focus = 4, stamina = 12 }
+kind = "instant"
+effects = [{ family = "heal", target = "self", amount = 12 }, { family = "stamina", target = "self", amount = 8 }]
+
+
+[[card]]
+id = 77
+key = "card.cinder_volley"
+set = "forge"
+rarity = "silver"
+requires = { element = 2 }
+cost = { focus = 3, stamina = 8 }
+kind = "instant"
+effects = [{ family = "damage", target = "opponent", amount = 8 }]
+
+
+[[card]]
+id = 78
+key = "card.storm_braid"
+set = "forge"
+rarity = "gold"
+requires = { element = 3 }
+cost = { focus = 4, stamina = 16 }
+kind = "instant"
+effects = [{ family = "damage", target = "both", amount = 12 }, { family = "stat_mod", target = "self", stat = "mag_atk", amount = 2, duration = "round" }]
+
+
+[[card]]
+id = 79
+key = "card.measured_thought"
+set = "forge"
+rarity = "silver"
+requires = { arcane = 2 }
+cost = { focus = 1, stamina = 8 }
+kind = "instant"
+effects = [{ family = "focus", target = "self", amount = 3 }]
+
+
+[[card]]
+id = 80
+key = "card.still_hour"
+set = "forge"
+rarity = "gold"
+requires = { arcane = 3 }
+cost = { focus = 4, stamina = 10 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "opponent", stat = "phys_atk", amount = -2, duration = "round" }, { family = "stat_mod", target = "opponent", stat = "mag_atk", amount = -2, duration = "round" }]
+
+
+[[card]]
+id = 81
+key = "card.ash_tether"
+set = "forge"
+rarity = "silver"
+requires = { necro = 2 }
+cost = { focus = 3, stamina = 6 }
+kind = "instant"
+effects = [{ family = "drain", pool = "stamina", amount = 8 }]
+
+
+[[card]]
+id = 82
+key = "card.grave_bloom"
+set = "forge"
+rarity = "gold"
+requires = { necro = 3 }
+cost = { focus = 4, stamina = 12 }
+kind = "instant"
+effects = [{ family = "damage", target = "opponent", amount = 7 }, { family = "heal", target = "self", amount = 7 }]
+
+
+[[card]]
+id = 83
+key = "card.brass_casing"
+set = "forge"
+rarity = "silver"
+requires = { tech = 2 }
+cost = { focus = 3, stamina = 8 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_def", amount = 2 }, { family = "stat_mod", target = "self", stat = "mag_def", amount = 1 }]
+
+
+[[card]]
+id = 84
+key = "card.overdrive_valve"
+set = "forge"
+rarity = "gold"
+requires = { tech = 3 }
+cost = { focus = 4, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round_end"
+keywords = ["intervention"]
+effects = [{ family = "stamina", target = "self", amount = 4 }]

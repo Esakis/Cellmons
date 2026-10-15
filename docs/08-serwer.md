@@ -228,3 +228,15 @@ Każda operacja administracyjna trafia do `audit_log` (kto, co, kiedy, przed i p
 | `ADMIN_IP_ALLOWLIST` | adresy z dostępem do panelu | puste (brak dostępu) |
 
 Sekrety (hasło bazy, klucze) tylko w zmiennych środowiskowych lub plikach Docker secrets, nigdy w repozytorium.
+
+## Implementacja lobby (F6.3–F7.1)
+
+`online/ws.rs` obsługuje autoryzację, Origin, limity, Protobuf, puls i zamykanie. `online/hub.rs` jest aktorem sesji, obecności, relacji i wyzwań; `online/room.rs` utrzymuje osobne, ograniczone kolejki pokojów, historię w RAM i rozsyłanie. `online/repo.rs` zawiera sprawdzane makrami SQLx zapytania i przygotowanie postaci/talii pod blokadami w transakcji. Obsługa polecenia ma limit 5 s. Wyjście/zmiana pokoju i rozłączenie anulują wyzwania. Odbiór rezerwacji pojedynku jest jednokrotny, a zakończenie zwalnia blokadę.
+
+`Hub::is_locked` obejmuje wysłane wyzwanie i rezerwację walki. Mutacje F8 `/api/game` są szeregowane z wyzwaniami przez Hub i sprawdzają trwałą blokadę pod blokadą wiersza użytkownika. Wyzwania są w RAM jednej instancji. Zaakceptowana walka ma dodatkowo blokady `duel_locks` w bazie. Aktor, dziennik i dzierżawy właściciela są w `duel/`; odtwarzanie po zabiciu procesu sprawdza test chaosu. Mutacje F8 muszą pod blokadą wiersza użytkownika sprawdzać trwałe blokady, a zmiana aktywnej postaci anuluje oczekujące wyzwania. Godzinne sprzątanie usuwa log czatu starszy niż 30 dni i listy usunięte przez obie strony. Domyślne limity: `WS_CONNECTIONS_PER_IP=20`, `WS_MAX_CONNECTIONS=5000`.
+
+Szczegóły F7.2–F7.5, limity, rozliczenie raz i ograniczenia wdrażania nowych wersji: [raport F7](25-pojedynki-online-testy.md).
+
+## Ekonomia i wymiana F9
+
+`economy.rs` obsługuje przepływy, nagrody arenowe, portfel i godzinne uzgodnienie; `store.rs` zakup, otwarcie i wysypisko; `trade.rs` ograniczone aktory wymiany z dzierżawą. Wspólne `activity.rs` chroni zasoby pomiędzy domenami pod blokadami użytkowników. Hub szereguje zaproszenia z pokojami i wyzwaniami; aktor wymiany wykonuje ofertę i obie akceptacje na trwałym dzienniku. Rozłączenie/wyjście z pokoju anuluje ofertę. [Raport F9](27-ekonomia-sklep-wymiana-testy.md).

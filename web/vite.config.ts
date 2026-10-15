@@ -1,3 +1,6 @@
+import { createHash } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
+import { relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadEnv } from 'vite';
 import solid from 'vite-plugin-solid';
@@ -5,6 +8,20 @@ import { defineConfig } from 'vitest/config';
 import { offlinePlugin } from './pwa-plugin.ts';
 
 export default defineConfig(({ mode }) => {
+  // Keep descriptive names in source; shorten repeated module selectors in shipped JS/CSS.
+  const moduleNames = new Map<string, Map<string, string>>();
+  const scopedName = (name: string, filename: string) => {
+    const file = relative(fileURLToPath(new URL('.', import.meta.url)), filename).replaceAll(
+      '\\',
+      '/',
+    );
+    const names = moduleNames.get(file) ?? new Map<string, string>();
+    moduleNames.set(file, names);
+    const prefix = createHash('sha256').update(file).digest('hex').slice(0, 8);
+    const value = names.get(name) ?? `_m${prefix}_${names.size.toString(36)}`;
+    names.set(name, value);
+    return value;
+  };
   // Adres serwera gry z pliku .env w katalogu głównym repozytorium (ten sam plik czyta serwer).
   const rootEnv = loadEnv(mode, fileURLToPath(new URL('..', import.meta.url)), '');
   const listenAddr = rootEnv.LISTEN_ADDR || '0.0.0.0:8080';
@@ -22,10 +39,22 @@ export default defineConfig(({ mode }) => {
     plugins: [
       solid({ hot: mode !== 'test' }),
       {
+        name: 'fluent-without-source-comments',
+        enforce: 'pre',
+        async load(id) {
+          if (!id.endsWith('.ftl?raw')) return;
+          const source = await readFile(id.slice(0, -4), 'utf8');
+          return `export default ${JSON.stringify(source.replace(/^#[^\r\n]*(?:\r?\n|$)/gm, ''))};`;
+        },
+      },
+      {
         name: 'native-api-csp',
         transformIndexHtml(html) {
           return apiOrigin
-            ? html.replace("connect-src 'self'", `connect-src 'self' ${apiOrigin}`)
+            ? html.replace(
+                "connect-src 'self'",
+                `connect-src 'self' ${apiOrigin} ${apiOrigin.replace('https:', 'wss:')}`,
+              )
             : html;
         },
       },
@@ -39,12 +68,18 @@ export default defineConfig(({ mode }) => {
       ...(mode === 'test' ? [] : [offlinePlugin()]),
     ],
     worker: { format: 'es' },
+    css: { modules: { generateScopedName: scopedName } },
     build: { assetsInlineLimit: 0, manifest: true },
     server: {
       port: 5173,
       strictPort: true,
       // Lokalnie klient i serwer gry działają na różnych portach.
-      proxy: { '/healthz': gameServer, '/readyz': gameServer, '/api': gameServer },
+      proxy: {
+        '/healthz': gameServer,
+        '/readyz': gameServer,
+        '/api': gameServer,
+        '/ws': { target: gameServer, ws: true },
+      },
     },
     preview: { port: 4173, strictPort: true },
     test: { environment: 'happy-dom' },

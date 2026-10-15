@@ -1,0 +1,35 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT request_hash,result FROM idempotency_keys WHERE user_id=$1 AND key=$2",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "request_hash",
+        "type_info": "Bytea",
+        "origin": {
+          "Table": {
+            "table": "idempotency_keys",
+            "name": "request_hash"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "result",
+        "type_info": "Bytea",
+        "origin": {
+          "Table": {
+            "table": "idempotency_keys",
+            "name": "result"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid", "Uuid"]
+    },
+    "nullable": [false, false]
+  },
+  "hash": "9dbe27d7342567d6467f958ecaf0c127cb7cc2a1a0396ae49a3743672fbcaa9c"
+}

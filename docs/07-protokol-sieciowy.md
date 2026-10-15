@@ -273,3 +273,21 @@ Endpointy wymagające sesji przyjmują ciasteczko (przeglądarka) albo nagłówe
 - **Inspektor protokołu** (tylko build deweloperski): panel w kliencie z listą wiadomości przychodzących i wychodzących, zdekodowanych do JSON, z filtrem i eksportem.
 - **Klient konsolowy** (`crates/loadtest`, tryb interaktywny): łączy się z serwerem i pozwala wysyłać wiadomości ręcznie. Przydaje się w testach i przy diagnozie.
 - **Nagrywanie sesji:** w środowisku testowym serwer może zapisać wszystkie wiadomości sesji do pliku, co pozwala odtworzyć zgłoszony błąd.
+
+## Implementacja F6.3–F7.1 (2026-10-15)
+
+Źródłem aktualnego formatu są `lobby.proto`, `session.proto` i `envelope.proto`. `NetError.code` jest stabilnym tekstowym kodem bez szczegółów bazy; `NetOk` potwierdza polecenie. Filtry używają wartości `all`/`level_pm2`/`none` oraz `all`/`clan_private`/`private`. Kanały: `room`/`private`/`clan`. Publiczne pokoje: `arena`, `training`, `castle`, `portal`, `bazaar`, `shop`, `tower`; prywatny pokój `clan:<uuid>` wymaga aktualnego członkostwa. Nazwy graczy są rozwiązywane na UUID po stronie serwera.
+
+Limit wejścia 16 KiB, wyjścia 256 KiB, kolejka wyjścia 256 wiadomości, limit pomieszczenia 100 osób i historia 50 wiadomości. Przepełnienie kolejki odłącza powolnego odbiorcę. Pierwszy `Hello`/`Resume` musi nadejść w 10 s; numeracja żądań rośnie w obrębie połączenia. Nieznane pola są tolerowane. Puls co 15 s sprawdza także ważność sesji, a unieważnienie przez HTTP powiadamia gateway od razu. Wznawianie w ciągu 60 s wymaga tej samej sesji i rotuje token przechowywany wyłącznie w RAM klienta.
+
+Wyzwanie wygasa po 30 s. `ChallengeReceived` zawiera publiczne profile obu stron i termin serwera. `ChallengeUpdate.status`: `accepted`, `declined`, `cancelled`, `expired`, `unavailable`, `finished`. Po akceptacji `duel_id` wskazuje działający trwały aktor F7.2. Stary interfejs rezerwacji pozostaje wyłącznie do izolowanych testów przekazania F7.1.
+
+## Pojedynki F7.2–F7.5
+
+`online_duel.proto` definiuje snapshot, podgląd i zatwierdzenie ruchu, poddanie, wynik, boty, ranking, historię i powtórki. Własna ręka i własny przyjęty ruch są prywatne dla uczestnika. Ręka/talia przeciwnika, jego nieujawniony ruch i ziarno nie są wysyłane w trakcie walki. Snapshot ma rewizję, termin i sumę kontrolną, a końcowy snapshot także zatwierdzony wynik z historycznymi nagrodami. `DuelEnd` ujawnia pełne ziarno dopiero po transakcji wyniku. Powtórka wymaga istniejącego zakończonego meczu. Pełny opis i granice walidacji: [raport F7](25-pojedynki-online-testy.md).
+
+## Ekonomia i wymiana F9
+
+`GET /api/economy` zwraca saldo i 50 ostatnich pozycji portfela; `GET /api/store` ofertę, kupione zestawy i postęp wysypiska. `POST /api/store` przyjmuje `{key: UUID, operation: {action: buy|open|discard, …}}`. Kupno podaje `kind` i otrzymany `quote`; otwarcie ID zestawu; wyrzucenie listę `{card_id, qty}`. Klucz wraz z treścią jest niezmienny przy ponawianiu. `PRICE_CHANGED` (409) wymaga świadomego nowego zakupu z aktualną ofertą, a `CONFLICT` odrzuca zmianę treści przy istniejącym kluczu. Kwoty `bigint` w JSON są łańcuchami dziesiętnymi. Odczyty i wyniki są prywatne i mają `Cache-Control: no-store`.
+
+`trade.proto`: zaproszenie po loginie, odpowiedź po UUID, zmiana oferty i potwierdzenie z wersją, anulowanie i odczyt snapshotu. `TradeSnapshot.revision` porządkuje wszystkie zmiany, `version` porządkuje same oferty. Kwoty Protobuf są `int64` (w TypeScript `bigint`), liczby kart `uint32`; serwer dodatkowo sprawdza zakres kolekcji i własność. Snapshot jest dostępny wyłącznie uczestnikom. Terminalny snapshot jest trwałym potwierdzeniem, także przy ponowieniu po utracie odpowiedzi. Szczegóły: [raport F9](27-ekonomia-sklep-wymiana-testy.md).

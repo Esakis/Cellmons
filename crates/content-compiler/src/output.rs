@@ -11,7 +11,7 @@ use crate::compile::Compiled;
 use crate::i18n::Lang;
 use crate::model::{AvatarSrc, CardSrc, SchoolSrc, StarterSrc};
 
-/// Treść dla klienta: te same pola co w plikach TOML, bez pól tylko dla projektanta (`ref`).
+/// Canonical rules and source definitions; also the input of content_version.
 #[derive(Serialize)]
 struct ClientContent<'a> {
     rules: &'a toml::Table,
@@ -19,13 +19,6 @@ struct ClientContent<'a> {
     avatars: Vec<&'a AvatarSrc>,
     cards: Vec<&'a CardSrc>,
     starters: Vec<&'a StarterSrc>,
-}
-
-#[derive(Serialize)]
-struct Versioned<'a> {
-    version: String,
-    #[serde(flatten)]
-    content: &'a ClientContent<'a>,
 }
 
 fn client_content(compiled: &Compiled) -> ClientContent<'_> {
@@ -70,12 +63,66 @@ pub fn hex(bytes: &[u8]) -> String {
 /// `content.json` z wersją treści.
 #[must_use]
 pub fn content_json(compiled: &Compiled) -> String {
-    let content = client_content(compiled);
-    let versioned = Versioned {
-        version: hex(&version(compiled)),
-        content: &content,
-    };
-    let mut json = serde_json::to_string_pretty(&versioned).expect("treść da się zapisać w JSON");
+    // The worker already holds executable effects and growth curves in WASM. The UI only
+    // needs initial profiles and numeric Fluent parameters, not a second copy of the engine.
+    // Hash the complete canonical source above, before producing this presentation payload.
+    let mut payload = serde_json::to_value(client_content(compiled)).expect("serializable content");
+    for avatar in payload["avatars"].as_array_mut().expect("avatar list") {
+        let fields = avatar.as_object_mut().expect("avatar");
+        fields.remove("growth");
+        fields.remove("dev_points");
+    }
+    // Paths remain a separate catalogue: they cannot become freely collectible templates.
+    let paths: Vec<_> = payload["avatars"]
+        .as_array()
+        .expect("avatar list")
+        .iter()
+        .filter(|a| a.get("path").is_some())
+        .cloned()
+        .collect();
+    payload["avatars"]
+        .as_array_mut()
+        .expect("avatar list")
+        .retain(|a| a.get("path").is_none());
+    payload
+        .as_object_mut()
+        .expect("content")
+        .insert("paths".into(), paths.into());
+    for card in payload["cards"].as_array_mut().expect("card list") {
+        let fields = card.as_object_mut().expect("card");
+        let mut params = serde_json::Map::new();
+        for key in ["focus", "stamina"] {
+            params.insert(key.into(), fields["cost"][key].clone());
+        }
+        if let Some(round) = fields.get("condition").and_then(|c| c.get("round")) {
+            params.insert("round".into(), round.clone());
+        }
+        for (index, effect) in fields["effects"]
+            .as_array()
+            .expect("effects")
+            .iter()
+            .enumerate()
+        {
+            for (key, value) in effect.as_object().expect("effect") {
+                if value.is_number() {
+                    let suffix = if index == 0 {
+                        String::new()
+                    } else {
+                        format!("_{}", index + 1)
+                    };
+                    params.insert(format!("{key}{suffix}"), value.clone());
+                }
+            }
+        }
+        fields.remove("effects");
+        fields.remove("condition");
+        fields.insert("params".into(), params.into());
+    }
+    payload
+        .as_object_mut()
+        .expect("content")
+        .insert("version".into(), hex(&version(compiled)).into());
+    let mut json = serde_json::to_string_pretty(&payload).expect("serializable content");
     json.push('\n');
     json
 }

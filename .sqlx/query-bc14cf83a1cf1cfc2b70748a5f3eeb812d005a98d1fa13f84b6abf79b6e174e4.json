@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT count(*) AS \"count!\" FROM friends WHERE user_id=$1 AND friend_id<>$2",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid", "Uuid"]
+    },
+    "nullable": [null]
+  },
+  "hash": "bc14cf83a1cf1cfc2b70748a5f3eeb812d005a98d1fa13f84b6abf79b6e174e4"
+}

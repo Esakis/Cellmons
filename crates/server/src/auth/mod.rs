@@ -1,5 +1,5 @@
 pub mod config;
-mod crypto;
+pub(crate) mod crypto;
 mod handlers;
 mod limits;
 pub mod mail;
@@ -95,6 +95,7 @@ pub struct Avatar {
     pub xp: i32,
 }
 
+#[derive(Clone)]
 pub(crate) struct Session {
     pub hash: Vec<u8>,
     pub user: Uuid,
@@ -102,6 +103,9 @@ pub(crate) struct Session {
 }
 
 impl Auth {
+    pub(crate) fn config(&self) -> &AuthConfig {
+        &self.0.config
+    }
     pub fn new(config: AuthConfig, mail: mail::Mailer) -> Self {
         Self(Arc::new(Inner {
             config,
@@ -155,7 +159,13 @@ impl Auth {
         .map_err(|_| Error::busy())
     }
 
-    fn limit(&self, scope: &str, identity: &str, count: usize, seconds: u64) -> Result<usize> {
+    pub(crate) fn limit(
+        &self,
+        scope: &str,
+        identity: &str,
+        count: usize,
+        seconds: u64,
+    ) -> Result<usize> {
         self.0
             .limits
             .take(
@@ -194,6 +204,12 @@ pub(crate) fn routes() -> Router<AppState> {
         .route("/api/auth/sessions", get(handlers::sessions))
         .route("/api/auth/sessions/{id}", delete(handlers::revoke))
         .route("/api/me", get(handlers::me))
+        .route("/api/game", get(crate::game::get).post(crate::game::post))
+        .route("/api/economy", get(crate::economy::get))
+        .route(
+            "/api/store",
+            get(crate::store::get).post(crate::store::post),
+        )
 }
 
 async fn profile(pool: &PgPool, user: Uuid) -> Result<Profile> {

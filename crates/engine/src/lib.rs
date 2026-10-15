@@ -34,7 +34,7 @@ pub use effect::{
     Target, Trigger,
 };
 pub use enchant::MAX_ENCHANTMENTS;
-pub use end::{Outcome, Reason, Termination, end_by};
+pub use end::{Outcome, Reason, Termination, end_by, end_draw};
 pub use event::{Event, EventBuf};
 pub use hash::state_hash;
 pub use moves::{

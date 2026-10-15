@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO boosters(id,user_id,kind,price,pools,seed,content_version,purchase_key) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Uuid", "Text", "Int8", "Bytea", "Bytea", "Bytea", "Uuid"]
+    },
+    "nullable": []
+  },
+  "hash": "f9ea6ced3bb3e73544d4dcdb7a92dc166dec0384f4f95b731f32beb7cf4bd5f4"
+}

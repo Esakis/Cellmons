@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO deck_presets(id,user_id,name,cards) VALUES ($1,$2,$3,$4)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Uuid", "Text", "Int2Array"]
+    },
+    "nullable": []
+  },
+  "hash": "77d6a48fe34b7374ea0bd2506a988080e6956428fc53296246717649723f84e5"
+}

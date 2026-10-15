@@ -35,7 +35,7 @@ impl Fixture {
         let mail = Arc::new(Mutex::new(Vec::new()));
         let auth = Auth::new(AuthConfig::local(), Mailer::Capture(mail.clone()));
         Self {
-            state: AppState { db, auth },
+            state: AppState::new(db, auth, server::online::Settings::default()),
             mail,
         }
     }
@@ -811,3 +811,12 @@ async fn production_cookie_is_host_scoped_and_other_accounts_cannot_revoke_sessi
         StatusCode::OK
     );
 }
+
+#[path = "auth/game.rs"]
+mod game;
+
+#[path = "auth/economy.rs"]
+mod economy;
+
+#[path = "auth/store.rs"]
+mod store;

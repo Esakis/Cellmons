@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 100" role="img" aria-label="Rezerwa taktyczna"><title>Rezerwa taktyczna</title>
+<defs><radialGradient id="bg" cx="50%" cy="35%" r="85%"><stop stop-color="#e8a581"/><stop offset=".55" stop-color="#7b211f"/><stop offset="1" stop-color="#111323"/></radialGradient><linearGradient id="metal" x2="1" y2="1"><stop stop-color="#fff1bd"/><stop offset=".4" stop-color="#bca073"/><stop offset="1" stop-color="#5b4934"/></linearGradient><radialGradient id="glow"><stop stop-color="#fff9d8" stop-opacity=".8"/><stop offset="1" stop-color="#e8a581" stop-opacity="0"/></radialGradient></defs>
+<rect width="160" height="100" fill="url(#bg)"/><circle cx="80" cy="46" r="42" fill="url(#glow)"/>
+<path d="M5 92L80 56 155 92M11 8L80 56 149 8" fill="none" stroke="#e8a581" opacity=".15"/>
+
+      <path d="M15 76L30 40 45 76M115 76L130 38 146 76" fill="#31262a" stroke="#ba7553"/>
+      <path d="M50 29Q80 15 110 29L115 81Q80 93 45 81Z" fill="#653c2c" stroke="#edc092" stroke-width="2"/>
+      <path d="M48 42Q80 59 112 42L105 24H55Z" fill="#a77043" stroke="#edc092"/>
+      <path d="M62 24Q62 8 80 8T98 24M58 43V80M102 43V80" fill="none" stroke="#d7b281" stroke-width="4"/>
+      <rect x="74" y="43" width="12" height="14" rx="2" fill="url(#metal)"/><path d="M78 47H82V53H78Z" fill="#45311e"/>
+      <path d="M73 66H87L90 79H70Z" fill="#86c9a3" stroke="#e1ffdb"/><path d="M76 62H84V68H76Z" fill="#d9c29d"/>
+      <path d="M19 21V56M20 22L41 26 34 37 20 34" fill="#ad6e5b" stroke="#e9bb8a"/>
+    
+<g fill="#e8a581" opacity=".7"><circle cx="18" cy="19" r="1"/><circle cx="141" cy="15" r="1.5"/><circle cx="23" cy="47" r=".8"/><circle cx="145" cy="84" r="1"/></g>
+<rect x="3" y="3" width="154" height="94" rx="3" fill="none" stroke="#ead1a0" opacity=".65"/><path d="M5 15V5H15M145 5H155V15M5 85V95H15M145 95H155V85" fill="none" stroke="#f7e2b5" stroke-width="1.5"/></svg>

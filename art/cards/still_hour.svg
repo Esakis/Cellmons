@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 100" role="img" aria-label="Zatrzymana godzina"><title>Zatrzymana godzina</title>
+<defs><radialGradient id="bg" cx="50%" cy="35%" r="85%"><stop stop-color="#bac5ff"/><stop offset=".55" stop-color="#242653"/><stop offset="1" stop-color="#111323"/></radialGradient><linearGradient id="metal" x2="1" y2="1"><stop stop-color="#fff1bd"/><stop offset=".4" stop-color="#bca073"/><stop offset="1" stop-color="#5b4934"/></linearGradient><radialGradient id="glow"><stop stop-color="#fff9d8" stop-opacity=".8"/><stop offset="1" stop-color="#bac5ff" stop-opacity="0"/></radialGradient></defs>
+<rect width="160" height="100" fill="url(#bg)"/><circle cx="80" cy="46" r="42" fill="url(#glow)"/>
+<path d="M5 92L80 56 155 92M11 8L80 56 149 8" fill="none" stroke="#bac5ff" opacity=".15"/>
+
+      <circle cx="80" cy="49" r="39" fill="none" stroke="#aca4d7" stroke-dasharray="2 7"/>
+      <path d="M55 12H105M55 88H105" stroke="url(#metal)" stroke-width="6" stroke-linecap="round"/>
+      <path d="M60 16Q60 37 77 49 60 65 60 84H100Q100 65 83 49 100 37 100 16Z" fill="#5d5890" fill-opacity=".55" stroke="#d6dbff" stroke-width="2"/>
+      <path d="M66 25H94L81 43H79Z" fill="#e7d38c"/><path d="M66 80L80 68 94 80Z" fill="#e7d38c"/>
+      <circle cx="80" cy="50" r="2" fill="#fff1c1"/><circle cx="80" cy="59" r="2" fill="#fff1c1"/>
+      <path d="M30 49H52M108 49H130M31 43L25 49 31 55M129 43L135 49 129 55" fill="none" stroke="#c0d6ff" stroke-width="2"/>
+    
+<g fill="#bac5ff" opacity=".7"><circle cx="18" cy="19" r="1"/><circle cx="141" cy="15" r="1.5"/><circle cx="23" cy="47" r=".8"/><circle cx="145" cy="84" r="1"/></g>
+<rect x="3" y="3" width="154" height="94" rx="3" fill="none" stroke="#ead1a0" opacity=".65"/><path d="M5 15V5H15M145 5H155V15M5 85V95H15M145 95H155V85" fill="none" stroke="#f7e2b5" stroke-width="1.5"/></svg>

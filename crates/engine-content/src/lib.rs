@@ -12,7 +12,21 @@ use engine::{
 #[rustfmt::skip]
 mod generated;
 
-pub use generated::{AVATARS, CARD_KEYS, CONTENT_VERSION, STARTERS};
+pub use generated::{AVATARS, CARD_KEYS, CARD_META, CONTENT_VERSION, PATHS, STARTERS};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CardRarity {
+    Bronze,
+    Silver,
+    Gold,
+}
+#[derive(Debug, Clone, Copy)]
+pub struct CardMeta {
+    pub id: CardId,
+    pub rarity: CardRarity,
+    pub in_boosters: bool,
+    pub set: &'static str,
+}
 
 /// Najwyższy poziom postaci (R-ENT-04).
 pub const MAX_LEVEL: u8 = 20;
@@ -28,9 +42,20 @@ pub struct Growth {
 
 /// Szablon postaci (`content/avatars`).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AvatarRarity {
+    Common,
+    Uncommon,
+    Rare,
+    Junkyard,
+    Shade,
+}
+
+/// Szablon postaci (`content/avatars`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct AvatarDef {
     pub id: u16,
     pub key: &'static str,
+    pub rarity: AvatarRarity,
     /// Szkoła, dla której postać jest startowa.
     pub starter_for: Option<School>,
     /// Statystyki na poziomie 1.
@@ -40,6 +65,15 @@ pub struct AvatarDef {
     pub growth: &'static [Growth],
     /// Punkty rozwoju: (poziom, liczba).
     pub dev_points: &'static [(u8, u8)],
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct PathDef {
+    pub base_avatar: u16,
+    pub variant: u8,
+    pub avatar: AvatarDef,
+    pub specializations: [engine::Specialization; 2],
+    pub gifts: [CardId; 2],
 }
 
 impl AvatarDef {
@@ -108,7 +142,15 @@ pub fn rules() -> RulesConfig {
 /// Postać o identyfikatorze `id`.
 #[must_use]
 pub fn avatar(id: u16) -> Option<&'static AvatarDef> {
-    AVATARS.iter().find(|avatar| avatar.id == id)
+    AVATARS
+        .iter()
+        .find(|avatar| avatar.id == id)
+        .or_else(|| path(id).map(|p| &p.avatar))
+}
+
+#[must_use]
+pub fn path(id: u16) -> Option<&'static PathDef> {
+    PATHS.iter().find(|path| path.avatar.id == id)
 }
 
 /// Klucz karty, np. `card.bronze_edge`.
@@ -122,7 +164,7 @@ pub fn card_key(id: CardId) -> Option<&'static str> {
 
 #[cfg(test)]
 mod tests {
-    use super::{AVATARS, MAX_LEVEL, STARTERS, avatar, content, rules};
+    use super::{AVATARS, AvatarRarity, MAX_LEVEL, STARTERS, avatar, content, rules};
 
     #[test]
     fn generated_content_is_accepted_by_the_engine() {
@@ -154,16 +196,25 @@ mod tests {
             assert!((55..=90).contains(&stamina), "{}: W +{stamina}", avatar.key);
             let hp = end.hp_max - start.hp_max;
             assert!((55..=95).contains(&hp), "{}: Ż +{hp}", avatar.key);
-            // Na poziomie 20 dwie szkoły: 3 + 2 albo 3 + 3.
+            // Final schools usually 3+2 or 3+3; the reference Masakrator has a single school.
             let mut levels = schools.0;
             levels.sort_unstable();
             assert!(
-                levels[5] == 3 && levels[4] >= 2,
+                levels[5] == 3 && (levels[4] == 0 || levels[4] >= 2),
                 "{}: szkoły {levels:?}",
                 avatar.key
             );
             let points: u8 = avatar.dev_points.iter().map(|(_, count)| count).sum();
-            assert_eq!(points, 6, "{}", avatar.key);
+            assert_eq!(
+                points,
+                if avatar.rarity == AvatarRarity::Junkyard {
+                    10
+                } else {
+                    6
+                },
+                "{}",
+                avatar.key
+            );
         }
     }
 }

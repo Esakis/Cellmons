@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM ignores WHERE user_id=$1 AND ignored_id=$2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Uuid"]
+    },
+    "nullable": []
+  },
+  "hash": "cd28653de31d4853b97b3be14d56de69707388d6bf27446a2bd415b72231a345"
+}

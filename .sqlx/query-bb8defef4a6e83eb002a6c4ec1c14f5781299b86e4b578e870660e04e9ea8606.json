@@ -1,0 +1,35 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT points,rewards_granted FROM junkyard WHERE user_id=$1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "points",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "junkyard",
+            "name": "points"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "rewards_granted",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "junkyard",
+            "name": "rewards_granted"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid"]
+    },
+    "nullable": [false, false]
+  },
+  "hash": "bb8defef4a6e83eb002a6c4ec1c14f5781299b86e4b578e870660e04e9ea8606"
+}

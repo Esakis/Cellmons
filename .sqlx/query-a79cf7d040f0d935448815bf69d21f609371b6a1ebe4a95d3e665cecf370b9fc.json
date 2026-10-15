@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT EXISTS(SELECT 1 FROM duel_locks WHERE duel_id=$1) AS \"active!\"",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "active!",
+        "type_info": "Bool",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid"]
+    },
+    "nullable": [null]
+  },
+  "hash": "a79cf7d040f0d935448815bf69d21f609371b6a1ebe4a95d3e665cecf370b9fc"
+}

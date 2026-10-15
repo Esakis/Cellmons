@@ -144,6 +144,9 @@ test('email link token is removed from the address and consumed only on confirma
     }
     return route.fulfill({ status: 401, json: { error: 'UNAUTHENTICATED' } });
   });
+  // The email may be opened while the account route is already mounted.
+  await page.goto('/#/account');
+  await expect(page.getByRole('button', { name: 'Sign in', exact: true }).last()).toBeVisible();
   await page.goto(`/#/account?action=verify&token=${token}`);
   await expect(page).not.toHaveURL(/token=/);
   expect(consumed).toBe(false);

@@ -1,0 +1,25 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT EXISTS(SELECT 1 FROM ignores WHERE (user_id=$1 AND ignored_id=$2) OR (user_id=$2 AND ignored_id=$1)) AS \"ignored!\",EXISTS(SELECT 1 FROM friends WHERE user_id=$2 AND friend_id=$1) AS \"invited!\"",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "ignored!",
+        "type_info": "Bool",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 1,
+        "name": "invited!",
+        "type_info": "Bool",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid", "Uuid"]
+    },
+    "nullable": [null, null]
+  },
+  "hash": "c46d5f38ee88420f44a25ec693d69715a85d09c9d58627a873b241e3ca01573d"
+}

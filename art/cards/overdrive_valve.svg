@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 100" role="img" aria-label="Zawór przeciążenia"><title>Zawór przeciążenia</title>
+<defs><radialGradient id="bg" cx="50%" cy="35%" r="85%"><stop stop-color="#91e0df"/><stop offset=".55" stop-color="#12454c"/><stop offset="1" stop-color="#111323"/></radialGradient><linearGradient id="metal" x2="1" y2="1"><stop stop-color="#fff1bd"/><stop offset=".4" stop-color="#bca073"/><stop offset="1" stop-color="#5b4934"/></linearGradient><radialGradient id="glow"><stop stop-color="#fff9d8" stop-opacity=".8"/><stop offset="1" stop-color="#91e0df" stop-opacity="0"/></radialGradient></defs>
+<rect width="160" height="100" fill="url(#bg)"/><circle cx="80" cy="46" r="42" fill="url(#glow)"/>
+<path d="M5 92L80 56 155 92M11 8L80 56 149 8" fill="none" stroke="#91e0df" opacity=".15"/>
+
+      <path d="M8 67H45L53 52M152 67H115L107 52M23 94V76H55M137 94V76H105" fill="none" stroke="#927f4c" stroke-width="12"/>
+      <path d="M8 67H45L53 52M152 67H115L107 52" fill="none" stroke="#f0d496" stroke-width="3"/>
+      <circle cx="80" cy="52" r="28" fill="url(#metal)" stroke="#ffe5af" stroke-width="2"/>
+      <circle cx="80" cy="52" r="21" fill="#122f39" stroke="#87bfc0"/>
+      <path d="M65 48A16 16 0 0 1 94 44" fill="none" stroke="#9fdbcf" stroke-width="3"/>
+      <path d="M87 38A16 16 0 0 1 96 52" fill="none" stroke="#e18b65" stroke-width="3"/>
+      <path d="M80 52L91 39" stroke="#ffe3a3" stroke-width="3" stroke-linecap="round"/><circle cx="80" cy="52" r="4" fill="#ddbf7c"/>
+      <path d="M54 28Q43 18 53 9M67 24Q60 13 70 5M104 27Q116 14 106 6" fill="none" stroke="#c0e5df" stroke-width="3" opacity=".7"/>
+      <path d="M71 86H89V94H71Z" fill="#b5a16f"/>
+    
+<g fill="#91e0df" opacity=".7"><circle cx="18" cy="19" r="1"/><circle cx="141" cy="15" r="1.5"/><circle cx="23" cy="47" r=".8"/><circle cx="145" cy="84" r="1"/></g>
+<rect x="3" y="3" width="154" height="94" rx="3" fill="none" stroke="#ead1a0" opacity=".65"/><path d="M5 15V5H15M145 5H155V15M5 85V95H15M145 95H155V85" fill="none" stroke="#f7e2b5" stroke-width="1.5"/></svg>

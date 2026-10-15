@@ -129,6 +129,8 @@ flowchart LR
 
 **Aktualizacja F6.2 (2026-10-15).** Zaimplementowano rejestrację z zestawem startowym, logowanie i wylogowanie web/aplikacji, sesje i ich unieważnianie, potwierdzanie e-maila, reset hasła, rotację tokenu, bilet WebSocket, CORS i limity prób. Dodano formularze konta oraz lokalnego gościa bez API i zapisu danych (decyzja właściciela, ADR-018). Testy akceptacyjne obejmują obie ścieżki logowania i tryb gościa offline. SMTP i Turnstile wymagają konfiguracji przed wdrożeniem publicznym. Następny krok: F6.3. Szczegóły i granice: [raport F6.2](23-konta-i-gosc-testy.md).
 
+**Aktualizacja F6.3–F7.1 (2026-10-15).** Wykonano cztery kolejne punkty: gateway WebSocket, pomieszczenia/czat/kontakty/poczta, klient lobby oraz wyzwania. Gateway przechodzi test 1000 równoczesnych uwierzytelnionych połączeń. Testy przeglądarkowe obejmują prawdziwą rejestrację dwóch kont i czat na desktopie oraz emulacji Pixel 5. Przyjęte wyzwanie tworzy niezmienną rezerwację, którą odbierze aktor F7.2; obecny zakres nie obejmuje jeszcze walk online. Raport i poprawki code review: [24](24-lobby-websocket-wyzwania-testy.md). **Następny punkt: F7.2.**
+
 ## F7. Pojedynki online (≈ 3 tydz.) → M3
 
 | Krok | Zadania | Kryteria akceptacji |
@@ -138,6 +140,8 @@ flowchart LR
 | F7.3 Wynik | ranking (R-RNK), PD (R-PD), statystyki gracza, historia walk z powtórką | wzór rankingu zgodny z tabelą z `01-badania-i-zrodla.md`, rozdz. 5.1 |
 | F7.4 Trening online | boty „AI” w sali treningowej (R-TRE-01…02) | bot odpowiada od razu |
 | F7.5 Klient online | ekran walki online, `DuelSnapshot` po wznowieniu, profil i ranking | **M3:** dwie osoby rozgrywają pełną walkę przez internet (środowisko testowe) |
+
+**Aktualizacja F7.2–F7.5 (2026-10-15).** Zaimplementowano trwałego aktora walki, odtwarzanie po zabiciu procesu, rozliczenie rankingu/PD/statystyk, historię z powtórką, boty treningowe i ekran walki online z wznowieniem. Testy lokalne obejmują dwa prawdziwe konta na desktopie i emulowanym telefonie. Publiczna próba dwóch osób przez Internet wymaga środowiska testowego i pozostaje do odbioru M3. Raport i poprawki przeglądu: [25](25-pojedynki-online-testy.md). **Kolejny zakres implementacji: F8.**
 
 ## F8. Postacie i kolekcja (≈ 3 tydz.)
 
@@ -149,6 +153,8 @@ flowchart LR
 | F8.4 Zdobywanie postaci | nagrody na arenie, gwarancje dla nowych graczy (R-NAG-01) | test statystyczny szans |
 | F8.5 Klient | ekrany postaci, rozwoju, konstruktora talii, biblioteki czarów | test e2e „nowa postać → talia → walka” |
 
+**Aktualizacja F8 (2026-10-15).** Zaimplementowano pulę i aktywację postaci, rozwój PR, kolekcję, talie i zestawy z przycinaniem, nagrody arenowe oraz klienta. Gość ma osobną kolekcję demonstracyjną w RAM i własny trening offline. Testy obejmują konkurencyjne operacje i cały przepływ „nowa postać → talia → walka”. Wyniki i poprawki przeglądu: [26](26-postacie-kolekcja-testy.md). **Następny zakres: F9.1, ekonomia.**
+
 ## F9. Ekonomia i treść bety (≈ 4 tydz.) → M4
 
 | Krok | Zadania | Kryteria akceptacji |
@@ -159,6 +165,8 @@ flowchart LR
 | F9.4 Wymiana | aktor wymiany, wersje ofert, atomowa transakcja (R-WYM) | test współbieżności: brak duplikacji kart przy równoległych operacjach |
 | F9.5 Treść beta | +60 kart, +10 postaci, z ilustracjami SVG (`03-tresc-gry.md`, rozdz. 9) | testy scenariuszowe; raport balansu; grafiki zatwierdzone przez właściciela |
 | F9.6 Beta zamknięta | środowisko testowe dostępne dla zaproszonych. Równolegle: zgłoszenie znaku SPELLGAMBIT, jeśli nie nastąpiło w F0.7, oraz założenie konta organizacji w Google Play i numeru D-U-N-S, bo weryfikacja może potrwać kilka tygodni | **M4:** 20–50 testerów przez 2 tygodnie; lista błędów |
+
+**Aktualizacja F9.1–F9.4 (2026-10-15).** Zaimplementowano portfel i księgę z uzgodnieniem, sklep i otwieranie z jawnymi szansami oraz kluczami idempotencji, wysypisko z trzema unikalnymi postaciami i przycinaniem talii, a także aktora wymiany z wersjami ofert, dzierżawą i atomowym rozliczeniem. Klient działa w PL/EN; test dwóch kont obejmuje także utraconą odpowiedź na zakup. Testy PostgreSQL: 57; przeglądarka desktop i Pixel 5; Lighthouse 99/100/100/100. Raport i poprawki: [27](27-ekonomia-sklep-wymiana-testy.md). **F9.5: treść przygotowana** (132 karty, 19 postaci, test każdej karty, portrety i ilustracje); [raport balansu](28-tresc-beta-balans.md) wskazuje konfiguracje do kalibracji F10.5. Odbiór nowych grafik pozostaje otwarty. F9.6 nie przeprowadzono.
 
 ## F10. Pełna treść i rozwój (≈ 8–10 tydz.)
 

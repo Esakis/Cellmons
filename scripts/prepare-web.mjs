@@ -39,6 +39,9 @@ run('wasm-bindgen', [
   'target/wasm32-unknown-unknown/wasm-release/engine_wasm.wasm',
   '--target',
   'web',
+  // Ship executable code; Rust symbol names remain in the local Cargo artifact for debugging.
+  '--remove-name-section',
+  '--remove-producers-section',
   '--out-dir',
   'web/src/generated/engine',
 ]);

@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO duel_journal(id,kind,engine_version,content_version,data,owner_instance,lease_until) VALUES ($1,$2,$3,$4,$5,$6,now()+($7::bigint*interval '1 millisecond'))",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Text", "Text", "Bytea", "Bytea", "Uuid", "Int8"]
+    },
+    "nullable": []
+  },
+  "hash": "f82b4d450da9bd9154edd5ef788b7771cdc4b3f89116b18055cfda5a9372c86a"
+}

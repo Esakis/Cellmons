@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Destylator"><title>Destylator</title><defs><radialGradient id="bg" cx="50%" cy="35%" r="80%"><stop stop-color="#318089"/><stop offset="1" stop-color="#18262e"/></radialGradient><linearGradient id="metal" x2="1" y2="1"><stop stop-color="#efe3bd"/><stop offset=".5" stop-color="#ac9568"/><stop offset="1" stop-color="#4f493f"/></linearGradient></defs><rect width="200" height="200" rx="12" fill="url(#bg)"/><circle cx="102" cy="70" r="58" fill="none" stroke="#ddcf9f" stroke-width="1" opacity=".35"/>
+<path d="M19 157V35H43V75M162 149V24H185V112" fill="none" stroke="#a78b58" stroke-width="12"/>
+<path d="M19 157V35H43M162 149V24H185" fill="none" stroke="#e4c990" stroke-width="3"/>
+<circle cx="43" cy="80" r="17" fill="#3b6b6b" stroke="#d3b274" stroke-width="4"/>
+<path d="M30 200Q33 145 68 126L87 116H122L143 131Q168 155 173 200" fill="#40575a" stroke="#a8bcb0" stroke-width="2"/>
+<path d="M81 119L100 150 124 119 134 200H68Z" fill="#a28053"/>
+<path d="M71 53Q100 27 128 57L124 102Q116 119 100 125 84 118 76 101Z" fill="#b98d70" stroke="#513d38" stroke-width="2"/>
+<path d="M67 65L74 40Q101 29 128 48L134 70Z" fill="#4f4c41" stroke="#ccb888" stroke-width="2"/>
+<path d="M70 72H133" stroke="#6e5039" stroke-width="10"/>
+<circle cx="84" cy="73" r="13" fill="#618f8b" stroke="url(#metal)" stroke-width="5"/><circle cx="119" cy="73" r="13" fill="#618f8b" stroke="url(#metal)" stroke-width="5"/>
+<path d="M78 68L88 77M113 68L123 77" stroke="#c8f1e2" stroke-width="2"/>
+<path d="M98 82L94 95 105 96M91 108Q101 112 111 106" fill="none" stroke="#694d43" stroke-width="2"/>
+<path d="M42 170Q58 157 79 166L84 184 64 190 45 184" fill="#ae856b" stroke="#513d38"/>
+<path d="M135 149V164L147 180Q150 191 139 194H118Q109 188 117 177L126 164V149Z" fill="#70caba" fill-opacity=".85" stroke="#d0eee1" stroke-width="2"/>
+<path d="M125 150H136M120 181H145" stroke="#e6d3a1" stroke-width="4"/>
+<rect x="4" y="4" width="192" height="192" rx="9" fill="none" stroke="#d5bd88" opacity=".7"/><path d="M12 30V12H30M170 12H188V30M12 170V188H30M170 188H188V170" stroke="#e1c894" fill="none"/></svg>

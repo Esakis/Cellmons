@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM chat_log WHERE created_at<now()-interval '30 days'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "350612ccba1d43af735c02c3f323545607cddd8451d917b381b3f6f3780a624a"
+}

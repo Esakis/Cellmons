@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE avatars SET dev_points_unspent=dev_points_unspent-$3,dp_phys_atk=$4,dp_phys_def=$5,dp_mag_atk=$6,dp_mag_def=$7,dp_hp=$8,dp_stamina=$9,revision=revision+1 WHERE id=$1 AND user_id=$2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Uuid", "Int2", "Int2", "Int2", "Int2", "Int2", "Int2", "Int2"]
+    },
+    "nullable": []
+  },
+  "hash": "f0e9142c12d26603b5d5ca8b6fb5cb406208810759e785449a3ad640f186e8a2"
+}

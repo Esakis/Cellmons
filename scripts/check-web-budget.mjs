@@ -5,6 +5,11 @@ import { brotliCompressSync } from 'node:zlib';
 
 const output = fileURLToPath(new URL('../web/dist/', import.meta.url));
 const manifest = JSON.parse(await readFile(join(output, '.vite/manifest.json'), 'utf8'));
+const onlineAssets = new Set(
+  JSON.parse(await readFile(join(output, 'online-assets.json'), 'utf8')).excluded.map((f) =>
+    join(output, f),
+  ),
+);
 function graph(key, files = new Set()) {
   const entry = manifest[key];
   if (!entry || files.has(entry.file)) return files;
@@ -62,10 +67,13 @@ const rows = [
   ],
   ['WASM (Brotli)', await sum(files.filter((f) => f.endsWith('.wasm'))), 90],
   ['Card illustrations (Brotli)', await sum([...illustrations]), 80],
+  ['Online account and lobby on demand (Brotli)', await sum([...onlineAssets]), 45],
   [
     'Complete offline app without card illustrations (Brotli, images/fonts original)',
     await sum(
-      files.filter((f) => !illustrations.has(f)),
+      files.filter(
+        (f) => !illustrations.has(f) && !onlineAssets.has(f) && !f.endsWith('online-assets.json'),
+      ),
       async (f) => (/\.(woff2|png)$/.test(f) ? (await stat(f)).size : compressed(f)),
     ),
     200,

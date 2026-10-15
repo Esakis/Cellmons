@@ -225,3 +225,21 @@ Skrypty `deploy/postgres/roles.sql` i `privileges.sql` rozdzielają role `game_m
 ## 7. Kopie zapasowe
 
 Ciągła archiwizacja WAL i pełne kopie dzienne do magazynu obiektowego (WAL-G lub pgBackRest), odtwarzanie do punktu w czasie (PITR), comiesięczna próba odtworzenia. Szczegóły: `15-infrastruktura-i-wdrozenie.md`, rozdz. 7.
+
+## Migracja F6.4
+
+Piąta migracja `202610150005_social_rooms.sql` dodaje sześć tabel: `friends`, `ignores`, `mail`, `clans`, `clan_members`, `chat_log` (łącznie 15 tabel domenowych). Klany/członkostwo są podstawą autoryzacji prywatnego czatu; interfejs zarządzania klanami pozostaje w F11. Kontakty mają limit 100, skrzynka odbiorcza 500 listów, list 1000 znaków. Kasowanie listu jest niezależne dla nadawcy i odbiorcy; odczyt i paginacja są ograniczone do właściciela. Log moderacyjny czatu zachowuje się 30 dni. Zastosowanych wcześniejszych migracji nie zmieniono.
+
+## Trwałe pojedynki F7
+
+Migracje 006–007 dodają `duel_journal`, `duel_locks`, `duel_journal_rounds`, `matches`, `rating_history` i `player_stats`. Prywatny dziennik zapisuje wejścia silnika, nie jego pamięć. Zapis ruchu sprawdza właściciela dzierżawy i rewizję. Transakcja wyniku zapisuje nagrody i historyczne salda rankingu, oznacza dziennik jako zakończony i usuwa blokady. Dziennik jest wymagany do odtworzenia i powtórek; nie wolno usuwać go niezależnie od meczu. [Testy F7](25-pojedynki-online-testy.md).
+
+## Rozwój i archiwum F8
+
+Migracja 008 dodaje rewizje postaci/talii/zestawów, `arena_progress` i historyczne odblokowania. Migracja 009 dodaje `match_projections`: publiczną gotową powtórkę i prywatny końcowy widok każdego uczestnika. Nowe zakończone mecze nie wymagają starego wykonawcy do wyświetlenia historii. Łącznie są 23 tabele domenowe. Wszystkie te zmiany są dopisanymi migracjami. [Raport F8](26-postacie-kolekcja-testy.md).
+
+## Ekonomia i wymiana F9
+
+Migracje 010–013 dodają `wallets`, `ledger_transactions`, `ledger_entries`, `daily_counters`, `boosters`, `idempotency_keys`, `junkyard`, `activity_locks` i `trades` (łącznie 32 tabele domenowe). Salda i pozycje księgi są `bigint`; suma w PostgreSQL używa `numeric`. Odroczone triggery sprawdzają bilans transakcji i zgodność portfela z księgą; historia nie dopuszcza UPDATE/DELETE. Dane osobowe muszą być anonimizowane bez niszczenia księgi.
+
+Mutacje najpierw blokują wiersze użytkowników rosnąco po UUID, następnie sprawdzają `duel_locks` oraz `activity_locks`. Dziennik wymiany ma właściciela, dzierżawę i rewizję. Wygasłe wymiany są anulowane; zakończona transakcja nie jest wykonywana ponownie. Zakup zamraża prywatny seed, wersję treści i jawne pule; otwarcie zapisuje wynik razem z dodaniem kart. Klucze idempotencji są trwałe i nie należy ich usuwać niezależnie od deduplikowanej operacji. [Testy i ograniczenia F9](27-ekonomia-sklep-wymiana-testy.md).

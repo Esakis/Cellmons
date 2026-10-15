@@ -1,0 +1,57 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT status,pools,seed,contents FROM boosters WHERE id=$1 AND user_id=$2 FOR UPDATE",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "status",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "boosters",
+            "name": "status"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "pools",
+        "type_info": "Bytea",
+        "origin": {
+          "Table": {
+            "table": "boosters",
+            "name": "pools"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "seed",
+        "type_info": "Bytea",
+        "origin": {
+          "Table": {
+            "table": "boosters",
+            "name": "seed"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "contents",
+        "type_info": "Int2Array",
+        "origin": {
+          "Table": {
+            "table": "boosters",
+            "name": "contents"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid", "Uuid"]
+    },
+    "nullable": [false, false, false, true]
+  },
+  "hash": "80671453932405c2a3bf6a95fce3d83bb2d0c77a7706304705f17fec1d9495d4"
+}

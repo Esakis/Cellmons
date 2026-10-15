@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Strażnik ruin"><title>Strażnik ruin</title><defs><radialGradient id="bg" cx="50%" cy="35%" r="80%"><stop stop-color="#617c5a"/><stop offset="1" stop-color="#202b2b"/></radialGradient><linearGradient id="metal" x2="1" y2="1"><stop stop-color="#efe3bd"/><stop offset=".5" stop-color="#ac9568"/><stop offset="1" stop-color="#4f493f"/></linearGradient></defs><rect width="200" height="200" rx="12" fill="url(#bg)"/><circle cx="102" cy="70" r="58" fill="none" stroke="#ddcf9f" stroke-width="1" opacity=".35"/>
+<path d="M20 176V62Q22 24 57 19M180 176V62Q178 24 143 19" fill="none" stroke="#718077" stroke-width="20"/>
+<path d="M18 83L33 69M169 51L181 64M19 126L31 112M169 138L182 151" stroke="#b9bca0" stroke-width="2"/>
+<path d="M17 182Q28 146 34 37M180 188Q164 145 174 40" fill="none" stroke="#81955f" stroke-width="4"/>
+<path d="M32 66Q52 47 47 72L32 82M168 96Q148 78 150 105L168 113" fill="#91a868"/>
+<path d="M31 200Q34 142 65 118L86 111H121L145 129Q170 154 172 200Z" fill="#56664e" stroke="#b3b995" stroke-width="2"/>
+<path d="M64 120Q55 51 85 34 117 22 136 64L137 125 118 148 76 144Z" fill="#465441" stroke="#9ca581" stroke-width="2"/>
+<path d="M77 66Q103 43 126 68L121 103 103 119 84 103Z" fill="#b4aa8e" stroke="#4a4b40"/>
+<path d="M78 79L96 84M108 84L123 79" stroke="#5c6556" stroke-width="3"/>
+<path d="M101 83L97 96 106 97M90 104L103 129 116 103" fill="#d6d1b6"/>
+<path d="M65 126L88 163 108 151 135 125M54 181L88 163 119 185" fill="none" stroke="#aaa880" stroke-width="3"/>
+<circle cx="105" cy="153" r="10" fill="url(#metal)"/><path d="M105 145V161M100 149L110 157" stroke="#5b6550" stroke-width="2"/>
+<path d="M40 200L43 73M43 75L29 57M43 74L60 56" fill="none" stroke="#b29a6d" stroke-width="7"/>
+<path d="M29 57Q40 32 59 56 52 76 43 75Z" fill="#797697" stroke="#cec2d8" stroke-width="2"/>
+<rect x="4" y="4" width="192" height="192" rx="9" fill="none" stroke="#d5bd88" opacity=".7"/><path d="M12 30V12H30M170 12H188V30M12 170V188H30M170 188H188V170" stroke="#e1c894" fill="none"/></svg>

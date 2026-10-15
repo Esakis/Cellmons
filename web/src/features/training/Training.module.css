@@ -255,86 +255,677 @@
   font-size: 0.7rem;
   padding-top: 2px;
 }
-/* The board: both sides with their stat columns in the middle. */
+@media (max-width: 900px) {
+  .setup,
+  .duel {
+    padding: 24px 20px;
+  }
+  .setupGrid {
+    gap: 24px;
+    grid-template-columns: 1.4fr 1fr;
+  }
+  .avatarChoice strong {
+    font-size: 0.72rem;
+  }
+  .sectionHeading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+@media (max-width: 650px) {
+  .setup,
+  .duel {
+    padding: 20px 16px;
+  }
+  .hero {
+    padding: 6px 0 26px;
+  }
+  .sigil {
+    display: none;
+  }
+  .hero h1 {
+    font-size: 2.4rem;
+  }
+  .setupGrid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .avatarChoice {
+    padding: 12px 5px;
+  }
+  .avatarChoice[aria-pressed="true"] {
+    padding: 11px 4px;
+  }
+  .avatarPortrait {
+    height: 82px;
+    width: 82px;
+    margin-bottom: 9px;
+  }
+  .avatarChoice .choiceStats {
+    font-size: 0.57rem;
+  }
+  .avatars {
+    gap: 8px;
+  }
+  .sectionHeading {
+    flex-direction: row;
+    align-items: center;
+  }
+  .guide {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+/* Duel window: a framed board with slim, square panels, metal plates and coins. */
+.duel {
+  --duel-edge: #050406;
+  --duel-band: #3a3530;
+  --duel-line: #a8874a;
+  --duel-window:
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgb(217 180 90 / 0.1), transparent 70%),
+    linear-gradient(180deg, #27221f, #151213);
+  --duel-panel: linear-gradient(180deg, #40213a, #221222);
+  --duel-panel-line: #6f4265;
+  --duel-center: linear-gradient(180deg, #1f2b26, #111815);
+  --duel-center-line: #46624f;
+  --duel-strip: linear-gradient(180deg, #2e2028, #120c10);
+  --duel-strip-text: #f1dfb4;
+  --duel-plate: linear-gradient(180deg, #3b3631, #1c1917);
+  --duel-inset: #0d0a0e;
+  --duel-tray: linear-gradient(180deg, #a56f3a, #6a4120);
+  --duel-tray-line: #331e0b;
+  --duel-card-body: linear-gradient(180deg, #2f2829, #1b1617);
+  --duel-text-box: linear-gradient(180deg, #4a1a2d, #300e1d);
+  --duel-text-box-color: #f3e6d0;
+  --duel-on-dark: invert(92%) sepia(18%) saturate(420%) hue-rotate(358deg) brightness(98%);
+  --coin-gold: radial-gradient(circle at 35% 30%, #fff2bd, #d9b45a 50%, #87611d);
+  --coin-bronze: radial-gradient(circle at 35% 30%, #f3cf94, #b27c37 55%, #5c3a11);
+  --coin-phys: radial-gradient(circle at 35% 30%, #f4a07a, #a8392a 55%, #4e1309);
+  --coin-mag: radial-gradient(circle at 35% 30%, #aab3ff, #3f4ab0 55%, #191e5a);
+  --coin-focus: radial-gradient(circle at 35% 30%, #93b3f0, #2f4f8f 60%, #152649);
+  --coin-stamina: radial-gradient(circle at 35% 30%, #92ddad, #2e7d4f 60%, #133b24);
+  --coin-red: radial-gradient(circle at 35% 30%, #ff9c84, #c0291c 60%, #640d06);
+}
+:global(:root[data-theme="light"]) .duel {
+  --duel-edge: #5e430f;
+  --duel-band: #dccaa5;
+  --duel-line: #a8801f;
+  --duel-window:
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgb(217 180 90 / 0.18), transparent 70%),
+    linear-gradient(180deg, #fbf6ea, #efe3c9);
+  --duel-panel: linear-gradient(180deg, #f6edf3, #eadbe6);
+  --duel-panel-line: #c5a2bb;
+  --duel-center: linear-gradient(180deg, #eef3ef, #dde8e0);
+  --duel-center-line: #a3bfae;
+  --duel-plate: linear-gradient(180deg, #fffdf8, #efe2c6);
+  --duel-inset: #f7f0e1;
+  --duel-tray: linear-gradient(180deg, #e0b27a, #b07c43);
+  --duel-tray-line: #7a5222;
+  --duel-card-body: linear-gradient(180deg, #f7eed8, #e8d7b0);
+  --duel-text-box: linear-gradient(180deg, #fffaf0, #f1e4c8);
+  --duel-text-box-color: #2b2118;
+}
+.table,
 .board {
   position: relative;
-  padding: 0 18px 18px;
-  border: 1px solid var(--gold-dark);
-  border-radius: 16px;
-  background:
-    radial-gradient(ellipse 70% 40% at 50% 0%, rgb(217 180 90 / 0.12), transparent 70%),
-    var(--panel-bg);
-  box-shadow: var(--panel-shadow);
-  outline: 1px solid rgb(217 180 90 / 0.22);
-  outline-offset: -8px;
+  padding: 0 16px 14px;
+  border: 1px solid var(--duel-edge);
+  border-radius: 3px;
+  background: var(--duel-window);
+  box-shadow:
+    inset 0 0 0 3px var(--duel-band),
+    inset 0 0 0 4px var(--duel-line),
+    inset 0 0 0 5px var(--duel-edge),
+    0 14px 34px rgb(0 0 0 / 0.5);
+}
+/* Gold corner brackets on the window and on its panels. */
+.table::before,
+.board::before,
+.sideCard::before,
+.command::before,
+.combatant::before {
+  --corner: 10px;
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid var(--duel-line);
+  pointer-events: none;
+  mask:
+    conic-gradient(at var(--corner) var(--corner), #0000 75%, #000 0) 0 0 /
+    calc(100% - var(--corner)) calc(100% - var(--corner));
+}
+.table::before,
+.board::before {
+  --corner: 28px;
+  inset: 8px;
+  border-width: 2px;
+}
+.titleBar {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+  margin: 0 30px 8px;
 }
 .boardTitle {
-  width: fit-content;
-  margin: -1px auto 16px;
-  padding: 8px 48px 9px;
+  position: relative;
+  margin: -1px 0 0;
+  padding: 5px 46px 6px;
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--heading);
+  text-shadow: var(--heading-shadow);
+  background: var(--duel-plate);
+  border: 1px solid var(--duel-line);
+  border-top: 0;
+  box-shadow:
+    0 0 0 1px var(--duel-edge),
+    0 5px 14px rgb(0 0 0 / 0.4);
+}
+/* Drawn diamonds rather than text, so screen readers do not announce them. */
+.boardTitle::before,
+.boardTitle::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  background: var(--duel-line);
+  transform: rotate(45deg);
+}
+.boardTitle::before {
+  left: 18px;
+}
+.boardTitle::after {
+  right: 18px;
+}
+.namePlate {
+  justify-self: center;
+  min-width: min(100%, 140px);
+  max-width: 100%;
+  margin-top: 7px;
+  padding: 3px 14px;
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-text);
+  background: var(--duel-inset);
+  border: 1px solid var(--duel-line);
+  box-shadow:
+    0 0 0 1px var(--duel-edge),
+    inset 0 1px 6px rgb(0 0 0 / 0.45);
+}
+.loading {
+  padding: 80px 16px;
+  text-align: center;
+}
+.loading button,
+.loading a {
+  margin: 10px;
+}
+.error {
+  color: var(--error);
+}
+
+/* Decision screen: character panels, health gauges and the sequence in the middle. */
+.tableGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 16px minmax(300px, 340px) 16px minmax(0, 1fr);
+  gap: 8px;
+  align-items: stretch;
+}
+.sideCard,
+.combatant {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--duel-panel-line);
+  border-radius: 2px;
+  background: var(--duel-panel);
+  box-shadow:
+    0 0 0 1px var(--duel-edge),
+    inset 0 1px 0 rgb(255 255 255 / 0.06),
+    0 6px 16px rgb(0 0 0 / 0.35);
+}
+.nameStrip {
+  margin: 0;
+  padding: 4px 30px;
+  overflow: hidden;
+  font-size: 0.86rem;
+  letter-spacing: 0.14em;
+  text-align: center;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--duel-strip-text);
+  background: var(--duel-strip);
+  border: 1px solid var(--duel-edge);
+  box-shadow: inset 0 0 0 1px rgb(217 180 90 / 0.28);
+}
+.initiativeBadge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  line-height: 1;
+  color: #fff4e8;
+  background: var(--coin-red);
+  border: 1px solid #3a0904;
+  box-shadow:
+    0 0 0 2px var(--duel-line),
+    0 2px 6px rgb(0 0 0 / 0.5);
+}
+.portraitFrame {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  background:
+    radial-gradient(circle at 50% 45%, rgb(217 180 90 / 0.2), transparent 65%), var(--duel-inset);
+  border: 1px solid var(--duel-line);
+  box-shadow:
+    0 0 0 1px var(--duel-edge),
+    inset 0 0 0 1px var(--duel-edge),
+    inset 0 0 22px rgb(0 0 0 / 0.55);
+}
+.sidePortrait {
+  display: block;
+  width: min(100%, 168px);
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
+}
+.schools {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px 12px;
+  padding: 3px 8px;
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: var(--duel-strip-text);
+  background: var(--duel-strip);
+  border: 1px solid var(--duel-edge);
+}
+.schools span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.schools img {
+  width: 15px;
+  height: 15px;
+  filter: var(--duel-on-dark);
+}
+.panelIcon {
+  filter: var(--icon-filter);
+}
+.pills {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
+  margin: 0;
+}
+/* Stat tiles with a gentle arch on top. */
+.pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 7px 2px 5px;
+  border: 1px solid var(--duel-line);
+  border-radius: 14px 14px 2px 2px;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.07), transparent 55%), var(--duel-inset);
+  box-shadow:
+    0 0 0 1px var(--duel-edge),
+    inset 0 0 0 1px var(--duel-edge);
+}
+.pill dt,
+.pill dd {
+  margin: 0;
+}
+.pill dd {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--heading);
+}
+.medalIcon {
+  width: 17px;
+  height: 17px;
+}
+.enchantments {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 4px;
+  min-height: 30px;
+  padding: 5px 6px;
+  overflow: auto;
+  font-size: 0.64rem;
+  color: var(--color-text-muted);
+  background: var(--duel-inset);
+  border: 1px solid var(--duel-panel-line);
+  box-shadow: inset 0 2px 6px rgb(0 0 0 / 0.4);
+}
+.enchantments > span {
+  padding: 2px 6px;
+  color: var(--color-text);
+  background: var(--surface);
+  border: 1px solid var(--duel-line);
+}
+.gauge {
+  position: relative;
+  margin: 24px 0 2px;
+  overflow: hidden;
+  background: var(--duel-inset);
+  border: 1px solid var(--duel-edge);
+  box-shadow:
+    0 0 0 1px var(--duel-line),
+    inset 0 2px 8px rgb(0 0 0 / 0.6);
+}
+.gauge > span {
+  position: absolute;
+  inset: auto 0 0;
+  background: linear-gradient(90deg, #f6b27a, #cc5f2c 50%, #7d2a10);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.45);
+  transition: height 0.4s ease-out;
+}
+.gauge > span[data-low="true"] {
+  background: linear-gradient(90deg, #ff7a6a, #b3141e 55%, #5e0a0f);
+}
+.command {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--duel-center-line);
+  border-radius: 2px;
+  background: var(--duel-center);
+  box-shadow:
+    0 0 0 1px var(--duel-edge),
+    inset 0 1px 0 rgb(255 255 255 / 0.05),
+    inset 0 2px 14px rgb(0 0 0 / 0.4);
+}
+.roundTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.roundTitle {
+  min-width: 0;
+  text-align: center;
+}
+.roundTitle h1 {
+  margin: 0;
+  font-size: 1.3rem;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.roundTitle small {
+  font-size: 0.64rem;
+  color: var(--color-text-muted);
+}
+.focusOrb,
+.slotOrb {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  font-family: var(--font-display);
   font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #2a1a08;
+  background: var(--coin-gold);
+  border: 1px solid #5e430f;
+  box-shadow:
+    0 0 0 2px var(--duel-edge),
+    0 0 0 3px var(--duel-line),
+    0 3px 8px rgb(0 0 0 / 0.5);
+}
+.focusOrb small {
+  font-family: "Inter Variable", system-ui, sans-serif;
+  font-size: 0.45rem;
+}
+.slotOrb {
+  width: 32px;
+  height: 32px;
+  font-size: 0.9rem;
+}
+.sequence {
+  --coin: 52px;
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+}
+.rowLabel {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 600;
   letter-spacing: 0.26em;
   text-transform: uppercase;
-  color: var(--heading);
-  background: var(--inset-bg);
-  border: 1px solid var(--gold-dark);
-  border-top: 0;
-  border-radius: 0 0 12px 12px;
-  box-shadow: 0 6px 16px rgb(0 0 0 / 0.35);
+  color: var(--accent);
 }
+/* The tray and the row of the opponent's previous moves share spacing, so coins line up. */
+.slots,
+.opponentRow {
+  display: flex;
+  justify-content: space-evenly;
+  gap: 8px;
+  width: 100%;
+  max-width: 380px;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0 11px;
+}
+.slots {
+  padding: 6px 10px;
+  border: 1px solid var(--duel-tray-line);
+  border-radius: 4px;
+  background: var(--duel-tray);
+  box-shadow:
+    0 0 0 1px var(--duel-edge),
+    inset 0 1px 0 rgb(255 255 255 / 0.3),
+    inset 0 -3px 8px rgb(0 0 0 / 0.35),
+    0 3px 8px rgb(0 0 0 / 0.35);
+}
+.slot {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--coin);
+  height: var(--coin);
+  min-height: 0;
+  padding: 0;
+  border: 2px solid #2b1408;
+  border-radius: 50%;
+  background: var(--coin-phys);
+  box-shadow:
+    inset 0 0 0 2px rgb(255 214 160 / 0.45),
+    inset 0 -5px 9px rgb(0 0 0 / 0.35),
+    0 2px 5px rgb(0 0 0 / 0.55);
+}
+.slot[data-kind="1"] {
+  border-color: #10143a;
+  background: var(--coin-mag);
+  box-shadow:
+    inset 0 0 0 2px rgb(200 210 255 / 0.45),
+    inset 0 -5px 9px rgb(0 0 0 / 0.35),
+    0 2px 5px rgb(0 0 0 / 0.55);
+}
+.slot img {
+  width: 52%;
+  height: 52%;
+  filter: brightness(0) invert(1) drop-shadow(0 1px 1px rgb(0 0 0 / 0.6));
+}
+.slot kbd {
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  font-family: inherit;
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: #2a1a08;
+  background: var(--coin-gold);
+  border: 1px solid #5e430f;
+}
+.ghostSlot {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin: 0 calc((var(--coin) - 22px) / 2);
+  border: 1px dashed var(--duel-center-line);
+  border-radius: 50%;
+  font-size: 0.7rem;
+  line-height: 1;
+  color: var(--color-text-muted);
+}
+.ghostSlot[data-kind="0"] {
+  border: 1px solid #2b1408;
+  background: var(--coin-phys);
+}
+.ghostSlot[data-kind="1"] {
+  border: 1px solid #10143a;
+  background: var(--coin-mag);
+}
+.ghostSlot .ghostIcon {
+  width: 12px;
+  height: 12px;
+  filter: brightness(0) invert(1);
+}
+.opponentCaption {
+  font-size: 0.56rem;
+  line-height: 1.3;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+.timerBox {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  column-gap: 10px;
+  padding: 5px 10px 5px 5px;
+  background: var(--duel-plate);
+  border: 1px solid var(--duel-line);
+  box-shadow: 0 0 0 1px var(--duel-edge);
+}
+.timerBox strong {
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  min-width: 40px;
+  height: 36px;
+  padding: 0 6px;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--heading);
+  background: var(--duel-inset);
+  border: 1px solid var(--duel-edge);
+  box-shadow: inset 0 1px 6px rgb(0 0 0 / 0.5);
+}
+.timerBox span {
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+.timerBox small {
+  font-size: 0.62rem;
+  color: var(--color-text-muted);
+}
+.result {
+  margin: auto 0;
+  padding: 14px 10px 12px;
+  text-align: center;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgb(217 180 90 / 0.25), transparent 70%), var(--duel-plate);
+  border: 1px solid var(--duel-line);
+  box-shadow:
+    0 0 0 1px var(--duel-edge),
+    0 0 30px rgb(217 180 90 / 0.18);
+}
+.result h2 {
+  margin: 2px 0 6px;
+  font-size: 1.9rem;
+  color: var(--heading);
+  text-shadow: var(--heading-shadow);
+}
+.result p {
+  margin: 0 0 8px;
+  font-size: 0.78rem;
+}
+.result button,
+.result a {
+  min-height: 36px;
+  margin: 4px 3px 0;
+  padding: 6px 14px;
+  border-radius: 2px;
+}
+
+/* Simulation screen: both fighters with their stat columns in the middle. */
 .fighters {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 92px 92px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) 84px 84px minmax(0, 1fr);
   grid-template-areas:
     "me statsMe statsOpponent opponent"
     "me exchange exchange opponent";
-  gap: 12px;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 8px;
   align-items: stretch;
 }
 .combatant {
   grid-area: me;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 16px;
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  min-width: 0;
-  background:
-    radial-gradient(ellipse 80% 40% at 50% 0%, rgb(57 73 171 / 0.22), transparent 70%),
-    var(--surface);
 }
 .combatant[data-owner="1"] {
   grid-area: opponent;
-  background:
-    radial-gradient(ellipse 80% 40% at 50% 0%, rgb(178 58 46 / 0.22), transparent 70%),
-    var(--surface);
 }
-.nameplate {
-  text-align: center;
-}
-.portraitFrame {
-  position: relative;
+.combatant .portraitFrame {
   align-self: center;
-  padding: 10px;
-  border: 2px solid var(--gold);
-  border-radius: 14px;
-  background: radial-gradient(circle, rgb(217 180 90 / 0.2), transparent 70%), var(--inset-bg);
-  box-shadow:
-    inset 0 0 0 4px var(--surface),
-    inset 0 0 0 5px var(--gold-dark),
-    0 6px 18px rgb(0 0 0 / 0.4);
 }
 .portrait {
   display: block;
-  width: 132px;
-  height: 132px;
-  border-radius: 50%;
-  box-shadow:
-    0 0 0 3px var(--surface),
-    0 0 0 5px var(--gold),
-    0 0 20px rgb(217 180 90 / 0.35);
+  width: 120px;
+  height: 120px;
 }
 .popup {
   position: absolute;
@@ -346,7 +937,7 @@
   font-weight: 800;
   white-space: nowrap;
   background: rgb(255 253 248 / 0.92);
-  border-radius: 999px;
+  border-radius: 3px;
   box-shadow: 0 2px 6px rgb(0 0 0 / 0.2);
   pointer-events: none;
   opacity: 0;
@@ -421,9 +1012,9 @@
   width: 20px;
   height: 20px;
   font-size: 0.7rem;
-  color: var(--color-text);
-  background: #f8f3e8;
-  border: 1px solid #b8954c;
+  color: #2a1a08;
+  background: var(--coin-gold);
+  border: 1px solid #5e430f;
   border-radius: 50%;
 }
 /* Flies until the impact at half time, then bursts and fades. */
@@ -448,31 +1039,21 @@
     opacity: 0;
   }
 }
-.ownerLabel {
-  font-size: 0.65rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--accent);
-}
-.combatant h2 {
-  font-size: 1.05rem;
-  margin: 4px 0 0;
-}
 .healthLabel {
   display: flex;
   justify-content: space-between;
-  font-size: 0.7rem;
-  margin-bottom: 6px;
+  font-size: 0.68rem;
 }
 .health {
   position: relative;
   width: 100%;
-  height: 14px;
+  height: 9px;
   overflow: hidden;
-  background: var(--inset-bg);
-  border: 1px solid var(--gold-dark);
-  border-radius: 7px;
-  box-shadow: inset 0 2px 4px rgb(0 0 0 / 0.5);
+  background: var(--duel-inset);
+  border: 1px solid var(--duel-edge);
+  box-shadow:
+    0 0 0 1px var(--duel-line),
+    inset 0 2px 4px rgb(0 0 0 / 0.5);
 }
 .srOnly {
   position: absolute;
@@ -486,7 +1067,6 @@
 .healthFill {
   position: absolute;
   inset: 0 auto 0 0;
-  border-radius: inherit;
 }
 /* The ghost lags behind so the lost health stays visible for a moment. */
 .healthGhost {
@@ -501,31 +1081,48 @@
 .healthFill[data-low="true"] {
   background: var(--hp-low);
 }
-.schools span {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
+.played {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  justify-items: center;
+  gap: 5px;
 }
-.schools img,
-.requirements img {
-  width: 18px;
-  height: 18px;
+.playedLabel {
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
 }
-.panelIcon {
-  filter: var(--icon-filter);
+.playedEmpty {
+  display: grid;
+  place-items: center;
+  width: min(100%, 210px);
+  aspect-ratio: 5 / 6;
+  margin: 0;
+  padding: 12px;
+  font-size: 0.66rem;
+  text-align: center;
+  color: var(--color-text-muted);
+  background: rgb(0 0 0 / 0.18);
+  border: 1px dashed var(--duel-panel-line);
 }
 .statColumn {
   grid-area: statsMe;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-between;
   gap: 4px;
+  min-height: 0;
   margin: 0;
-  padding: 14px 6px;
-  border: 1px solid var(--gold-dark);
-  border-radius: 46px;
-  background: linear-gradient(180deg, rgb(255 255 255 / 0.04), transparent 40%), var(--inset-bg);
-  box-shadow: inset 0 2px 12px rgb(0 0 0 / 0.5);
+  padding: 10px 4px;
+  border: 1px solid var(--duel-center-line);
+  border-radius: 2px;
+  background: var(--duel-center);
+  box-shadow:
+    0 0 0 1px var(--duel-edge),
+    inset 0 2px 12px rgb(0 0 0 / 0.4);
 }
 .statColumn[data-owner="1"] {
   grid-area: statsOpponent;
@@ -546,353 +1143,482 @@
 .medal {
   display: grid;
   place-items: center;
-  width: 38px;
-  height: 38px;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #3b2410;
   border-radius: 50%;
-  border: 1px solid var(--gold);
-  background: radial-gradient(circle at 35% 30%, var(--surface-raised), var(--inset-bg));
-  box-shadow: 0 0 10px rgb(217 180 90 / 0.25);
+  background: var(--coin-bronze);
+  box-shadow:
+    0 0 0 1px var(--duel-edge),
+    inset 0 1px 0 rgb(255 255 255 / 0.35);
 }
-.medalIcon {
-  width: 20px;
-  height: 20px;
+.medal .medalIcon {
+  width: 16px;
+  height: 16px;
+  filter: brightness(0) opacity(0.78);
 }
 .statRow dd {
-  margin-bottom: 8px;
   font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.2;
   color: var(--heading);
 }
 .statDealt {
-  margin-top: auto;
-  padding-top: 10px;
   width: 100%;
-  border-top: 1px solid var(--gold-dark);
+  padding-top: 6px;
+  border-top: 1px solid var(--duel-center-line);
 }
 .statDealt dt {
-  font-size: 0.56rem;
-  letter-spacing: 0.08em;
+  font-size: 0.52rem;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--color-text-muted);
 }
 .statDealt dd {
   display: grid;
   place-items: center;
-  width: 42px;
-  height: 42px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   font-family: var(--font-display);
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 700;
-  color: var(--primary-text);
-  background: var(--primary-bg);
-  border: 1px solid var(--primary-border);
+  color: #2a1a08;
+  background: var(--coin-gold);
+  border: 1px solid #5e430f;
+  box-shadow: 0 0 0 1px var(--duel-edge);
 }
-.played {
-  margin-top: 4px;
+/* Since the round start: green for gains, red for losses. */
+.statRow[data-trend="up"] dd {
+  color: var(--heal);
 }
-.playedLabel {
-  display: block;
-  margin-bottom: 6px;
-  text-align: center;
-  font-size: 0.6rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+.statRow[data-trend="down"] dd {
+  color: var(--hit);
+}
+.statRow[data-trend="mixed"] dd {
   color: var(--accent);
 }
-.playedEmpty {
-  margin: 0;
-  padding: 18px 10px;
-  text-align: center;
-  font-size: 0.68rem;
-  color: var(--color-text-muted);
-  border: 1px dashed var(--color-border);
-  border-radius: 10px;
-}
-.playedCard {
-  --rarity: var(--rarity-bronze);
-  display: grid;
-  width: min(100%, 230px);
-  margin: 0 auto;
+.exchange {
+  grid-area: exchange;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 6px;
+  min-height: 70px;
   padding: 8px;
-  color: var(--card-text);
-  background:
-    var(--card-bg) padding-box,
-    var(--rarity) border-box;
-  border: 3px solid transparent;
-  border-radius: 10px;
-  box-shadow: 0 6px 16px rgb(0 0 0 / 0.4);
+  border: 1px solid var(--duel-center-line);
+  border-radius: 2px;
+  background: var(--duel-center);
+  box-shadow:
+    0 0 0 1px var(--duel-edge),
+    inset 0 2px 12px rgb(0 0 0 / 0.4);
 }
-.playedCard[data-rarity="silver"] {
-  --rarity: var(--rarity-silver);
+.exchangeIdle {
+  color: var(--duel-line);
 }
-.playedCard[data-rarity="gold"] {
-  --rarity: var(--rarity-gold);
-}
-.playedCard > strong {
-  font-family: var(--font-display);
-  font-size: 0.76rem;
-}
-.playedPicture {
-  display: block;
-  width: 100%;
-  aspect-ratio: 8 / 5;
-  border: 2px solid var(--card-line);
-  border-radius: 4px;
-}
-.playedCard > p {
-  margin: 0;
-  font-size: 0.66rem;
-  line-height: 1.5;
-}
-.schools {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  font-size: 0.63rem;
-}
-.enchantments {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 12px;
-  font-size: 0.63rem;
-  color: var(--color-text-muted);
-}
-.enchantments > span {
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-  padding: 4px;
-}
-.slots {
-  display: flex;
-  justify-content: center;
-  gap: 14px;
-}
-.slot {
-  position: relative;
+.exchangeHit {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  flex: 0 1 var(--slot-width);
-  aspect-ratio: 2 / 3;
-  border-radius: 42px;
-  border: 2px solid var(--physical-border);
-  min-width: 0;
-  padding: 10px 5px;
-  background: var(--physical-bg);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.12),
-    0 4px 10px rgb(0 0 0 / 0.3);
+  gap: 2px;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  animation: pop 0.35s ease-out;
 }
-.slot[data-kind="1"] {
-  background: var(--magical-bg);
-  border-color: var(--magical-border);
+.exchangeIcon {
+  width: 24px;
+  height: 24px;
 }
-.slot img {
-  width: 50px;
-  height: 50px;
-  filter: var(--icon-filter) drop-shadow(0 2px 4px rgb(0 0 0 / 0.5));
+.exchangeHit[data-result="hit"],
+.arenaStrike[data-result="hit"] {
+  color: var(--hit);
 }
-.slot kbd {
-  position: absolute;
-  top: 3px;
-  left: 5px;
-  font-size: 0.56rem;
+.exchangeHit[data-result="block"],
+.arenaStrike[data-result="block"] {
+  color: var(--block);
+}
+.exchangeHit[data-result="miss"],
+.arenaStrike[data-result="miss"] {
   color: var(--color-text-muted);
 }
+.arena {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px 12px;
+  min-height: 42px;
+  margin-top: 10px;
+  padding: 6px 18px;
+  text-align: center;
+  background: var(--duel-inset);
+  border: 1px solid var(--duel-line);
+  box-shadow:
+    0 0 0 1px var(--duel-edge),
+    inset 0 1px 8px rgb(0 0 0 / 0.5);
+}
+.arenaIdle {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  letter-spacing: 0.12em;
+  color: var(--gold);
+}
+.arenaStrike {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  animation: pop 0.35s ease-out;
+}
+.arenaIcon {
+  width: 22px;
+  height: 22px;
+}
+.arenaText {
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* The hand: cards in metal frames, coloured by rarity. */
 .hand {
-  margin-top: 26px;
+  margin-top: 10px;
 }
 .cards {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px;
-  align-items: start;
+  gap: 8px;
+  align-items: stretch;
+}
+.card,
+.playedCard {
+  --rarity: var(--rarity-bronze);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  color: var(--duel-text-box-color);
+  background:
+    var(--duel-card-body) padding-box,
+    var(--rarity) border-box;
+  border: 3px solid transparent;
+  border-radius: 3px;
+  box-shadow:
+    0 0 0 1px var(--duel-edge),
+    0 6px 14px rgb(0 0 0 / 0.45);
+}
+.card[data-rarity="silver"],
+.playedCard[data-rarity="silver"] {
+  --rarity: var(--rarity-silver);
+}
+.card[data-rarity="gold"],
+.playedCard[data-rarity="gold"] {
+  --rarity: var(--rarity-gold);
 }
 .card {
-  --rarity: var(--rarity-bronze);
-  color: var(--card-text);
-  background:
-    var(--card-bg) padding-box,
-    var(--rarity) border-box;
-  border: 4px solid transparent;
-  border-radius: 12px;
-  overflow: hidden;
-  position: relative;
-  box-shadow: 0 8px 20px rgb(0 0 0 / 0.4);
   transition:
     transform 0.15s,
     box-shadow 0.15s;
 }
-.card[data-rarity="silver"] {
-  --rarity: var(--rarity-silver);
-}
-.card[data-rarity="gold"] {
-  --rarity: var(--rarity-gold);
-}
 .card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
 }
 .card[data-selected="true"] {
-  transform: translateY(-6px);
-  outline: 3px solid var(--accent);
-  outline-offset: 3px;
+  transform: translateY(-4px);
   box-shadow:
-    0 12px 26px rgb(0 0 0 / 0.5),
-    0 0 26px rgb(246 221 147 / 0.45);
+    0 0 0 1px var(--duel-edge),
+    0 0 0 3px var(--gold-bright),
+    0 0 22px rgb(255 170 60 / 0.55),
+    0 10px 22px rgb(0 0 0 / 0.5);
 }
 .cardMain {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 4px;
   width: 100%;
+  min-height: 0;
+  padding: 4px 4px 3px;
   border: 0;
   border-radius: 0;
   background: none;
-  padding: 10px;
+  font-size: inherit;
+  font-weight: 400;
   text-align: left;
-  display: flex;
-  flex-direction: column;
-  min-height: 250px;
-  gap: 9px;
-  color: var(--card-text);
+  color: inherit;
+}
+.playedCard {
+  gap: 4px;
+  width: min(100%, 210px);
+  padding: 4px;
 }
 .cardTop {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 6px;
-  width: 100%;
-  min-height: 44px;
+  gap: 5px;
+  min-height: 24px;
+  padding: 2px 30px 2px 6px;
+  color: var(--duel-strip-text);
+  background: var(--duel-strip);
+  border: 1px solid var(--duel-edge);
+  box-shadow: inset 0 0 0 1px rgb(217 180 90 / 0.22);
 }
 .cardTop > strong {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
   font-family: var(--font-display);
-  font-size: 0.74rem;
-  line-height: 1.35;
+  font-size: 0.7rem;
+  font-weight: 600;
   letter-spacing: 0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .cardTop > kbd {
-  font-size: 0.53rem;
-  margin-left: auto;
-  align-self: flex-start;
-  color: var(--card-muted);
+  font-family: inherit;
+  font-size: 0.55rem;
+  color: rgb(241 223 180 / 0.6);
 }
-.costBadges {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.costBadges > b {
-  display: flex;
+.focusBadge,
+.staminaBadge {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  width: 25px;
-  height: 25px;
-  background: radial-gradient(circle at 35% 30%, #7d9be0, #2f4f8f 60%, #182a52);
-  border: 1px solid #0f1d3d;
+  flex-shrink: 0;
   border-radius: 50%;
-  color: white;
-  font-size: 0.7rem;
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.4);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 1px 1px rgb(0 0 0 / 0.5);
+  box-shadow:
+    0 0 0 1px var(--duel-edge),
+    inset 0 1px 0 rgb(255 255 255 / 0.35),
+    0 1px 3px rgb(0 0 0 / 0.5);
 }
-.costBadges > b + b {
-  background: radial-gradient(circle at 35% 30%, #7fd09e, #2e7d4f 60%, #164229);
-  border-color: #0e3320;
+.focusBadge {
+  position: absolute;
+  top: 50%;
+  right: 2px;
   width: 22px;
   height: 22px;
+  margin-top: -11px;
+  background: var(--coin-focus);
 }
-.costBadges small {
-  font-size: 0.45rem;
+.staminaBadge {
+  width: 19px;
+  height: 19px;
+  background: var(--coin-stamina);
 }
-.cardArt {
-  display: grid;
-  place-items: center;
-  width: 100%;
-  height: 66px;
-  background: var(--inset-bg);
-  border-radius: 4px;
-}
-.cardArt img {
-  width: 42px;
-  height: 42px;
-  opacity: 0.65;
-}
-.cardArt[data-picture="true"] {
-  height: auto;
-  aspect-ratio: 8 / 5;
-  overflow: hidden;
-  border: 2px solid var(--card-line);
-  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.35);
-}
-.cardArt[data-picture="true"] img {
-  width: 100%;
-  height: 100%;
-  opacity: 1;
-}
-.detailsPicture {
-  display: block;
-  width: 100%;
-  max-width: 360px;
-  border-radius: 6px;
+.focusBadge small,
+.staminaBadge small {
+  font-size: 0.42rem;
 }
 .requirements {
   display: flex;
   align-items: center;
   gap: 6px;
   font-size: 0.65rem;
+  font-weight: 600;
 }
 .requirements > span {
   display: inline-flex;
   align-items: center;
   gap: 3px;
 }
-.cardText {
-  font-size: 0.7rem;
-  line-height: 1.65;
+.requirements img {
+  width: 18px;
+  height: 18px;
 }
-.cardActions {
-  border-top: 1px solid var(--card-line);
+.cardArt {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 8 / 5;
+  overflow: hidden;
+  background: var(--duel-inset);
+  border: 1px solid var(--duel-edge);
+  box-shadow: 0 0 0 1px rgb(217 180 90 / 0.28);
+}
+/* Positioned, so the picture always fits the box whatever height the card gets. */
+.cardArt img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.cardArt[data-picture="false"] img {
+  inset: 18%;
+  width: 64%;
+  height: 64%;
+  opacity: 0.6;
+  filter: var(--icon-filter);
+}
+/* The played card keeps the whole illustration; its description box takes the rest. */
+.playedCard .cardArt {
+  flex: none;
+  aspect-ratio: 8 / 5;
+}
+.cardStrip {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 4px;
+  gap: 6px;
+  min-height: 22px;
+  padding: 1px 2px 1px 6px;
+  color: var(--duel-strip-text);
+  background: var(--duel-strip);
+  border: 1px solid var(--duel-edge);
 }
-.cardActions button {
-  font-size: 0.68rem;
+.cardStrip .requirements img {
+  width: 14px;
+  height: 14px;
+  filter: var(--duel-on-dark);
+}
+.cardText {
+  display: -webkit-box;
+  flex: none;
+  height: calc(3 * 1.35em + 10px);
+  overflow: hidden;
+  padding: 4px 6px;
+  font-size: 0.66rem;
+  line-height: 1.35;
+  color: var(--duel-text-box-color);
+  background: var(--duel-text-box);
+  border: 1px solid var(--duel-edge);
+  box-shadow: inset 0 1px 5px rgb(0 0 0 / 0.35);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+.playedCard .cardText {
+  height: auto;
+  max-height: calc(5 * 1.35em + 10px);
+  -webkit-line-clamp: 5;
+}
+.cardActions {
+  display: flex;
+  gap: 3px;
+  padding: 0 4px 4px;
+}
+.card .cardActions button {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 24px;
+  padding: 2px 4px;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--color-text);
+  background: var(--duel-plate);
+  border: 1px solid var(--duel-edge);
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px rgb(217 180 90 / 0.2);
+}
+.card .cardActions button:last-child {
+  flex: 0 0 28px;
+}
+.card .cardActions button[aria-pressed="true"] {
+  color: var(--primary-text);
+  background: var(--primary-bg);
+  border-color: var(--primary-border);
 }
 .cardUnavailable {
   display: block;
-  padding: 0 10px 8px;
-  color: var(--card-error);
-  font-size: 0.59rem;
-  line-height: 1.5;
+  padding: 0 6px 4px;
+  font-size: 0.58rem;
+  line-height: 1.35;
+  color: var(--error);
 }
+/* A card chosen to cast glows orange; a card chosen to discard turns grey. */
+.card[data-action="1"] .cardText {
+  color: #fff4e2;
+  background: linear-gradient(180deg, #cf6a22, #8c3a0c);
+}
+.card[data-action="2"] {
+  box-shadow:
+    0 0 0 1px var(--duel-edge),
+    0 0 0 3px #c0392b,
+    0 0 18px rgb(192 57 43 / 0.5),
+    0 10px 22px rgb(0 0 0 / 0.5);
+}
+.card[data-action="2"] .cardArt {
+  filter: grayscale(0.85) brightness(0.8);
+}
+
+/* Bottom of the window: the message plate and the move buttons. */
+.commandBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 10px;
+}
+.validation {
+  flex: 1 1 260px;
+  margin: 0;
+  padding: 7px 14px;
+  font-size: 0.76rem;
+  text-align: center;
+  color: var(--accent);
+  background: var(--duel-inset);
+  border: 1px solid var(--duel-line);
+  box-shadow:
+    0 0 0 1px var(--duel-edge),
+    inset 0 1px 6px rgb(0 0 0 / 0.45);
+}
+.commandButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+.commandBar .commandButtons button {
+  min-height: 34px;
+  padding: 6px 14px;
+  border-radius: 2px;
+  font-size: 0.74rem;
+}
+/* The button variants are global classes, so they must not be renamed by CSS modules. */
+.commandBar .commandButtons button:global(.secondary),
+.commandBar .commandButtons button:global(.quiet) {
+  color: var(--color-text);
+  background: var(--duel-plate);
+  border: 1px solid var(--duel-line);
+  box-shadow:
+    0 0 0 1px var(--duel-edge),
+    inset 0 1px 0 rgb(255 255 255 / 0.08);
+}
+.commandBar .commandButtons button:global(.primary) {
+  box-shadow:
+    0 0 0 1px var(--duel-edge),
+    inset 0 1px 0 rgb(255 255 255 / 0.45);
+}
+
+/* Dialog contents: card details, the chronicle and the round log. */
 .cardDetails {
   line-height: 1.8;
 }
 .cardCost {
   font-weight: 650;
 }
-.arena {
-  border: 1px solid var(--gold-dark);
-  border-radius: 999px;
-  background:
-    linear-gradient(90deg, transparent, rgb(217 180 90 / 0.14), transparent), var(--inset-bg);
-  min-height: 60px;
-  display: grid;
-  place-items: center;
-  text-align: center;
-  margin: 24px 0 12px;
-  padding: 10px 24px;
-  font-family: var(--font-display);
-  font-size: 0.9rem;
-  letter-spacing: 0.02em;
-  box-shadow: inset 0 2px 8px rgb(0 0 0 / 0.4);
-}
-.arena > span {
-  color: var(--gold);
-  font-size: 1.3rem;
+.detailsPicture {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  border-radius: 3px;
 }
 .log {
   margin-top: 16px;
@@ -914,191 +1640,8 @@
   font-size: 0.63rem;
   line-height: 1.7;
 }
-.result {
-  text-align: center;
-  padding: 34px 16px;
-  margin-top: 24px;
-  border: 1px solid var(--gold);
-  border-radius: 14px;
-  background:
-    radial-gradient(ellipse at 50% 0%, rgb(217 180 90 / 0.3), transparent 70%), var(--panel-bg);
-  box-shadow:
-    var(--panel-shadow),
-    0 0 40px rgb(217 180 90 / 0.25);
-}
-.result h2 {
-  font-size: 2.6rem;
-  margin: 12px 0;
-  color: var(--heading);
-  text-shadow: var(--heading-shadow);
-}
-.result p {
-  font-size: 0.85rem;
-}
-.result button,
-.result a {
-  margin: 8px 4px 0;
-}
-.loading {
-  padding: 80px 16px;
-  text-align: center;
-}
-.loading button,
-.loading a {
-  margin: 10px;
-}
-.error {
-  color: var(--error);
-}
-@media (max-width: 900px) {
-  .setup,
-  .duel {
-    padding: 24px 20px;
-  }
-  .setupGrid {
-    gap: 24px;
-    grid-template-columns: 1.4fr 1fr;
-  }
-  .avatarChoice strong {
-    font-size: 0.72rem;
-  }
-  .sectionHeading {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-  .portrait {
-    width: 96px;
-    height: 96px;
-  }
-  .combatant {
-    padding: 12px;
-  }
-  .cards {
-    gap: 8px;
-  }
-  .cardMain {
-    padding: 8px;
-    min-height: 275px;
-  }
-}
-@media (max-width: 650px) {
-  .setup,
-  .duel {
-    padding: 20px 16px;
-  }
-  .hero {
-    padding: 6px 0 26px;
-  }
-  .sigil {
-    display: none;
-  }
-  .hero h1 {
-    font-size: 2.4rem;
-  }
-  .setupGrid {
-    grid-template-columns: 1fr;
-    gap: 28px;
-  }
-  .avatarChoice {
-    padding: 12px 5px;
-  }
-  .avatarChoice[aria-pressed="true"] {
-    padding: 11px 4px;
-  }
-  .avatarPortrait {
-    height: 82px;
-    width: 82px;
-    margin-bottom: 9px;
-  }
-  .avatarChoice .choiceStats {
-    font-size: 0.57rem;
-  }
-  .avatars {
-    gap: 8px;
-  }
-  .sectionHeading {
-    flex-direction: row;
-    align-items: center;
-  }
-  .guide {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-  .board {
-    padding: 0 8px 8px;
-  }
-  .fighters {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-areas:
-      "me opponent"
-      "statsMe statsOpponent"
-      "exchange exchange";
-    gap: 8px;
-  }
-  .combatant {
-    gap: 8px;
-    padding: 10px;
-  }
-  .portraitFrame {
-    padding: 6px;
-  }
-  .portrait {
-    width: 72px;
-    height: 72px;
-  }
-  .combatant h2 {
-    font-size: 0.85rem;
-    min-height: 34px;
-  }
-  .statColumn {
-    flex-flow: row wrap;
-    justify-content: center;
-    border-radius: 14px;
-    padding: 10px 6px;
-  }
-  .statDealt {
-    border-top: 0;
-    padding-top: 0;
-  }
-  .cards {
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x proximity;
-    padding: 16px 8px 12px;
-    margin: -16px -8px 0;
-  }
-  .card {
-    flex: 0 0 166px;
-    scroll-snap-align: start;
-  }
-  .cardMain {
-    min-height: 252px;
-  }
-}
-
-.cardActions button {
-  min-width: 44px;
-  padding: 6px;
-  font-size: 0.62rem;
-}
-.cardActions button[aria-pressed="true"] {
-  color: var(--accent);
-  background: var(--selected);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .healthGhost,
-  .healthFill {
-    transition: none;
-  }
-}
-
 .chronicle {
   margin-top: 18px;
-}
-.chronicle > h2 {
-  font-size: 0.95rem;
-  margin: 0 0 10px;
 }
 .chronicleEmpty {
   font-size: 0.75rem;
@@ -1109,10 +1652,10 @@
   grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
   gap: 8px 18px;
   align-items: start;
-  padding: 12px 14px;
-  margin-bottom: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
   border: 1px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: 3px;
   background: var(--panel-bg);
   box-shadow: var(--panel-shadow);
 }
@@ -1175,576 +1718,321 @@
   line-height: 1.7;
   color: var(--color-text-muted);
 }
-@media (max-width: 650px) {
-  .chronicleRound {
-    grid-template-columns: 1fr;
-  }
-}
 
-/* Decision screen: character cards on the sides, the sequence of attacks and defenses in the middle. */
-.table {
-  position: relative;
-  padding: 0 18px 18px;
-  border: 1px solid var(--gold-dark);
-  border-radius: 16px;
-  background:
-    radial-gradient(ellipse 70% 40% at 50% 0%, rgb(217 180 90 / 0.12), transparent 70%),
-    var(--panel-bg);
-  box-shadow: var(--panel-shadow);
-  outline: 1px solid rgb(217 180 90 / 0.22);
-  outline-offset: -8px;
-}
-.tableGrid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(330px, 380px) minmax(0, 1fr);
-  gap: 16px;
-  align-items: stretch;
-}
-.sideCard {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 14px;
-  min-width: 0;
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  background:
-    radial-gradient(ellipse 80% 40% at 50% 0%, rgb(57 73 171 / 0.22), transparent 70%),
-    var(--surface);
-}
-.sideCard[data-owner="1"] {
-  background:
-    radial-gradient(ellipse 80% 40% at 50% 0%, rgb(178 58 46 / 0.22), transparent 70%),
-    var(--surface);
-}
-.sideCard h2 {
-  font-size: 1.05rem;
-  margin: 4px 0 0;
-}
-.sideCard .schools {
-  justify-content: center;
-}
-.sideCard .portraitFrame {
-  display: grid;
-  place-items: center;
-  width: min(100%, 220px);
-  padding: 22px 12px;
-  border-radius: 90px 90px 14px 14px;
-}
-.sidePortrait {
-  display: block;
-  width: min(100%, 190px);
-  height: auto;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  box-shadow:
-    0 0 0 3px var(--surface),
-    0 0 0 5px var(--gold),
-    0 0 24px rgb(217 180 90 / 0.4);
-}
-.pills {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 6px;
-  margin: 0;
-}
-.pill {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 18px 2px;
-  border: 1px solid var(--gold-dark);
-  border-radius: 999px;
-  background: var(--inset-bg);
-}
-.pill dt,
-.pill dd {
-  margin: 0;
-}
-.pill dd {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 1.15rem;
-  color: var(--heading);
-}
-.command {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 16px 18px;
-  border: 1px solid var(--gold-dark);
-  border-radius: 14px;
-  background: linear-gradient(180deg, rgb(255 255 255 / 0.04), transparent 40%), var(--inset-bg);
-  box-shadow: inset 0 2px 12px rgb(0 0 0 / 0.5);
-}
-.roundTop {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-.roundTitle {
-  text-align: center;
-}
-.roundTitle h1 {
-  margin: 2px 0;
-  font-size: 1.6rem;
-}
-.roundTitle small {
-  font-size: 0.68rem;
-  color: var(--color-text-muted);
-}
-.focusOrb {
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  width: 48px;
-  height: 72px;
-  border-radius: 24px;
-  font-family: var(--font-display);
-  font-size: 1.4rem;
-  font-weight: 700;
-  line-height: 1;
-  color: var(--primary-text);
-  background: var(--primary-bg);
-  border: 1px solid var(--primary-border);
-  box-shadow: 0 0 14px rgb(217 180 90 / 0.35);
-}
-.focusOrb small {
-  font-size: 0.5rem;
-}
-.sequence {
-  --slot-width: 84px;
-  display: grid;
-  gap: 10px;
-  justify-items: center;
-}
-.rowLabel {
-  font-family: var(--font-display);
-  font-size: 0.8rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--accent);
-}
-.slots {
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-.opponentRow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 4px 14px;
-  width: 100%;
-}
-.opponentCaption {
-  font-size: 0.58rem;
-  color: var(--color-text-muted);
-}
-.ghostSlot {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 58px;
-  margin: 0 calc((var(--slot-width) - 40px) / 2);
-  border-radius: 20px;
-  border: 1px dashed var(--color-border);
-  color: var(--color-text-muted);
-  background: var(--surface);
-}
-.ghostSlot[data-kind="0"] {
-  border: 1px solid var(--physical-border);
-  background: var(--physical-bg);
-}
-.ghostSlot[data-kind="1"] {
-  border: 1px solid var(--magical-border);
-  background: var(--magical-bg);
-}
-.ghostIcon {
-  width: 26px;
-  height: 26px;
-}
-.timerBox {
-  display: grid;
-  justify-items: center;
-  gap: 4px;
-  padding: 8px;
-  border-top: 1px solid var(--gold-dark);
-  text-align: center;
-}
-.timerBox strong {
-  display: grid;
-  place-items: center;
-  min-width: 90px;
-  padding: 6px 20px;
-  font-family: var(--font-display);
-  font-size: 1.9rem;
-  border: 1px solid var(--gold-dark);
-  border-radius: 999px;
-  background: var(--surface);
-}
-.timerBox span {
-  font-size: 0.8rem;
-}
-.timerBox small {
-  font-size: 0.66rem;
-  color: var(--color-text-muted);
-}
-.commandBar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 10px 16px;
-  margin-top: 16px;
-  padding: 10px 14px;
-  border: 1px solid var(--gold-dark);
-  border-radius: 12px;
-  background: var(--inset-bg);
-}
-.validation {
-  margin: 0;
-  font-size: 0.78rem;
-  color: var(--accent);
-}
-.commandButtons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-left: auto;
-}
-
-/* Simulation screen: the exchange box and the wide strip with the current attack. */
-.statRow[data-changed="true"] dd {
-  color: var(--hit);
-}
-.exchange {
-  grid-area: exchange;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  padding: 8px;
-  border: 1px solid var(--gold-dark);
-  border-radius: 14px;
-  background: var(--inset-bg);
-}
-.slotOrb {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  font-family: var(--font-display);
-  font-weight: 700;
-  color: var(--primary-text);
-  background: var(--primary-bg);
-  border: 1px solid var(--primary-border);
-}
-.exchangeIdle {
-  color: var(--gold);
-}
-.exchangeHit {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  animation: pop 0.35s ease-out;
-}
-.exchangeIcon {
-  width: 26px;
-  height: 26px;
-}
-.exchangeHit[data-result="hit"],
-.arenaStrike[data-result="hit"] {
-  color: var(--hit);
-}
-.exchangeHit[data-result="block"],
-.arenaStrike[data-result="block"] {
-  color: var(--block);
-}
-.exchangeHit[data-result="miss"],
-.arenaStrike[data-result="miss"] {
-  color: var(--color-text-muted);
-}
-.arenaStrike {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 14px;
-  font-size: 1.6rem;
-  font-weight: 700;
-  animation: pop 0.35s ease-out;
-}
-.arenaIcon {
-  width: 32px;
-  height: 32px;
-}
-.arenaText {
-  font-size: 0.88rem;
-}
-@keyframes pop {
-  from {
-    opacity: 0;
-    transform: scale(0.6);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
 @media (max-width: 900px) {
   .tableGrid {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .gauge {
+    display: none;
   }
   .command {
     grid-column: 1 / -1;
     order: 3;
   }
+  .portrait {
+    width: 96px;
+    height: 96px;
+  }
+  .cards {
+    gap: 6px;
+  }
+  /* Narrow cards: the name may take two lines instead of being cut. */
+  .cardTop {
+    min-height: 34px;
+  }
+  .cardTop > strong {
+    display: -webkit-box;
+    line-height: 1.15;
+    white-space: normal;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
 }
 @media (max-width: 650px) {
-  .table {
-    padding: 0 8px 8px;
+  .duel {
+    padding: 12px 8px 20px;
   }
-  .tableGrid {
-    gap: 8px;
+  .table,
+  .board {
+    padding: 0 8px 10px;
   }
-  .sideCard {
-    padding: 10px;
+  .table::before,
+  .board::before {
+    --corner: 18px;
+    inset: 6px;
+  }
+  /* The title gets its own row; each name plate sits above its panel. */
+  .titleBar {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 6px 8px;
+    margin: 0 4px 8px;
+  }
+  .namePlate {
+    min-width: 0;
+    margin-top: 0;
+    padding: 3px 8px;
+    font-size: 0.66rem;
+  }
+  .boardTitle {
+    grid-row: 1;
+    grid-column: 1 / -1;
+    justify-self: center;
+    padding: 4px 16px 5px;
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+  }
+  .boardTitle::before,
+  .boardTitle::after {
+    display: none;
+  }
+  .sideCard,
+  .combatant {
+    gap: 6px;
+    padding: 8px;
+  }
+  .nameStrip {
+    padding: 3px 24px;
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
+  }
+  .sidePortrait {
+    width: min(100%, 110px);
   }
   .pills {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .sequence {
-    --slot-width: 72px;
+    --coin: 48px;
+  }
+  .fighters {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      "me opponent"
+      "statsMe statsOpponent"
+      "exchange exchange";
+    grid-template-rows: auto;
+  }
+  .portrait {
+    width: 72px;
+    height: 72px;
+  }
+  .statColumn {
+    flex-flow: row wrap;
+    justify-content: center;
+    padding: 8px 4px;
+  }
+  .statDealt {
+    width: auto;
+    padding-top: 0;
+    border-top: 0;
+  }
+  .cards {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    padding: 12px 8px 10px;
+    margin: -12px -8px 0;
+  }
+  .card {
+    flex: 0 0 160px;
+    scroll-snap-align: start;
   }
   .commandButtons {
     width: 100%;
   }
+  .chronicleRound {
+    grid-template-columns: 1fr;
+  }
 }
 
-/* On desktop the whole duel fits the window: sizes follow the viewport height. */
+/* On desktop the whole duel fits the window, which never grows beyond a compact board. */
 @media (min-width: 901px) and (min-height: 600px) {
   .duel {
-    max-width: 1440px;
-    padding: 8px 24px 0;
+    max-width: 1260px;
+    padding: 8px 16px 0;
   }
   .table,
   .board {
     display: flex;
     flex-direction: column;
-    height: calc(100dvh - 100px);
-    padding: 0 14px 12px;
+    height: min(calc(100dvh - 100px), 920px);
   }
-  .boardTitle {
+  .titleBar,
+  .commandBar,
+  .arena {
     flex-shrink: 0;
-    margin-bottom: 8px;
-    padding: 4px 40px 5px;
-    font-size: 0.85rem;
   }
-  .tableGrid {
-    flex: 1 1 0;
-    min-height: 0;
-    gap: 12px;
-  }
-  .sideCard {
-    gap: 1dvh;
-    padding: 1.2dvh 12px;
-    overflow: hidden;
-  }
-  .sideCard h2 {
-    font-size: 0.95rem;
-  }
-  .sideCard .portraitFrame {
-    width: auto;
-    padding: 1.4dvh 1dvh;
-  }
-  .sidePortrait {
-    width: 16dvh;
-  }
-  .pill {
-    gap: 2px;
-    padding: 0.9dvh 2px;
-  }
-  .pill dd {
-    font-size: 0.95rem;
-  }
-  .medalIcon {
-    width: 16px;
-    height: 16px;
-  }
-  .command {
-    gap: 0.6dvh;
-    padding: 1dvh 14px;
-    justify-content: space-between;
-    overflow: hidden;
-  }
-  .roundTitle h1 {
-    font-size: 1.35rem;
-  }
-  .focusOrb {
-    width: 4dvh;
-    height: 6dvh;
-    font-size: 1.1rem;
-  }
-  .sequence {
-    --slot-width: 5.6dvh;
-    gap: 0.5dvh;
-  }
-  .rowLabel {
-    font-size: 0.68rem;
-  }
-  .slot {
-    padding: 0;
-  }
-  .slot img {
-    width: 55%;
-    height: auto;
-  }
-  .ghostSlot {
-    width: 3dvh;
-    height: 4.2dvh;
-    margin: 0 calc((var(--slot-width) - 3dvh) / 2);
-  }
-  .ghostIcon {
-    width: 2.2dvh;
-    height: 2.2dvh;
-  }
-  .timerBox {
-    grid-auto-flow: column;
-    align-items: center;
-    gap: 12px;
-    padding: 0.8dvh 0 0;
-  }
-  .timerBox strong {
-    min-width: 0;
-    padding: 2px 14px;
-    font-size: 1.3rem;
-  }
-  .hand {
-    display: flex;
-    flex: 0 0 25dvh;
-    flex-direction: column;
-    min-height: 0;
-    margin-top: 1dvh;
-  }
-  .hand .sectionHeading {
-    display: none;
-  }
-  .cards {
-    flex: 1 1 0;
-    min-height: 0;
-    align-items: stretch;
-    gap: 10px;
-  }
-  .card {
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-  }
-  .card:hover,
-  .card[data-selected="true"] {
-    transform: none;
-  }
-  .cardMain {
-    flex: 1 1 0;
-    min-height: 0;
-    gap: 0.6dvh;
-    padding: 0.8dvh 8px;
-    overflow: hidden;
-  }
-  .cardTop {
-    min-height: 0;
-  }
-  .costBadges {
-    flex-direction: row;
-  }
-  .cardArt[data-picture="true"] {
-    flex: 1 1 0;
-    min-height: 0;
-    aspect-ratio: auto;
-  }
-  .cardArt[data-picture="true"] img {
-    object-fit: contain;
-  }
-  .cardText {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    font-size: 0.66rem;
-    line-height: 1.45;
-  }
-  .cardActions button {
-    min-height: 30px;
-    padding: 2px 6px;
-  }
-  .commandBar {
-    flex-shrink: 0;
-    margin-top: 1dvh;
-    padding: 6px 12px;
-  }
-  .commandBar button {
-    min-height: 40px;
-    padding: 8px 14px;
-  }
+  .tableGrid,
   .fighters {
     flex: 1 1 0;
     min-height: 0;
   }
+  .sideCard,
+  .command,
   .combatant {
     min-height: 0;
     overflow: hidden;
-    padding: 1.2dvh 12px;
   }
-  .portrait {
-    width: 16dvh;
-    height: 16dvh;
+  .sideCard .portraitFrame {
+    flex: 3 1 0;
+    min-height: 56px;
+    max-height: 250px;
   }
-  .played {
-    display: flex;
-    flex: 1 1 0;
-    flex-direction: column;
-    min-height: 0;
-  }
-  .playedCard {
-    flex: 1 1 0;
-    min-height: 0;
-    grid-template-rows: auto minmax(0, 1fr) auto;
-  }
-  .playedPicture {
+  .sidePortrait {
+    width: 100%;
     height: 100%;
+  }
+  .enchantments {
+    flex: 1 1 0;
+  }
+  .sequence {
+    --coin: clamp(36px, 5.8dvh, 56px);
+  }
+  .hand {
+    display: grid;
+    flex: 0 0 clamp(176px, 29dvh, 290px);
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 8px;
+    min-height: 0;
+  }
+  /* A narrow column next to the cards, as in the classic board: the label and the deck size. */
+  .hand .sectionHeading {
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    padding: 10px 0;
+    background: var(--duel-strip);
+    border: 1px solid var(--duel-edge);
+    box-shadow: inset 0 0 0 1px rgb(217 180 90 / 0.22);
+  }
+  .hand .sectionHeading h2,
+  .hand .sectionHeading > span {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+  }
+  .hand .sectionHeading h2 {
+    font-size: 0.68rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--duel-strip-text);
+  }
+  .hand .sectionHeading > span {
+    padding: 6px 3px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: #2a1a08;
+    background: var(--coin-gold);
+    border: 1px solid #5e430f;
+    border-radius: 10px;
+  }
+  .cards,
+  .card {
+    min-height: 0;
+  }
+  .cardMain {
+    flex: 1 1 0;
+    overflow: hidden;
+  }
+  .cardArt {
+    flex: 1 1 0;
     min-height: 0;
     aspect-ratio: auto;
-    object-fit: cover;
   }
-  .statColumn {
-    gap: 0;
-    padding: 1dvh 6px;
+  .portrait {
+    width: clamp(84px, 16dvh, 160px);
+    height: clamp(84px, 16dvh, 160px);
   }
-  .medal {
-    width: 4.4dvh;
-    height: 4.4dvh;
+  .played {
+    flex: 1 1 0;
+    min-height: 0;
   }
-  .statRow dd {
-    margin-bottom: 0.6dvh;
+  .playedCard,
+  .playedEmpty {
+    width: auto;
+    max-width: 100%;
+    height: 100%;
+    min-height: 0;
+    aspect-ratio: 5 / 7;
+  }
+  .playedCard .cardText {
+    flex: 1 1 0;
+    min-height: 0;
+    max-height: none;
+    -webkit-line-clamp: 8;
+  }
+}
+/* Short desktop windows: a tighter centre and two lines of card text. */
+@media (min-width: 901px) and (min-height: 600px) and (max-height: 780px) {
+  .titleBar {
+    margin-bottom: 6px;
+  }
+  .sideCard {
+    gap: 5px;
+    padding: 8px;
+  }
+  .nameStrip {
+    padding: 2px 30px;
+  }
+  .pill {
+    padding: 4px 2px 3px;
+  }
+  .command {
+    gap: 4px;
+    padding: 8px 10px;
+  }
+  .sequence {
+    --coin: clamp(32px, 5.4dvh, 56px);
+    gap: 3px;
+  }
+  .ghostSlot {
+    width: 18px;
+    height: 18px;
+    margin: 0 calc((var(--coin) - 18px) / 2);
+  }
+  .opponentCaption {
+    display: none;
+  }
+  .roundTitle h1 {
     font-size: 1.1rem;
   }
-  .statDealt dd {
-    width: 4.6dvh;
-    height: 4.6dvh;
+  .focusOrb {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
   }
+  .timerBox strong {
+    min-width: 34px;
+    height: 30px;
+    font-size: 1rem;
+  }
+  .hand {
+    flex-basis: clamp(170px, 28dvh, 290px);
+    margin-top: 8px;
+  }
+  .card .cardText {
+    height: calc(2 * 1.35em + 10px);
+    -webkit-line-clamp: 2;
+  }
+  .commandBar,
   .arena {
-    flex-shrink: 0;
-    min-height: 0;
-    margin: 1dvh 0 0;
-    padding: 0.8dvh 20px;
+    margin-top: 8px;
+  }
+}
+@media (pointer: coarse) {
+  .commandBar .commandButtons button {
+    min-height: 44px;
+  }
+  .card .cardActions button {
+    min-height: 40px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .healthGhost,
+  .healthFill,
+  .gauge > span {
+    transition: none;
   }
 }

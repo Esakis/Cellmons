@@ -36,3 +36,10 @@ export function t(key: string, args?: Record<string, FluentVariable>): string {
   return bundle.formatPattern(message.value, args);
 }
 export const hasTranslation = (key: string) => bundles.en.hasMessage(key);
+
+export function addTranslations(resources: { pl: string; en: string }) {
+  for (const locale of ['pl', 'en'] as const) {
+    const errors = bundles[locale].addResource(new FluentResource(resources[locale]));
+    if (errors.length) throw new Error(`Invalid ${locale} feature translations`);
+  }
+}

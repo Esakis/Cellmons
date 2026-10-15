@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO duel_locks(user_id,duel_id) VALUES ($1,$2) ON CONFLICT DO NOTHING",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Uuid"]
+    },
+    "nullable": []
+  },
+  "hash": "1214f262a7da0a8669684799ec3bd0f1d9b11536d46325e00923202ee0153c61"
+}

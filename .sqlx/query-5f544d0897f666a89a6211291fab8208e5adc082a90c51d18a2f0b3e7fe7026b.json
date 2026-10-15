@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT count(*) AS \"count!\" FROM mail WHERE to_user=$1 AND NOT deleted_by_recipient",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid"]
+    },
+    "nullable": [null]
+  },
+  "hash": "5f544d0897f666a89a6211291fab8208e5adc082a90c51d18a2f0b3e7fe7026b"
+}

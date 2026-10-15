@@ -1,5 +1,5 @@
 # Parametry zasad gry (docs/02-zasady-gry.md, rozdz. 13). Silnik czyta sekcje [duel] i [deck];
-# sekcje dla serwera (ranking, doświadczenie, ekonomia) dojdą w kolejnych fazach.
+# sekcje rating, xp i training są wspólne dla wersjonowanej treści i serwera.
 # Nieznany klucz w [duel] albo [deck] jest błędem, żeby literówka nie przeszła niezauważona.
 
 [duel]
@@ -23,3 +23,34 @@ size = 20                               # R-TAL-01: karty w talii
 max_copies = 4                          # R-TAL-02: kopie tej samej karty
 fill_missing_with_random = true         # R-TAL-05: uzupełnianie talii losowymi kartami
 saved_presets_max = 10                  # R-TAL-06: zapisane zestawy talii (serwer)
+
+[rating]
+k = 10
+
+[xp]
+base = 100
+min = 10
+max = 300
+tier_mult_pct = [100, 110, 120, 130]
+tier_add = [0, 0, 3, 6]
+unverified_cap = 3000
+cap = 65000
+
+[training]
+bot_rotation_min = 5
+
+[unlock]
+arena_chance_ppm = 5000
+newbie_wins = [5, 15, 30]
+rarity_weights = [70, 25, 5]
+
+[economy]
+initial = 40
+arena_first_win = 10
+arena_win = 2
+arena_win_daily_cap = 10 # Ducats from normal wins, plus the separate first-win bonus; day = UTC.
+
+[junkyard]
+rarity_points = [5, 25, 100]
+reward_threshold = 1000
+fallback_ducats = 40

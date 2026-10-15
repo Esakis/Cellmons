@@ -1,0 +1,79 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id,kind,status,price,contents,pools FROM boosters WHERE user_id=$1 ORDER BY (status='unopened') DESC,id DESC LIMIT 200",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "boosters",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "kind",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "boosters",
+            "name": "kind"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "status",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "boosters",
+            "name": "status"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "price",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "boosters",
+            "name": "price"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "contents",
+        "type_info": "Int2Array",
+        "origin": {
+          "Table": {
+            "table": "boosters",
+            "name": "contents"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "pools",
+        "type_info": "Bytea",
+        "origin": {
+          "Table": {
+            "table": "boosters",
+            "name": "pools"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid"]
+    },
+    "nullable": [false, false, false, false, true, false]
+  },
+  "hash": "f400ecfb2e7a038ffec8a12de2b2d4a604360b7d887da5773e65f24519543822"
+}

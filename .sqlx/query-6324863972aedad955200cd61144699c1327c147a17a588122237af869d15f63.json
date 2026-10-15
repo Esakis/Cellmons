@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT c.id FROM clan_members m JOIN clans c ON c.id=m.clan_id WHERE m.user_id=$1 AND c.status='active'",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "clans",
+            "name": "id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid"]
+    },
+    "nullable": [false]
+  },
+  "hash": "6324863972aedad955200cd61144699c1327c147a17a588122237af869d15f63"
+}

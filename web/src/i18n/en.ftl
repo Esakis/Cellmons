@@ -204,3 +204,12 @@ auth-error-FORBIDDEN = Request rejected. Reload the page and try again.
 auth-error-TRY_AGAIN = The service is temporarily busy. Please try again.
 auth-error-SERVER_UNAVAILABLE = Cannot reach the server. Guest mode and offline training are still available.
 
+
+lobby = Lobby
+lobby-gate = Lobby requires an account and an internet connection. Guests can play offline training.
+
+collection = Collection
+
+store = Store
+store-ducats = Dukats
+store-gate = The store requires an account and an internet connection.

@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT balance FROM wallets WHERE user_id=$1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "balance",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "wallets",
+            "name": "balance"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid"]
+    },
+    "nullable": [false]
+  },
+  "hash": "f499c67928cf8975d2c53c8ba1a28a9f22185976dd779fc553563e06f2798f7b"
+}

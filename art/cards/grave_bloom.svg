@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 100" role="img" aria-label="Grobowy rozkwit"><title>Grobowy rozkwit</title>
+<defs><radialGradient id="bg" cx="50%" cy="35%" r="85%"><stop stop-color="#d4a7e5"/><stop offset=".55" stop-color="#34203e"/><stop offset="1" stop-color="#111323"/></radialGradient><linearGradient id="metal" x2="1" y2="1"><stop stop-color="#fff1bd"/><stop offset=".4" stop-color="#bca073"/><stop offset="1" stop-color="#5b4934"/></linearGradient><radialGradient id="glow"><stop stop-color="#fff9d8" stop-opacity=".8"/><stop offset="1" stop-color="#d4a7e5" stop-opacity="0"/></radialGradient></defs>
+<rect width="160" height="100" fill="url(#bg)"/><circle cx="80" cy="46" r="42" fill="url(#glow)"/>
+<path d="M5 92L80 56 155 92M11 8L80 56 149 8" fill="none" stroke="#d4a7e5" opacity=".15"/>
+
+      <path d="M14 90V52Q25 39 36 52V90M126 90V43Q137 31 148 43V90" fill="#3e3545" stroke="#75637e"/>
+      <path d="M80 91Q72 68 80 49" fill="none" stroke="#c5c0a7" stroke-width="4"/>
+      <path d="M76 73Q49 65 53 53 73 51 78 70M81 82Q106 67 110 79 103 92 82 86" fill="#576451" stroke="#c9c5aa"/>
+      <ellipse cx="80" cy="38" rx="10" ry="22" fill="#b98fc9"/><ellipse cx="80" cy="38" rx="10" ry="22" transform="rotate(60 80 38)" fill="#d6a4df"/>
+      <ellipse cx="80" cy="38" rx="10" ry="22" transform="rotate(120 80 38)" fill="#bc83c9"/>
+      <circle cx="80" cy="38" r="10" fill="#e3dac4" stroke="#f7ecd8"/><path d="M75 35H77M83 35H85M77 42H83" stroke="#543e5e" stroke-width="2"/>
+      <path d="M54 92Q80 84 108 94" stroke="#a697a8" fill="none"/>
+    
+<g fill="#d4a7e5" opacity=".7"><circle cx="18" cy="19" r="1"/><circle cx="141" cy="15" r="1.5"/><circle cx="23" cy="47" r=".8"/><circle cx="145" cy="84" r="1"/></g>
+<rect x="3" y="3" width="154" height="94" rx="3" fill="none" stroke="#ead1a0" opacity=".65"/><path d="M5 15V5H15M145 5H155V15M5 85V95H15M145 95H155V85" fill="none" stroke="#f7e2b5" stroke-width="1.5"/></svg>

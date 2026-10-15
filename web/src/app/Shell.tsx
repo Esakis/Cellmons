@@ -45,6 +45,9 @@ export function Shell(props: ParentProps) {
             {t('training')}
           </A>
           <A href="/settings">{t('settings')}</A>
+          <A href="/lobby">{t('lobby')}</A>
+          <A href="/collection">{t('collection')}</A>
+          <A href="/store">{t('store')}</A>
           <A href="/account">{t('auth-account')}</A>
         </nav>
         <select

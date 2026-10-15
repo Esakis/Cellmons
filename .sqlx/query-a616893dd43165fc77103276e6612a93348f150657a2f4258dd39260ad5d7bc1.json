@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM sessions WHERE id_hash=$1 AND kind='web' RETURNING user_id",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "sessions",
+            "name": "user_id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": ["Bytea"]
+    },
+    "nullable": [false]
+  },
+  "hash": "a616893dd43165fc77103276e6612a93348f150657a2f4258dd39260ad5d7bc1"
+}

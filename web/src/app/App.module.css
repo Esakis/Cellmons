@@ -44,6 +44,8 @@
 }
 .header nav {
   display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
   gap: 28px;
   font-size: 0.8rem;
   align-self: stretch;
@@ -102,9 +104,18 @@
     flex-wrap: wrap;
   }
   .header nav {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     order: 3;
     width: 100%;
     padding-top: 6px;
+    gap: 6px 16px;
+  }
+  .header nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    justify-content: center;
   }
   .brand {
     font-size: 1.25rem;

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 100" role="img" aria-label="Więź popiołu"><title>Więź popiołu</title>
+<defs><radialGradient id="bg" cx="50%" cy="35%" r="85%"><stop stop-color="#d4a7e5"/><stop offset=".55" stop-color="#34203e"/><stop offset="1" stop-color="#111323"/></radialGradient><linearGradient id="metal" x2="1" y2="1"><stop stop-color="#fff1bd"/><stop offset=".4" stop-color="#bca073"/><stop offset="1" stop-color="#5b4934"/></linearGradient><radialGradient id="glow"><stop stop-color="#fff9d8" stop-opacity=".8"/><stop offset="1" stop-color="#d4a7e5" stop-opacity="0"/></radialGradient></defs>
+<rect width="160" height="100" fill="url(#bg)"/><circle cx="80" cy="46" r="42" fill="url(#glow)"/>
+<path d="M5 92L80 56 155 92M11 8L80 56 149 8" fill="none" stroke="#d4a7e5" opacity=".15"/>
+
+      <path d="M0 89Q29 70 59 90T120 86 160 91V100H0Z" fill="#251d2d"/>
+      <path d="M20 84Q42 48 36 24M140 84Q118 48 124 24" fill="none" stroke="#6a5667" stroke-width="12"/>
+      <path d="M26 31L23 12M34 26L33 7M42 27L45 10M118 27L115 10M126 26L127 7M134 31L137 12" stroke="#d6bfcb" stroke-width="4" stroke-linecap="round"/>
+      <path d="M34 35Q60 57 80 48T126 35" fill="none" stroke="#a06fb3" stroke-width="9"/>
+      <path d="M34 35Q60 57 80 48T126 35" fill="none" stroke="#e2b2ed" stroke-width="5" stroke-dasharray="6 5"/>
+      <ellipse cx="80" cy="49" rx="16" ry="21" fill="url(#glow)"/>
+      <path d="M73 70L80 60 87 70 80 81Z" fill="#e3c3e8"/>
+    
+<g fill="#d4a7e5" opacity=".7"><circle cx="18" cy="19" r="1"/><circle cx="141" cy="15" r="1.5"/><circle cx="23" cy="47" r=".8"/><circle cx="145" cy="84" r="1"/></g>
+<rect x="3" y="3" width="154" height="94" rx="3" fill="none" stroke="#ead1a0" opacity=".65"/><path d="M5 15V5H15M145 5H155V15M5 85V95H15M145 95H155V85" fill="none" stroke="#f7e2b5" stroke-width="1.5"/></svg>

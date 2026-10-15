@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM duel_locks WHERE duel_id=$1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid"]
+    },
+    "nullable": []
+  },
+  "hash": "76d24955ee6b1d01d70d8cd370f684e8df6bd8b0b289832d4eaab0e58d427184"
+}

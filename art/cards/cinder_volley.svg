@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 100" role="img" aria-label="Salwa żaru"><title>Salwa żaru</title>
+<defs><radialGradient id="bg" cx="50%" cy="35%" r="85%"><stop stop-color="#91dbbb"/><stop offset=".55" stop-color="#163e3d"/><stop offset="1" stop-color="#111323"/></radialGradient><linearGradient id="metal" x2="1" y2="1"><stop stop-color="#fff1bd"/><stop offset=".4" stop-color="#bca073"/><stop offset="1" stop-color="#5b4934"/></linearGradient><radialGradient id="glow"><stop stop-color="#fff9d8" stop-opacity=".8"/><stop offset="1" stop-color="#91dbbb" stop-opacity="0"/></radialGradient></defs>
+<rect width="160" height="100" fill="url(#bg)"/><circle cx="80" cy="46" r="42" fill="url(#glow)"/>
+<path d="M5 92L80 56 155 92M11 8L80 56 149 8" fill="none" stroke="#91dbbb" opacity=".15"/>
+
+      <path d="M0 88L35 67 56 86 88 65 121 81 160 62V100H0Z" fill="#19373c"/>
+      <path d="M17 13Q58 22 113 57M16 37Q58 42 100 73M51 6Q91 13 133 38" fill="none" stroke="#ee7936" stroke-width="7"/>
+      <path d="M17 13Q58 22 113 57M16 37Q58 42 100 73M51 6Q91 13 133 38" fill="none" stroke="#ffdb8e" stroke-width="2"/>
+      <path d="M105 45Q130 48 126 67 102 72 103 55L113 58ZM94 62Q113 65 111 81 92 87 90 72L100 74ZM124 26Q146 29 144 47 125 51 120 38L134 40Z" fill="#ff9e42" stroke="#ffd69a"/>
+      <circle cx="115" cy="59" r="5" fill="#fff3ce"/><circle cx="101" cy="74" r="4" fill="#fff3ce"/><circle cx="135" cy="39" r="4" fill="#fff3ce"/>
+    
+<g fill="#91dbbb" opacity=".7"><circle cx="18" cy="19" r="1"/><circle cx="141" cy="15" r="1.5"/><circle cx="23" cy="47" r=".8"/><circle cx="145" cy="84" r="1"/></g>
+<rect x="3" y="3" width="154" height="94" rx="3" fill="none" stroke="#ead1a0" opacity=".65"/><path d="M5 15V5H15M145 5H155V15M5 85V95H15M145 95H155V85" fill="none" stroke="#f7e2b5" stroke-width="1.5"/></svg>

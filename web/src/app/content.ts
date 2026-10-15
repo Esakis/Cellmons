@@ -23,13 +23,9 @@ export const icon = (key: string) => symbols[`../assets/icons/${key}.svg`];
 export const fluentKey = (key: string, field = 'name') => `${key.replace('.', '-')}-${field}`;
 
 export function cardArgs(card: Card): Record<string, number> {
-  const args: Record<string, number> = { focus: card.cost.focus, stamina: card.cost.stamina };
-  if (card.condition && 'round' in card.condition) args.round = card.condition.round;
-  for (const [index, effect] of card.effects.entries()) {
-    const suffix = index === 0 ? '' : `_${index + 1}`;
-    for (const [key, value] of Object.entries(effect)) {
-      if (typeof value === 'number') args[`${key}${suffix}`] = value;
-    }
+  const args: Record<string, number> = {};
+  for (const [key, value] of Object.entries(card.params)) {
+    if (typeof value === 'number') args[key] = value;
   }
   return args;
 }

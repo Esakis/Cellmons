@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT count(*) AS \"count!\" FROM boosters WHERE user_id=$1 AND status='unopened'",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid"]
+    },
+    "nullable": [null]
+  },
+  "hash": "36469ea3cae21380a0dd0e3cd29c888e425ffb54873c8d563512833a2935a1a8"
+}

@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO ledger_transactions(id,reason,ref_id) VALUES ($1,$2,$3)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Text", "Uuid"]
+    },
+    "nullable": []
+  },
+  "hash": "42d80fae294606c2e0cc3ad864266ceb3f5e6d35b3ec25b024db4045f074d7ea"
+}

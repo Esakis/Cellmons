@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE avatars SET is_active=true,revision=revision+1 WHERE id=$1 AND user_id=$2 AND deleted_at IS NULL",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Uuid"]
+    },
+    "nullable": []
+  },
+  "hash": "54d6cf2c6ffa8994a5484c03e516ac3d6df3b60ab3dbf7761fa99c0f8c3c3fa7"
+}

@@ -4,14 +4,17 @@ use anyhow::Context as _;
 use server::{config::Config, db, gateway, telemetry};
 
 fn main() -> anyhow::Result<()> {
-    let migrate = match std::env::args().skip(1).collect::<Vec<_>>().as_slice() {
-        [] => false,
-        [arg] if arg == "migrate" => true,
+    let command = match std::env::args().skip(1).collect::<Vec<_>>().as_slice() {
+        [] => "run",
+        [arg] if arg == "migrate" => "migrate",
+        [arg] if arg == "reconcile" => "reconcile",
         [arg] if arg == "--help" || arg == "-h" => {
-            println!("server [migrate]\n  migrate: apply embedded database migrations, then exit");
+            println!(
+                "server [migrate|reconcile]\n  migrate: apply embedded database migrations, then exit\n  reconcile: read-only currency ledger check, exits nonzero on mismatch"
+            );
             return Ok(());
         }
-        _ => anyhow::bail!("usage: server [migrate]"),
+        _ => anyhow::bail!("usage: server [migrate|reconcile]"),
     };
     // `.env` wczytujemy przed startem wątków Tokio, bo dotenvy zmienia zmienne środowiskowe procesu.
     load_dotenv()?;
@@ -23,11 +26,20 @@ fn main() -> anyhow::Result<()> {
         .build()
         .context("cannot start the Tokio runtime")?
         .block_on(async {
-            if migrate {
+            if command == "migrate" {
                 let pool = db::migration_pool(&config)?;
                 db::migrate(&pool).await?;
                 pool.close().await;
                 tracing::info!("database migrations applied");
+                Ok(())
+            } else if command == "reconcile" {
+                let pool = db::connect_lazy(&config)?;
+                let report = server::economy::reconcile(&pool)
+                    .await
+                    .map_err(|e| anyhow::anyhow!("reconciliation failed: {}", e.0))?;
+                println!("{}", serde_json::to_string(&report)?);
+                pool.close().await;
+                anyhow::ensure!(report.is_ok(), "currency ledger mismatch");
                 Ok(())
             } else {
                 run(config).await
@@ -44,10 +56,9 @@ async fn run(config: Config) -> anyhow::Result<()> {
         })
     })?;
     let auth = server::auth::Auth::from_config(auth_config)?;
-    let app = gateway::router(gateway::AppState {
-        db: db.clone(),
-        auth,
-    });
+    let state = gateway::AppState::new(db.clone(), auth, server::online::Settings::from_env()?);
+    let online = state.online.clone();
+    let app = gateway::router(state);
 
     let listener = tokio::net::TcpListener::bind(config.listen_addr)
         .await
@@ -62,7 +73,10 @@ async fn run(config: Config) -> anyhow::Result<()> {
         listener,
         app.into_make_service_with_connect_info::<std::net::SocketAddr>(),
     )
-    .with_graceful_shutdown(shutdown_signal())
+    .with_graceful_shutdown(async move {
+        shutdown_signal().await;
+        online.hub.shutdown().await;
+    })
     .await
     .context("HTTP server failed")?;
 

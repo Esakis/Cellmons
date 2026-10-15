@@ -251,6 +251,90 @@ fn content_version_changes_with_any_change_including_texts() {
     assert_ne!(first, second);
 }
 
+#[test]
+fn presentation_payload_is_compact_but_version_still_covers_hidden_engine_semantics() {
+    let fixture = Fixture::new();
+    let first = build(fixture.path()).unwrap();
+    let mut payload: serde_json::Value = serde_json::from_str(&content_json(&first)).unwrap();
+    assert!(payload["avatars"][0].get("growth").is_none());
+    assert!(payload["cards"][0].get("effects").is_none());
+    assert_eq!(payload["cards"][0]["params"]["amount"], 2);
+    assert_eq!(payload["cards"][0]["params"]["focus"], 2);
+    assert_eq!(payload["cards"][3]["params"]["round"], 4);
+    assert_eq!(first.avatars[0].growth.len(), 19);
+    fixture.replace(
+        "cards/core/combat.toml",
+        "target = \"self\", stat = \"phys_atk\"",
+        "target = \"opponent\", stat = \"phys_atk\"",
+    );
+    let second = build(fixture.path()).unwrap();
+    assert_ne!(version(&first), version(&second));
+    let mut changed: serde_json::Value = serde_json::from_str(&content_json(&second)).unwrap();
+    payload.as_object_mut().unwrap().remove("version");
+    changed.as_object_mut().unwrap().remove("version");
+    assert_eq!(
+        payload, changed,
+        "presentation equality must never hide an engine change from content_version"
+    );
+}
+
+#[test]
+fn paths_are_complete_validated_profiles_separate_from_collectible_templates() {
+    let fixture = Fixture::new();
+    let file = fixture.path().join("avatars/basic.toml");
+    let mut definitions = avatars();
+    for variant in 0..2 {
+        let profile = avatars()
+            .replace("id = 1", &format!("id = {}", 101 + variant))
+            .replace("avatar.runner", &format!("avatar.path_{variant}"))
+            .replace("starter_for = \"combat\"\n", "");
+        definitions += &profile;
+        definitions += &format!(
+            "path = {{base_avatar = 1, variant = {variant},specializations = [\"combat\",\"concentration\"],gifts = [\"card.prayer\",\"card.bliss\"]}}\n"
+        );
+    }
+    fs::write(&file, definitions).unwrap();
+    let card_file = fixture.path().join("cards/core/combat.toml");
+    let mut cards = fs::read_to_string(&card_file).unwrap();
+    cards += "\n[[card]]\nid = 6\nkey = \"card.bliss\"\nset = \"core\"\nrarity = \"silver\"\ncost = {focus = 2, stamina = 8}\nkind = \"enchantment\"\ntrigger = \"on_round\"\neffects = [{family = \"heal\",target = \"self\",amount = 1}]\n";
+    fs::write(card_file, cards).unwrap();
+    for lang in ["pl", "en"] {
+        let path = fixture.path().join(format!("i18n/{lang}.ftl"));
+        let mut text = fs::read_to_string(&path).unwrap();
+        text += "\ncard-bliss-name = Bliss\ncard-bliss-text = Heal { $amount }.\navatar-path_0-name = First Path\navatar-path_1-name = Second Path\n";
+        fs::write(path, text).unwrap();
+    }
+    let compiled = build(fixture.path()).unwrap();
+    let json: serde_json::Value = serde_json::from_str(&content_json(&compiled)).unwrap();
+    assert_eq!(json["avatars"].as_array().unwrap().len(), 1);
+    assert_eq!(json["paths"].as_array().unwrap().len(), 2);
+    let generated = codegen::generate(&compiled).unwrap();
+    assert!(generated.contains("pub static PATHS"));
+    assert!(generated.contains("gifts: [2, 6]"));
+    fixture.replace(
+        "avatars/basic.toml",
+        "specializations = [\"combat\",\"concentration\"]",
+        "specializations = [\"necro\",\"concentration\"]",
+    );
+    assert!(
+        fixture
+            .errors()
+            .contains("specjalizacja szkolna musi należeć do profilu drogi")
+    );
+    fixture.replace(
+        "avatars/basic.toml",
+        "gifts = [\"card.prayer\",\"card.bliss\"]",
+        "gifts = [\"card.edge\",\"card.bliss\"]",
+    );
+    assert!(
+        fixture
+            .errors()
+            .contains("dwa różne istniejące umagicznienia")
+    );
+    fixture.replace("avatars/basic.toml", "variant = 1", "variant = 0");
+    assert!(fixture.errors().contains("dokładnie dwie drogi"));
+}
+
 /// Zepsuty plik daje błąd zawierający `expected`.
 fn rejects(file: &str, from: &str, to: &str, expected: &str) {
     let fixture = Fixture::new();
@@ -287,6 +371,7 @@ fn syntax_errors_point_to_the_line() {
 
 #[test]
 fn ids_keys_and_references_are_checked() {
+    rejects("cards/core/combat.toml", "id = 1", "id = 32768", "1–32767");
     rejects(
         "cards/core/combat.toml",
         "id = 2",

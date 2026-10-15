@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file game/v1/training.proto.
  */
 export const file_game_v1_training: GenFile = /*@__PURE__*/
-  fileDesc("ChZnYW1lL3YxL3RyYWluaW5nLnByb3RvEgdnYW1lLnYxIvABCg9UcmFpbmluZ1JlcXVlc3QSCwoDc2VxGAEgASgNEicKBXN0YXJ0GAIgASgLMhYuZ2FtZS52MS5UcmFpbmluZ1NldHVwSAASIQoEcGxheRgDIAEoCzIRLmdhbWUudjEuRHVlbE1vdmVIABIkCgdwcmV2aWV3GAQgASgLMhEuZ2FtZS52MS5EdWVsTW92ZUgAEisKB2ZvcmZlaXQYBSABKAsyGC5nYW1lLnYxLlRyYWluaW5nRm9yZmVpdEgAEikKBnJlcGxheRgGIAEoCzIXLmdhbWUudjEuVHJhaW5pbmdSZXBsYXlIAEIGCgRib2R5IoEBCg1UcmFpbmluZ1NldHVwEhEKCWF2YXRhcl9pZBgBIAEoDRISCgpwcm9maWxlX2lkGAIgASgJEgwKBHNlZWQYAyABKAwSEAoIcm90YXRpb24YBCABKA0SEAoIYXV0b3BsYXkYBSABKAgSFwoPY29udGVudF92ZXJzaW9uGAYgASgJIhEKD1RyYWluaW5nRm9yZmVpdCIQCg5UcmFpbmluZ1JlcGxheSJRCghEdWVsTW92ZRIPCgdhdHRhY2tzGAEgAygNEhAKCGRlZmVuc2VzGAIgAygNEg4KBmFjdGlvbhgDIAEoDRISCgpoYW5kX2luZGV4GAQgASgNIogBCgtNb3ZlUHJldmlldxIPCgdjaGFuZ2VzGAEgASgNEhIKCmZvY3VzX2Nvc3QYAiABKAUSFAoMc3RhbWluYV9jb3N0GAMgASgFEhMKC2ZvY3VzX2FmdGVyGAQgASgFEhoKEm1heF9hdHRhY2tfc3RhbWluYRgFIAEoBRINCgVlcnJvchgGIAEoCSLAAQoIRHVlbFNpZGUSCgoCaHAYASABKAUSEAoIaHBfc3RhcnQYAiABKAUSDwoHc3RhbWluYRgDIAEoBRINCgVmb2N1cxgEIAEoBRINCgVzdGF0cxgFIAMoBRIPCgdzY2hvb2xzGAYgAygNEg8KB2F0dGFja3MYByADKA0SEAoIZGVmZW5zZXMYCCADKA0SEAoIZGVja19sZW4YCSABKA0SEAoIaGFuZF9sZW4YCiABKA0SDwoHZGlzY2FyZBgLIAMoDSIwCg9EdWVsRW5jaGFudG1lbnQSDAoEc2lkZRgBIAEoDRIPCgdjYXJkX2lkGAIgASgNIi0KC0R1ZWxPdXRjb21lEg4KBndpbm5lchgBIAEoDRIOCgZyZWFzb24YAiABKAkiwwEKCUR1ZWxFdmVudBIMCgRraW5kGAEgASgJEgwKBHNpZGUYAiABKA0SDwoHY2FyZF9pZBgDIAEoDRIOCgZhbW91bnQYBCABKAUSDAoEc2xvdBgFIAEoDRITCgthdHRhY2tfa2luZBgGIAEoDRIRCglvbGRfdmFsdWUYByABKAUSEQoJbmV3X3ZhbHVlGAggASgFEg4KBmRldGFpbBgJIAEoCRIgCgVtb3ZlcxgKIAMoCzIRLmdhbWUudjEuRHVlbE1vdmUijAIKDFRyYWluaW5nVmlldxINCgVyb3VuZBgBIAEoDRIUCgx0b3RhbF9yb3VuZHMYAiABKA0SEgoKaW5pdGlhdGl2ZRgDIAEoDRIdCgJtZRgEIAEoCzIRLmdhbWUudjEuRHVlbFNpZGUSIwoIb3Bwb25lbnQYBSABKAsyES5nYW1lLnYxLkR1ZWxTaWRlEgwKBGhhbmQYBiADKA0SLgoMZW5jaGFudG1lbnRzGAcgAygLMhguZ2FtZS52MS5EdWVsRW5jaGFudG1lbnQSJQoHb3V0Y29tZRgIIAEoCzIULmdhbWUudjEuRHVlbE91dGNvbWUSGgoSb3Bwb25lbnRfYXZhdGFyX2lkGAkgASgNIscBCg1UcmFpbmluZ1JlcGx5EgsKA3NlcRgBIAEoDRINCgVlcnJvchgCIAEoCRIjCgR2aWV3GAMgASgLMhUuZ2FtZS52MS5UcmFpbmluZ1ZpZXcSJQoHcHJldmlldxgEIAEoCzIULmdhbWUudjEuTW92ZVByZXZpZXcSKgoMY2FzdF9vcHRpb25zGAUgAygLMhQuZ2FtZS52MS5Nb3ZlUHJldmlldxIiCgZldmVudHMYBiADKAsyEi5nYW1lLnYxLkR1ZWxFdmVudGIGcHJvdG8z");
+  fileDesc("ChZnYW1lL3YxL3RyYWluaW5nLnByb3RvEgdnYW1lLnYxIvABCg9UcmFpbmluZ1JlcXVlc3QSCwoDc2VxGAEgASgNEicKBXN0YXJ0GAIgASgLMhYuZ2FtZS52MS5UcmFpbmluZ1NldHVwSAASIQoEcGxheRgDIAEoCzIRLmdhbWUudjEuRHVlbE1vdmVIABIkCgdwcmV2aWV3GAQgASgLMhEuZ2FtZS52MS5EdWVsTW92ZUgAEisKB2ZvcmZlaXQYBSABKAsyGC5nYW1lLnYxLlRyYWluaW5nRm9yZmVpdEgAEikKBnJlcGxheRgGIAEoCzIXLmdhbWUudjEuVHJhaW5pbmdSZXBsYXlIAEIGCgRib2R5IrABCg1UcmFpbmluZ1NldHVwEhEKCWF2YXRhcl9pZBgBIAEoDRISCgpwcm9maWxlX2lkGAIgASgJEgwKBHNlZWQYAyABKAwSEAoIcm90YXRpb24YBCABKA0SEAoIYXV0b3BsYXkYBSABKAgSFwoPY29udGVudF92ZXJzaW9uGAYgASgJEi0KBmN1c3RvbRgHIAEoCzIdLmdhbWUudjEuVHJhaW5pbmdDdXN0b21QbGF5ZXIiQgoUVHJhaW5pbmdDdXN0b21QbGF5ZXISDQoFbGV2ZWwYASABKA0SDQoFc3BlbnQYAiADKA0SDAoEZGVjaxgDIAMoDSIRCg9UcmFpbmluZ0ZvcmZlaXQiEAoOVHJhaW5pbmdSZXBsYXkiUQoIRHVlbE1vdmUSDwoHYXR0YWNrcxgBIAMoDRIQCghkZWZlbnNlcxgCIAMoDRIOCgZhY3Rpb24YAyABKA0SEgoKaGFuZF9pbmRleBgEIAEoDSKIAQoLTW92ZVByZXZpZXcSDwoHY2hhbmdlcxgBIAEoDRISCgpmb2N1c19jb3N0GAIgASgFEhQKDHN0YW1pbmFfY29zdBgDIAEoBRITCgtmb2N1c19hZnRlchgEIAEoBRIaChJtYXhfYXR0YWNrX3N0YW1pbmEYBSABKAUSDQoFZXJyb3IYBiABKAkiwAEKCER1ZWxTaWRlEgoKAmhwGAEgASgFEhAKCGhwX3N0YXJ0GAIgASgFEg8KB3N0YW1pbmEYAyABKAUSDQoFZm9jdXMYBCABKAUSDQoFc3RhdHMYBSADKAUSDwoHc2Nob29scxgGIAMoDRIPCgdhdHRhY2tzGAcgAygNEhAKCGRlZmVuc2VzGAggAygNEhAKCGRlY2tfbGVuGAkgASgNEhAKCGhhbmRfbGVuGAogASgNEg8KB2Rpc2NhcmQYCyADKA0iMAoPRHVlbEVuY2hhbnRtZW50EgwKBHNpZGUYASABKA0SDwoHY2FyZF9pZBgCIAEoDSItCgtEdWVsT3V0Y29tZRIOCgZ3aW5uZXIYASABKA0SDgoGcmVhc29uGAIgASgJIsMBCglEdWVsRXZlbnQSDAoEa2luZBgBIAEoCRIMCgRzaWRlGAIgASgNEg8KB2NhcmRfaWQYAyABKA0SDgoGYW1vdW50GAQgASgFEgwKBHNsb3QYBSABKA0SEwoLYXR0YWNrX2tpbmQYBiABKA0SEQoJb2xkX3ZhbHVlGAcgASgFEhEKCW5ld192YWx1ZRgIIAEoBRIOCgZkZXRhaWwYCSABKAkSIAoFbW92ZXMYCiADKAsyES5nYW1lLnYxLkR1ZWxNb3ZlIowCCgxUcmFpbmluZ1ZpZXcSDQoFcm91bmQYASABKA0SFAoMdG90YWxfcm91bmRzGAIgASgNEhIKCmluaXRpYXRpdmUYAyABKA0SHQoCbWUYBCABKAsyES5nYW1lLnYxLkR1ZWxTaWRlEiMKCG9wcG9uZW50GAUgASgLMhEuZ2FtZS52MS5EdWVsU2lkZRIMCgRoYW5kGAYgAygNEi4KDGVuY2hhbnRtZW50cxgHIAMoCzIYLmdhbWUudjEuRHVlbEVuY2hhbnRtZW50EiUKB291dGNvbWUYCCABKAsyFC5nYW1lLnYxLkR1ZWxPdXRjb21lEhoKEm9wcG9uZW50X2F2YXRhcl9pZBgJIAEoDSLHAQoNVHJhaW5pbmdSZXBseRILCgNzZXEYASABKA0SDQoFZXJyb3IYAiABKAkSIwoEdmlldxgDIAEoCzIVLmdhbWUudjEuVHJhaW5pbmdWaWV3EiUKB3ByZXZpZXcYBCABKAsyFC5nYW1lLnYxLk1vdmVQcmV2aWV3EioKDGNhc3Rfb3B0aW9ucxgFIAMoCzIULmdhbWUudjEuTW92ZVByZXZpZXcSIgoGZXZlbnRzGAYgAygLMhIuZ2FtZS52MS5EdWVsRXZlbnRiBnByb3RvMw");
 
 /**
  * Offline worker boundary. No hidden opponent hand, deck order or RNG is returned.
@@ -99,6 +99,13 @@ export type TrainingSetup = Message<"game.v1.TrainingSetup"> & {
    * @generated from field: string content_version = 6;
    */
   contentVersion: string;
+
+  /**
+   * Optional RAM-only character/deck from the collection screen.
+   *
+   * @generated from field: game.v1.TrainingCustomPlayer custom = 7;
+   */
+  custom?: TrainingCustomPlayer | undefined;
 };
 
 /**
@@ -107,6 +114,33 @@ export type TrainingSetup = Message<"game.v1.TrainingSetup"> & {
  */
 export const TrainingSetupSchema: GenMessage<TrainingSetup> = /*@__PURE__*/
   messageDesc(file_game_v1_training, 1);
+
+/**
+ * @generated from message game.v1.TrainingCustomPlayer
+ */
+export type TrainingCustomPlayer = Message<"game.v1.TrainingCustomPlayer"> & {
+  /**
+   * @generated from field: uint32 level = 1;
+   */
+  level: number;
+
+  /**
+   * @generated from field: repeated uint32 spent = 2;
+   */
+  spent: number[];
+
+  /**
+   * @generated from field: repeated uint32 deck = 3;
+   */
+  deck: number[];
+};
+
+/**
+ * Describes the message game.v1.TrainingCustomPlayer.
+ * Use `create(TrainingCustomPlayerSchema)` to create a new message.
+ */
+export const TrainingCustomPlayerSchema: GenMessage<TrainingCustomPlayer> = /*@__PURE__*/
+  messageDesc(file_game_v1_training, 2);
 
 /**
  * @generated from message game.v1.TrainingForfeit
@@ -119,7 +153,7 @@ export type TrainingForfeit = Message<"game.v1.TrainingForfeit"> & {
  * Use `create(TrainingForfeitSchema)` to create a new message.
  */
 export const TrainingForfeitSchema: GenMessage<TrainingForfeit> = /*@__PURE__*/
-  messageDesc(file_game_v1_training, 2);
+  messageDesc(file_game_v1_training, 3);
 
 /**
  * @generated from message game.v1.TrainingReplay
@@ -132,7 +166,7 @@ export type TrainingReplay = Message<"game.v1.TrainingReplay"> & {
  * Use `create(TrainingReplaySchema)` to create a new message.
  */
 export const TrainingReplaySchema: GenMessage<TrainingReplay> = /*@__PURE__*/
-  messageDesc(file_game_v1_training, 3);
+  messageDesc(file_game_v1_training, 4);
 
 /**
  * Slot values: 0 physical, 1 magical. Action: 0 none, 1 cast, 2 discard.
@@ -166,7 +200,7 @@ export type DuelMove = Message<"game.v1.DuelMove"> & {
  * Use `create(DuelMoveSchema)` to create a new message.
  */
 export const DuelMoveSchema: GenMessage<DuelMove> = /*@__PURE__*/
-  messageDesc(file_game_v1_training, 4);
+  messageDesc(file_game_v1_training, 5);
 
 /**
  * @generated from message game.v1.MovePreview
@@ -208,7 +242,7 @@ export type MovePreview = Message<"game.v1.MovePreview"> & {
  * Use `create(MovePreviewSchema)` to create a new message.
  */
 export const MovePreviewSchema: GenMessage<MovePreview> = /*@__PURE__*/
-  messageDesc(file_game_v1_training, 5);
+  messageDesc(file_game_v1_training, 6);
 
 /**
  * @generated from message game.v1.DuelSide
@@ -277,7 +311,7 @@ export type DuelSide = Message<"game.v1.DuelSide"> & {
  * Use `create(DuelSideSchema)` to create a new message.
  */
 export const DuelSideSchema: GenMessage<DuelSide> = /*@__PURE__*/
-  messageDesc(file_game_v1_training, 6);
+  messageDesc(file_game_v1_training, 7);
 
 /**
  * @generated from message game.v1.DuelEnchantment
@@ -299,7 +333,7 @@ export type DuelEnchantment = Message<"game.v1.DuelEnchantment"> & {
  * Use `create(DuelEnchantmentSchema)` to create a new message.
  */
 export const DuelEnchantmentSchema: GenMessage<DuelEnchantment> = /*@__PURE__*/
-  messageDesc(file_game_v1_training, 7);
+  messageDesc(file_game_v1_training, 8);
 
 /**
  * @generated from message game.v1.DuelOutcome
@@ -323,7 +357,7 @@ export type DuelOutcome = Message<"game.v1.DuelOutcome"> & {
  * Use `create(DuelOutcomeSchema)` to create a new message.
  */
 export const DuelOutcomeSchema: GenMessage<DuelOutcome> = /*@__PURE__*/
-  messageDesc(file_game_v1_training, 8);
+  messageDesc(file_game_v1_training, 9);
 
 /**
  * Language-neutral events; parameters depend on kind. Side: 0 player, 1 opponent.
@@ -387,7 +421,7 @@ export type DuelEvent = Message<"game.v1.DuelEvent"> & {
  * Use `create(DuelEventSchema)` to create a new message.
  */
 export const DuelEventSchema: GenMessage<DuelEvent> = /*@__PURE__*/
-  messageDesc(file_game_v1_training, 9);
+  messageDesc(file_game_v1_training, 10);
 
 /**
  * @generated from message game.v1.TrainingView
@@ -444,7 +478,7 @@ export type TrainingView = Message<"game.v1.TrainingView"> & {
  * Use `create(TrainingViewSchema)` to create a new message.
  */
 export const TrainingViewSchema: GenMessage<TrainingView> = /*@__PURE__*/
-  messageDesc(file_game_v1_training, 10);
+  messageDesc(file_game_v1_training, 11);
 
 /**
  * @generated from message game.v1.TrainingReply
@@ -486,5 +520,5 @@ export type TrainingReply = Message<"game.v1.TrainingReply"> & {
  * Use `create(TrainingReplySchema)` to create a new message.
  */
 export const TrainingReplySchema: GenMessage<TrainingReply> = /*@__PURE__*/
-  messageDesc(file_game_v1_training, 11);
+  messageDesc(file_game_v1_training, 12);
 

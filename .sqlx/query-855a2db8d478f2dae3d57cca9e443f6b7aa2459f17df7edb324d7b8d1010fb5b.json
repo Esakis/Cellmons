@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO unlocked_templates(user_id,template_id,source) VALUES ($1,$2,'arena') ON CONFLICT DO NOTHING",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Int4"]
+    },
+    "nullable": []
+  },
+  "hash": "855a2db8d478f2dae3d57cca9e443f6b7aa2459f17df7edb324d7b8d1010fb5b"
+}

@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT DISTINCT duel_id FROM duel_locks WHERE duel_id=ANY($1)",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "duel_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "duel_locks",
+            "name": "duel_id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": ["UuidArray"]
+    },
+    "nullable": [false]
+  },
+  "hash": "62851dee5419f9993dfc58af7cd62c6a8d3dfb1a1b7ba128b6c4095e66a6011d"
+}

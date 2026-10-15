@@ -8,15 +8,21 @@
 
 import type { GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv2";
+import type { ChallengeCancel, ChallengeReceived, ChallengeRespond, ChallengeSend, ChallengeUpdate, ChatMessage, ChatSend, Empty, Hello, MailList, MailSend, MailSnapshot, MailTarget, NetError, NetOk, PlayerInfo, PlayerTarget, Resume, RoomDelta, RoomJoin, RoomLeave, RoomSnapshot, SessionReplaced, SetAfk, SetChallengeFilter, SetChatFilter, SocialSnapshot, Welcome } from "./lobby_pb";
+import { file_game_v1_lobby } from "./lobby_pb";
+import type { DuelEnd, DuelMoveAccepted, DuelMovePreview, DuelPreviewMove, DuelSnapshot, DuelSubmitMove, DuelTarget, MatchHistory, MatchHistoryGet, MatchReplay, MatchReplayData, RankingGet, RankingSnapshot, TrainingBots, TrainingChallengeBot } from "./online_duel_pb";
+import { file_game_v1_online_duel } from "./online_duel_pb";
 import type { Ping, Pong } from "./session_pb";
 import { file_game_v1_session } from "./session_pb";
+import type { TradeConfirm, TradeInvite, TradeRespond, TradeSnapshot, TradeTarget, TradeUpdate } from "./trade_pb";
+import { file_game_v1_trade } from "./trade_pb";
 import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file game/v1/envelope.proto.
  */
 export const file_game_v1_envelope: GenFile = /*@__PURE__*/
-  fileDesc("ChZnYW1lL3YxL2VudmVsb3BlLnByb3RvEgdnYW1lLnYxIkMKDUNsaWVudE1lc3NhZ2USCwoDc2VxGAEgASgNEh0KBHBpbmcYAiABKAsyDS5nYW1lLnYxLlBpbmdIAEIGCgRib2R5IlUKDVNlcnZlck1lc3NhZ2USCwoDc2VxGAEgASgNEhAKCHJlcGx5X3RvGAIgASgNEh0KBHBvbmcYAyABKAsyDS5nYW1lLnYxLlBvbmdIAEIGCgRib2R5YgZwcm90bzM", [file_game_v1_session]);
+  fileDesc("ChZnYW1lL3YxL2VudmVsb3BlLnByb3RvEgdnYW1lLnYxIsENCg1DbGllbnRNZXNzYWdlEgsKA3NlcRgBIAEoDRIdCgRwaW5nGAIgASgLMg0uZ2FtZS52MS5QaW5nSAASHwoFaGVsbG8YAyABKAsyDi5nYW1lLnYxLkhlbGxvSAASIQoGcmVzdW1lGAQgASgLMg8uZ2FtZS52MS5SZXN1bWVIABImCglyb29tX2pvaW4YBSABKAsyES5nYW1lLnYxLlJvb21Kb2luSAASKAoKcm9vbV9sZWF2ZRgGIAEoCzISLmdhbWUudjEuUm9vbUxlYXZlSAASJgoJY2hhdF9zZW5kGAcgASgLMhEuZ2FtZS52MS5DaGF0U2VuZEgAEjsKFHNldF9jaGFsbGVuZ2VfZmlsdGVyGAggASgLMhsuZ2FtZS52MS5TZXRDaGFsbGVuZ2VGaWx0ZXJIABIxCg9zZXRfY2hhdF9maWx0ZXIYCSABKAsyFi5nYW1lLnYxLlNldENoYXRGaWx0ZXJIABIiCgdzZXRfYWZrGAogASgLMg8uZ2FtZS52MS5TZXRBZmtIABInCgZ3aG9faXMYCyABKAsyFS5nYW1lLnYxLlBsYXllclRhcmdldEgAEisKCmZyaWVuZF9hZGQYDCABKAsyFS5nYW1lLnYxLlBsYXllclRhcmdldEgAEi4KDWZyaWVuZF9yZW1vdmUYDSABKAsyFS5nYW1lLnYxLlBsYXllclRhcmdldEgAEisKCmlnbm9yZV9hZGQYDiABKAsyFS5nYW1lLnYxLlBsYXllclRhcmdldEgAEi4KDWlnbm9yZV9yZW1vdmUYDyABKAsyFS5nYW1lLnYxLlBsYXllclRhcmdldEgAEiUKC3NvY2lhbF9saXN0GBAgASgLMg4uZ2FtZS52MS5FbXB0eUgAEiYKCW1haWxfc2VuZBgRIAEoCzIRLmdhbWUudjEuTWFpbFNlbmRIABImCgltYWlsX2xpc3QYEiABKAsyES5nYW1lLnYxLk1haWxMaXN0SAASKAoJbWFpbF9yZWFkGBMgASgLMhMuZ2FtZS52MS5NYWlsVGFyZ2V0SAASKgoLbWFpbF9kZWxldGUYFCABKAsyEy5nYW1lLnYxLk1haWxUYXJnZXRIABIwCg5jaGFsbGVuZ2Vfc2VuZBgVIAEoCzIWLmdhbWUudjEuQ2hhbGxlbmdlU2VuZEgAEjYKEWNoYWxsZW5nZV9yZXNwb25kGBYgASgLMhkuZ2FtZS52MS5DaGFsbGVuZ2VSZXNwb25kSAASNAoQY2hhbGxlbmdlX2NhbmNlbBgXIAEoCzIYLmdhbWUudjEuQ2hhbGxlbmdlQ2FuY2VsSAASLAoNZHVlbF9zbmFwc2hvdBgYIAEoCzITLmdhbWUudjEuRHVlbFRhcmdldEgAEjMKEGR1ZWxfc3VibWl0X21vdmUYGSABKAsyFy5nYW1lLnYxLkR1ZWxTdWJtaXRNb3ZlSAASNQoRZHVlbF9wcmV2aWV3X21vdmUYGiABKAsyGC5nYW1lLnYxLkR1ZWxQcmV2aWV3TW92ZUgAEisKDGR1ZWxfZm9yZmVpdBgbIAEoCzITLmdhbWUudjEuRHVlbFRhcmdldEgAEj8KFnRyYWluaW5nX2NoYWxsZW5nZV9ib3QYHCABKAsyHS5nYW1lLnYxLlRyYWluaW5nQ2hhbGxlbmdlQm90SAASJwoNdHJhaW5pbmdfYm90cxgdIAEoCzIOLmdhbWUudjEuRW1wdHlIABIqCgtyYW5raW5nX2dldBgeIAEoCzITLmdhbWUudjEuUmFua2luZ0dldEgAEjUKEW1hdGNoX2hpc3RvcnlfZ2V0GB8gASgLMhguZ2FtZS52MS5NYXRjaEhpc3RvcnlHZXRIABIsCgxtYXRjaF9yZXBsYXkYICABKAsyFC5nYW1lLnYxLk1hdGNoUmVwbGF5SAASLAoMdHJhZGVfaW52aXRlGCEgASgLMhQuZ2FtZS52MS5UcmFkZUludml0ZUgAEi4KDXRyYWRlX3Jlc3BvbmQYIiABKAsyFS5nYW1lLnYxLlRyYWRlUmVzcG9uZEgAEiwKDHRyYWRlX3VwZGF0ZRgjIAEoCzIULmdhbWUudjEuVHJhZGVVcGRhdGVIABIuCg10cmFkZV9jb25maXJtGCQgASgLMhUuZ2FtZS52MS5UcmFkZUNvbmZpcm1IABIsCgx0cmFkZV9jYW5jZWwYJSABKAsyFC5nYW1lLnYxLlRyYWRlVGFyZ2V0SAASLgoOdHJhZGVfc25hcHNob3QYJiABKAsyFC5nYW1lLnYxLlRyYWRlVGFyZ2V0SABCBgoEYm9keSK/CAoNU2VydmVyTWVzc2FnZRILCgNzZXEYASABKA0SEAoIcmVwbHlfdG8YAiABKA0SHQoEcG9uZxgDIAEoCzINLmdhbWUudjEuUG9uZ0gAEiMKB3dlbGNvbWUYBCABKAsyEC5nYW1lLnYxLldlbGNvbWVIABI0ChBzZXNzaW9uX3JlcGxhY2VkGAUgASgLMhguZ2FtZS52MS5TZXNzaW9uUmVwbGFjZWRIABIiCgVlcnJvchgGIAEoCzIRLmdhbWUudjEuTmV0RXJyb3JIABIcCgJvaxgHIAEoCzIOLmdhbWUudjEuTmV0T2tIABIuCg1yb29tX3NuYXBzaG90GAggASgLMhUuZ2FtZS52MS5Sb29tU25hcHNob3RIABIoCgpyb29tX2RlbHRhGAkgASgLMhIuZ2FtZS52MS5Sb29tRGVsdGFIABIsCgxjaGF0X21lc3NhZ2UYCiABKAsyFC5nYW1lLnYxLkNoYXRNZXNzYWdlSAASKgoLcGxheWVyX2luZm8YCyABKAsyEy5nYW1lLnYxLlBsYXllckluZm9IABIyCg9zb2NpYWxfc25hcHNob3QYDCABKAsyFy5nYW1lLnYxLlNvY2lhbFNuYXBzaG90SAASLgoNbWFpbF9zbmFwc2hvdBgNIAEoCzIVLmdhbWUudjEuTWFpbFNuYXBzaG90SAASOAoSY2hhbGxlbmdlX3JlY2VpdmVkGA4gASgLMhouZ2FtZS52MS5DaGFsbGVuZ2VSZWNlaXZlZEgAEjQKEGNoYWxsZW5nZV91cGRhdGUYDyABKAsyGC5nYW1lLnYxLkNoYWxsZW5nZVVwZGF0ZUgAEi4KDWR1ZWxfc25hcHNob3QYECABKAsyFS5nYW1lLnYxLkR1ZWxTbmFwc2hvdEgAEjcKEmR1ZWxfbW92ZV9hY2NlcHRlZBgRIAEoCzIZLmdhbWUudjEuRHVlbE1vdmVBY2NlcHRlZEgAEjUKEWR1ZWxfbW92ZV9wcmV2aWV3GBIgASgLMhguZ2FtZS52MS5EdWVsTW92ZVByZXZpZXdIABIkCghkdWVsX2VuZBgTIAEoCzIQLmdhbWUudjEuRHVlbEVuZEgAEi4KDXRyYWluaW5nX2JvdHMYFCABKAsyFS5nYW1lLnYxLlRyYWluaW5nQm90c0gAEjQKEHJhbmtpbmdfc25hcHNob3QYFSABKAsyGC5nYW1lLnYxLlJhbmtpbmdTbmFwc2hvdEgAEi4KDW1hdGNoX2hpc3RvcnkYFiABKAsyFS5nYW1lLnYxLk1hdGNoSGlzdG9yeUgAEjUKEW1hdGNoX3JlcGxheV9kYXRhGBcgASgLMhguZ2FtZS52MS5NYXRjaFJlcGxheURhdGFIABIwCg50cmFkZV9zbmFwc2hvdBgYIAEoCzIWLmdhbWUudjEuVHJhZGVTbmFwc2hvdEgAQgYKBGJvZHliBnByb3RvMw", [file_game_v1_lobby, file_game_v1_online_duel, file_game_v1_session, file_game_v1_trade]);
 
 /**
  * Wiadomość klienta.
@@ -40,6 +46,222 @@ export type ClientMessage = Message<"game.v1.ClientMessage"> & {
      */
     value: Ping;
     case: "ping";
+  } | {
+    /**
+     * @generated from field: game.v1.Hello hello = 3;
+     */
+    value: Hello;
+    case: "hello";
+  } | {
+    /**
+     * @generated from field: game.v1.Resume resume = 4;
+     */
+    value: Resume;
+    case: "resume";
+  } | {
+    /**
+     * @generated from field: game.v1.RoomJoin room_join = 5;
+     */
+    value: RoomJoin;
+    case: "roomJoin";
+  } | {
+    /**
+     * @generated from field: game.v1.RoomLeave room_leave = 6;
+     */
+    value: RoomLeave;
+    case: "roomLeave";
+  } | {
+    /**
+     * @generated from field: game.v1.ChatSend chat_send = 7;
+     */
+    value: ChatSend;
+    case: "chatSend";
+  } | {
+    /**
+     * @generated from field: game.v1.SetChallengeFilter set_challenge_filter = 8;
+     */
+    value: SetChallengeFilter;
+    case: "setChallengeFilter";
+  } | {
+    /**
+     * @generated from field: game.v1.SetChatFilter set_chat_filter = 9;
+     */
+    value: SetChatFilter;
+    case: "setChatFilter";
+  } | {
+    /**
+     * @generated from field: game.v1.SetAfk set_afk = 10;
+     */
+    value: SetAfk;
+    case: "setAfk";
+  } | {
+    /**
+     * @generated from field: game.v1.PlayerTarget who_is = 11;
+     */
+    value: PlayerTarget;
+    case: "whoIs";
+  } | {
+    /**
+     * @generated from field: game.v1.PlayerTarget friend_add = 12;
+     */
+    value: PlayerTarget;
+    case: "friendAdd";
+  } | {
+    /**
+     * @generated from field: game.v1.PlayerTarget friend_remove = 13;
+     */
+    value: PlayerTarget;
+    case: "friendRemove";
+  } | {
+    /**
+     * @generated from field: game.v1.PlayerTarget ignore_add = 14;
+     */
+    value: PlayerTarget;
+    case: "ignoreAdd";
+  } | {
+    /**
+     * @generated from field: game.v1.PlayerTarget ignore_remove = 15;
+     */
+    value: PlayerTarget;
+    case: "ignoreRemove";
+  } | {
+    /**
+     * @generated from field: game.v1.Empty social_list = 16;
+     */
+    value: Empty;
+    case: "socialList";
+  } | {
+    /**
+     * @generated from field: game.v1.MailSend mail_send = 17;
+     */
+    value: MailSend;
+    case: "mailSend";
+  } | {
+    /**
+     * @generated from field: game.v1.MailList mail_list = 18;
+     */
+    value: MailList;
+    case: "mailList";
+  } | {
+    /**
+     * @generated from field: game.v1.MailTarget mail_read = 19;
+     */
+    value: MailTarget;
+    case: "mailRead";
+  } | {
+    /**
+     * @generated from field: game.v1.MailTarget mail_delete = 20;
+     */
+    value: MailTarget;
+    case: "mailDelete";
+  } | {
+    /**
+     * @generated from field: game.v1.ChallengeSend challenge_send = 21;
+     */
+    value: ChallengeSend;
+    case: "challengeSend";
+  } | {
+    /**
+     * @generated from field: game.v1.ChallengeRespond challenge_respond = 22;
+     */
+    value: ChallengeRespond;
+    case: "challengeRespond";
+  } | {
+    /**
+     * @generated from field: game.v1.ChallengeCancel challenge_cancel = 23;
+     */
+    value: ChallengeCancel;
+    case: "challengeCancel";
+  } | {
+    /**
+     * @generated from field: game.v1.DuelTarget duel_snapshot = 24;
+     */
+    value: DuelTarget;
+    case: "duelSnapshot";
+  } | {
+    /**
+     * @generated from field: game.v1.DuelSubmitMove duel_submit_move = 25;
+     */
+    value: DuelSubmitMove;
+    case: "duelSubmitMove";
+  } | {
+    /**
+     * @generated from field: game.v1.DuelPreviewMove duel_preview_move = 26;
+     */
+    value: DuelPreviewMove;
+    case: "duelPreviewMove";
+  } | {
+    /**
+     * @generated from field: game.v1.DuelTarget duel_forfeit = 27;
+     */
+    value: DuelTarget;
+    case: "duelForfeit";
+  } | {
+    /**
+     * @generated from field: game.v1.TrainingChallengeBot training_challenge_bot = 28;
+     */
+    value: TrainingChallengeBot;
+    case: "trainingChallengeBot";
+  } | {
+    /**
+     * @generated from field: game.v1.Empty training_bots = 29;
+     */
+    value: Empty;
+    case: "trainingBots";
+  } | {
+    /**
+     * @generated from field: game.v1.RankingGet ranking_get = 30;
+     */
+    value: RankingGet;
+    case: "rankingGet";
+  } | {
+    /**
+     * @generated from field: game.v1.MatchHistoryGet match_history_get = 31;
+     */
+    value: MatchHistoryGet;
+    case: "matchHistoryGet";
+  } | {
+    /**
+     * @generated from field: game.v1.MatchReplay match_replay = 32;
+     */
+    value: MatchReplay;
+    case: "matchReplay";
+  } | {
+    /**
+     * @generated from field: game.v1.TradeInvite trade_invite = 33;
+     */
+    value: TradeInvite;
+    case: "tradeInvite";
+  } | {
+    /**
+     * @generated from field: game.v1.TradeRespond trade_respond = 34;
+     */
+    value: TradeRespond;
+    case: "tradeRespond";
+  } | {
+    /**
+     * @generated from field: game.v1.TradeUpdate trade_update = 35;
+     */
+    value: TradeUpdate;
+    case: "tradeUpdate";
+  } | {
+    /**
+     * @generated from field: game.v1.TradeConfirm trade_confirm = 36;
+     */
+    value: TradeConfirm;
+    case: "tradeConfirm";
+  } | {
+    /**
+     * @generated from field: game.v1.TradeTarget trade_cancel = 37;
+     */
+    value: TradeTarget;
+    case: "tradeCancel";
+  } | {
+    /**
+     * @generated from field: game.v1.TradeTarget trade_snapshot = 38;
+     */
+    value: TradeTarget;
+    case: "tradeSnapshot";
   } | { case: undefined; value?: undefined };
 };
 
@@ -79,6 +301,132 @@ export type ServerMessage = Message<"game.v1.ServerMessage"> & {
      */
     value: Pong;
     case: "pong";
+  } | {
+    /**
+     * @generated from field: game.v1.Welcome welcome = 4;
+     */
+    value: Welcome;
+    case: "welcome";
+  } | {
+    /**
+     * @generated from field: game.v1.SessionReplaced session_replaced = 5;
+     */
+    value: SessionReplaced;
+    case: "sessionReplaced";
+  } | {
+    /**
+     * @generated from field: game.v1.NetError error = 6;
+     */
+    value: NetError;
+    case: "error";
+  } | {
+    /**
+     * @generated from field: game.v1.NetOk ok = 7;
+     */
+    value: NetOk;
+    case: "ok";
+  } | {
+    /**
+     * @generated from field: game.v1.RoomSnapshot room_snapshot = 8;
+     */
+    value: RoomSnapshot;
+    case: "roomSnapshot";
+  } | {
+    /**
+     * @generated from field: game.v1.RoomDelta room_delta = 9;
+     */
+    value: RoomDelta;
+    case: "roomDelta";
+  } | {
+    /**
+     * @generated from field: game.v1.ChatMessage chat_message = 10;
+     */
+    value: ChatMessage;
+    case: "chatMessage";
+  } | {
+    /**
+     * @generated from field: game.v1.PlayerInfo player_info = 11;
+     */
+    value: PlayerInfo;
+    case: "playerInfo";
+  } | {
+    /**
+     * @generated from field: game.v1.SocialSnapshot social_snapshot = 12;
+     */
+    value: SocialSnapshot;
+    case: "socialSnapshot";
+  } | {
+    /**
+     * @generated from field: game.v1.MailSnapshot mail_snapshot = 13;
+     */
+    value: MailSnapshot;
+    case: "mailSnapshot";
+  } | {
+    /**
+     * @generated from field: game.v1.ChallengeReceived challenge_received = 14;
+     */
+    value: ChallengeReceived;
+    case: "challengeReceived";
+  } | {
+    /**
+     * @generated from field: game.v1.ChallengeUpdate challenge_update = 15;
+     */
+    value: ChallengeUpdate;
+    case: "challengeUpdate";
+  } | {
+    /**
+     * @generated from field: game.v1.DuelSnapshot duel_snapshot = 16;
+     */
+    value: DuelSnapshot;
+    case: "duelSnapshot";
+  } | {
+    /**
+     * @generated from field: game.v1.DuelMoveAccepted duel_move_accepted = 17;
+     */
+    value: DuelMoveAccepted;
+    case: "duelMoveAccepted";
+  } | {
+    /**
+     * @generated from field: game.v1.DuelMovePreview duel_move_preview = 18;
+     */
+    value: DuelMovePreview;
+    case: "duelMovePreview";
+  } | {
+    /**
+     * @generated from field: game.v1.DuelEnd duel_end = 19;
+     */
+    value: DuelEnd;
+    case: "duelEnd";
+  } | {
+    /**
+     * @generated from field: game.v1.TrainingBots training_bots = 20;
+     */
+    value: TrainingBots;
+    case: "trainingBots";
+  } | {
+    /**
+     * @generated from field: game.v1.RankingSnapshot ranking_snapshot = 21;
+     */
+    value: RankingSnapshot;
+    case: "rankingSnapshot";
+  } | {
+    /**
+     * @generated from field: game.v1.MatchHistory match_history = 22;
+     */
+    value: MatchHistory;
+    case: "matchHistory";
+  } | {
+    /**
+     * @generated from field: game.v1.MatchReplayData match_replay_data = 23;
+     */
+    value: MatchReplayData;
+    case: "matchReplayData";
+  } | {
+    /**
+     * @generated from field: game.v1.TradeSnapshot trade_snapshot = 24;
+     */
+    value: TradeSnapshot;
+    case: "tradeSnapshot";
   } | { case: undefined; value?: undefined };
 };
 

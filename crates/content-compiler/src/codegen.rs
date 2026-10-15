@@ -41,7 +41,7 @@ fn raw(compiled: &Compiled) -> String {
         "use engine::{AttackFilter, CardDef, CardId, CardKind, Condition, Cost, Coupling, \
          CounterResolution, DeckRules, DefaultSettings, DuelRules, Duration, Effect, HandAction, \
          Keywords, Kind, Pool, RulesConfig, School, Schools, Stat, StatPair, Stats, Target, Trigger};\n\n\
-         use crate::{AvatarDef, Growth, StarterDef, effects};\n\n",
+         use crate::{AvatarDef, AvatarRarity, CardMeta, CardRarity, Growth, PathDef, StarterDef, effects};\n\n",
     );
     let _ = writeln!(
         out,
@@ -92,11 +92,72 @@ fn raw(compiled: &Compiled) -> String {
     }
     out.push_str("];\n\n");
 
+    out.push_str("/// Store and collection metadata.\npub static CARD_META: &[CardMeta] = &[\n");
+    for card in &compiled.cards {
+        let _ = writeln!(
+            out,
+            "CardMeta {{id:{},rarity:CardRarity::{:?},in_boosters:{},set:{:?}}},",
+            card.def.id, card.src.rarity, card.src.in_boosters, card.src.set
+        );
+    }
+    out.push_str("];\n\n");
+
     out.push_str(
         "/// Postacie rosnąco według identyfikatora.\npub static AVATARS: &[AvatarDef] = &[\n",
     );
     for avatar in &compiled.avatars {
-        out.push_str(&avatar_def(avatar));
+        if avatar.src.path.is_none() {
+            out.push_str(&avatar_def(avatar));
+        }
+    }
+    out.push_str("];\n\n");
+    out.push_str("/// Reincarnation profiles, excluded from collectible templates.\npub static PATHS: &[PathDef] = &[\n");
+    for avatar in &compiled.avatars {
+        let Some(path) = &avatar.src.path else {
+            continue;
+        };
+        let definition = avatar_def(avatar);
+        let definition = definition.trim_end().trim_end_matches(',');
+        let specs: Vec<_> = path
+            .specializations
+            .iter()
+            .map(|s| match s.as_str() {
+                "essence" => "engine::Specialization::Essence".into(),
+                "concentration" => "engine::Specialization::Concentration".into(),
+                s => format!(
+                    "engine::Specialization::School(School::{})",
+                    match s {
+                        "combat" => "Combat",
+                        "divine" => "Divine",
+                        "element" => "Element",
+                        "arcane" => "Arcane",
+                        "necro" => "Necro",
+                        "tech" => "Tech",
+                        _ => unreachable!("validated specialization"),
+                    }
+                ),
+            })
+            .collect();
+        let gifts: Vec<_> = path
+            .gifts
+            .iter()
+            .map(|key| {
+                compiled
+                    .cards
+                    .iter()
+                    .find(|c| c.src.key == *key)
+                    .expect("validated gift")
+                    .def
+                    .id
+            })
+            .collect();
+        let _ = writeln!(
+            out,
+            "PathDef {{base_avatar:{},variant:{},avatar:{definition},specializations:[{}],gifts:{gifts:?}}},",
+            path.base_avatar,
+            path.variant,
+            specs.join(",")
+        );
     }
     out.push_str("];\n\n");
 
@@ -120,9 +181,10 @@ fn raw(compiled: &Compiled) -> String {
 fn avatar_def(avatar: &CompiledAvatar) -> String {
     let growth: Vec<String> = avatar.growth.iter().map(growth).collect();
     format!(
-        "AvatarDef {{ id: {}, key: {:?}, starter_for: {}, base: {}, schools: {}, growth: &[{}], dev_points: &{:?} }},\n",
+        "AvatarDef {{ id: {}, key: {:?}, rarity: AvatarRarity::{:?}, starter_for: {}, base: {}, schools: {}, growth: &[{}], dev_points: &{:?} }},\n",
         avatar.src.id,
         avatar.src.key,
+        avatar.src.rarity,
         avatar
             .src
             .starter_for

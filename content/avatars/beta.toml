@@ -1,0 +1,316 @@
+[[avatar]]
+id = 7
+key = "avatar.storm_surveyor"
+ref = "Elektrykus"
+rarity = "common"
+base = { phys_atk = 3, phys_def = 0, mag_atk = 3, mag_def = 2, hp = 30, stamina = 40 }
+schools = { element = 1, tech = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+# Generator Z-GRW: --weights 20,10,45,25 --combat 17 --stamina 70 --hp 75 --school 5:element=2 --school 10:tech=2 --school 15:element=3 --school 19:tech=3
+growth = [
+  # przyrosty: [AF, OF, AM, OM, W, Ż]
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [0, 0, 1, 0, 4, 4] },
+  { level = 4, d = [0, 0, 0, 1, 4, 4] },
+  { level = 5, d = [1, 0, 0, 0, 3, 4], schools = { element = 2 } },
+  { level = 6, d = [0, 0, 1, 0, 4, 4] },
+  { level = 7, d = [0, 1, 0, 0, 4, 4] },
+  { level = 8, d = [0, 0, 1, 0, 3, 4] },
+  { level = 9, d = [0, 0, 0, 1, 4, 4] },
+  { level = 10, d = [1, 0, 0, 0, 4, 4], schools = { tech = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 3, 4] },
+  { level = 12, d = [0, 0, 1, 0, 4, 4] },
+  { level = 13, d = [0, 0, 1, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 1, 3, 4] },
+  { level = 15, d = [1, 0, 0, 0, 4, 4], schools = { element = 3 } },
+  { level = 16, d = [0, 0, 1, 0, 4, 4] },
+  { level = 17, d = [0, 0, 0, 1, 3, 4] },
+  { level = 18, d = [0, 0, 1, 0, 4, 4] },
+  { level = 19, d = [0, 1, 0, 0, 4, 4], schools = { tech = 3 } },
+  { level = 20, d = [0, 0, 1, 0, 4, 4] },
+]
+
+[[avatar]]
+id = 8
+key = "avatar.stoneguard"
+ref = "Gorylla"
+rarity = "common"
+base = { phys_atk = 4, phys_def = 1, mag_atk = 3, mag_def = 1, hp = 40, stamina = 25 }
+schools = { combat = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+# Generator Z-GRW: --weights 35,25,25,15 --combat 17 --stamina 75 --hp 70 --school 5:combat=2 --school 9:divine=1 --school 14:combat=3 --school 18:divine=2
+growth = [
+  # przyrosty: [AF, OF, AM, OM, W, Ż]
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [1, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 1, 0, 0, 4, 4] },
+  { level = 5, d = [0, 0, 1, 0, 4, 3], schools = { combat = 2 } },
+  { level = 6, d = [0, 0, 0, 1, 4, 4] },
+  { level = 7, d = [1, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 1, 0, 0, 4, 3] },
+  { level = 9, d = [0, 0, 1, 0, 4, 4], schools = { divine = 1 } },
+  { level = 10, d = [1, 0, 0, 0, 4, 4] },
+  { level = 11, d = [0, 0, 0, 0, 4, 3] },
+  { level = 12, d = [0, 0, 0, 1, 4, 4] },
+  { level = 13, d = [1, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 1, 0, 0, 4, 3], schools = { combat = 3 } },
+  { level = 15, d = [0, 0, 1, 0, 4, 4] },
+  { level = 16, d = [1, 0, 0, 0, 4, 4] },
+  { level = 17, d = [0, 1, 0, 0, 4, 3] },
+  { level = 18, d = [0, 0, 1, 0, 4, 4], schools = { divine = 2 } },
+  { level = 19, d = [1, 0, 0, 0, 4, 4] },
+  { level = 20, d = [0, 0, 0, 1, 4, 4] },
+]
+
+[[avatar]]
+id = 9
+key = "avatar.tide_oracle"
+ref = "Pani Jeziora"
+rarity = "common"
+base = { phys_atk = 3, phys_def = 1, mag_atk = 4, mag_def = 1, hp = 30, stamina = 40 }
+schools = { divine = 1, element = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+# Generator Z-GRW: --weights 15,20,40,25 --combat 17 --stamina 70 --hp 75 --school 5:divine=2 --school 10:element=2 --school 15:divine=3 --school 19:element=3
+growth = [
+  # przyrosty: [AF, OF, AM, OM, W, Ż]
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [0, 0, 1, 0, 4, 4] },
+  { level = 4, d = [0, 0, 0, 1, 4, 4] },
+  { level = 5, d = [0, 1, 0, 0, 3, 4], schools = { divine = 2 } },
+  { level = 6, d = [1, 0, 0, 0, 4, 4] },
+  { level = 7, d = [0, 0, 1, 0, 4, 4] },
+  { level = 8, d = [0, 0, 0, 1, 3, 4] },
+  { level = 9, d = [0, 0, 1, 0, 4, 4] },
+  { level = 10, d = [0, 1, 0, 0, 4, 4], schools = { element = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 3, 4] },
+  { level = 12, d = [0, 0, 1, 0, 4, 4] },
+  { level = 13, d = [1, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 1, 3, 4] },
+  { level = 15, d = [0, 0, 1, 0, 4, 4], schools = { divine = 3 } },
+  { level = 16, d = [0, 1, 0, 0, 4, 4] },
+  { level = 17, d = [0, 0, 1, 0, 3, 4] },
+  { level = 18, d = [0, 0, 0, 1, 4, 4] },
+  { level = 19, d = [1, 0, 0, 0, 4, 4], schools = { element = 3 } },
+  { level = 20, d = [0, 0, 1, 0, 4, 4] },
+]
+
+[[avatar]]
+id = 10
+key = "avatar.venom_scout"
+ref = "Skorpia"
+rarity = "common"
+base = { phys_atk = 3, phys_def = 1, mag_atk = 3, mag_def = 2, hp = 30, stamina = 35 }
+schools = { necro = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+# Generator Z-GRW: --weights 35,20,30,15 --combat 17 --stamina 75 --hp 75 --school 5:necro=2 --school 9:combat=1 --school 14:necro=3 --school 18:combat=2
+growth = [
+  # przyrosty: [AF, OF, AM, OM, W, Ż]
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [1, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 0, 1, 0, 4, 4] },
+  { level = 5, d = [0, 1, 0, 0, 4, 4], schools = { necro = 2 } },
+  { level = 6, d = [0, 0, 0, 1, 4, 4] },
+  { level = 7, d = [1, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 0, 1, 0, 4, 4] },
+  { level = 9, d = [1, 0, 0, 0, 4, 4], schools = { combat = 1 } },
+  { level = 10, d = [0, 1, 0, 0, 4, 4] },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [0, 0, 1, 0, 4, 4] },
+  { level = 13, d = [1, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 1, 4, 4], schools = { necro = 3 } },
+  { level = 15, d = [0, 0, 1, 0, 4, 4] },
+  { level = 16, d = [0, 1, 0, 0, 4, 4] },
+  { level = 17, d = [1, 0, 0, 0, 4, 4] },
+  { level = 18, d = [0, 0, 1, 0, 4, 4], schools = { combat = 2 } },
+  { level = 19, d = [1, 0, 0, 0, 4, 4] },
+  { level = 20, d = [0, 0, 0, 1, 4, 4] },
+]
+
+[[avatar]]
+id = 11
+key = "avatar.iron_reaver"
+ref = "Masakrator"
+rarity = "uncommon"
+base = { phys_atk = 6, phys_def = 0, mag_atk = 3, mag_def = 0, hp = 45, stamina = 25 }
+schools = { combat = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+# Growth from docs/dane/rozwoj_postaci.csv, complete numeric levels 2–20.
+growth = [
+  { level = 2, d = [0, 1, 0, 0, 4, 5] },
+  { level = 3, d = [1, 0, 0, 0, 2, 5] },
+  { level = 4, d = [0, 1, 0, 0, 3, 5] },
+  { level = 5, d = [1, 0, 0, 0, 3, 5] },
+  { level = 6, d = [0, 0, 0, 1, 3, 4] },
+  { level = 7, d = [1, 0, 0, 0, 3, 4] },
+  { level = 8, d = [0, 0, 0, 0, 2, 3] },
+  { level = 9, d = [0, 0, 1, 0, 4, 6] },
+  { level = 10, d = [0, 1, 0, 0, 3, 4], schools = { combat = 2 } },
+  { level = 11, d = [0, 0, 0, 1, 3, 4] },
+  { level = 12, d = [1, 0, 0, 0, 3, 5] },
+  { level = 13, d = [0, 0, 0, 1, 3, 5] },
+  { level = 14, d = [0, 1, 1, 0, 2, 5] },
+  { level = 15, d = [0, 0, 1, 0, 3, 5] },
+  { level = 16, d = [1, 0, 0, 0, 3, 5] },
+  { level = 17, d = [1, 0, 0, 0, 3, 5] },
+  { level = 18, d = [0, 0, 1, 0, 3, 5], schools = { combat = 3 } },
+  { level = 19, d = [0, 1, 0, 0, 3, 5] },
+  { level = 20, d = [1, 0, 0, 0, 2, 5] },
+]
+
+[[avatar]]
+id = 12
+key = "avatar.rift_duelist"
+ref = "Ripper"
+rarity = "uncommon"
+base = { phys_atk = 5, phys_def = 0, mag_atk = 4, mag_def = 0, hp = 40, stamina = 30 }
+schools = { combat = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+# Growth from docs/dane/rozwoj_postaci.csv, complete numeric levels 2–20.
+growth = [
+  { level = 2, d = [1, 0, 0, 0, 2, 4] },
+  { level = 3, d = [0, 0, 1, 0, 3, 4] },
+  { level = 4, d = [0, 0, 1, 0, 3, 4] },
+  { level = 5, d = [1, 0, 0, 0, 3, 4] },
+  { level = 6, d = [0, 0, 0, 0, 3, 4], schools = { combat = 2 } },
+  { level = 7, d = [1, 0, 0, 0, 3, 4] },
+  { level = 8, d = [0, 0, 0, 0, 4, 4] },
+  { level = 9, d = [1, 0, 0, 0, 2, 4] },
+  { level = 10, d = [0, 0, 0, 0, 3, 4], schools = { necro = 1, combat = 2 } },
+  { level = 11, d = [0, 0, 1, 0, 4, 6] },
+  { level = 12, d = [1, 0, 0, 0, 4, 4] },
+  { level = 13, d = [0, 0, 0, 0, 4, 4], schools = { necro = 1, combat = 3 } },
+  { level = 14, d = [0, 0, 1, 0, 4, 4] },
+  { level = 15, d = [0, 0, 1, 0, 4, 4] },
+  { level = 16, d = [1, 0, 0, 0, 6, 4] },
+  { level = 17, d = [1, 0, 0, 0, 4, 4] },
+  { level = 18, d = [0, 0, 0, 0, 4, 4], schools = { necro = 2, combat = 3 } },
+  { level = 19, d = [1, 0, 0, 0, 5, 5] },
+  { level = 20, d = [0, 0, 1, 0, 5, 5] },
+]
+
+[[avatar]]
+id = 13
+key = "avatar.root_sage"
+ref = "Sokrates"
+rarity = "uncommon"
+base = { phys_atk = 4, phys_def = 2, mag_atk = 2, mag_def = 1, hp = 40, stamina = 30 }
+schools = { combat = 1, element = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+# Generator Z-GRW: --weights 30,30,25,15 --combat 17 --stamina 70 --hp 70 --school 5:combat=2 --school 10:element=2 --school 15:combat=3 --school 19:element=3
+growth = [
+  # przyrosty: [AF, OF, AM, OM, W, Ż]
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [1, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 1, 0, 0, 4, 4] },
+  { level = 5, d = [0, 0, 1, 0, 3, 3], schools = { combat = 2 } },
+  { level = 6, d = [0, 0, 0, 1, 4, 4] },
+  { level = 7, d = [1, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 1, 0, 0, 3, 3] },
+  { level = 9, d = [0, 0, 1, 0, 4, 4] },
+  { level = 10, d = [1, 0, 0, 0, 4, 4], schools = { element = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 3, 3] },
+  { level = 12, d = [0, 1, 0, 0, 4, 4] },
+  { level = 13, d = [0, 0, 1, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 1, 3, 3] },
+  { level = 15, d = [1, 0, 0, 0, 4, 4], schools = { combat = 3 } },
+  { level = 16, d = [0, 1, 0, 0, 4, 4] },
+  { level = 17, d = [0, 0, 1, 0, 3, 3] },
+  { level = 18, d = [1, 0, 0, 0, 4, 4] },
+  { level = 19, d = [0, 1, 0, 0, 4, 4], schools = { element = 3 } },
+  { level = 20, d = [0, 0, 0, 1, 4, 4] },
+]
+
+[[avatar]]
+id = 18
+key = "avatar.glass_alchemist"
+ref = "Alchemik"
+rarity = "rare"
+base = { phys_atk = 3, phys_def = 0, mag_atk = 3, mag_def = 2, hp = 30, stamina = 45 }
+schools = { arcane = 1, tech = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+# Generator Z-GRW: --weights 15,15,45,25 --combat 17 --stamina 65 --hp 75 --school 5:arcane=2 --school 10:tech=2 --school 15:arcane=3 --school 19:tech=3
+growth = [
+  # przyrosty: [AF, OF, AM, OM, W, Ż]
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [0, 0, 1, 0, 3, 4] },
+  { level = 4, d = [0, 0, 0, 1, 4, 4] },
+  { level = 5, d = [1, 0, 0, 0, 3, 4], schools = { arcane = 2 } },
+  { level = 6, d = [0, 0, 1, 0, 4, 4] },
+  { level = 7, d = [0, 1, 0, 0, 3, 4] },
+  { level = 8, d = [0, 0, 1, 0, 3, 4] },
+  { level = 9, d = [0, 0, 0, 1, 4, 4] },
+  { level = 10, d = [0, 0, 1, 0, 3, 4], schools = { tech = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [1, 0, 0, 0, 3, 4] },
+  { level = 13, d = [0, 1, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 1, 0, 3, 4] },
+  { level = 15, d = [0, 0, 0, 1, 3, 4], schools = { arcane = 3 } },
+  { level = 16, d = [0, 0, 1, 0, 4, 4] },
+  { level = 17, d = [0, 0, 0, 1, 3, 4] },
+  { level = 18, d = [0, 0, 1, 0, 4, 4] },
+  { level = 19, d = [1, 0, 0, 0, 3, 4], schools = { tech = 3 } },
+  { level = 20, d = [0, 0, 1, 0, 4, 4] },
+]
+
+[[avatar]]
+id = 19
+key = "avatar.dusk_stalker"
+ref = "Hiena"
+rarity = "rare"
+base = { phys_atk = 3, phys_def = 1, mag_atk = 3, mag_def = 2, hp = 30, stamina = 35 }
+schools = { arcane = 1, necro = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+# Generator Z-GRW: --weights 35,15,35,15 --combat 17 --stamina 75 --hp 80 --school 5:necro=2 --school 10:arcane=2 --school 15:necro=3 --school 19:arcane=3
+growth = [
+  # przyrosty: [AF, OF, AM, OM, W, Ż]
+  { level = 2, d = [0, 0, 0, 0, 3, 4] },
+  { level = 3, d = [1, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 0, 1, 0, 4, 4] },
+  { level = 5, d = [0, 1, 0, 0, 4, 4], schools = { necro = 2 } },
+  { level = 6, d = [0, 0, 0, 1, 4, 5] },
+  { level = 7, d = [1, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 0, 1, 0, 4, 4] },
+  { level = 9, d = [1, 0, 0, 0, 4, 4] },
+  { level = 10, d = [0, 0, 1, 0, 4, 4], schools = { arcane = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 5] },
+  { level = 12, d = [0, 1, 0, 0, 4, 4] },
+  { level = 13, d = [1, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 1, 0, 4, 4] },
+  { level = 15, d = [0, 0, 0, 1, 4, 4], schools = { necro = 3 } },
+  { level = 16, d = [1, 0, 0, 0, 4, 5] },
+  { level = 17, d = [0, 0, 1, 0, 4, 4] },
+  { level = 18, d = [1, 0, 0, 0, 4, 4] },
+  { level = 19, d = [0, 0, 1, 0, 4, 4], schools = { arcane = 3 } },
+  { level = 20, d = [0, 1, 0, 0, 4, 5] },
+]
+
+[[avatar]]
+id = 20
+key = "avatar.dawn_lancer"
+ref = "Lambert"
+rarity = "rare"
+base = { phys_atk = 5, phys_def = 1, mag_atk = 2, mag_def = 2, hp = 35, stamina = 30 }
+schools = { combat = 1, divine = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+# Growth from docs/dane/rozwoj_postaci.csv, complete numeric levels 2–20.
+growth = [
+  { level = 2, d = [0, 0, 1, 0, 3, 6] },
+  { level = 3, d = [1, 0, 0, 0, 3, 3] },
+  { level = 4, d = [0, 1, 0, 0, 3, 3] },
+  { level = 5, d = [0, 0, 0, 0, 3, 4], schools = { divine = 1, combat = 2 } },
+  { level = 6, d = [0, 0, 1, 0, 3, 4] },
+  { level = 7, d = [0, 0, 1, 0, 3, 4] },
+  { level = 8, d = [0, 1, 0, 0, 3, 4] },
+  { level = 9, d = [0, 0, 0, 0, 2, 4], schools = { divine = 2, combat = 2 } },
+  { level = 10, d = [1, 0, 0, 0, 3, 4] },
+  { level = 11, d = [0, 0, 0, 1, 3, 4] },
+  { level = 12, d = [1, 0, 0, 0, 3, 4] },
+  { level = 13, d = [0, 1, 0, 0, 3, 4] },
+  { level = 14, d = [0, 1, 0, 0, 3, 4] },
+  { level = 15, d = [0, 0, 0, 0, 3, 4], schools = { divine = 2, combat = 3 } },
+  { level = 16, d = [1, 0, 0, 0, 4, 4] },
+  { level = 17, d = [1, 0, 0, 1, 4, 6] },
+  { level = 18, d = [0, 0, 1, 0, 4, 4] },
+  { level = 19, d = [1, 0, 0, 0, 4, 5] },
+  { level = 20, d = [0, 0, 0, 1, 3, 5] },
+]

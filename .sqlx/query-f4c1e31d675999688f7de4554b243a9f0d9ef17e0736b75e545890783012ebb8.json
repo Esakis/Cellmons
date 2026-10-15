@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE mail SET read_at=COALESCE(read_at,now()) WHERE id=$2 AND to_user=$1 AND NOT deleted_by_recipient",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Uuid"]
+    },
+    "nullable": []
+  },
+  "hash": "f4c1e31d675999688f7de4554b243a9f0d9ef17e0736b75e545890783012ebb8"
+}

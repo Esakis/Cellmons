@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 100" role="img" aria-label="Mosiężna osłona"><title>Mosiężna osłona</title>
+<defs><radialGradient id="bg" cx="50%" cy="35%" r="85%"><stop stop-color="#91e0df"/><stop offset=".55" stop-color="#12454c"/><stop offset="1" stop-color="#111323"/></radialGradient><linearGradient id="metal" x2="1" y2="1"><stop stop-color="#fff1bd"/><stop offset=".4" stop-color="#bca073"/><stop offset="1" stop-color="#5b4934"/></linearGradient><radialGradient id="glow"><stop stop-color="#fff9d8" stop-opacity=".8"/><stop offset="1" stop-color="#91e0df" stop-opacity="0"/></radialGradient></defs>
+<rect width="160" height="100" fill="url(#bg)"/><circle cx="80" cy="46" r="42" fill="url(#glow)"/>
+<path d="M5 92L80 56 155 92M11 8L80 56 149 8" fill="none" stroke="#91e0df" opacity=".15"/>
+
+      <path d="M28 30L42 23 47 72 35 80 22 62ZM132 30L118 23 113 72 125 80 138 62Z" fill="#94713b" stroke="#dfc78d"/>
+      <path d="M49 17H111L117 63Q110 83 80 92 50 83 43 63Z" fill="url(#metal)" stroke="#ffe4a2" stroke-width="3"/>
+      <path d="M57 25H103L108 60Q101 75 80 83 59 75 52 60Z" fill="#235b63" stroke="#83c9ca" stroke-width="2"/>
+      <circle cx="80" cy="51" r="17" fill="#8d713f" stroke="#e5cb86" stroke-width="4"/>
+      <circle cx="80" cy="51" r="8" fill="#88d7d9" stroke="#d5f6e6"/>
+      <path d="M80 30V34M80 68V72M59 51H63M97 51H101" stroke="#e6d0a0" stroke-width="3"/>
+      <circle cx="55" cy="21" r="2" fill="#4e472f"/><circle cx="105" cy="21" r="2" fill="#4e472f"/>
+    
+<g fill="#91e0df" opacity=".7"><circle cx="18" cy="19" r="1"/><circle cx="141" cy="15" r="1.5"/><circle cx="23" cy="47" r=".8"/><circle cx="145" cy="84" r="1"/></g>
+<rect x="3" y="3" width="154" height="94" rx="3" fill="none" stroke="#ead1a0" opacity=".65"/><path d="M5 15V5H15M145 5H155V15M5 85V95H15M145 95H155V85" fill="none" stroke="#f7e2b5" stroke-width="1.5"/></svg>

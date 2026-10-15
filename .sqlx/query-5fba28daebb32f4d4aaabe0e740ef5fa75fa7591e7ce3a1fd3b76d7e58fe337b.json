@@ -1,0 +1,59 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT m.id,f.login::text AS \"sender!\",t.login::text AS \"recipient!\",m.body,(EXTRACT(EPOCH FROM m.created_at)*1000)::bigint AS \"at_ms!\",m.read_at IS NOT NULL AS \"read!\" FROM mail m JOIN users f ON f.id=m.from_user JOIN users t ON t.id=m.to_user WHERE (($3 AND m.from_user=$1 AND NOT m.deleted_by_sender) OR (NOT $3 AND m.to_user=$1 AND NOT m.deleted_by_recipient)) AND ($2::uuid IS NULL OR m.id<$2) ORDER BY m.id DESC LIMIT $4",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "mail",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "sender!",
+        "type_info": "Text",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 2,
+        "name": "recipient!",
+        "type_info": "Text",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 3,
+        "name": "body",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "mail",
+            "name": "body"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "at_ms!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 5,
+        "name": "read!",
+        "type_info": "Bool",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid", "Uuid", "Bool", "Int8"]
+    },
+    "nullable": [false, null, null, false, null, null]
+  },
+  "hash": "5fba28daebb32f4d4aaabe0e740ef5fa75fa7591e7ce3a1fd3b76d7e58fe337b"
+}

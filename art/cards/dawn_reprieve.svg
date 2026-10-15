@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 100" role="img" aria-label="Wytchnienie świtu"><title>Wytchnienie świtu</title>
+<defs><radialGradient id="bg" cx="50%" cy="35%" r="85%"><stop stop-color="#ffe6a6"/><stop offset=".55" stop-color="#604417"/><stop offset="1" stop-color="#111323"/></radialGradient><linearGradient id="metal" x2="1" y2="1"><stop stop-color="#fff1bd"/><stop offset=".4" stop-color="#bca073"/><stop offset="1" stop-color="#5b4934"/></linearGradient><radialGradient id="glow"><stop stop-color="#fff9d8" stop-opacity=".8"/><stop offset="1" stop-color="#ffe6a6" stop-opacity="0"/></radialGradient></defs>
+<rect width="160" height="100" fill="url(#bg)"/><circle cx="80" cy="46" r="42" fill="url(#glow)"/>
+<path d="M5 92L80 56 155 92M11 8L80 56 149 8" fill="none" stroke="#ffe6a6" opacity=".15"/>
+
+      <circle cx="80" cy="38" r="31" fill="url(#glow)"/><circle cx="80" cy="38" r="17" fill="#fff3bc"/>
+      <path d="M80 7V2M80 74V67M49 38H40M120 38H111M58 16L52 10M108 65L102 59M58 59L52 65M108 10L102 16" stroke="#f4d27c" stroke-width="2"/>
+      <path d="M0 66Q40 50 80 64T160 62V100H0Z" fill="#3f4331"/>
+      <path d="M11 78Q76 56 151 77M8 90Q78 65 152 91" fill="none" stroke="#b8a573"/>
+      <path d="M56 74Q80 65 104 74L110 89H50Z" fill="url(#metal)" stroke="#fff0c0"/>
+      <path d="M61 73Q80 84 99 73" fill="none" stroke="#4e432f" stroke-width="2"/>
+      <path d="M29 91V55M29 62L22 55M29 69L36 60M130 91V55M130 62L123 54M130 69L137 61" stroke="#d9bc70" stroke-width="2"/>
+    
+<g fill="#ffe6a6" opacity=".7"><circle cx="18" cy="19" r="1"/><circle cx="141" cy="15" r="1.5"/><circle cx="23" cy="47" r=".8"/><circle cx="145" cy="84" r="1"/></g>
+<rect x="3" y="3" width="154" height="94" rx="3" fill="none" stroke="#ead1a0" opacity=".65"/><path d="M5 15V5H15M145 5H155V15M5 85V95H15M145 95H155V85" fill="none" stroke="#f7e2b5" stroke-width="1.5"/></svg>

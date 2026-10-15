@@ -261,6 +261,9 @@ pub async fn register(
     sqlx::query!("INSERT INTO ratings(user_id) VALUES ($1)", user)
         .execute(&mut *tx)
         .await?;
+    crate::economy::grant_initial(&mut tx, user)
+        .await
+        .map_err(|_| Error::busy())?;
     message(&state, &mut tx, user, &email, "verify").await?;
     tx.commit().await?;
     Ok((
@@ -302,12 +305,19 @@ async fn insert_session(
     android: bool,
     headers: &HeaderMap,
     ip: &str,
-) -> Result<()> {
+) -> Result<Option<(Uuid, Vec<u8>)>> {
+    let mut replaced = None;
     if !android && let Some(old) = security::cookie_token(&state.auth, headers) {
         let old = crypto::hash(&old);
-        sqlx::query!("DELETE FROM sessions WHERE id_hash=$1 AND kind='web'", old)
-            .execute(&mut **tx)
-            .await?;
+        if let Some(row) = sqlx::query!(
+            "DELETE FROM sessions WHERE id_hash=$1 AND kind='web' RETURNING user_id",
+            old
+        )
+        .fetch_optional(&mut **tx)
+        .await?
+        {
+            replaced = Some((row.user_id, old));
+        }
     }
     sqlx::query!(
         "DELETE FROM sessions WHERE user_id=$1 AND expires_at<=now()",
@@ -336,7 +346,7 @@ async fn insert_session(
     let device = if android { "Android" } else { "Web" };
     let ip_hash = state.auth.limit_key("session-ip", ip);
     sqlx::query!("INSERT INTO sessions(id_hash,kind,user_id,expires_at,user_agent,device_label,rotated_at,ip_hash) VALUES ($1,$2,$3,now()+interval '30 days',$4,$5,now(),$6)", hash, kind, user, agent, device, ip_hash).execute(&mut **tx).await?;
-    Ok(())
+    Ok(replaced)
 }
 
 pub async fn login(
@@ -387,7 +397,7 @@ pub async fn login(
         return Err(Error::unauthorized());
     }
     let raw = crypto::token().map_err(|_| Error::busy())?;
-    insert_session(
+    let replaced = insert_session(
         &mut tx,
         &state,
         row.id,
@@ -401,6 +411,9 @@ pub async fn login(
         .execute(&mut *tx)
         .await?;
     tx.commit().await?;
+    if let Some((user, hash)) = replaced {
+        state.online.hub.revoke(user, Some(hash)).await;
+    }
     state
         .auth
         .0
@@ -432,13 +445,16 @@ pub async fn me(State(state): State<AppState>, headers: HeaderMap) -> Result<Jso
 pub async fn logout(State(state): State<AppState>, headers: HeaderMap) -> Result<Response> {
     let (raw, kind) = security::credential(&state.auth, &headers)?;
     let hash = crypto::hash(&raw);
-    sqlx::query!(
-        "DELETE FROM sessions WHERE id_hash=$1 AND kind=$2",
+    let removed = sqlx::query!(
+        "DELETE FROM sessions WHERE id_hash=$1 AND kind=$2 RETURNING user_id",
         hash,
         kind
     )
-    .execute(&state.db)
+    .fetch_optional(&state.db)
     .await?;
+    if let Some(removed) = removed {
+        state.online.hub.revoke(removed.user_id, Some(hash)).await;
+    }
     let mut response = StatusCode::NO_CONTENT.into_response();
     if kind == "web" {
         response.headers_mut().insert(
@@ -561,6 +577,7 @@ pub async fn reset_confirm(
     .execute(&mut *tx)
     .await?;
     tx.commit().await?;
+    state.online.hub.revoke(user_id, None).await;
     Ok(Json(serde_json::json!({"reset":true})))
 }
 
@@ -585,6 +602,11 @@ pub async fn rotate(
     let next = crypto::hash(&raw);
     sqlx::query!("UPDATE sessions SET id_hash=$2, rotated_at=now(), last_seen_at=now(), expires_at=now()+interval '30 days' WHERE id_hash=$1", current.hash, next).execute(&mut *tx).await?;
     tx.commit().await?;
+    state
+        .online
+        .hub
+        .revoke(current.user, Some(current.hash))
+        .await;
     Ok(Json(serde_json::json!({"token":raw,"expires_in":2592000})))
 }
 
@@ -613,5 +635,6 @@ pub async fn revoke(
     )
     .execute(&state.db)
     .await?;
+    state.online.hub.revoke(current.user, Some(hash)).await;
     Ok(StatusCode::NO_CONTENT)
 }

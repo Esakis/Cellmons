@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 100" role="img" aria-label="Wyważona myśl"><title>Wyważona myśl</title>
+<defs><radialGradient id="bg" cx="50%" cy="35%" r="85%"><stop stop-color="#bac5ff"/><stop offset=".55" stop-color="#242653"/><stop offset="1" stop-color="#111323"/></radialGradient><linearGradient id="metal" x2="1" y2="1"><stop stop-color="#fff1bd"/><stop offset=".4" stop-color="#bca073"/><stop offset="1" stop-color="#5b4934"/></linearGradient><radialGradient id="glow"><stop stop-color="#fff9d8" stop-opacity=".8"/><stop offset="1" stop-color="#bac5ff" stop-opacity="0"/></radialGradient></defs>
+<rect width="160" height="100" fill="url(#bg)"/><circle cx="80" cy="46" r="42" fill="url(#glow)"/>
+<path d="M5 92L80 56 155 92M11 8L80 56 149 8" fill="none" stroke="#bac5ff" opacity=".15"/>
+
+      <ellipse cx="80" cy="46" rx="50" ry="27" transform="rotate(-22 80 46)" fill="none" stroke="#d0b78b" stroke-width="2"/>
+      <ellipse cx="80" cy="46" rx="24" ry="39" transform="rotate(25 80 46)" fill="none" stroke="#98b9ef" stroke-width="2"/>
+      <circle cx="80" cy="46" r="14" fill="url(#glow)"/><circle cx="80" cy="46" r="7" fill="#e5edff"/>
+      <circle cx="41" cy="31" r="5" fill="url(#metal)"/><circle cx="108" cy="23" r="4" fill="#b8d4f2"/><circle cx="123" cy="55" r="6" fill="#b695d1"/>
+      <path d="M39 83L79 75 121 83 120 94 80 88 40 94Z" fill="#d8c6b5" stroke="#9e82ad"/><path d="M80 77V89M47 86L72 81M87 81L113 86" stroke="#614871"/>
+      <path d="M80 18V10M80 82V74M51 46H44M117 46H109" stroke="#d3c6ff"/>
+    
+<g fill="#bac5ff" opacity=".7"><circle cx="18" cy="19" r="1"/><circle cx="141" cy="15" r="1.5"/><circle cx="23" cy="47" r=".8"/><circle cx="145" cy="84" r="1"/></g>
+<rect x="3" y="3" width="154" height="94" rx="3" fill="none" stroke="#ead1a0" opacity=".65"/><path d="M5 15V5H15M145 5H155V15M5 85V95H15M145 95H155V85" fill="none" stroke="#f7e2b5" stroke-width="1.5"/></svg>

@@ -50,7 +50,7 @@ fn focus_cap_is_optional() {
 
 #[test]
 fn sections_for_the_server_are_ignored() {
-    let text = format!("{RULES_TOML}\n[rating]\ninitial = 1000\n");
+    let text = format!("{RULES_TOML}\n[future_server_feature]\nlimit = 1000\n");
     assert_eq!(parse(&text).expect("poprawny TOML"), classic_rules());
 }
 

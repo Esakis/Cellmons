@@ -1,0 +1,32 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO matches(id,kind,first_user,second_user,first_avatar,second_avatar,winner,reason,rounds,first_rating_delta,second_rating_delta,first_xp,second_xp,first_rating_new,second_rating_new,first_unlock,second_unlock,first_ducats,second_ducats) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Int2",
+        "Text",
+        "Int2",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d0d744bae16ab000a4bf42966ba0d2fdd0483e5df2e6f756b804b45de599e6cc"
+}

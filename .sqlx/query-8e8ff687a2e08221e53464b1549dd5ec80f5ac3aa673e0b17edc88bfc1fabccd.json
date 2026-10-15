@@ -1,0 +1,35 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT first_win_bonus,win_ducats FROM daily_counters WHERE user_id=$1 AND day=(now() AT TIME ZONE 'UTC')::date FOR UPDATE",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "first_win_bonus",
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "daily_counters",
+            "name": "first_win_bonus"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "win_ducats",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "daily_counters",
+            "name": "win_ducats"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid"]
+    },
+    "nullable": [false, false]
+  },
+  "hash": "8e8ff687a2e08221e53464b1549dd5ec80f5ac3aa673e0b17edc88bfc1fabccd"
+}

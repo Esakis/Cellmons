@@ -2,7 +2,7 @@
 
 Projekt gry karcianej z elementami RPG (przeglądarka i Android), odtwarzającej zasady polskiej gry sieciowej **Cellmons** (Pogram, 2004–2009). Mechanika pochodzi z oryginału, a nazwy, teksty, fabuła i grafiki są własne. „Cellmons” zostaje tylko nazwą repozytorium. Nazwę produktu, znak towarowy i domeny opisuje `docs/20-nazwa-i-znak-towarowy.md`.
 
-**Status:** F6.2 — rejestracja, logowanie, sesje przeglądarki i aplikacji, potwierdzanie e-maila, reset hasła oraz lokalny tryb „Graj jako gość”. Gość działa wyłącznie w pamięci klienta, bez API i zapisu danych lub postępu. Szczegóły i konfigurację poczty opisuje [raport F6.2](docs/23-konta-i-gosc-testy.md). Następny krok to F6.3: połączenia WebSocket. Działa też trening offline F5 w przeglądarce/PWA i Android debug; do zamknięcia F5 pozostają pomiary na fizycznych telefonach (start, 60 FPS i dostępność), opisane w [raporcie F5](docs/21-trening-offline-testy.md). Treść gry (72 karty i zestawy startowe) jest w `content/`, a zatwierdzone grafiki w `art/`.
+**Status:** zaimplementowane F9.1–F9.4 — Dukaty i bilansowana księga, sklep z jawnymi szansami i idempotencją, wysypisko oraz atomowa wymiana kart i waluty. [Raport F9](docs/27-ekonomia-sklep-wymiana-testy.md). Działają też postacie i kolekcja ([F8](docs/26-postacie-kolekcja-testy.md)) oraz trwałe walki online ([F7](docs/25-pojedynki-online-testy.md)). Gość korzysta tylko z RAM i treningu offline. Kolejny zakres: **F10, rozwój i pełna treść**; przygotowano też treść F9.5 ([audyt balansu](docs/28-tresc-beta-balans.md)). Obecnie 132 karty i 19 postaci; nowe ilustracje oczekują na odbiór właściciela. Publiczna beta i testy fizycznych telefonów wymagają docelowego środowiska i urządzeń.
 
 ## Uruchomienie lokalne
 
@@ -67,3 +67,6 @@ Zalecana kolejność czytania: 01 → 02 → 03 → 04 → 16, potem pozostałe 
 | [21. Trening offline — testy](docs/21-trening-offline-testy.md) | zakres F5, pomiary, PWA i Android debug, otwarte testy sprzętowe |
 | [22. Baza i migracje — testy](docs/22-baza-migracje-testy.md) | zakres F6.1, migracje, role bazy, SQLx offline i testy integralności |
 | [23. Konta i gość — testy](docs/23-konta-i-gosc-testy.md) | F6.2, logowanie web/aplikacji, e-mail, limity, gość bez zapisu danych |
+| [24. Lobby, WebSocket i wyzwania — testy](docs/24-lobby-websocket-wyzwania-testy.md) | F6.3–F7.1, obciążenie, testy dwóch klientów i poprawki przeglądu |
+| [25. Pojedynki online — testy](docs/25-pojedynki-online-testy.md) | F7.2–F7.5, restart procesu, wynik, boty i klient |
+| [26. Postacie i kolekcja — testy](docs/26-postacie-kolekcja-testy.md) | F8, transakcje, PR, talie, nagrody i gość offline |

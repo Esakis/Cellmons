@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE decks SET cards=$2,revision=revision+1,updated_at=now() WHERE avatar_id=$1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Int2Array"]
+    },
+    "nullable": []
+  },
+  "hash": "a995f228ba1f5e12acb8135c1c2f231eed14f7049867f3082d8633d246b44a4f"
+}

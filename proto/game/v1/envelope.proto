@@ -5,7 +5,10 @@ syntax = "proto3";
 // (rozdz. 4) dochodzą razem z obsługującymi je funkcjami.
 package game.v1;
 
+import "game/v1/lobby.proto";
+import "game/v1/online_duel.proto";
 import "game/v1/session.proto";
+import "game/v1/trade.proto";
 
 // Wiadomość klienta.
 message ClientMessage {
@@ -14,6 +17,42 @@ message ClientMessage {
 
   oneof body {
     Ping ping = 2;
+    Hello hello = 3;
+    Resume resume = 4;
+    RoomJoin room_join = 5;
+    RoomLeave room_leave = 6;
+    ChatSend chat_send = 7;
+    SetChallengeFilter set_challenge_filter = 8;
+    SetChatFilter set_chat_filter = 9;
+    SetAfk set_afk = 10;
+    PlayerTarget who_is = 11;
+    PlayerTarget friend_add = 12;
+    PlayerTarget friend_remove = 13;
+    PlayerTarget ignore_add = 14;
+    PlayerTarget ignore_remove = 15;
+    Empty social_list = 16;
+    MailSend mail_send = 17;
+    MailList mail_list = 18;
+    MailTarget mail_read = 19;
+    MailTarget mail_delete = 20;
+    ChallengeSend challenge_send = 21;
+    ChallengeRespond challenge_respond = 22;
+    ChallengeCancel challenge_cancel = 23;
+    DuelTarget duel_snapshot = 24;
+    DuelSubmitMove duel_submit_move = 25;
+    DuelPreviewMove duel_preview_move = 26;
+    DuelTarget duel_forfeit = 27;
+    TrainingChallengeBot training_challenge_bot = 28;
+    Empty training_bots = 29;
+    RankingGet ranking_get = 30;
+    MatchHistoryGet match_history_get = 31;
+    MatchReplay match_replay = 32;
+    TradeInvite trade_invite = 33;
+    TradeRespond trade_respond = 34;
+    TradeUpdate trade_update = 35;
+    TradeConfirm trade_confirm = 36;
+    TradeTarget trade_cancel = 37;
+    TradeTarget trade_snapshot = 38;
   }
 }
 
@@ -26,5 +65,26 @@ message ServerMessage {
 
   oneof body {
     Pong pong = 3;
+    Welcome welcome = 4;
+    SessionReplaced session_replaced = 5;
+    NetError error = 6;
+    NetOk ok = 7;
+    RoomSnapshot room_snapshot = 8;
+    RoomDelta room_delta = 9;
+    ChatMessage chat_message = 10;
+    PlayerInfo player_info = 11;
+    SocialSnapshot social_snapshot = 12;
+    MailSnapshot mail_snapshot = 13;
+    ChallengeReceived challenge_received = 14;
+    ChallengeUpdate challenge_update = 15;
+    DuelSnapshot duel_snapshot = 16;
+    DuelMoveAccepted duel_move_accepted = 17;
+    DuelMovePreview duel_move_preview = 18;
+    DuelEnd duel_end = 19;
+    TrainingBots training_bots = 20;
+    RankingSnapshot ranking_snapshot = 21;
+    MatchHistory match_history = 22;
+    MatchReplayData match_replay_data = 23;
+    TradeSnapshot trade_snapshot = 24;
   }
 }

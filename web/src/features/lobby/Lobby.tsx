@@ -1,0 +1,914 @@
+import { A } from '@solidjs/router';
+import { createEffect, createMemo, createSignal, For, onCleanup, onMount, Show } from 'solid-js';
+import { account, restoreAccount } from '../../app/account';
+import { avatars, portrait } from '../../app/content';
+import type {
+  ChallengeReceived,
+  ChatMessage,
+  MailEntry,
+  PublicPlayer,
+  SocialSnapshot,
+} from '../../generated/proto/game/v1/lobby_pb';
+import { addTranslations, hasTranslation, t } from '../../i18n';
+import { type ClientBody, OnlineClient, type ServerBody, type Status } from '../../net/client';
+import { parseCommand } from '../../net/commands';
+import en from './en.ftl?raw';
+import pl from './pl.ftl?raw';
+import './lobby.css';
+import type { DuelEnd, DuelSnapshot } from '../../generated/proto/game/v1/online_duel_pb';
+import type { TradeSnapshot } from '../../generated/proto/game/v1/trade_pb';
+import { OnlineDuel } from './OnlineDuel';
+import { OnlineRecords } from './OnlineRecords';
+import { Trade } from './Trade';
+
+addTranslations({ pl, en });
+const rooms = ['arena', 'training', 'castle', 'portal', 'bazaar', 'shop', 'tower'];
+
+export function Lobby() {
+  const client = new OnlineClient();
+  const [status, setStatus] = createSignal<Status>('connecting');
+  const [me, setMe] = createSignal<PublicPlayer>();
+  const [room, setRoom] = createSignal('');
+  const [players, setPlayers] = createSignal<PublicPlayer[]>([]);
+  const [messages, setMessages] = createSignal<ChatMessage[]>([]);
+  const [social, setSocial] = createSignal<SocialSnapshot>();
+  const [selected, setSelected] = createSignal<PublicPlayer>();
+  const [offers, setOffers] = createSignal<ChallengeReceived[]>([]);
+  const [text, setText] = createSignal('');
+  const [error, setError] = createSignal('');
+  const [notice, setNotice] = createSignal('');
+  const [help, setHelp] = createSignal(false);
+  const [tab, setTab] = createSignal<'map' | 'social' | 'mail' | 'ranking' | 'history'>('map');
+  const [sort, setSort] = createSignal('login');
+  const [mail, setMail] = createSignal<MailEntry[]>([]);
+  const [sent, setSent] = createSignal(false);
+  const [cursor, setCursor] = createSignal('');
+  const [now, setNow] = createSignal(Date.now());
+  const [duel, setDuel] = createSignal<DuelSnapshot>();
+  const [duelEnd, setDuelEnd] = createSignal<DuelEnd>();
+  const [trade, setTrade] = createSignal<TradeSnapshot>();
+  const [bots, setBots] = createSignal<PublicPlayer[]>([]);
+  let offset = 0;
+  let lastPrivate = '';
+  let disposed = false;
+  let chatLog: HTMLDivElement | undefined;
+  const connected = () => status() === 'connected';
+  const sorted = createMemo(() =>
+    [...players()].sort((a, b) =>
+      sort() === 'login'
+        ? a.login.localeCompare(b.login)
+        : sort() === 'rating'
+          ? b.rating - a.rating
+          : b.level - a.level,
+    ),
+  );
+  function showError(reason: unknown) {
+    if (disposed) return;
+    const code = reason instanceof Error ? reason.message : 'UNAVAILABLE';
+    setError(
+      t(hasTranslation(`lobby-error-${code}`) ? `lobby-error-${code}` : 'lobby-error-default'),
+    );
+  }
+  async function send(body: ClientBody) {
+    setError('');
+    try {
+      return await client.send(body);
+    } catch (reason) {
+      showError(reason);
+      return undefined;
+    }
+  }
+  function receive(body: ServerBody) {
+    switch (body.case) {
+      case 'welcome':
+        setMe(body.value.profile);
+        offset = Number(body.value.serverTimeMs) - Date.now();
+        setRoom('');
+        setPlayers([]);
+        setMessages([]);
+        setOffers([]);
+        setSelected(undefined);
+        if (trade())
+          void send({
+            case: 'tradeSnapshot',
+            value: { $typeName: 'game.v1.TradeTarget', tradeId: trade()?.tradeId ?? '' },
+          });
+        if (duel())
+          void send({
+            case: 'duelSnapshot',
+            value: { $typeName: 'game.v1.DuelTarget', duelId: duel()?.duelId ?? '' },
+          });
+        break;
+      case 'tradeSnapshot':
+        setTrade((previous) =>
+          previous &&
+          (previous.tradeId > body.value.tradeId ||
+            (previous.tradeId === body.value.tradeId && previous.revision > body.value.revision))
+            ? previous
+            : body.value,
+        );
+        break;
+      case 'duelSnapshot':
+        setDuel((previous) =>
+          previous?.duelId === body.value.duelId && previous.revision > body.value.revision
+            ? previous
+            : body.value,
+        );
+        if (body.value.result) setDuelEnd(body.value.result);
+        else if (duelEnd()?.duelId !== body.value.duelId) setDuelEnd(undefined);
+        break;
+      case 'duelEnd':
+        if (duel()?.duelId === body.value.duelId) setDuelEnd(body.value);
+        break;
+      case 'trainingBots':
+        setBots(body.value.bots);
+        break;
+      case 'roomSnapshot':
+        setRoom(body.value.room);
+        setPlayers(body.value.players);
+        setMessages(body.value.messages);
+        if (body.value.room === 'training')
+          void send({ case: 'trainingBots', value: { $typeName: 'game.v1.Empty' } });
+        break;
+      case 'roomDelta': {
+        if (body.value.room !== room()) break;
+        const delta = body.value;
+        setPlayers((rows) => [
+          ...rows
+            .filter((p) => !delta.left.includes(p.id) && !delta.joined.some((u) => u.id === p.id))
+            .map((p) => delta.updated.find((u) => u.id === p.id) ?? p),
+          ...delta.joined,
+        ]);
+        const own = delta.updated.find((p) => p.id === me()?.id);
+        if (own) setMe(own);
+        break;
+      }
+      case 'chatMessage': {
+        const message = body.value;
+        if (message.channel === 'private' && message.fromId !== me()?.id)
+          lastPrivate = message.fromLogin;
+        setMessages((rows) =>
+          rows.some((m) => m.id === message.id) ? rows : [...rows, message].slice(-150),
+        );
+        queueMicrotask(() => chatLog?.scrollTo({ top: chatLog.scrollHeight }));
+        break;
+      }
+      case 'socialSnapshot':
+        setSocial(body.value);
+        break;
+      case 'playerInfo':
+        setSelected(body.value.player);
+        break;
+      case 'mailSnapshot':
+        setMail(body.value.messages);
+        setCursor(body.value.nextCursor);
+        setSent(body.value.sent);
+        break;
+      case 'challengeReceived':
+        setOffers((rows) => [
+          ...rows.filter((o) => o.challengeId !== body.value.challengeId),
+          body.value,
+        ]);
+        break;
+      case 'challengeUpdate':
+        setOffers((rows) => rows.filter((o) => o.challengeId !== body.value.challengeId));
+        setNotice(t(`lobby-challenge-${body.value.status}`));
+        break;
+      default:
+        break;
+    }
+  }
+  client.onMessage = receive;
+  client.onStatus = setStatus;
+  onMount(() => {
+    if (account()?.kind !== 'account') void restoreAccount();
+    const timer = window.setInterval(() => setNow(Date.now() + offset), 1000);
+    onCleanup(() => clearInterval(timer));
+  });
+  createEffect(() => {
+    if (account()?.kind === 'account') client.start();
+    else {
+      client.stop();
+      setStatus('signed-out');
+      setMe(undefined);
+      setPlayers([]);
+      setMessages([]);
+      setSocial(undefined);
+      setMail([]);
+      setOffers([]);
+      setDuel(undefined);
+      setDuelEnd(undefined);
+      setTrade(undefined);
+      setBots([]);
+    }
+  });
+  onCleanup(() => {
+    disposed = true;
+    client.stop();
+  });
+  function socialChange(player: string, ignore: boolean, add: boolean) {
+    const value = { $typeName: 'game.v1.PlayerTarget' as const, player };
+    return send(
+      ignore
+        ? add
+          ? { case: 'ignoreAdd', value }
+          : { case: 'ignoreRemove', value }
+        : add
+          ? { case: 'friendAdd', value }
+          : { case: 'friendRemove', value },
+    );
+  }
+  async function chat(event: SubmitEvent) {
+    event.preventDefault();
+    try {
+      const command = parseCommand(text(), lastPrivate);
+      let result: ServerBody | undefined;
+      if (command.kind === 'help') {
+        setHelp(true);
+        setText('');
+        return;
+      }
+      if (command.kind === 'send')
+        result = await send({
+          case: 'chatSend',
+          value: {
+            $typeName: 'game.v1.ChatSend',
+            channel: command.channel,
+            to: command.to,
+            text: command.text,
+          },
+        });
+      if (command.kind === 'social')
+        result = await socialChange(command.player, command.relation === 'ignore', command.add);
+      if (command.kind === 'list') {
+        setTab('social');
+        result = await send({ case: 'socialList', value: { $typeName: 'game.v1.Empty' } });
+      }
+      if (command.kind === 'afk') {
+        result = await send({
+          case: 'setAfk',
+          value: { $typeName: 'game.v1.SetAfk', afk: !me()?.afk },
+        });
+        if (result) setMe((p) => (p ? { ...p, afk: !p.afk } : p));
+      }
+      if (command.kind === 'who')
+        result = await send({
+          case: 'whoIs',
+          value: { $typeName: 'game.v1.PlayerTarget', player: command.player },
+        });
+      if (result) setText('');
+    } catch (reason) {
+      showError(reason);
+    }
+  }
+  function loadMail(outgoing = sent(), beforeId = '') {
+    return send({
+      case: 'mailList',
+      value: { $typeName: 'game.v1.MailList', beforeId, limit: 20, sent: outgoing },
+    });
+  }
+  async function mailAction(id: string, remove: boolean) {
+    const value = { $typeName: 'game.v1.MailTarget' as const, id };
+    if (await send(remove ? { case: 'mailDelete', value } : { case: 'mailRead', value }))
+      await loadMail();
+  }
+  async function compose(event: SubmitEvent) {
+    event.preventDefault();
+    const form = event.currentTarget as HTMLFormElement;
+    const data = new FormData(form);
+    if (
+      await send({
+        case: 'mailSend',
+        value: {
+          $typeName: 'game.v1.MailSend',
+          to: String(data.get('to')),
+          text: String(data.get('text')),
+        },
+      })
+    ) {
+      form.reset();
+      setNotice(t('lobby-mail-sent'));
+      if (sent()) await loadMail(true);
+    }
+  }
+  const time = (value: bigint) =>
+    new Date(Number(value)).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return (
+    <section class="lobby-page">
+      <div class="lobby-heading">
+        <div>
+          <p class="eyebrow">SPELLGAMBIT · ONLINE</p>
+          <h1>{t('lobby')}</h1>
+        </div>
+        <p role="status" data-testid="connection-status">
+          {t(`lobby-status-${status()}`)}
+        </p>
+      </div>
+      <Show
+        when={status() === 'replaced' || status() === 'incompatible' || status() === 'signed-out'}
+      >
+        <p>{t(status() === 'incompatible' ? 'lobby-update' : 'lobby-login-needed')}</p>
+        <A href="/account">{t('auth-account')}</A>{' '}
+        <button type="button" onClick={() => client.restart()}>
+          {t('lobby-reconnect')}
+        </button>
+      </Show>
+      <Show when={error()}>
+        <p class="lobby-error" role="alert">
+          {error()}
+        </p>
+      </Show>
+      <Show when={notice()}>
+        <p role="status">{notice()}</p>
+      </Show>
+      <Show when={duel()}>
+        {(active) => (
+          <OnlineDuel
+            snapshot={active()}
+            end={duelEnd()}
+            connected={connected()}
+            now={now()}
+            send={send}
+            close={() => {
+              setDuel(undefined);
+              setDuelEnd(undefined);
+            }}
+          />
+        )}
+      </Show>
+      <Show when={trade()}>
+        {(value) => (
+          <Trade
+            snapshot={value()}
+            user={me()?.id ?? ''}
+            connected={connected()}
+            now={now()}
+            send={send}
+            close={() => setTrade(undefined)}
+          />
+        )}
+      </Show>
+      <Show when={me()} keyed>
+        {(self) => (
+          <>
+            <div class="lobby-toolbar">
+              <strong>{self.login}</strong>
+              <span>
+                {t('lobby-level', { level: self.level })} · {self.rating} RP
+              </span>
+              <label>
+                {t('lobby-challenges')}
+                <select
+                  aria-label={t('lobby-challenges')}
+                  value={self.challengeFilter}
+                  disabled={!connected()}
+                  onChange={async (e) => {
+                    const filter = e.currentTarget.value;
+                    if (
+                      await send({
+                        case: 'setChallengeFilter',
+                        value: { $typeName: 'game.v1.SetChallengeFilter', filter },
+                      })
+                    )
+                      setMe((p) => (p ? { ...p, challengeFilter: filter } : p));
+                  }}
+                >
+                  <option value="all">{t('lobby-all')}</option>
+                  <option value="level_pm2">±2 {t('lobby-level-label')}</option>
+                  <option value="none">{t('lobby-none')}</option>
+                </select>
+              </label>
+              <button
+                type="button"
+                disabled={!connected()}
+                aria-pressed={self.afk}
+                onClick={async () => {
+                  if (
+                    await send({
+                      case: 'setAfk',
+                      value: { $typeName: 'game.v1.SetAfk', afk: !self.afk },
+                    })
+                  )
+                    setMe((p) => (p ? { ...p, afk: !p.afk } : p));
+                }}
+              >
+                AFK {self.afk ? '✓' : ''}
+              </button>
+            </div>
+            <Show when={!self.verified}>
+              <p class="lobby-hint">{t('lobby-unverified')}</p>
+            </Show>
+            <div class="lobby-layout">
+              <div class="lobby-main">
+                <nav class="lobby-tabs" aria-label={t('lobby')}>
+                  <For each={['map', 'social', 'mail', 'ranking', 'history'] as const}>
+                    {(value) => (
+                      <button
+                        type="button"
+                        aria-pressed={tab() === value}
+                        onClick={() => {
+                          setTab(value);
+                          if (value === 'mail') void loadMail();
+                        }}
+                      >
+                        {t(`lobby-tab-${value}`)}
+                      </button>
+                    )}
+                  </For>
+                </nav>
+                <Show when={tab() === 'map'}>
+                  <section class="lobby-map" aria-label={t('lobby-tab-map')}>
+                    <For each={self.clanId ? [...rooms, `clan:${self.clanId}`] : rooms}>
+                      {(name) => (
+                        <button
+                          type="button"
+                          classList={{ current: room() === name }}
+                          disabled={!connected()}
+                          onClick={() =>
+                            void send({
+                              case: 'roomJoin',
+                              value: { $typeName: 'game.v1.RoomJoin', room: name },
+                            })
+                          }
+                        >
+                          <span aria-hidden="true">
+                            {name === 'arena' ? '⚔' : name === 'tower' ? '♜' : '✦'}
+                          </span>
+                          {t(name.startsWith('clan:') ? 'lobby-room-clan' : `lobby-room-${name}`)}
+                        </button>
+                      )}
+                    </For>
+                  </section>
+                </Show>
+                <Show when={tab() === 'ranking'}>
+                  <OnlineRecords mode="ranking" send={send} select={setSelected} />
+                </Show>
+                <Show when={tab() === 'history'}>
+                  <OnlineRecords mode="history" send={send} select={setSelected} />
+                </Show>
+                <Show when={room() === 'shop'}>
+                  <A href="/store">{t('store')}</A>
+                </Show>
+                <Show when={room() === 'training' && tab() === 'map'}>
+                  <section class="lobby-panel">
+                    <h2>{t('online-bots')}</h2>
+                    <p>{t('online-training-help')}</p>
+                    <button
+                      type="button"
+                      disabled={!connected()}
+                      onClick={() =>
+                        void send({ case: 'trainingBots', value: { $typeName: 'game.v1.Empty' } })
+                      }
+                    >
+                      {t('refresh')}
+                    </button>
+                    <div class="online-bots">
+                      <For each={bots()}>
+                        {(bot) => (
+                          <button
+                            type="button"
+                            disabled={!connected() || !!me()?.busy}
+                            onClick={() =>
+                              void send({
+                                case: 'trainingChallengeBot',
+                                value: { $typeName: 'game.v1.TrainingChallengeBot', botId: bot.id },
+                              })
+                            }
+                          >
+                            {bot.login}
+                          </button>
+                        )}
+                      </For>
+                    </div>
+                  </section>
+                </Show>
+                <Show when={tab() === 'social'}>
+                  <div class="lobby-panel">
+                    <h2>{t('lobby-friends')}</h2>
+                    <For each={social()?.friends}>
+                      {(p) => (
+                        <div class="lobby-social-row">
+                          <button
+                            class="quiet"
+                            type="button"
+                            onClick={() =>
+                              void send({
+                                case: 'whoIs',
+                                value: { $typeName: 'game.v1.PlayerTarget', player: p.login },
+                              })
+                            }
+                          >
+                            {p.login} · {t(p.online ? 'lobby-online' : 'lobby-offline')}
+                          </button>
+                          <button
+                            type="button"
+                            disabled={!connected()}
+                            onClick={() => void socialChange(p.login, false, false)}
+                          >
+                            {t('lobby-remove')}
+                          </button>
+                        </div>
+                      )}
+                    </For>
+                    <h2>{t('lobby-ignores')}</h2>
+                    <For each={social()?.ignores}>
+                      {(p) => (
+                        <div class="lobby-social-row">
+                          <span>{p.login}</span>
+                          <button
+                            type="button"
+                            disabled={!connected()}
+                            onClick={() => void socialChange(p.login, true, false)}
+                          >
+                            {t('lobby-remove')}
+                          </button>
+                        </div>
+                      )}
+                    </For>
+                    <p>{t('lobby-social-help')}</p>
+                  </div>
+                </Show>
+                <Show when={tab() === 'mail'}>
+                  <div class="lobby-panel">
+                    <h2>{t('lobby-tab-mail')}</h2>
+                    <div class="lobby-tabs">
+                      <button
+                        type="button"
+                        disabled={!connected()}
+                        aria-pressed={!sent()}
+                        onClick={() => void loadMail(false)}
+                      >
+                        {t('lobby-inbox')}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={!connected()}
+                        aria-pressed={sent()}
+                        onClick={() => void loadMail(true)}
+                      >
+                        {t('lobby-sent')}
+                      </button>
+                    </div>
+                    <For each={mail()} fallback={<p>{t('lobby-empty')}</p>}>
+                      {(m) => (
+                        <article class="lobby-letter">
+                          <strong>{sent() ? m.toLogin : m.fromLogin}</strong>{' '}
+                          <time>{time(m.atMs)}</time>
+                          <p>{m.text}</p>
+                          <Show when={!sent() && !m.read}>
+                            <button type="button" onClick={() => void mailAction(m.id, false)}>
+                              {t('lobby-read')}
+                            </button>
+                          </Show>{' '}
+                          <button type="button" onClick={() => void mailAction(m.id, true)}>
+                            {t('lobby-remove')}
+                          </button>
+                        </article>
+                      )}
+                    </For>
+                    <Show when={cursor()}>
+                      <button
+                        type="button"
+                        disabled={!connected()}
+                        onClick={() => void loadMail(sent(), cursor())}
+                      >
+                        {t('lobby-older')}
+                      </button>
+                    </Show>
+                    <form class="lobby-compose" onSubmit={(event) => void compose(event)}>
+                      <label>
+                        {t('lobby-recipient')}
+                        <input
+                          name="to"
+                          required
+                          minLength={3}
+                          maxLength={20}
+                          pattern={String.raw`[A-Za-z0-9_\-]+`}
+                        />
+                      </label>
+                      <label>
+                        {t('lobby-message')}
+                        <textarea name="text" required maxLength={1000} rows={3} />
+                      </label>
+                      <button type="submit" disabled={!connected()}>
+                        {t('lobby-send-mail')}
+                      </button>
+                    </form>
+                  </div>
+                </Show>
+                <section class="lobby-chat">
+                  <div class="lobby-chat-heading">
+                    <h2>
+                      {room()
+                        ? t(room().startsWith('clan:') ? 'lobby-room-clan' : `lobby-room-${room()}`)
+                        : t('lobby-choose-room')}
+                    </h2>
+                    <label>
+                      {t('lobby-chat-filter')}
+                      <select
+                        disabled={!connected()}
+                        onChange={(e) =>
+                          void send({
+                            case: 'setChatFilter',
+                            value: {
+                              $typeName: 'game.v1.SetChatFilter',
+                              filter: e.currentTarget.value,
+                            },
+                          })
+                        }
+                      >
+                        <option value="all">{t('lobby-all')}</option>
+                        <option value="clan_private">{t('lobby-clan-private')}</option>
+                        <option value="private">{t('lobby-private')}</option>
+                      </select>
+                    </label>
+                  </div>
+                  <div
+                    ref={chatLog}
+                    class="lobby-log"
+                    role="log"
+                    aria-label={t('lobby-messages')}
+                    aria-live="polite"
+                  >
+                    <For each={messages()}>
+                      {(m) => (
+                        <p classList={{ private: m.channel === 'private' }}>
+                          <time>{time(m.atMs)}</time>{' '}
+                          <button
+                            class="quiet"
+                            type="button"
+                            onClick={() =>
+                              void send({
+                                case: 'whoIs',
+                                value: { $typeName: 'game.v1.PlayerTarget', player: m.fromLogin },
+                              })
+                            }
+                          >
+                            {m.fromLogin}
+                          </button>
+                          <Show when={m.channel !== 'room'}>
+                            <small> [{t(`lobby-channel-${m.channel}`)}]</small>
+                          </Show>
+                          : <span>{m.text}</span>
+                        </p>
+                      )}
+                    </For>
+                  </div>
+                  <form class="lobby-chat-form" onSubmit={(e) => void chat(e)}>
+                    <input
+                      aria-label={t('lobby-message')}
+                      value={text()}
+                      onInput={(e) => setText(e.currentTarget.value)}
+                      maxLength={330}
+                      disabled={!connected()}
+                      placeholder={t('lobby-chat-placeholder')}
+                    />
+                    <button type="submit" class="primary" disabled={!connected() || !text().trim()}>
+                      {t('lobby-send')}
+                    </button>
+                    <button type="button" aria-expanded={help()} onClick={() => setHelp(!help())}>
+                      /help
+                    </button>
+                  </form>
+                  <Show when={help()}>
+                    <p class="lobby-help">{t('lobby-help')}</p>
+                  </Show>
+                </section>
+              </div>
+              <aside class="lobby-sidebar">
+                <div class="lobby-panel">
+                  <div class="lobby-chat-heading">
+                    <h2>{t('lobby-players', { count: players().length })}</h2>
+                    <select
+                      aria-label={t('lobby-sort')}
+                      value={sort()}
+                      onChange={(e) => setSort(e.currentTarget.value)}
+                    >
+                      <option value="login">{t('lobby-name')}</option>
+                      <option value="rating">RP</option>
+                      <option value="level">{t('lobby-level-label')}</option>
+                    </select>
+                  </div>
+                  <ul class="lobby-player-list">
+                    <For each={sorted()}>
+                      {(p) => (
+                        <li>
+                          <button type="button" onClick={() => setSelected(p)}>
+                            <span>
+                              {p.login} {p.afk ? '☾' : ''} {p.busy ? '⚔' : ''}
+                            </span>
+                            <small>
+                              {t('lobby-level', { level: p.level })} · {p.rating} RP
+                            </small>
+                            <small>
+                              {t(`lobby-${p.title}`)} ·{' '}
+                              {avatars.get(p.templateId)
+                                ? t(`${avatars.get(p.templateId)?.key.replace('.', '-')}-name`)
+                                : '—'}
+                            </small>
+                          </button>
+                        </li>
+                      )}
+                    </For>
+                  </ul>
+                </div>
+                <Show when={selected()} keyed>
+                  {(p) => (
+                    <div class="lobby-panel lobby-profile">
+                      <button
+                        class="lobby-close"
+                        type="button"
+                        aria-label={t('lobby-close')}
+                        onClick={() => setSelected(undefined)}
+                      >
+                        ×
+                      </button>
+                      <Show when={avatars.get(p.templateId)}>
+                        {(avatar) => (
+                          <img width="80" height="80" alt="" src={portrait(avatar().key)} />
+                        )}
+                      </Show>
+                      <h2>{p.login}</h2>
+                      <p>
+                        {t('lobby-level', { level: p.level })} · {p.rating} RP · #{p.rank || '—'}
+                      </p>
+                      <Show when={p.title}>
+                        <p>{t(`lobby-${p.title}`)}</p>
+                      </Show>
+                      <Show when={p.clanName}>
+                        <p>{p.clanName}</p>
+                      </Show>
+                      <p>{p.description}</p>
+                      <dl class="lobby-stats">
+                        <For each={p.stats}>
+                          {(stat, index) => (
+                            <>
+                              <dt>{['AF', 'OF', 'AM', 'OM', 'HP', 'STA'][index()]}</dt>
+                              <dd>{stat}</dd>
+                            </>
+                          )}
+                        </For>
+                      </dl>
+                      <Show when={p.id !== self.id}>
+                        <div class="lobby-actions">
+                          <button
+                            type="button"
+                            disabled={
+                              !connected() || room() !== 'arena' || p.busy || self.busy || p.afk
+                            }
+                            onClick={() =>
+                              void send({
+                                case: 'challengeSend',
+                                value: { $typeName: 'game.v1.ChallengeSend', target: p.login },
+                              })
+                            }
+                          >
+                            {t('lobby-challenge')}
+                          </button>
+                          <button
+                            type="button"
+                            disabled={!connected()}
+                            onClick={() => {
+                              setText(`/t ${p.login}, `);
+                            }}
+                          >
+                            {t('lobby-private')}
+                          </button>
+                          <button
+                            type="button"
+                            disabled={
+                              !connected() ||
+                              room() !== 'bazaar' ||
+                              !p.verified ||
+                              !self.verified ||
+                              p.busy ||
+                              self.busy ||
+                              p.afk
+                            }
+                            onClick={() =>
+                              void send({
+                                case: 'tradeInvite',
+                                value: { $typeName: 'game.v1.TradeInvite', target: p.login },
+                              })
+                            }
+                          >
+                            {t('trade-title')}
+                          </button>
+                          <button
+                            type="button"
+                            disabled={!connected()}
+                            onClick={() => void socialChange(p.login, false, true)}
+                          >
+                            {t('lobby-add-friend')}
+                          </button>
+                          <button
+                            type="button"
+                            disabled={!connected()}
+                            onClick={() => void socialChange(p.login, true, true)}
+                          >
+                            {t('lobby-ignore')}
+                          </button>
+                        </div>
+                      </Show>
+                    </div>
+                  )}
+                </Show>
+                <For each={offers()}>
+                  {(offer) => (
+                    <div class="lobby-panel lobby-offer">
+                      <h2>{t('lobby-challenge')}</h2>
+                      <p>
+                        {offer.from?.login} → {offer.to?.login}
+                      </p>
+                      <Show when={offer.from} keyed>
+                        {(p) => (
+                          <>
+                            <Show when={avatars.get(p.templateId)}>
+                              {(avatar) => (
+                                <img width="64" height="64" alt="" src={portrait(avatar().key)} />
+                              )}
+                            </Show>
+                            <p>
+                              {t('lobby-level', { level: p.level })} · {p.rating} RP · #
+                              {p.rank || '—'}
+                            </p>
+                            <p>
+                              {t(`lobby-${p.title}`)} {p.clanName}
+                            </p>
+                            <p>
+                              {p.stats
+                                .map(
+                                  (value, index) =>
+                                    `${['AF', 'OF', 'AM', 'OM', 'HP', 'STA'][index]} ${value}`,
+                                )
+                                .join(' · ')}
+                            </p>
+                            <p>{p.description}</p>
+                          </>
+                        )}
+                      </Show>
+                      <p>{Math.max(0, Math.ceil((Number(offer.expiresAtMs) - now()) / 1000))} s</p>
+                      <Show
+                        when={offer.to?.id === self.id}
+                        fallback={
+                          <button
+                            type="button"
+                            disabled={!connected()}
+                            onClick={() =>
+                              void send({
+                                case: 'challengeCancel',
+                                value: {
+                                  $typeName: 'game.v1.ChallengeCancel',
+                                  challengeId: offer.challengeId,
+                                },
+                              })
+                            }
+                          >
+                            {t('lobby-cancel')}
+                          </button>
+                        }
+                      >
+                        <button
+                          type="button"
+                          disabled={!connected() || Number(offer.expiresAtMs) <= now()}
+                          onClick={() =>
+                            void send({
+                              case: 'challengeRespond',
+                              value: {
+                                $typeName: 'game.v1.ChallengeRespond',
+                                challengeId: offer.challengeId,
+                                accept: true,
+                              },
+                            })
+                          }
+                        >
+                          {t('lobby-accept')}
+                        </button>{' '}
+                        <button
+                          type="button"
+                          disabled={!connected()}
+                          onClick={() =>
+                            void send({
+                              case: 'challengeRespond',
+                              value: {
+                                $typeName: 'game.v1.ChallengeRespond',
+                                challengeId: offer.challengeId,
+                                accept: false,
+                              },
+                            })
+                          }
+                        >
+                          {t('lobby-decline')}
+                        </button>
+                      </Show>
+                    </div>
+                  )}
+                </For>
+              </aside>
+            </div>
+          </>
+        )}
+      </Show>
+    </section>
+  );
+}

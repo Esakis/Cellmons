@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE avatars SET xp=$2,level=$3,dev_points_unspent=dev_points_unspent+$4,revision=revision+1 WHERE id=$1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Int4", "Int2", "Int2"]
+    },
+    "nullable": []
+  },
+  "hash": "25e82e49797d859efb3dff8f8d84efde4196abe859188e97c5ded936f8d8d524"
+}

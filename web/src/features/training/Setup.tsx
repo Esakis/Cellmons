@@ -76,7 +76,9 @@ export function TrainingSetup() {
                     height="120"
                   />
                   <strong>{t(fluentKey(avatar.key))}</strong>
-                  <span>{t(`school-${avatar.starter_for}-name`)}</span>
+                  <span>
+                    {t(`school-${avatar.starter_for ?? Object.keys(avatar.schools)[0]}-name`)}
+                  </span>
                   <span class={styles.choiceStats}>
                     {avatar.base.hp} {t('hp')} · {avatar.base.stamina} W
                   </span>

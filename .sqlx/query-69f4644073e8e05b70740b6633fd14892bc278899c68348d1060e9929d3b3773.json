@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO daily_counters(user_id,day) VALUES ($1,(now() AT TIME ZONE 'UTC')::date) ON CONFLICT DO NOTHING",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid"]
+    },
+    "nullable": []
+  },
+  "hash": "69f4644073e8e05b70740b6633fd14892bc278899c68348d1060e9929d3b3773"
+}

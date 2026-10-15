@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT count(*) AS \"count!\" FROM ignores WHERE user_id=$1 AND ignored_id<>$2",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count!",
+        "type_info": "Int8",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid", "Uuid"]
+    },
+    "nullable": [null]
+  },
+  "hash": "a55e15b02d50481e75015b6fe6ab103feaf20d255a925f2e6b8fd9ea327d562a"
+}

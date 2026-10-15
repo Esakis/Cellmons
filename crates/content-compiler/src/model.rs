@@ -109,6 +109,9 @@ pub struct AvatarSrc {
     #[serde(rename = "ref", default, skip_serializing)]
     pub reference: Option<String>,
     pub rarity: AvatarRarity,
+    /// Reincarnation path profiles are compiled separately from collectible templates.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub path: Option<PathSrc>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub starter_for: Option<SchoolKey>,
     pub base: BaseStats,
@@ -117,6 +120,15 @@ pub struct AvatarSrc {
     pub dev_points: BTreeMap<String, u8>,
     /// Przyrosty na poziomach 2–20.
     pub growth: Vec<GrowthSrc>,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct PathSrc {
+    pub base_avatar: u16,
+    pub variant: u8,
+    pub specializations: [String; 2],
+    pub gifts: [String; 2],
 }
 
 /// `cards/<zestaw>/*.toml`.

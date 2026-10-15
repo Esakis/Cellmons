@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO rating_history(match_id,user_id,before,after) VALUES ($1,$2,$3,$4)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Uuid", "Int4", "Int4"]
+    },
+    "nullable": []
+  },
+  "hash": "5e9a67decc2edc9c0067124f27d1edc0290e5b783722ce5ed31b60340bf99d2d"
+}

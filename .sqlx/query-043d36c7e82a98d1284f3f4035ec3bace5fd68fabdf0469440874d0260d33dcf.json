@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE junkyard SET points=$2,rewards_granted=$3 WHERE user_id=$1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Int8", "Int8"]
+    },
+    "nullable": []
+  },
+  "hash": "043d36c7e82a98d1284f3f4035ec3bace5fd68fabdf0469440874d0260d33dcf"
+}

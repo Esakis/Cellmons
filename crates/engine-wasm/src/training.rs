@@ -1,8 +1,7 @@
 //! Offline session owns the full state; only PlayerView crosses the WASM boundary.
-use engine::{
-    CardAction, DuelState, Event, EventBuf, Kind, Move, Outcome, Phase, PlayerSetup, Side,
-};
+use engine::{CardAction, DuelState, Event, EventBuf, Move, PlayerSetup, Side};
 use engine_ai::{Bot, Level, training_profiles};
+use protocol::duel::{decode_move, move_error, preview};
 use protocol::{Message, game::v1 as wire};
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -137,10 +136,52 @@ fn start(setup: wire::TrainingSetup) -> Result<Session, String> {
     let seed: [u8; 32] = setup.seed.try_into().map_err(|_| "invalid_seed")?;
     let id = u16::try_from(setup.avatar_id).map_err(|_| "invalid_avatar")?;
     let avatar = engine_content::avatar(id).ok_or("invalid_avatar")?;
-    let starter = engine_content::STARTERS
-        .iter()
-        .find(|starter| starter.avatar == id)
-        .ok_or("invalid_avatar")?;
+    let level = setup.custom.as_ref().map_or(1, |p| p.level);
+    if !(1..=20).contains(&level) {
+        return Err("invalid_setup".into());
+    }
+    let mut player = PlayerSetup {
+        avatar: avatar.snapshot(level as u8),
+        deck: Default::default(),
+    };
+    if let Some(custom) = setup.custom {
+        if custom.spent.len() != 6 || custom.spent.iter().any(|v| *v > 100) {
+            return Err("invalid_setup".into());
+        }
+        player.avatar.stats.phys_atk += custom.spent[0] as i32;
+        player.avatar.stats.phys_def += custom.spent[1] as i32;
+        player.avatar.stats.mag_atk += custom.spent[2] as i32;
+        player.avatar.stats.mag_def += custom.spent[3] as i32;
+        player.avatar.stats.hp_max += 7 * custom.spent[4] as i32;
+        player.avatar.stats.stamina_max += 7 * custom.spent[5] as i32;
+        for id in custom.deck {
+            player
+                .deck
+                .try_push(u16::try_from(id).map_err(|_| "invalid_setup")?)
+                .map_err(|_| "invalid_setup")?;
+        }
+    } else {
+        if let Some(starter) = engine_content::STARTERS
+            .iter()
+            .find(|starter| starter.avatar == id)
+        {
+            player.deck = starter.deck.iter().copied().collect();
+        } else {
+            let rules = engine_content::rules().deck;
+            for _ in 0..rules.max_copies {
+                for card in content
+                    .cards()
+                    .iter()
+                    .filter(|c| player.avatar.schools.meets(&c.requires))
+                {
+                    if player.deck.len() == usize::from(rules.size) {
+                        break;
+                    }
+                    player.deck.push(card.id);
+                }
+            }
+        }
+    }
     let profiles = training_profiles();
     let profile = profiles
         .bots
@@ -149,14 +190,10 @@ fn start(setup: wire::TrainingSetup) -> Result<Session, String> {
         .ok_or("invalid_profile")?;
     let rotation = setup.rotation as usize % profile.avatar_pool.len();
     let opponent_avatar = u32::from(profile.avatar_pool[rotation]);
-    let opponent = profile.player(1, rotation).ok_or("invalid_profile")?;
-    let players = [
-        PlayerSetup {
-            avatar: avatar.snapshot(1),
-            deck: starter.deck.iter().copied().collect(),
-        },
-        opponent,
-    ];
+    let opponent = profile
+        .player(level as u8, rotation)
+        .ok_or("invalid_profile")?;
+    let players = [player, opponent];
     let state = engine::new_duel(
         &engine::DuelSetup {
             rules: engine_content::rules(),
@@ -178,73 +215,6 @@ fn start(setup: wire::TrainingSetup) -> Result<Session, String> {
     })
 }
 
-fn decode_move(input: &wire::DuelMove) -> Result<Move, String> {
-    fn slots(values: &[u32]) -> Result<[Kind; 3], String> {
-        let kinds: Vec<_> = values
-            .iter()
-            .map(|kind| match kind {
-                0 => Ok(Kind::Phys),
-                1 => Ok(Kind::Mag),
-                _ => Err("invalid_move".to_owned()),
-            })
-            .collect::<Result<_, _>>()?;
-        kinds.try_into().map_err(|_| "invalid_move".into())
-    }
-    let index = u8::try_from(input.hand_index).map_err(|_| "invalid_move")?;
-    Ok(Move {
-        attacks: slots(&input.attacks)?,
-        defenses: slots(&input.defenses)?,
-        card: match input.action {
-            0 => CardAction::None,
-            1 => CardAction::Cast(index),
-            2 => CardAction::Discard(index),
-            _ => return Err("invalid_move".into()),
-        },
-    })
-}
-
-fn kinds(values: &[Kind; 3]) -> Vec<u32> {
-    values
-        .iter()
-        .map(|kind| u32::from(*kind == Kind::Mag))
-        .collect()
-}
-fn encode_move(mv: &Move) -> wire::DuelMove {
-    let (action, hand_index) = match mv.card {
-        CardAction::None => (0, 0),
-        CardAction::Cast(i) => (1, u32::from(i)),
-        CardAction::Discard(i) => (2, u32::from(i)),
-    };
-    wire::DuelMove {
-        attacks: kinds(&mv.attacks),
-        defenses: kinds(&mv.defenses),
-        action,
-        hand_index,
-    }
-}
-fn move_error(error: engine::MoveError) -> String {
-    use engine::MoveError::*;
-    match error {
-        WrongPhase => "finished",
-        InvalidHandIndex => "invalid_hand",
-        RequirementsNotMet => "requirements",
-        InterventionUsed => "intervention",
-        NotEnoughFocus => "focus",
-        NotEnoughStamina => "stamina",
-        UnknownCard => "unknown_card",
-    }
-    .into()
-}
-fn preview(p: engine::Preview) -> wire::MovePreview {
-    wire::MovePreview {
-        changes: u32::from(p.cost.changes),
-        focus_cost: p.cost.focus,
-        stamina_cost: p.cost.stamina,
-        focus_after: p.focus_after,
-        max_attack_stamina: p.max_attack_stamina,
-        error: p.validity.err().map(move_error).unwrap_or_default(),
-    }
-}
 fn fill_preview(session: &Session, mv: Move, reply: &mut wire::TrainingReply) {
     let seen = engine::view(&session.state, Side::A);
     let content = engine_content::content();
@@ -262,266 +232,10 @@ fn fill_preview(session: &Session, mv: Move, reply: &mut wire::TrainingReply) {
         .collect();
 }
 fn snapshot(session: &Session) -> wire::TrainingView {
-    let seen = engine::view(&session.state, Side::A);
-    wire::TrainingView {
-        round: u32::from(seen.round),
-        total_rounds: u32::from(seen.rules.duel.rounds),
-        initiative: seen.initiative.index() as u32,
-        me: Some(side(&seen.me)),
-        opponent: Some(side(&seen.opponent)),
-        hand: seen.hand.iter().map(|id| u32::from(*id)).collect(),
-        enchantments: seen
-            .enchantments
-            .iter()
-            .map(|(owner, id)| wire::DuelEnchantment {
-                side: owner.index() as u32,
-                card_id: u32::from(*id),
-            })
-            .collect(),
-        outcome: match seen.phase {
-            Phase::Finished(result) => Some(outcome(result)),
-            _ => None,
-        },
-        opponent_avatar_id: session.opponent_avatar,
-    }
+    protocol::duel::snapshot(&session.state, Side::A, session.opponent_avatar)
 }
-fn side(seen: &engine::SideView) -> wire::DuelSide {
-    wire::DuelSide {
-        hp: seen.hp,
-        hp_start: seen.hp_start,
-        stamina: seen.stamina,
-        focus: seen.focus,
-        stats: engine::Stat::ALL.map(|stat| seen.stats.get(stat)).to_vec(),
-        schools: seen.schools.0.map(u32::from).to_vec(),
-        attacks: kinds(&seen.attacks),
-        defenses: kinds(&seen.defenses),
-        deck_len: u32::from(seen.deck_len),
-        hand_len: u32::from(seen.hand_len),
-        discard: seen.discard.iter().map(|id| u32::from(*id)).collect(),
-    }
-}
-fn outcome(result: Outcome) -> wire::DuelOutcome {
-    let (winner, reason) = match result {
-        Outcome::Win { winner, reason } => (winner.index() as u32 + 1, reason),
-        Outcome::Draw { reason } => (0, reason),
-    };
-    wire::DuelOutcome {
-        winner,
-        reason: match reason {
-            engine::Reason::Knockout => "knockout",
-            engine::Reason::Rounds => "rounds",
-            engine::Reason::Forfeit => "forfeit",
-            engine::Reason::Disconnect => "disconnect",
-            engine::Reason::Timeout => "timeout",
-            engine::Reason::ConditionalWin => "conditional",
-        }
-        .into(),
-    }
-}
-
 fn event(input: &Event) -> Option<wire::DuelEvent> {
-    use Event::*;
-    let mut out = wire::DuelEvent::default();
-    // The opponent's draws stay private. All other card IDs here are public.
-    out.kind = match *input {
-        CardDrawn { side: Side::B, .. } => return None,
-        RoundStarted { round, .. } => {
-            out.amount = i32::from(round);
-            "round"
-        }
-        MovesRevealed { moves, change_cost } => {
-            out.moves = moves.iter().map(encode_move).collect();
-            out.old_value = change_cost[0];
-            out.new_value = change_cost[1];
-            "reveal"
-        }
-        SpellCast {
-            side,
-            card,
-            focus,
-            stamina,
-        } => {
-            out.side = side.index() as u32;
-            out.card_id = u32::from(card);
-            out.old_value = focus;
-            out.new_value = stamina;
-            "cast"
-        }
-        SpellCountered {
-            side,
-            card,
-            focus,
-            stamina,
-        } => {
-            out.side = side.index() as u32;
-            out.card_id = u32::from(card);
-            out.old_value = focus;
-            out.new_value = stamina;
-            "countered"
-        }
-        SpellFailed { side, card } => {
-            out.side = side.index() as u32;
-            out.card_id = u32::from(card);
-            "failed"
-        }
-        SpellFizzled { side, card } => {
-            out.side = side.index() as u32;
-            out.card_id = u32::from(card);
-            "fizzled"
-        }
-        RandomSpell { side, drawn, .. } => {
-            out.side = side.index() as u32;
-            out.card_id = u32::from(drawn);
-            "random"
-        }
-        CardDiscarded { side, card } | ForcedDiscard { side, card, .. } => {
-            out.side = side.index() as u32;
-            out.card_id = u32::from(card);
-            "discard"
-        }
-        CardDrawn { side, card } => {
-            out.side = side.index() as u32;
-            out.card_id = u32::from(card);
-            "draw"
-        }
-        EnchantmentAdded { side, card } => {
-            out.side = side.index() as u32;
-            out.card_id = u32::from(card);
-            "enchant"
-        }
-        EnchantmentRemoved { side, card, .. } => {
-            out.side = side.index() as u32;
-            out.card_id = u32::from(card);
-            "disenchant"
-        }
-        StatChanged {
-            side,
-            stat,
-            old,
-            new,
-            source,
-        } => {
-            out.side = side.index() as u32;
-            out.card_id = u32::from(source);
-            out.old_value = old;
-            out.new_value = new;
-            out.detail = format!("{stat:?}");
-            "stat"
-        }
-        ResourceChanged {
-            side,
-            resource,
-            old,
-            new,
-            source,
-        } => {
-            out.side = side.index() as u32;
-            out.card_id = u32::from(source);
-            out.old_value = old;
-            out.new_value = new;
-            out.detail = format!("{resource:?}");
-            "resource"
-        }
-        SchoolChanged {
-            side,
-            school,
-            old,
-            new,
-            source,
-        } => {
-            out.side = side.index() as u32;
-            out.card_id = u32::from(source);
-            out.old_value = i32::from(old);
-            out.new_value = i32::from(new);
-            out.detail = format!("{school:?}");
-            "school"
-        }
-        Healed {
-            side,
-            amount,
-            source,
-        } => {
-            out.side = side.index() as u32;
-            out.card_id = u32::from(source);
-            out.amount = amount;
-            "heal"
-        }
-        Damaged {
-            side,
-            amount,
-            source,
-        } => {
-            out.side = side.index() as u32;
-            out.card_id = u32::from(source);
-            out.amount = amount;
-            "damage"
-        }
-        ChoicesSwapped { side, source } => {
-            out.side = side.index() as u32;
-            out.card_id = u32::from(source);
-            "swap"
-        }
-        AttackOverride {
-            attacker,
-            hit,
-            source,
-            ..
-        } => {
-            out.side = attacker.index() as u32;
-            out.card_id = u32::from(source);
-            out.amount = i32::from(hit);
-            "override"
-        }
-        DamageTakenChanged {
-            side,
-            percent,
-            source,
-        } => {
-            out.side = side.index() as u32;
-            out.card_id = u32::from(source);
-            out.new_value = percent as i32;
-            "multiplier"
-        }
-        AttackHit {
-            attacker,
-            slot,
-            kind,
-            damage,
-            stamina_cost,
-            multiplier,
-        } => {
-            out.side = attacker.index() as u32;
-            out.slot = u32::from(slot);
-            out.attack_kind = u32::from(kind == Kind::Mag);
-            out.amount = damage;
-            out.old_value = multiplier;
-            out.new_value = stamina_cost;
-            "hit"
-        }
-        AttackBlocked {
-            attacker,
-            slot,
-            kind,
-        } => {
-            out.side = attacker.index() as u32;
-            out.slot = u32::from(slot);
-            out.attack_kind = u32::from(kind == Kind::Mag);
-            "block"
-        }
-        AttackMissed {
-            attacker,
-            slot,
-            kind,
-        } => {
-            out.side = attacker.index() as u32;
-            out.slot = u32::from(slot);
-            out.attack_kind = u32::from(kind == Kind::Mag);
-            "miss"
-        }
-        DuelEnded { .. } => "end",
-    }
-    .into();
-    Some(out)
+    protocol::duel::event_for(input, Side::A)
 }
 
 #[cfg(test)]
@@ -554,11 +268,70 @@ mod tests {
             seed: vec![42; 32],
             rotation: 2,
             autoplay: true,
+            custom: None,
             content_version: engine_content::CONTENT_VERSION
                 .iter()
                 .map(|b| format!("{b:02x}"))
                 .collect(),
         }
+    }
+    #[test]
+    fn every_nonstarter_class_can_start_local_training() {
+        for avatar in engine_content::AVATARS
+            .iter()
+            .filter(|a| !engine_content::STARTERS.iter().any(|s| s.avatar == a.id))
+        {
+            let mut setup = setup();
+            setup.avatar_id = u32::from(avatar.id);
+            setup.autoplay = false;
+            let reply = call(
+                &mut Training::new(),
+                1,
+                wire::training_request::Body::Start(setup),
+            );
+            assert!(reply.error.is_empty(), "{}: {}", avatar.key, reply.error);
+            assert!(!reply.view.unwrap().hand.is_empty());
+        }
+    }
+    #[test]
+    fn local_collection_deck_and_development_points_reach_the_engine() {
+        let mut setup = setup();
+        setup.autoplay = false;
+        let ids = engine_content::STARTERS[0]
+            .cards
+            .iter()
+            .take(5)
+            .map(|(id, _)| u32::from(*id))
+            .collect::<Vec<_>>();
+        setup.custom = Some(wire::TrainingCustomPlayer {
+            level: 5,
+            spent: vec![1, 0, 0, 0, 2, 0],
+            deck: ids
+                .iter()
+                .flat_map(|id| std::iter::repeat_n(*id, 4))
+                .collect(),
+        });
+        let reply = call(
+            &mut Training::new(),
+            1,
+            wire::training_request::Body::Start(setup.clone()),
+        );
+        assert!(reply.error.is_empty());
+        let view = reply.view.unwrap();
+        let base = engine_content::avatar(1).unwrap().snapshot(5);
+        assert_eq!(view.me.as_ref().unwrap().stats[0], base.stats.phys_atk + 1);
+        assert_eq!(view.me.as_ref().unwrap().hp_start, base.stats.hp_max + 14);
+        assert!(view.hand.iter().all(|id| ids.contains(id)));
+        setup.custom.as_mut().unwrap().spent = vec![1];
+        assert_eq!(
+            call(
+                &mut Training::new(),
+                1,
+                wire::training_request::Body::Start(setup)
+            )
+            .error,
+            "invalid_setup"
+        );
     }
     #[test]
     fn worker_protocol_finishes_a_deterministic_bot_duel_and_replays_without_mutation() {

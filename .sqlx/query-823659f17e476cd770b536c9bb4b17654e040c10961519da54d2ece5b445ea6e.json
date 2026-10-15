@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO ledger_entries(tx_id,account,delta) VALUES ($1,$2,-($4::bigint)),($1,$3,$4::bigint)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Text", "Text", "Int8"]
+    },
+    "nullable": []
+  },
+  "hash": "823659f17e476cd770b536c9bb4b17654e040c10961519da54d2ece5b445ea6e"
+}
