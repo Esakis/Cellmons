@@ -61,6 +61,27 @@ pub enum School {
     Tech,
 }
 
+/// Specjalizacja po 2. reinkarnacji: koszt po redukcji `(2 × koszt + 1) div 3` (R-CZA-09, Z-SPC).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Specialization {
+    /// Koszt W czarów, których wymagania obejmują tę szkołę.
+    School(School),
+    /// „Esencja”: koszt W wszystkich czarów.
+    Essence,
+    /// „Koncentracja”: koszt K wszystkich czarów.
+    Concentration,
+}
+
+/// Szkoły w kolejności poziomów w [`Schools`].
+pub const SCHOOLS: [School; 6] = [
+    School::Combat,
+    School::Divine,
+    School::Element,
+    School::Arcane,
+    School::Necro,
+    School::Tech,
+];
+
 /// Poziomy biegłości 0..=4 w 6 szkołach (R-ENT-03), indeksowane przez [`School`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Schools(pub [u8; 6]);
@@ -95,7 +116,38 @@ impl Schools {
     }
 }
 
-/// Statystyki efektywne postaci (R-ENT-06).
+/// Statystyka postaci (R-ENT-06), indeks warstw zmian w stanie gracza.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Stat {
+    PhysAtk,
+    PhysDef,
+    MagAtk,
+    MagDef,
+    HpMax,
+    StaminaMax,
+}
+
+impl Stat {
+    pub const ALL: [Stat; 6] = [
+        Stat::PhysAtk,
+        Stat::PhysDef,
+        Stat::MagAtk,
+        Stat::MagDef,
+        Stat::HpMax,
+        Stat::StaminaMax,
+    ];
+
+    /// Najmniejsza wartość efektywna: 0 dla ataków i obron, 1 dla Ż_max i W_max (Z-ENG-2).
+    #[must_use]
+    pub const fn floor(self) -> i32 {
+        match self {
+            Stat::HpMax | Stat::StaminaMax => 1,
+            Stat::PhysAtk | Stat::PhysDef | Stat::MagAtk | Stat::MagDef => 0,
+        }
+    }
+}
+
+/// Statystyki postaci (R-ENT-06).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Stats {
     pub phys_atk: i32,
@@ -107,6 +159,32 @@ pub struct Stats {
 }
 
 impl Stats {
+    #[must_use]
+    pub const fn get(&self, stat: Stat) -> i32 {
+        match stat {
+            Stat::PhysAtk => self.phys_atk,
+            Stat::PhysDef => self.phys_def,
+            Stat::MagAtk => self.mag_atk,
+            Stat::MagDef => self.mag_def,
+            Stat::HpMax => self.hp_max,
+            Stat::StaminaMax => self.stamina_max,
+        }
+    }
+
+    /// Statystyki z wartości w kolejności `Stat::ALL`.
+    #[must_use]
+    pub const fn from_values(values: [i32; 6]) -> Self {
+        let [phys_atk, phys_def, mag_atk, mag_def, hp_max, stamina_max] = values;
+        Self {
+            phys_atk,
+            phys_def,
+            mag_atk,
+            mag_def,
+            hp_max,
+            stamina_max,
+        }
+    }
+
     /// Atak danego typu: AF albo AM (R-ATK-04).
     #[must_use]
     pub const fn attack(&self, kind: Kind) -> i32 {

@@ -67,6 +67,8 @@ flowchart LR
 | F2.5 Test referencyjny | TR-01 (walka #26519, rundy 1–3; rundy 1–2 z kartami bez efektu są testowane od F1.3) | TR-01 zielony |
 | F2.6 Boty L0–L1 i CLI | bot losowy i heurystyczny; `sim` rozgrywa pojedynki w konsoli | **M1:** 100 000 pojedynków botów bez paniki; raport z CLI |
 
+**Stan (2026-10-15).** Kroki F2.1–F2.6 zrobione. Rozpraszanie (`dispel`) jest w F2.3 razem z umagicznieniami. `sim run --n 100000` rozgrywa 100 000 pojedynków bez paniki dla par botów L1–L1, L1–L0 i L0–L0; L1 wygrywa z L0 ok. 62% pojedynków. Nowe decyzje Z-ENG-5, Z-ENG-6 i pozostałe z `06-silnik-gry.md`, rozdz. 5 czekają na zatwierdzenie.
+
 ## F3. Treść, narzędzia i pierwsze grafiki (≈ 3 tydz.)
 
 | Krok | Zadania | Kryteria akceptacji |

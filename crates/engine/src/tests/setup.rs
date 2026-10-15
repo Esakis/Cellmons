@@ -57,9 +57,10 @@ fn r_poj_01_snapshot_does_not_follow_later_changes() {
     setup.players[0].avatar.stats.phys_atk = 99;
     setup.players[0].avatar.schools = Schools::NONE;
 
-    assert_eq!(state.player(Side::A).stats(), &A);
+    assert_eq!(state.player(Side::A).base_stats(), &A);
+    assert_eq!(state.stats(Side::A), A);
     assert_eq!(
-        state.player(Side::A).schools(),
+        state.player(Side::A).base_schools(),
         &Schools::NONE.with(School::Combat, 2)
     );
 }

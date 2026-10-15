@@ -25,7 +25,8 @@ Na Windowsie Rust potrzebuje narzędzi C++ z Visual Studio (Build Tools, składn
 | `run.bat -Stop` | zatrzymuje bazę; dane zostają w woluminie Dockera |
 | `check.bat` | wszystkie kontrole z CI: Rust, silnik do WebAssembly z testem natywne = WASM, klient, proto, testy e2e i serwer z bazą |
 | `check.bat -Quick` | szybsze sprawdzenie, bez testów e2e i testu serwera z bazą |
-| `cargo run -p sim -- duel [ziarno]` | losowy pojedynek silnikiem, opisany runda po rundzie |
+| `cargo run -p sim -- duel [ziarno] [--a L0\|L1] [--b L0\|L1]` | pojedynek botów (domyślnie L1 przeciw L1) na losowych postaciach i kartach testowych, opisany runda po rundzie |
+| `cargo run --release -p sim -- run [--n 1000] [--seed 0] [--a L1] [--b L1]` | seria pojedynków botów: wygrane, remisy, powody końca, średnia liczba rund, przewaga inicjatywy i czas |
 | `cargo bench -p engine` | pomiar rozstrzygania rundy i całego pojedynku (`docs/06-silnik-gry.md`, rozdz. 10) |
 
 - Serwer i klient działają w osobnych oknach; zamknięcie okna zatrzymuje usługę.

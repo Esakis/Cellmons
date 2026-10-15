@@ -5,8 +5,9 @@ use std::hint::black_box;
 
 use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
 use engine::{
-    AvatarSnapshot, CardAction, CardDef, Content, Cost, DuelSetup, EventBuf, Keywords, Kind, Move,
-    PlayerSetup, RulesConfig, Schools, Stats, new_duel, resolve_round,
+    AvatarSnapshot, CardAction, CardDef, CardKind, Content, Cost, DuelSetup, Duration, Effect,
+    EventBuf, Keywords, Kind, Move, PlayerSetup, RulesConfig, Schools, Stat, Stats, Target,
+    new_duel, resolve_round,
 };
 
 const RULES: &str = include_str!("../../../content/rules.toml");
@@ -20,6 +21,8 @@ fn player(stats: Stats) -> PlayerSetup {
         avatar: AvatarSnapshot {
             stats,
             schools: Schools::NONE,
+            specialization: None,
+            gift: None,
         },
         deck: (1..=10).chain(1..=10).collect(),
     }
@@ -78,7 +81,17 @@ fn bench(c: &mut Criterion) {
                 focus: 1,
                 stamina: 4,
             },
+            kind: CardKind::Instant,
+            condition: None,
             keywords: Keywords::default(),
+            effects: [Effect::StatMod {
+                target: Target::Caster,
+                stat: Stat::PhysAtk,
+                amount: 1,
+                duration: Duration::Round,
+            }]
+            .into_iter()
+            .collect(),
         })
         .collect();
     let content = Content::new([0; 32], &cards).expect("poprawna treść");

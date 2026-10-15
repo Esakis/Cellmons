@@ -34,6 +34,8 @@ Losuje jeden z dozwolonych ruchów z rozkładu równomiernego. Służy do fuzzin
 4. **Czary:** rzuca kartę o najwyższej „wartości na koszt” (wartość z heurystyki rodziny efektu, `03-tresc-gry.md`, rozdz. 5.3). Pilnuje, żeby W nie spadło poniżej progu bezpieczeństwa (R-ATK-03).
 5. **Losowość:** z prawdopodobieństwem ε (domyślnie 0,15) zmienia jeden slot losowo, żeby nie być w pełni przewidywalnym.
 
+**Implementacja (F2.6, `crates/engine-ai`).** `Bot::new(poziom, ziarno)` i `Bot::choose(&PlayerView, &Content) -> Move`; to samo ziarno i ten sam widok dają ten sam ruch. L0 wylicza wszystkie 64 ustawienia razem z akcjami kart i losuje spośród dozwolonych. L1 przewiduje, że przeciwnik zostawi ustawienia z poprzedniej rundy: atakuje typem, którego przeciwnik nie blokuje, a broni się przed jego ostatnimi atakami. Slot zmienia, gdy zysk w Ż przekracza dwukrotność kosztu zmiany. Czar wybiera według wartości efektu na koszt, z rezerwą W ≥ ¼ W_max, a kartę, której nie może rzucić, odrzuca.
+
 ### L2: adaptacyjny (model przeciwnika)
 
 - Model: dla każdego slotu rozkład wyborów przeciwnika warunkowany numerem rundy i jego ustawieniem z poprzedniej rundy, z rozkładem a priori Dirichleta. Model aktualizuje się w trakcie pojedynku, a dla graczy z historią (sala treningowa) także między pojedynkami.
@@ -96,6 +98,7 @@ Kolor nazwy przeciwnika (R-WYP-02): zielony, gdy jest niżej od gracza, żółty
 | Polecenie | Co robi | Wynik |
 |---|---|---|
 | `sim duel` | pojedyncza walka z pełnym zapisem zdarzeń | log tekstowy, powtórka |
+| `sim run --n 100000 --a L1 --b L0` | seria pojedynków botów (od F2.6, na kartach testowych) | wygrane, remisy, powody końca, średnia liczba rund, przewaga inicjatywy, czas |
 | `sim matrix --level 10 --bot L2 --n 2000` | każda postać przeciw każdej na tym samym poziomie | macierz współczynników wygranych z przedziałami ufności |
 | `sim card <klucz>` | test A/B: talia z kartą i bez niej | zmiana współczynnika wygranych, częstość użycia, wygrane po rzuceniu |
 | `sim initiative` | przewaga inicjatywy | odsetek wygranych gracza z inicjatywą |

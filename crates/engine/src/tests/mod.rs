@@ -3,16 +3,21 @@
 
 mod attack;
 mod content;
+mod effects;
+mod enchantments;
 mod end;
 mod examples;
+mod families;
 mod hash;
 mod invariants;
+mod keywords;
 mod moves;
 mod replay;
 mod rng;
 mod round;
 mod rules;
 mod setup;
+mod view;
 
 use crate::card::Content;
 use crate::event::{Event, EventBuf};

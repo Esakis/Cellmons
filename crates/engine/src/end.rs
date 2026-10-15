@@ -2,6 +2,7 @@
 
 use std::cmp::Ordering;
 
+use crate::card::Condition;
 use crate::event::{Event, EventBuf};
 use crate::round::DuelError;
 use crate::state::{DuelState, Phase};
@@ -27,6 +28,8 @@ pub enum Reason {
     Disconnect,
     /// Walkower po kolejnych brakach ruchu (R-RUN-09).
     Timeout,
+    /// Wygrana warunkowa z efektu karty (R-KON-06).
+    ConditionalWin,
 }
 
 /// Zakończenie spoza rozgrywki, zgłaszane przez serwer. Czasy i liczniki z zasad
@@ -69,6 +72,47 @@ pub fn end_by(
     state.phase = Phase::Finished(outcome);
     events.push(Event::DuelEnded { outcome });
     Ok(outcome)
+}
+
+/// Czy warunek karty jest spełniony dla strony `side` (R-CZA-08, R-KON-06).
+pub(crate) fn holds(state: &DuelState, side: Side, condition: Condition) -> bool {
+    match condition {
+        Condition::RoundAtLeast(round) => state.round >= round,
+        Condition::HpPercentAhead => {
+            let (me, foe) = (state.player(side), state.player(side.other()));
+            let ahead = compare_hp_percent([me.hp, foe.hp], [me.hp_start, foe.hp_start]);
+            ahead
+                == Outcome::Win {
+                    winner: Side::A,
+                    reason: Reason::Rounds,
+                }
+        }
+        Condition::OpponentExhausted => state.player(side.other()).stamina == 0,
+    }
+}
+
+/// Wygrane warunkowe zgłoszone w tej rundzie, sprawdzane przed nokautem (R-KON-06). Gdy warunek
+/// spełniają obie strony, jest remis (Z-IWN).
+pub(crate) fn conditional_win(state: &DuelState) -> Option<Outcome> {
+    let won = Side::BOTH.map(|side| {
+        state
+            .win_checks
+            .iter()
+            .any(|&(owner, condition)| owner == side && holds(state, side, condition))
+    });
+    let reason = Reason::ConditionalWin;
+    match won {
+        [true, true] => Some(Outcome::Draw { reason }),
+        [true, false] => Some(Outcome::Win {
+            winner: Side::A,
+            reason,
+        }),
+        [false, true] => Some(Outcome::Win {
+            winner: Side::B,
+            reason,
+        }),
+        [false, false] => None,
+    }
 }
 
 /// Nokaut sprawdzany raz, na końcu rundy (R-KON-01): obie strony z Ż ≤ 0 to remis.

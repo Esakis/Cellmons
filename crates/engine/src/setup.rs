@@ -6,12 +6,14 @@ use std::num::NonZeroU32;
 use arrayvec::ArrayVec;
 use rand_chacha::rand_core::Rng;
 
-use crate::card::{CardId, Content};
+use crate::card::{CardId, CardKind, Content};
+use crate::enchant;
+use crate::event::EventBuf;
 use crate::rng::{self, Stream};
 use crate::round::begin_round;
 use crate::rules::{DefaultSettings, MAX_DECK_SIZE, RulesConfig, RulesError};
-use crate::state::{DuelState, Phase, PlayerState};
-use crate::types::{Kind, MAX_POOL, MAX_STAT, SLOTS, Schools, Side, Stats};
+use crate::state::{DuelState, NORMAL_DAMAGE_PERCENT, Phase, PlayerState};
+use crate::types::{Kind, MAX_POOL, MAX_STAT, SLOTS, Schools, Side, Specialization, Stats};
 
 /// Snapshot postaci z chwili startu pojedynku (R-POJ-01). Specjalizacja i dar dochodzą w fazie F2.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -19,6 +21,11 @@ pub struct AvatarSnapshot {
     /// Statystyki efektywne.
     pub stats: Stats,
     pub schools: Schools,
+    /// Specjalizacja po 2. reinkarnacji (R-CZA-09).
+    pub specialization: Option<Specialization>,
+    /// Dar po 3. reinkarnacji: karta umagicznienia działająca od startu, bez kosztów (R-POJ-07,
+    /// Z-GFT).
+    pub gift: Option<CardId>,
 }
 
 /// Postać i talia gracza.
@@ -54,6 +61,8 @@ pub enum SetupError {
     UnknownCard(Side, CardId),
     /// Talię trzeba uzupełnić (R-TAL-05), a treść nie ma kart.
     EmptyCardPool,
+    /// Daru nie ma w treści gry albo nie jest umagicznieniem (R-POJ-07).
+    InvalidGift(Side),
 }
 
 impl fmt::Display for SetupError {
@@ -68,6 +77,7 @@ impl fmt::Display for SetupError {
             }
             Self::UnknownCard(side, card) => write!(f, "gracz {side:?}: nieznana karta {card}"),
             Self::EmptyCardPool => write!(f, "brak kart do uzupełnienia talii"),
+            Self::InvalidGift(side) => write!(f, "gracz {side:?}: dar nie jest umagicznieniem"),
         }
     }
 }
@@ -87,13 +97,23 @@ pub fn new_duel(setup: &DuelSetup, content: &Content<'_>) -> Result<DuelState, S
         decks[side.index()] = prepare_deck(rules, content, &setup.seed, side, deck)?;
     }
     let avatars = Side::BOTH.map(|side| setup.players[side.index()].avatar);
-    Ok(start(rules, avatars, decks, draw_initiative(&setup.seed)))
+    let initiative = draw_initiative(&setup.seed);
+    let mut state = start(rules, &setup.seed, avatars, decks, initiative);
+    // R-POJ-07: dary działają od startu, przed 1. rundą, jak darmowe umagicznienia (Z-GFT).
+    let mut events = EventBuf::new();
+    for side in Side::BOTH {
+        if let Some(gift) = avatars[side.index()].gift.and_then(|id| content.get(id)) {
+            enchant::register(&mut state, &mut events, side, gift, 1);
+        }
+    }
+    Ok(state)
 }
 
 /// Stan na początku 1. rundy dla gotowych talii i znanej inicjatywy. `rules` muszą przejść
 /// walidację.
 pub(crate) fn start(
     rules: &RulesConfig,
+    seed: &[u8; 32],
     avatars: [AvatarSnapshot; 2],
     decks: [ArrayVec<CardId, MAX_DECK_SIZE>; 2],
     initiative: Side,
@@ -108,6 +128,11 @@ pub(crate) fn start(
             new_player(rules, &avatars[0], deck_a),
             new_player(rules, &avatars[1], deck_b),
         ],
+        overrides: ArrayVec::new(),
+        rng: rng::stream(seed, Stream::Effects),
+        enchantments: ArrayVec::new(),
+        next_order: 0,
+        win_checks: ArrayVec::new(),
     };
     begin_round(&mut state);
     state
@@ -127,8 +152,15 @@ fn new_player(
         hand.push(card);
     }
     PlayerState {
-        stats: avatar.stats,
-        schools: avatar.schools,
+        base: avatar.stats,
+        permanent: [0; 6],
+        round_delta: [0; 6],
+        base_schools: avatar.schools,
+        specialization: avatar.specialization,
+        school_permanent: [0; 6],
+        school_round: [0; 6],
+        damage_pct: NORMAL_DAMAGE_PERCENT,
+        round_damage_pct: NORMAL_DAMAGE_PERCENT,
         hp: avatar.stats.hp_max,
         hp_start: avatar.stats.hp_max,
         stamina: avatar.stats.stamina_max,
@@ -177,6 +209,14 @@ fn validate_player(
     }
     if !player.avatar.schools.is_valid() {
         return Err(SetupError::InvalidSchools(side));
+    }
+    if let Some(gift) = player.avatar.gift {
+        let enchantment = content
+            .get(gift)
+            .is_some_and(|def| matches!(def.kind, CardKind::Enchantment(_)));
+        if !enchantment {
+            return Err(SetupError::InvalidGift(side));
+        }
     }
     if player.deck.len() > usize::from(rules.deck.size) {
         return Err(SetupError::DeckTooLarge(side));

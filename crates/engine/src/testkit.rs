@@ -9,7 +9,9 @@ use arrayvec::ArrayVec;
 use rand_chacha::ChaCha8Rng;
 use rand_chacha::rand_core::{Rng, SeedableRng};
 
-use crate::card::{CardDef, CardId, Content, Cost, Keywords};
+use crate::card::{CardDef, CardId, CardKind, Condition, Content, Cost, Coupling, Keywords};
+use crate::effect::{AttackFilter, Duration, Effect, HandAction, Pool, Target, Trigger};
+use crate::enchant;
 use crate::end::{Termination, end_by};
 use crate::event::EventBuf;
 use crate::hash::state_hash;
@@ -22,7 +24,7 @@ use crate::rules::{
 };
 use crate::setup::{self, AvatarSnapshot, DuelSetup, PlayerSetup, new_duel};
 use crate::state::DuelState;
-use crate::types::{Kind, SLOTS, School, Schools, Side, Stats};
+use crate::types::{Kind, SLOTS, School, Schools, Side, Specialization, Stat, Stats};
 
 /// Wersja treści używana w testach.
 pub const TEST_CONTENT_VERSION: [u8; 32] = [0; 32];
@@ -78,14 +80,36 @@ pub const fn stats(
 
 /// Karta testowa bez efektu i bez wymagań.
 #[must_use]
-pub const fn noop_card(id: CardId, focus: u16, stamina: u16) -> CardDef {
+pub fn noop_card(id: CardId, focus: u16, stamina: u16) -> CardDef {
+    spell(id, focus, stamina, &[])
+}
+
+/// Czar testowy bez wymagań, z podanymi efektami.
+#[must_use]
+pub fn spell(id: CardId, focus: u16, stamina: u16, effects: &[Effect]) -> CardDef {
     CardDef {
         id,
         requires: Schools::NONE,
         cost: Cost { focus, stamina },
-        keywords: Keywords {
-            intervention: false,
-        },
+        kind: CardKind::Instant,
+        condition: None,
+        keywords: Keywords::default(),
+        effects: effects.iter().copied().collect(),
+    }
+}
+
+/// Umagicznienie testowe bez wymagań, z wyzwalaczem i efektami.
+#[must_use]
+pub fn enchantment(
+    id: CardId,
+    focus: u16,
+    stamina: u16,
+    trigger: Trigger,
+    effects: &[Effect],
+) -> CardDef {
+    CardDef {
+        kind: CardKind::Enchantment(trigger),
+        ..spell(id, focus, stamina, effects)
     }
 }
 
@@ -102,6 +126,8 @@ pub fn player(stats: Stats, deck: &[CardId]) -> PlayerSetup {
         avatar: AvatarSnapshot {
             stats,
             schools: Schools::NONE,
+            specialization: None,
+            gift: None,
         },
         deck: deck.iter().copied().collect(),
     }
@@ -141,6 +167,8 @@ pub struct Scenario {
     hands: [Vec<CardId>; 2],
     decks: [Vec<CardId>; 2],
     initiative: Side,
+    seed: [u8; 32],
+    gifts: Vec<(Side, CardDef)>,
 }
 
 impl Scenario {
@@ -152,16 +180,41 @@ impl Scenario {
             avatars: [a, b].map(|stats| AvatarSnapshot {
                 stats,
                 schools: Schools::NONE,
+                specialization: None,
+                gift: None,
             }),
             hands: [Vec::new(), Vec::new()],
             decks: [Vec::new(), Vec::new()],
             initiative: Side::A,
+            seed: [0; 32],
+            gifts: Vec::new(),
         }
+    }
+
+    /// Specjalizacja strony (R-CZA-09).
+    #[must_use]
+    pub fn specialization(mut self, side: Side, specialization: Specialization) -> Self {
+        self.avatars[side.index()].specialization = Some(specialization);
+        self
+    }
+
+    /// Dar strony: umagicznienie działające od startu (R-POJ-07).
+    #[must_use]
+    pub fn gift(mut self, side: Side, card: &CardDef) -> Self {
+        self.gifts.push((side, card.clone()));
+        self
     }
 
     #[must_use]
     pub fn rules(mut self, rules: RulesConfig) -> Self {
         self.rules = rules;
+        self
+    }
+
+    /// Ziarno strumienia losowych efektów kart.
+    #[must_use]
+    pub fn seed(mut self, seed: [u8; 32]) -> Self {
+        self.seed = seed;
         self
     }
 
@@ -198,17 +251,26 @@ impl Scenario {
             .validate()
             .expect("zasady scenariusza są poprawne");
         let empty = [ArrayVec::new(), ArrayVec::new()];
-        let mut state = setup::start(&self.rules, self.avatars, empty, self.initiative);
+        let mut state = setup::start(
+            &self.rules,
+            &self.seed,
+            self.avatars,
+            empty,
+            self.initiative,
+        );
         for side in Side::BOTH {
             let player = state.player_mut(side);
             player.hand = self.hands[side.index()].iter().copied().collect();
             player.deck = self.decks[side.index()].iter().copied().collect();
         }
+        for (side, gift) in &self.gifts {
+            enchant::register(&mut state, &mut EventBuf::new(), *side, gift, 1);
+        }
         state
     }
 }
 
-/// Karty do losowych pojedynków: różne koszty, wymagania szkół i interwencje.
+/// Karty do losowych pojedynków: różne koszty, wymagania szkół, interwencje i efekty.
 #[must_use]
 pub fn sample_cards() -> Vec<CardDef> {
     let requires = |levels: &[(School, u8)]| {
@@ -218,26 +280,325 @@ pub fn sample_cards() -> Vec<CardDef> {
                 schools.with(school, level)
             })
     };
-    let card = |id, focus, stamina, levels: &[(School, u8)], intervention| CardDef {
-        id,
-        requires: requires(levels),
-        cost: Cost { focus, stamina },
-        keywords: Keywords { intervention },
+    let card =
+        |id, focus, stamina, levels: &[(School, u8)], intervention, effects: &[Effect]| CardDef {
+            id,
+            requires: requires(levels),
+            cost: Cost { focus, stamina },
+            kind: CardKind::Instant,
+            condition: None,
+            keywords: Keywords {
+                intervention,
+                ..Keywords::default()
+            },
+            effects: effects.iter().copied().collect(),
+        };
+    let stat = |target, stat, amount, duration| Effect::StatMod {
+        target,
+        stat,
+        amount,
+        duration,
     };
+    let (me, foe, both) = (Target::Caster, Target::Opponent, Target::Both);
+    let (duel, round) = (Duration::Duel, Duration::Round);
     vec![
-        card(1, 0, 0, &[], false),
-        card(2, 1, 4, &[], false),
-        card(3, 2, 8, &[], false),
-        card(4, 1, 12, &[], false),
-        card(5, 3, 6, &[], false),
-        card(6, 4, 24, &[], false),
-        card(7, 2, 6, &[(School::Combat, 1)], false),
-        card(8, 2, 12, &[(School::Divine, 2)], false),
-        card(9, 1, 8, &[(School::Element, 1), (School::Arcane, 1)], false),
-        card(10, 3, 18, &[(School::Necro, 3)], false),
-        card(11, 2, 12, &[(School::Tech, 2)], false),
-        card(12, 2, 10, &[], true),
-        card(13, 1, 4, &[(School::Arcane, 1)], true),
+        card(1, 0, 0, &[], false, &[]),
+        card(2, 1, 4, &[], false, &[stat(me, Stat::PhysAtk, 2, duel)]),
+        card(
+            3,
+            2,
+            8,
+            &[],
+            false,
+            &[Effect::Focus {
+                target: foe,
+                amount: -2,
+            }],
+        ),
+        card(4, 1, 12, &[], false, &[stat(foe, Stat::PhysDef, -2, round)]),
+        card(
+            5,
+            3,
+            6,
+            &[],
+            false,
+            &[Effect::Stamina {
+                target: foe,
+                amount: -10,
+            }],
+        ),
+        card(
+            6,
+            4,
+            24,
+            &[],
+            false,
+            &[
+                stat(me, Stat::MagAtk, 3, duel),
+                Effect::Stamina {
+                    target: me,
+                    amount: 5,
+                },
+            ],
+        ),
+        card(
+            7,
+            2,
+            6,
+            &[(School::Combat, 1)],
+            false,
+            &[stat(me, Stat::PhysDef, 2, duel)],
+        ),
+        card(
+            8,
+            2,
+            12,
+            &[(School::Divine, 2)],
+            false,
+            &[stat(me, Stat::HpMax, 7, duel)],
+        ),
+        card(
+            9,
+            1,
+            8,
+            &[(School::Element, 1), (School::Arcane, 1)],
+            false,
+            &[stat(both, Stat::MagDef, -1, duel)],
+        ),
+        card(
+            10,
+            3,
+            18,
+            &[(School::Necro, 3)],
+            false,
+            &[Effect::Focus {
+                target: me,
+                amount: 3,
+            }],
+        ),
+        card(
+            11,
+            2,
+            12,
+            &[(School::Tech, 2)],
+            false,
+            &[stat(foe, Stat::MagAtk, -2, round)],
+        ),
+        card(
+            12,
+            2,
+            10,
+            &[],
+            true,
+            &[Effect::Stamina {
+                target: me,
+                amount: 20,
+            }],
+        ),
+        card(
+            13,
+            1,
+            4,
+            &[(School::Arcane, 1)],
+            true,
+            &[Effect::Focus {
+                target: me,
+                amount: 2,
+            }],
+        ),
+        card(
+            14,
+            2,
+            6,
+            &[],
+            false,
+            &[Effect::Heal {
+                target: me,
+                amount: 12,
+            }],
+        ),
+        card(
+            15,
+            2,
+            10,
+            &[],
+            false,
+            &[Effect::Damage {
+                target: foe,
+                amount: 8,
+            }],
+        ),
+        card(
+            16,
+            3,
+            12,
+            &[],
+            false,
+            &[Effect::Drain {
+                pool: Pool::Hp,
+                amount: 6,
+            }],
+        ),
+        card(
+            17,
+            2,
+            4,
+            &[],
+            false,
+            &[Effect::ForceMiss {
+                target: foe,
+                filter: AttackFilter {
+                    kind: Some(Kind::Phys),
+                    slot: None,
+                    first_only: true,
+                },
+            }],
+        ),
+        card(
+            18,
+            3,
+            14,
+            &[],
+            false,
+            &[Effect::Unblockable {
+                target: me,
+                filter: AttackFilter::default(),
+            }],
+        ),
+        card(
+            19,
+            2,
+            12,
+            &[],
+            false,
+            &[Effect::SwapChoices { target: foe }],
+        ),
+        card(
+            20,
+            1,
+            6,
+            &[],
+            false,
+            &[Effect::Hand {
+                target: foe,
+                action: HandAction::DiscardRandom,
+                count: 1,
+            }],
+        ),
+        card(
+            21,
+            2,
+            8,
+            &[],
+            false,
+            &[
+                Effect::DamageTakenMult {
+                    target: foe,
+                    percent: 150,
+                    duration: round,
+                },
+                Effect::SchoolMod {
+                    target: me,
+                    school: School::Arcane,
+                    amount: 1,
+                    duration: duel,
+                },
+            ],
+        ),
+        CardDef {
+            kind: CardKind::Enchantment(Trigger::OnRound),
+            ..card(
+                22,
+                2,
+                8,
+                &[],
+                false,
+                &[Effect::Heal {
+                    target: me,
+                    amount: 3,
+                }],
+            )
+        },
+        CardDef {
+            kind: CardKind::Enchantment(Trigger::OnHit),
+            ..card(
+                23,
+                2,
+                6,
+                &[],
+                false,
+                &[
+                    stat(me, Stat::PhysDef, 1, Duration::WhileActive),
+                    Effect::Stamina {
+                        target: me,
+                        amount: 2,
+                    },
+                ],
+            )
+        },
+        card(24, 2, 6, &[], false, &[Effect::Dispel { target: foe }]),
+        CardDef {
+            kind: CardKind::Enchantment(Trigger::OnDamageTaken),
+            ..card(
+                25,
+                3,
+                10,
+                &[],
+                false,
+                &[Effect::Damage {
+                    target: foe,
+                    amount: 1,
+                }],
+            )
+        },
+        CardDef {
+            keywords: Keywords {
+                counter: true,
+                ..Keywords::default()
+            },
+            ..card(26, 2, 6, &[], false, &[])
+        },
+        CardDef {
+            keywords: Keywords {
+                coupling: Some(Coupling {
+                    school: School::Combat,
+                    level: 1,
+                }),
+                ..Keywords::default()
+            },
+            ..card(27, 1, 2, &[], false, &[stat(me, Stat::PhysAtk, 1, round)])
+        },
+        CardDef {
+            keywords: Keywords {
+                random: true,
+                ..Keywords::default()
+            },
+            ..card(28, 1, 0, &[], false, &[])
+        },
+        CardDef {
+            condition: Some(Condition::RoundAtLeast(3)),
+            ..card(
+                29,
+                1,
+                6,
+                &[],
+                false,
+                &[Effect::Damage {
+                    target: foe,
+                    amount: 12,
+                }],
+            )
+        },
+        card(
+            30,
+            3,
+            12,
+            &[],
+            false,
+            &[Effect::ConditionalWin {
+                condition: Condition::OpponentExhausted,
+            }],
+        ),
     ]
 }
 
@@ -315,7 +676,12 @@ fn random_player(rng: &mut ChaCha8Rng, content: &Content<'_>, rules: &RulesConfi
         }
     }
     PlayerSetup {
-        avatar: AvatarSnapshot { stats, schools },
+        avatar: AvatarSnapshot {
+            stats,
+            schools,
+            specialization: None,
+            gift: None,
+        },
         deck,
     }
 }

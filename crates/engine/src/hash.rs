@@ -1,11 +1,13 @@
 //! Skrót stanu pojedynku: porównanie natywne = WASM, testy i kontrola powtórek
 //! (`docs/06-silnik-gry.md`, rozdz. 7).
 
-use crate::card::CardId;
+use crate::card::{CardId, Condition};
+use crate::effect::AttackFilter;
+use crate::enchant::ActiveEnchantment;
 use crate::end::{Outcome, Reason};
 use crate::rules::{CounterResolution, DeckRules, DefaultSettings, DuelRules, RulesConfig};
-use crate::state::{DuelState, Phase, PlayerState};
-use crate::types::{Kind, Side, Stats};
+use crate::state::{AttackOverride, DuelState, Phase, PlayerState};
+use crate::types::{Kind, Side, Specialization, Stats};
 
 /// Kontekst BLAKE3 skrótu stanu.
 const HASH_CONTEXT: &str = "Spellgambit engine 2026-10-14 duel state hash";
@@ -21,6 +23,11 @@ pub fn state_hash(state: &DuelState) -> u64 {
         phase,
         initiative,
         players,
+        overrides,
+        rng,
+        enchantments,
+        next_order,
+        win_checks,
     } = state;
     let mut out = Encoder(blake3::Hasher::new_derive_key(HASH_CONTEXT));
     out.rules(rules);
@@ -29,6 +36,33 @@ pub fn state_hash(state: &DuelState) -> u64 {
     out.side(*initiative);
     for player in players {
         out.player(player);
+    }
+    out.u8(overrides.len() as u8);
+    for forced in overrides {
+        out.attack_override(forced);
+    }
+    out.0.update(&rng.get_seed());
+    out.0.update(&rng.get_stream().to_le_bytes());
+    out.0.update(&rng.get_word_pos().to_le_bytes());
+    out.u8(enchantments.len() as u8);
+    for active in enchantments {
+        // Wyzwalacz i efekty wynikają z karty w treści gry o wersji zapisanej w powtórce.
+        let ActiveEnchantment {
+            owner,
+            card,
+            order,
+            trigger: _,
+            effects: _,
+        } = active;
+        out.side(*owner);
+        out.u16(*card);
+        out.u16(*order);
+    }
+    out.u16(*next_order);
+    out.u8(win_checks.len() as u8);
+    for &(side, condition) in win_checks {
+        out.side(side);
+        out.condition(condition);
     }
     let hash = out.0.finalize();
     hash.as_bytes()
@@ -71,6 +105,43 @@ impl Encoder {
         for &card in cards {
             self.u16(card);
         }
+    }
+
+    fn condition(&mut self, condition: Condition) {
+        match condition {
+            Condition::RoundAtLeast(round) => {
+                self.u8(0);
+                self.u8(round);
+            }
+            Condition::HpPercentAhead => self.u8(1),
+            Condition::OpponentExhausted => self.u8(2),
+        }
+    }
+
+    fn attack_override(&mut self, forced: &AttackOverride) {
+        let AttackOverride {
+            attacker,
+            hit,
+            filter,
+            used,
+        } = *forced;
+        let AttackFilter {
+            kind,
+            slot,
+            first_only,
+        } = filter;
+        self.side(attacker);
+        self.u8(u8::from(hit));
+        match kind {
+            None => self.u8(0),
+            Some(kind) => {
+                self.u8(1);
+                self.kind(kind);
+            }
+        }
+        self.u8(slot.unwrap_or(u8::MAX));
+        self.u8(u8::from(first_only));
+        self.u8(u8::from(used));
     }
 
     fn rules(&mut self, rules: &RulesConfig) {
@@ -152,13 +223,21 @@ impl Encoder {
             Reason::Forfeit => 2,
             Reason::Disconnect => 3,
             Reason::Timeout => 4,
+            Reason::ConditionalWin => 5,
         });
     }
 
     fn player(&mut self, player: &PlayerState) {
         let PlayerState {
-            stats,
-            schools,
+            base,
+            permanent,
+            round_delta,
+            base_schools,
+            specialization,
+            school_permanent,
+            school_round,
+            damage_pct,
+            round_damage_pct,
             hp,
             hp_start,
             stamina,
@@ -177,11 +256,28 @@ impl Encoder {
             mag_def,
             hp_max,
             stamina_max,
-        } = *stats;
+        } = *base;
         for value in [phys_atk, phys_def, mag_atk, mag_def, hp_max, stamina_max] {
             self.i32(value);
         }
-        self.0.update(&schools.0);
+        for value in permanent.iter().chain(round_delta) {
+            self.i32(*value);
+        }
+        self.0.update(&base_schools.0);
+        match specialization {
+            None => self.u8(0),
+            Some(Specialization::School(school)) => {
+                self.u8(1);
+                self.u8(*school as u8);
+            }
+            Some(Specialization::Essence) => self.u8(2),
+            Some(Specialization::Concentration) => self.u8(3),
+        }
+        for delta in school_permanent.iter().chain(school_round) {
+            self.0.update(&delta.to_le_bytes());
+        }
+        self.0.update(&damage_pct.to_le_bytes());
+        self.0.update(&round_damage_pct.to_le_bytes());
         for value in [*hp, *hp_start, *stamina, *focus] {
             self.i32(value);
         }

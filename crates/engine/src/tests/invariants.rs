@@ -1,13 +1,14 @@
 //! Niezmienniki silnika na losowych danych (`docs/14-testy-i-jakosc.md`, rozdz. 2.1). Numery w
-//! komentarzach to punkty tej listy; punkt 7 (widoki gracza) dojdzie razem z `view` w fazie F5.
+//! komentarzach to punkty tej listy; punkt 7 (widok gracza) sprawdza `tests/view.rs`.
 
 use arrayvec::ArrayVec;
 use proptest::prelude::*;
 
 use crate::card::{CardId, Content};
+use crate::effect::Resource;
 use crate::end::{Outcome, Termination, end_by};
-use crate::event::EventBuf;
-use crate::moves::{CardAction, Move, default_move, validate_move};
+use crate::event::{Event, EventBuf};
+use crate::moves::{CardAction, Move, default_move, spell_cost, validate_move};
 use crate::round::{DuelError, resolve_round};
 use crate::rules::{MAX_DECK_SIZE, MAX_ROUNDS, RulesConfig};
 use crate::setup::{AvatarSnapshot, DuelSetup, PlayerSetup, new_duel};
@@ -71,6 +72,50 @@ fn mirror(outcome: Option<Outcome>) -> Option<Outcome> {
     })
 }
 
+/// K pobrana od strony w rundzie (zmiany ustawień, czar opłacony albo anulowany
+/// przeciwzaklęciem) oraz suma zmian K z efektów.
+fn focus_flow(events: &EventBuf, side: Side) -> (i32, i32) {
+    let (mut paid, mut effects) = (0, 0);
+    for event in events.as_slice() {
+        match *event {
+            Event::MovesRevealed { change_cost, .. } => paid += change_cost[side.index()],
+            Event::SpellCast {
+                side: caster,
+                focus,
+                ..
+            }
+            | Event::SpellCountered {
+                side: caster,
+                focus,
+                ..
+            } if caster == side => paid += focus,
+            Event::ResourceChanged {
+                side: changed,
+                resource: Resource::Focus,
+                old,
+                new,
+                ..
+            } if changed == side => {
+                effects += new - old;
+            }
+            _ => {}
+        }
+    }
+    (paid, effects)
+}
+
+/// K pobrana od strony za zmiany ustawień (R-RUN-05).
+fn paid_for_changes(events: &EventBuf, side: Side) -> i32 {
+    events
+        .as_slice()
+        .iter()
+        .find_map(|event| match event {
+            Event::MovesRevealed { change_cost, .. } => Some(change_cost[side.index()]),
+            _ => None,
+        })
+        .unwrap_or(0)
+}
+
 /// Karty gracza w ręce, talii i na stosie odrzuconych.
 fn card_count(state: &DuelState, side: Side) -> usize {
     let player = state.player(side);
@@ -94,9 +139,9 @@ fn arb_schools() -> impl Strategy<Value = Schools> {
     prop::array::uniform6(0u8..=3).prop_map(Schools)
 }
 
-/// Karty z `sample_cards` (identyfikatory 1..=13).
+/// Karty z `sample_cards` (identyfikatory 1..=30).
 fn arb_cards(max: usize) -> impl Strategy<Value = Vec<CardId>> {
-    prop::collection::vec(1u16..=13, 0..=max)
+    prop::collection::vec(1u16..=30, 0..=max)
 }
 
 /// Talia z co najwyżej 4 kopiami karty (R-TAL-02).
@@ -137,7 +182,12 @@ fn arb_rules() -> impl Strategy<Value = RulesConfig> {
 
 fn arb_player() -> impl Strategy<Value = PlayerSetup> {
     (arb_stats(), arb_schools(), arb_cards(20)).prop_map(|(stats, schools, cards)| PlayerSetup {
-        avatar: AvatarSnapshot { stats, schools },
+        avatar: AvatarSnapshot {
+            stats,
+            schools,
+            specialization: None,
+            gift: None,
+        },
         deck: capped_deck(&cards),
     })
 }
@@ -175,7 +225,15 @@ proptest! {
             }
             let moves = Side::BOTH.map(|side| choose(&state, &content, side, round[side.index()]));
             let costs = Side::BOTH.map(|side| validate_move(&state, &content, side, &moves[side.index()]));
+            let spell_focus = Side::BOTH.map(|side| match moves[side.index()].card {
+                CardAction::Cast(index) => {
+                    let card = state.player(side).hand()[usize::from(index)];
+                    content.get(card).map_or(0, |def| spell_cost(&state, side, def).focus)
+                }
+                CardAction::None | CardAction::Discard(_) => 0,
+            });
             let focus_before = Side::BOTH.map(|side| state.player(side).focus());
+            events.clear();
             let summary = resolve_round(&mut state, &content, &moves, &mut events);
             // 8: poprawny ruch nigdy nie daje błędu rozstrzygania.
             prop_assert!(summary.is_ok(), "{summary:?}");
@@ -183,12 +241,15 @@ proptest! {
             for side in Side::BOTH {
                 let player = state.player(side);
                 let cost = costs[side.index()].expect("ruch z `choose` jest poprawny");
-                // 9: K spada dokładnie o zmiany razy koszt zmiany plus koszt K czaru.
-                prop_assert_eq!(focus_before[side.index()] - summary.totals[side.index()].focus, cost.focus);
+                // 9: koszt K to zmiany razy koszt zmiany plus koszt K czaru, a K na koniec rundy to
+                // K sprzed rundy minus pobrane opłaty plus zmiany K z efektów kart.
+                let (paid, effects) = focus_flow(&events, side);
+                prop_assert_eq!(cost.focus, paid_for_changes(&events, side) + spell_focus[side.index()]);
+                prop_assert_eq!(summary.totals[side.index()].focus, focus_before[side.index()] - paid + effects);
                 // 1: W i K nie są ujemne.
                 prop_assert!(player.stamina() >= 0 && player.focus() >= 0);
                 // 2: statystyki efektywne w zakresie (Z-ENG-2).
-                let stats = player.stats();
+                let stats = state.stats(side);
                 prop_assert!([stats.phys_atk, stats.phys_def, stats.mag_atk, stats.mag_def].iter().all(|v| *v >= 0));
                 prop_assert!(stats.hp_max >= 1 && stats.stamina_max >= 1);
                 // 3: ręka nie rośnie ponad limit, a karty nie znikają ani nie przybywają.

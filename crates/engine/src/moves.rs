@@ -3,8 +3,9 @@
 use std::fmt;
 
 use crate::card::{CardDef, CardId, Content};
+use crate::rules::RulesConfig;
 use crate::state::{DuelState, PlayerState};
-use crate::types::{Kind, SLOTS, Side};
+use crate::types::{Kind, SLOTS, Schools, Side, Specialization, Stats};
 
 /// Akcja karty w ruchu (R-RUN-04); liczba to indeks karty w ręce.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -90,27 +91,13 @@ pub fn validate_move(
     side: Side,
     mv: &Move,
 ) -> Result<MoveCost, MoveError> {
-    let player = state.player(side);
-    let cost = move_cost(state, content, player, mv);
-    check_move(state, content, player, mv, &cost)?;
-    Ok(cost)
+    Mover::of(state, side).validate(content, mv)
 }
 
 /// Koszty i skutki ruchu do pokazania przed jego zatwierdzeniem.
 #[must_use]
 pub fn preview(state: &DuelState, content: &Content<'_>, side: Side, mv: &Move) -> Preview {
-    let player = state.player(side);
-    let cost = move_cost(state, content, player, mv);
-    Preview {
-        cost,
-        focus_after: player.focus - cost.focus,
-        max_attack_stamina: mv
-            .attacks
-            .iter()
-            .map(|&kind| player.stats.attack(kind))
-            .sum(),
-        validity: check_move(state, content, player, mv, &cost),
-    }
+    Mover::of(state, side).preview(content, mv)
 }
 
 /// Ruch „bez zmian”: ustawienia z poprzedniej rundy, bez akcji karty (R-RUN-09).
@@ -126,78 +113,169 @@ pub fn default_move(state: &DuelState, side: Side) -> Move {
 
 /// Liczba slotów różnych od ustawień z poprzedniej rundy; liczy się tylko stan końcowy (R-RUN-05).
 pub(crate) fn count_changes(player: &PlayerState, mv: &Move) -> u8 {
+    changes_between(&player.attacks, &player.defenses, mv)
+}
+
+fn changes_between(attacks: &[Kind; SLOTS], defenses: &[Kind; SLOTS], mv: &Move) -> u8 {
     let mut changes = 0;
     for slot in 0..SLOTS {
-        changes += u8::from(player.attacks[slot] != mv.attacks[slot]);
-        changes += u8::from(player.defenses[slot] != mv.defenses[slot]);
+        changes += u8::from(attacks[slot] != mv.attacks[slot]);
+        changes += u8::from(defenses[slot] != mv.defenses[slot]);
     }
     changes
 }
 
-fn move_cost(
-    state: &DuelState,
-    content: &Content<'_>,
-    player: &PlayerState,
-    mv: &Move,
-) -> MoveCost {
-    let changes = count_changes(player, mv);
-    let spell = cast_card(player, content, mv.card).ok().flatten();
-    let spell_focus = spell.map_or(0, |card| i32::from(card.cost.focus));
-    MoveCost {
-        changes,
-        focus: i32::from(changes) * state.rules.duel.change_cost + spell_focus,
-        stamina: spell.map_or(0, |card| i32::from(card.cost.stamina)),
-    }
+/// Koszt rzucenia karty przez stronę i mnożnik jej efektów.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct SpellCost {
+    pub(crate) focus: i32,
+    pub(crate) stamina: i32,
+    /// Poziom szkoły przy sprzężeniu (R-CZA-06), inaczej 1.
+    pub(crate) scale: i16,
 }
 
-fn check_move(
-    state: &DuelState,
-    content: &Content<'_>,
-    player: &PlayerState,
-    mv: &Move,
-    cost: &MoveCost,
-) -> Result<(), MoveError> {
-    if state.is_finished() {
-        return Err(MoveError::WrongPhase);
-    }
-    if let CardAction::Discard(index) = mv.card {
-        // Odrzucenie nic nie kosztuje (R-RUN-06, p. 5; Z-DSC).
-        hand_card(player, index)?;
-    }
-    if let Some(card) = cast_card(player, content, mv.card)? {
-        if !player.schools.meets(&card.requires) {
-            return Err(MoveError::RequirementsNotMet);
+/// Koszt rzucenia karty `card` przez stronę `side` (zob. `Mover::spell_cost`).
+pub(crate) fn spell_cost(state: &DuelState, side: Side, card: &CardDef) -> SpellCost {
+    Mover::of(state, side).spell_cost(card)
+}
+
+/// Dane strony potrzebne do sprawdzenia ruchu: ze stanu pojedynku albo z widoku gracza
+/// (`docs/06-silnik-gry.md`, rozdz. 8), więc sprawdzanie nie wymaga ukrytych informacji.
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct Mover<'a> {
+    pub(crate) rules: &'a RulesConfig,
+    pub(crate) finished: bool,
+    /// Statystyki i poziomy szkół efektywne.
+    pub(crate) stats: Stats,
+    pub(crate) schools: Schools,
+    pub(crate) specialization: Option<Specialization>,
+    pub(crate) focus: i32,
+    pub(crate) stamina: i32,
+    pub(crate) attacks: [Kind; SLOTS],
+    pub(crate) defenses: [Kind; SLOTS],
+    pub(crate) hand: &'a [CardId],
+    pub(crate) used_interventions: &'a [CardId],
+}
+
+impl<'a> Mover<'a> {
+    pub(crate) fn of(state: &'a DuelState, side: Side) -> Self {
+        let player = state.player(side);
+        Self {
+            rules: &state.rules,
+            finished: state.is_finished(),
+            stats: state.stats(side),
+            schools: state.schools(side),
+            specialization: player.specialization,
+            focus: player.focus,
+            stamina: player.stamina,
+            attacks: player.attacks,
+            defenses: player.defenses,
+            hand: &player.hand,
+            used_interventions: &player.used_interventions,
         }
-        if card.keywords.intervention && player.used_interventions.contains(&card.id) {
-            return Err(MoveError::InterventionUsed);
+    }
+
+    pub(crate) fn validate(&self, content: &Content<'_>, mv: &Move) -> Result<MoveCost, MoveError> {
+        let cost = self.cost(content, mv);
+        self.check(content, mv, &cost)?;
+        Ok(cost)
+    }
+
+    pub(crate) fn preview(&self, content: &Content<'_>, mv: &Move) -> Preview {
+        let cost = self.cost(content, mv);
+        Preview {
+            cost,
+            focus_after: self.focus - cost.focus,
+            max_attack_stamina: mv.attacks.iter().map(|&kind| self.stats.attack(kind)).sum(),
+            validity: self.check(content, mv, &cost),
         }
     }
-    if player.focus < cost.focus {
-        return Err(MoveError::NotEnoughFocus);
-    }
-    if player.stamina < cost.stamina {
-        return Err(MoveError::NotEnoughStamina);
-    }
-    Ok(())
-}
 
-/// Definicja rzucanej karty albo `None`, gdy ruch nie rzuca karty.
-fn cast_card<'a>(
-    player: &PlayerState,
-    content: &Content<'a>,
-    action: CardAction,
-) -> Result<Option<&'a CardDef>, MoveError> {
-    let CardAction::Cast(index) = action else {
-        return Ok(None);
-    };
-    let id = hand_card(player, index)?;
-    content.get(id).map(Some).ok_or(MoveError::UnknownCard)
-}
+    /// Koszt z karty, dopłata za sprzężenie (R-CZA-06), a na końcu redukcja specjalizacji,
+    /// liczona już z dopłatą (R-CZA-09, Z-SPC).
+    pub(crate) fn spell_cost(&self, card: &CardDef) -> SpellCost {
+        let mut cost = SpellCost {
+            focus: i32::from(card.cost.focus),
+            stamina: i32::from(card.cost.stamina),
+            scale: 1,
+        };
+        if let Some(coupling) = card.keywords.coupling {
+            let level = self.schools.level(coupling.school);
+            if level >= coupling.level.max(1) {
+                cost.focus += i32::from(level);
+                cost.stamina += 5 * i32::from(level);
+                cost.scale = i16::from(level);
+            }
+        }
+        let reduce = |value: i32| (2 * value + 1) / 3;
+        match self.specialization {
+            Some(Specialization::School(school)) if card.requires.level(school) > 0 => {
+                cost.stamina = reduce(cost.stamina);
+            }
+            Some(Specialization::Essence) => cost.stamina = reduce(cost.stamina),
+            Some(Specialization::Concentration) => cost.focus = reduce(cost.focus),
+            Some(Specialization::School(_)) | None => {}
+        }
+        cost
+    }
 
-fn hand_card(player: &PlayerState, index: u8) -> Result<CardId, MoveError> {
-    player
-        .hand
-        .get(usize::from(index))
-        .copied()
-        .ok_or(MoveError::InvalidHandIndex)
+    fn cost(&self, content: &Content<'_>, mv: &Move) -> MoveCost {
+        let changes = changes_between(&self.attacks, &self.defenses, mv);
+        let spell = self
+            .cast_card(content, mv.card)
+            .ok()
+            .flatten()
+            .map(|card| self.spell_cost(card));
+        MoveCost {
+            changes,
+            focus: i32::from(changes) * self.rules.duel.change_cost
+                + spell.map_or(0, |cost| cost.focus),
+            stamina: spell.map_or(0, |cost| cost.stamina),
+        }
+    }
+
+    fn check(&self, content: &Content<'_>, mv: &Move, cost: &MoveCost) -> Result<(), MoveError> {
+        if self.finished {
+            return Err(MoveError::WrongPhase);
+        }
+        if let CardAction::Discard(index) = mv.card {
+            // Odrzucenie nic nie kosztuje (R-RUN-06, p. 5; Z-DSC).
+            self.hand_card(index)?;
+        }
+        if let Some(card) = self.cast_card(content, mv.card)? {
+            if !self.schools.meets(&card.requires) {
+                return Err(MoveError::RequirementsNotMet);
+            }
+            if card.keywords.intervention && self.used_interventions.contains(&card.id) {
+                return Err(MoveError::InterventionUsed);
+            }
+        }
+        if self.focus < cost.focus {
+            return Err(MoveError::NotEnoughFocus);
+        }
+        if self.stamina < cost.stamina {
+            return Err(MoveError::NotEnoughStamina);
+        }
+        Ok(())
+    }
+
+    /// Definicja rzucanej karty albo `None`, gdy ruch nie rzuca karty.
+    fn cast_card<'c>(
+        &self,
+        content: &Content<'c>,
+        action: CardAction,
+    ) -> Result<Option<&'c CardDef>, MoveError> {
+        let CardAction::Cast(index) = action else {
+            return Ok(None);
+        };
+        let id = self.hand_card(index)?;
+        content.get(id).map(Some).ok_or(MoveError::UnknownCard)
+    }
+
+    fn hand_card(&self, index: u8) -> Result<CardId, MoveError> {
+        self.hand
+            .get(usize::from(index))
+            .copied()
+            .ok_or(MoveError::InvalidHandIndex)
+    }
 }

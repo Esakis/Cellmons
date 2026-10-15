@@ -23,6 +23,8 @@ pub(crate) enum Stream {
     DeckB,
     /// Losowanie inicjatywy (R-POJ-05).
     Initiative,
+    /// Losowe efekty kart, np. odrzucenie losowej karty z ręki.
+    Effects,
 }
 
 impl Stream {
@@ -38,6 +40,7 @@ impl Stream {
             Stream::DeckA => b"deck/A",
             Stream::DeckB => b"deck/B",
             Stream::Initiative => b"initiative",
+            Stream::Effects => b"effects",
         }
     }
 }
@@ -51,7 +54,7 @@ pub(crate) fn stream(seed: &[u8; 32], stream: Stream) -> ChaCha8Rng {
 }
 
 /// Liczba z przedziału `0..n` z rozkładu równomiernego (metoda Lemire'a, bez obciążenia).
-pub(crate) fn below(rng: &mut impl Rng, n: NonZeroU32) -> u32 {
+pub fn below(rng: &mut impl Rng, n: NonZeroU32) -> u32 {
     let n = n.get();
     // 2^32 mod n: wyniki z młodszą połową iloczynu poniżej progu są odrzucane.
     let threshold = n.wrapping_neg() % n;

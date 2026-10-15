@@ -7,8 +7,9 @@ rust-version.workspace = true
 publish.workspace = true
 
 [dependencies]
-# Na razie losowe pojedynki z narzędzi testowych silnika; boty dojdą w kroku F2.6.
+# Losowe postacie i talie z narzędzi testowych silnika; prawdziwa zawartość dojdzie w F3.
 engine = { workspace = true, features = ["testkit"] }
+engine-ai.workspace = true
 
 [lints.rust]
 unsafe_code = "forbid"

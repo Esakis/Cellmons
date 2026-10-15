@@ -2,7 +2,7 @@
 
 Projekt gry karcianej z elementami RPG (przeglądarka i Android), odtwarzającej zasady polskiej gry sieciowej **Cellmons** (Pogram, 2004–2009). Mechanika pochodzi z oryginału, a nazwy, teksty, fabuła i grafiki są własne. „Cellmons” zostaje tylko nazwą repozytorium. Nazwę produktu, znak towarowy i domeny opisuje `docs/20-nazwa-i-znak-towarowy.md`.
 
-**Status:** faza F1 z `docs/16-plan-wdrozenia.md`: rdzeń silnika walki. Silnik rozgrywa pełne pojedynki według zasad pojedynku, rund, ataków i końca walki, a karty mają już koszty i wymagania, ale jeszcze nie efekty. Działa deterministycznie natywnie i w WebAssembly i odtwarza powtórki. Następna faza to F2, system kart.
+**Status:** faza F2 z `docs/16-plan-wdrozenia.md`: system kart. Silnik rozgrywa pełne pojedynki z efektami kart, umagicznieniami i słowami kluczowymi, deterministycznie natywnie i w WebAssembly. Boty L0 (losowy) i L1 (heurystyczny) grają przez widok gracza, a `sim` rozgrywa nimi pojedynki. Następna faza to F3: treść, narzędzia i pierwsze grafiki.
 
 ## Uruchomienie lokalne
 
@@ -10,7 +10,8 @@ Potrzebne są: Rust (rustup), Node.js 24 LTS z pnpm (`corepack enable pnpm`) i D
 
 - `run.bat` uruchamia bazę danych, serwer gry i klienta, a potem otwiera przeglądarkę na http://localhost:5173.
 - `check.bat` wykonuje wszystkie kontrole z CI i kończy się podsumowaniem.
-- `cargo run -p sim -- duel [ziarno]` rozgrywa losowy pojedynek silnikiem i opisuje go runda po rundzie.
+- `cargo run -p sim -- duel [ziarno]` rozgrywa pojedynek botów i opisuje go runda po rundzie.
+- `cargo run --release -p sim -- run --n 100000` rozgrywa serię pojedynków botów i podsumowuje wyniki.
 
 ## Najważniejsze decyzje
 

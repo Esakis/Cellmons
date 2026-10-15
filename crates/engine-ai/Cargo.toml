@@ -9,6 +9,10 @@ publish.workspace = true
 [dependencies]
 engine.workspace = true
 engine-content.workspace = true
+rand_chacha.workspace = true
+
+[dev-dependencies]
+engine = { workspace = true, features = ["testkit"] }
 
 [lints]
 workspace = true

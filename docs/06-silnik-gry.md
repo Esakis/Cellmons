@@ -179,6 +179,14 @@ attack(state, a, slot, combo):
 - **Z-ENG-3:** leczenie nie podnosi Ż ponad `hp_max` (zgodne z walką #26519), chyba że efekt jawnie zwiększa `hp_max`.
 - **Z-ENG-4:** limit K (`duel.focus_cap`, w zasadach klasycznych brak limitu) ogranicza tylko przyrost z R-RUN-01. K zdobyta ponad limitem, np. z efektu karty, zostaje.
 
+**Decyzje silnika z fazy F2** (do zatwierdzenia):
+- **Z-ENG-5:** efekt przywracający W (rodzina `stamina`, `drain` z puli W) nie podnosi W ponad W_max, tak jak leczenie przy Z-ENG-3. W nie spada poniżej 0.
+- **Z-ENG-6:** efekty wykonane przez umagicznienie nie wyzwalają kolejnych umagicznień (np. obrażenia z umagicznienia nie uruchamiają `OnDamageTaken`). Wyklucza to nieskończone łańcuchy i uzależnienie wyniku od kolejności rejestracji.
+- Dar (R-POJ-07, Z-GFT) jest zwykłym umagicznieniem zarejestrowanym przed 1. rundą, więc można go rozproszyć.
+- Czas trwania `WhileActive` (modyfikator działa, dopóki umagicznienie jest aktywne) ma sens tylko w umagicznieniach. W czarze natychmiastowym taki efekt nic nie robi.
+- Sprzężenie (R-CZA-06) mnoży wartości efektów `StatMod`, `Heal`, `Damage`, `Stamina`, `Focus` i `Drain` przez poziom szkoły rzucającego, gdy ten poziom sięga progu sprzężenia. Pozostałe rodziny działają bez zmian.
+- `SwapChoices` zamienia ataki z obronami po ujawnieniu ruchów. Zamienione ustawienia są punktem odniesienia przy liczeniu kosztu zmian w następnej rundzie (R-RUN-05).
+
 ## 6. System efektów
 
 ### 6.1. Definicja karty w czasie wykonania
@@ -239,6 +247,14 @@ Wyzwalacze: `OnRound` (faza czarów, R-CZA-02), `BeforeAttack`, `OnHit`, `OnBloc
 
 `efektywna = max(0, baza + trwałe_zmiany + Σ modyfikatory_umagicznień + modyfikatory_rundy)` (Z-ENG-2). Wartości liczone leniwie z flagą „brudne” przy każdej zmianie listy umagicznień lub modyfikatorów. Specjalizacja (R-CZA-09) i sprzężenia (R-CZA-06) modyfikują koszty karty w `validate_move` i przy rzucaniu.
 
+### 6.4a. Implementacja w fazie F2
+
+- `effect.rs`: enum `Effect` z rodzinami `StatMod`, `StatSet`, `SwapStats`, `Heal`, `Damage`, `Stamina`, `Focus`, `Drain`, `ForceHit`, `ForceMiss`, `Unblockable`, `SwapChoices`, `DamageTakenMult`, `SchoolMod`, `Hand`, `Dispel` i `ConditionalWin` (R-KON-06). Przeciwzaklęcie i karta losowa są słowami kluczowymi (`Keywords`), a nie rodzinami. Efekty `custom` dojdą razem z treścią w F3.
+- Czas trwania: `Duel`, `Round`, `WhileActive`. Wyzwalacze umagicznień: `OnRound`, `OnHit`, `OnBlocked`, `OnDamageTaken`, `OnRoundEnd`; `OnHit` i `OnBlocked` mogą mieć filtr ataku (`AttackFilter`). Wyzwalacz `BeforeAttack` ze szkicu nie był potrzebny: wymuszone trafienia i chybienia ustawiają efekty rundy.
+- `enchant.rs`: lista aktywnych umagicznień (najwyżej `MAX_ENCHANTMENTS`), wywoływanych w kolejności rzucenia; premie ciągłe liczone w warstwach statystyk, szkół i mnożnika obrażeń.
+- `card.rs`: `CardKind` (`Instant` albo `Enchantment(Trigger)`), `Keywords` (interwencja, przeciwzaklęcie, sprzężenie, karta losowa) i opcjonalny `Condition` (R-CZA-08).
+- Zagrana karta schodzi z ręki przy ujawnieniu ruchów, a wygrane warunkowe są sprawdzane przed nokautem (R-KON-06).
+
 ### 6.5. Zdarzenia
 
 Każda zmiana stanu emituje zdarzenie. Zdarzenia są jedynym materiałem dla animacji klienta i dla zapisu powtórki „do wyświetlenia”. Silnik zapisuje w nich pełne dane; to, co widzi każdy gracz (kolumna „Widoczność”), wybiera warstwa widoków (faza F5) i protokół (faza F7).
@@ -256,6 +272,8 @@ Każda zmiana stanu emituje zdarzenie. Zdarzenia są jedynym materiałem dla ani
 | `Healed` / `Damaged` | strona, wartość, źródło | publiczne |
 | `CardDrawn` | strona, karta | tylko właściciel (przeciwnik dostaje `CardDrawnHidden`) |
 | `DuelEnded` | wynik, powód | publiczne |
+
+W fazie F2 doszły m.in. `ResourceChanged`, `AttackMissed`, `ChoicesSwapped`, `AttackOverride`, `DamageTakenChanged`, `SchoolChanged`, `RandomSpell`, `SpellFailed` i `ForcedDiscard`. Pełna lista z opisami jest w `crates/engine/src/event.rs`.
 
 ## 7. Losowość i determinizm
 
@@ -277,6 +295,8 @@ Każda zmiana stanu emituje zdarzenie. Zdarzenia są jedynym materiałem dla ani
 - skrót zobowiązania do ziarna (ADR-007), bez ziarna.
 
 `PlayerView` jest podstawą wiadomości `DuelStart` i `DuelSnapshot` (`07-protokol-sieciowy.md`).
+
+Implementacja (F2.6): `engine::view` i `PlayerView` z metodami `validate_move`, `preview` i `default_move`, które dają te same wyniki co funkcje na pełnym stanie (test `checking_moves_on_the_view_gives_the_same_answers_as_on_the_full_state`). Na widoku działają boty z `engine-ai`. Skrót zobowiązania do ziarna dojdzie razem z protokołem w F7.
 
 ## 9. Powtórki
 
@@ -311,6 +331,8 @@ Techniki:
 Pomiary: `criterion` (natywnie, `cargo bench -p engine`), benchmark w przeglądarce przez Playwright (`13-wydajnosc.md`).
 
 Pomiar po fazie F1 (2026-10-14, natywnie, Windows 10, karty bez efektów): mediana `resolve_round` 58 ns, pełny pojedynek 5 rund razem z `new_duel` 1,3 µs.
+
+Pomiar po fazie F2 (2026-10-15, natywnie, Windows 10, karty z efektami i umagicznieniem): mediana `resolve_round` 0,23 µs. `sim run` z botami L1 rozgrywa pojedynek w ok. 7,5 µs razem z losowaniem wejścia i decyzjami botów.
 
 ## 11. Testowalność
 

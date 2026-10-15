@@ -16,7 +16,10 @@ const B: Stats = stats(4, 2, 7, 1, 100, 45);
 
 fn intervention(id: u16) -> CardDef {
     CardDef {
-        keywords: Keywords { intervention: true },
+        keywords: Keywords {
+            intervention: true,
+            ..Keywords::default()
+        },
         ..noop_card(id, 1, 4)
     }
 }

@@ -1,11 +1,10 @@
-//! Karty w pojedynku: koszty, wymagania szkół i słowa kluczowe (`docs/06-silnik-gry.md`, rozdz. 6.1).
-//!
-//! Efekty kart dochodzą w fazie F2. W F1 rzucenie karty pobiera koszty i odkłada ją na stos
-//! odrzuconych.
+//! Karty w pojedynku: koszty, wymagania szkół, słowa kluczowe i efekty
+//! (`docs/06-silnik-gry.md`, rozdz. 6.1).
 
 use std::fmt;
 
-use crate::types::Schools;
+use crate::effect::{Effects, Trigger};
+use crate::types::{School, Schools};
 
 /// Identyfikator karty z treści gry (`content/cards`).
 pub type CardId = u16;
@@ -17,21 +16,65 @@ pub struct Cost {
     pub stamina: u16,
 }
 
-/// Słowa kluczowe karty (R-CZA-03…07). Pozostałe słowa kluczowe dochodzą w fazie F2.
+/// Słowa kluczowe karty (R-CZA-03…07).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Keywords {
     /// Interwencja: najwyżej jedno rzucenie tej karty w pojedynku (R-CZA-03).
     pub intervention: bool,
+    /// Przeciwzaklęcie: anuluje czar przeciwnika z tej rundy (R-CZA-04, R-CZA-05).
+    pub counter: bool,
+    /// Sprzężenie ze szkołą (R-CZA-06).
+    pub coupling: Option<Coupling>,
+    /// Karta losowa: przy rzuceniu zastępuje ją losowa karta z puli (R-CZA-07).
+    pub random: bool,
+}
+
+/// Sprzężenie ze szkołą `school` od poziomu `level` (R-CZA-06): przy poziomie postaci co najmniej
+/// `level` karta kosztuje dodatkowo 1 K i 5 W za każdy poziom tej szkoły, a liczbowe wartości jej
+/// efektów mnożą się przez ten poziom.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Coupling {
+    pub school: School,
+    pub level: u8,
+}
+
+/// Warunek działania karty (R-CZA-08) albo wygranej warunkowej (R-KON-06), z punktu widzenia
+/// strony, której karta działa.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Condition {
+    /// Trwa runda co najmniej o tym numerze.
+    RoundAtLeast(u8),
+    /// Procent życia strony jest wyższy niż przeciwnika (porównanie jak w R-KON-03).
+    HpPercentAhead,
+    /// Przeciwnik nie ma W.
+    OpponentExhausted,
 }
 
 /// Definicja karty potrzebna silnikowi.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CardDef {
     pub id: CardId,
     /// Wymagane poziomy szkół; 0 oznacza brak wymagania (R-ENT-07).
     pub requires: Schools,
     pub cost: Cost,
+    pub kind: CardKind,
     pub keywords: Keywords,
+    /// Warunek działania: gdy nie jest spełniony przy rozpatrzeniu, koszty są pobrane, a efektu
+    /// nie ma (R-CZA-08, Z-CND).
+    pub condition: Option<Condition>,
+    /// Efekty wykonywane po kolei: przy rzuceniu czaru zwykłego (R-RUN-12) albo przy każdym
+    /// wyzwoleniu umagicznienia (R-CZA-02).
+    pub effects: Effects,
+}
+
+/// Typ karty (R-CZA-01, R-CZA-02).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CardKind {
+    /// Czar zwykły: efekty działają raz, przy rzuceniu.
+    Instant,
+    /// Umagicznienie: działa od rzucenia do końca pojedynku albo do rozproszenia. Efekty
+    /// „póki działa” (`Duration::WhileActive`) działają ciągle, pozostałe przy każdym wyzwoleniu.
+    Enchantment(Trigger),
 }
 
 /// Treść gry widziana przez silnik: wersja i karty posortowane ściśle rosnąco według `id`.

@@ -5,6 +5,8 @@
 //! sprawdza, że każda reguła z zakresu silnika ma test.
 
 mod card;
+mod effect;
+mod enchant;
 mod end;
 mod event;
 mod hash;
@@ -16,6 +18,7 @@ mod rules;
 mod setup;
 mod state;
 mod types;
+mod view;
 
 #[cfg(any(test, feature = "testkit"))]
 pub mod testkit;
@@ -23,7 +26,14 @@ pub mod testkit;
 #[cfg(test)]
 mod tests;
 
-pub use card::{CardDef, CardId, Content, ContentError, Cost, Keywords};
+pub use card::{
+    CardDef, CardId, CardKind, Condition, Content, ContentError, Cost, Coupling, Keywords,
+};
+pub use effect::{
+    AttackFilter, Duration, Effect, Effects, HandAction, MAX_EFFECTS, Pool, Resource, StatPair,
+    Target, Trigger,
+};
+pub use enchant::MAX_ENCHANTMENTS;
 pub use end::{Outcome, Reason, Termination, end_by};
 pub use event::{Event, EventBuf};
 pub use hash::state_hash;
@@ -38,7 +48,13 @@ pub use rules::{
 };
 pub use setup::{AvatarSnapshot, DuelSetup, PlayerSetup, SetupError, new_duel};
 pub use state::{DuelState, Phase, PlayerState};
-pub use types::{Kind, MAX_POOL, MAX_SCHOOL_LEVEL, MAX_STAT, SLOTS, School, Schools, Side, Stats};
+pub use types::{
+    Kind, MAX_POOL, MAX_SCHOOL_LEVEL, MAX_STAT, SCHOOLS, SLOTS, School, Schools, Side,
+    Specialization, Stat, Stats,
+};
+
+pub use rng::below as uniform_below;
+pub use view::{PlayerView, SideView, view};
 
 /// Wersja silnika, zapisywana w powtórkach (`docs/06-silnik-gry.md`, rozdz. 9).
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");

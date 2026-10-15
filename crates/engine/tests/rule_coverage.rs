@@ -6,21 +6,22 @@ use std::fs;
 use std::path::Path;
 
 /// Rodziny reguł, które implementuje silnik.
-const FAMILIES: &[&str] = &["R-POJ-", "R-RUN-", "R-ATK-", "R-KON-"];
+const FAMILIES: &[&str] = &["R-POJ-", "R-RUN-", "R-ATK-", "R-KON-", "R-CZA-"];
 
 /// Reguły spoza tych rodzin, które silnik też sprawdza.
-const EXTRA: &[&str] = &["R-TAL-01", "R-TAL-02", "R-TAL-05", "R-CZA-03"];
+const EXTRA: &[&str] = &["R-TAL-01", "R-TAL-02", "R-TAL-05"];
 
 /// Reguły z tych rodzin realizowane później albo poza silnikiem.
 const DEFERRED: &[(&str, &str)] = &[
-    ("R-POJ-07", "dar jako umagicznienie, faza F2.3"),
     (
         "R-RUN-07",
         "zatwierdzenie ruchu i informacja dla przeciwnika, serwer w fazie F7",
     ),
     ("R-RUN-08", "limity czasu na ruch, serwer w fazie F7"),
-    ("R-RUN-13", "efekty umagicznień na koniec rundy, faza F2.3"),
-    ("R-KON-06", "wygrane warunkowe z efektów kart, faza F2.4"),
+    (
+        "R-CZA-10",
+        "lista kategorii efektów dla projektantów treści, bez osobnej reguły silnika",
+    ),
 ];
 
 /// Identyfikatory reguł w kolejności z dokumentu (definicje mają postać `**R-XXX-NN.`).
