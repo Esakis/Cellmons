@@ -298,6 +298,8 @@ W fazie F2 doszły m.in. `ResourceChanged`, `AttackMissed`, `ChoicesSwapped`, `A
 
 Implementacja (F2.6): `engine::view` i `PlayerView` z metodami `validate_move`, `preview` i `default_move`, które dają te same wyniki co funkcje na pełnym stanie (test `checking_moves_on_the_view_gives_the_same_answers_as_on_the_full_state`). Na widoku działają boty z `engine-ai`. Skrót zobowiązania do ziarna dojdzie razem z protokołem w F7.
 
+Od F4 `PlayerView::sample_state(content, opponent_hand, decks, seed)` tworzy hipotetyczny stan na potrzeby L3. Prywatny snapshot przechowuje wyłącznie jawne warstwy statystyk, umagicznienia i efekty rundy; obie ręce i talie są w nim wyczyszczone, a RNG nie jest kopiowany. Karty ukryte i nowe ziarno podaje bot. Metoda sprawdza długości i identyfikatory kart. Test odtwarzania zachowuje pełne warstwy efektów bez podwójnego naliczania premii ciągłych.
+
 ## 9. Powtórki
 
 ```rust
@@ -312,6 +314,8 @@ struct ReplayRecord {
 - **Rozmiar:** ok. 200–400 B w Protobuf. Dodatkowo serwer zapisuje skompresowaną listę zdarzeń (ok. 0,5–1 KB), żeby stare powtórki dało się wyświetlić nawet po zmianie silnika.
 - **Odtworzenie:** `replay()` buduje stan z `DuelSetup` i aplikuje ruchy. Wynik musi się zgadzać z zapisanym (test regresji na korpusie powtórek, `14-testy-i-jakosc.md`).
 - **Zgodność:** zmiana zasad, która zmienia wynik istniejących powtórek, podbija główną wersję silnika. Powtórkę odtwarza silnik zgodny według reguł Cargo: przy wersji 0.x z tą samą częścią minor, od 1.0 z tą samą częścią major (`Version::can_replay`). Serwer przechowuje powtórki z wersją i wyświetla stare z zapisanych zdarzeń.
+
+**Poprawki po przeglądzie F4 (silnik 0.2.0).** `stat_set` i `swap_stats` odejmują aktywne premie ciągłe przy wyznaczaniu warstwy trwałej, więc nie naliczają ich drugi raz. Hash stanu koduje również wyzwalacz i pełne, przeskalowane efekty każdego umagicznienia. Wymuszenia ataków są scalane według strony, wyniku i filtra (najwyżej 96 kombinacji); ponowne wyzwolenie zużytego `first_only` uzbraja je ponownie. Warunki wygranej są deduplikowane (najwyżej 3 na stronę). Żaden z tych buforów nie odrzuca poprawnych efektów z powodu liczby aktywnych umagicznień. Te poprawki zmieniają część wyników i skróty, dlatego powtórki 0.1.x wymagają poprzedniego silnika.
 
 ## 10. Wydajność
 

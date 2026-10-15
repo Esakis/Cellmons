@@ -1,4 +1,4 @@
-//! Boty (`docs/11-ai-i-symulacje.md`, rozdz. 3): L0 losowy i L1 heurystyczny. Bot widzi tylko
+//! Boty L0–L3 (`docs/11-ai-i-symulacje.md`, rozdz. 3). Bot widzi tylko
 //! `PlayerView`, czyli to samo co człowiek („Uczciwość botów”).
 
 use std::num::NonZeroU32;
@@ -9,14 +9,26 @@ use engine::{
 };
 use rand_chacha::ChaCha8Rng;
 use rand_chacha::rand_core::{Rng, SeedableRng};
+use serde::Deserialize;
+
+mod adaptive;
+mod profiles;
+mod search;
+
+pub use adaptive::OpponentModel;
+pub use profiles::{Archetype, BotProfile, Profiles, training_profiles};
 
 /// Poziom bota.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
 pub enum Level {
     /// Losuje jeden z dozwolonych ruchów z rozkładu równomiernego.
     L0,
     /// Heurystyki: obrony, ataki, oszczędzanie K, czary o najlepszej wartości na koszt.
     L1,
+    /// Model ujawnionych zachowań i odpowiedź na przewidywany rozkład.
+    L2,
+    /// Próbkowanie kart i strategia mieszana dla macierzy rozstrzygnięć silnika.
+    L3,
 }
 
 /// Prawdopodobieństwo losowej zmiany jednego slotu przez L1, w procentach (ε z `docs/11`).
@@ -27,6 +39,11 @@ const EPSILON_PERCENT: u32 = 15;
 pub struct Bot {
     level: Level,
     rng: ChaCha8Rng,
+    model: OpponentModel,
+    aggression: i32,
+    spell_bias: i32,
+    epsilon: u32,
+    temperature: i32,
 }
 
 impl Bot {
@@ -37,10 +54,17 @@ impl Bot {
         bytes[8] = match level {
             Level::L0 => 0,
             Level::L1 => 1,
+            Level::L2 => 2,
+            Level::L3 => 3,
         };
         Self {
             level,
             rng: ChaCha8Rng::from_seed(bytes),
+            model: OpponentModel::default(),
+            aggression: 100,
+            spell_bias: 100,
+            epsilon: EPSILON_PERCENT,
+            temperature: 300,
         }
     }
 
@@ -51,10 +75,37 @@ impl Bot {
 
     /// Ruch na bieżącą rundę; zawsze poprawny dla widoku `view`.
     pub fn choose(&mut self, view: &PlayerView, content: &Content<'_>) -> Move {
+        self.observe(view);
+        if !matches!(view.phase, engine::Phase::AwaitingMoves) {
+            return view.default_move();
+        }
         match self.level {
             Level::L0 => self.random_move(view, content),
             Level::L1 => self.heuristic_move(view, content),
+            Level::L2 => self.adaptive_move(view, content),
+            Level::L3 => self.search_move(view, content),
         }
+    }
+
+    /// Przekaż widok po rozstrzygnięciu rundy, także ostatniej. Nie losuje ruchu.
+    /// Powtórne przekazanie tego samego widoku nie dopisuje obserwacji.
+    pub fn observe(&mut self, view: &PlayerView) {
+        self.model.observe(view);
+    }
+
+    /// Model można zachować między pojedynkami danego przeciwnika. Nie zawiera kart.
+    pub fn model(&self) -> &OpponentModel {
+        &self.model
+    }
+
+    pub fn set_model(&mut self, mut model: OpponentModel) {
+        model.reset_duel();
+        self.model = model;
+    }
+
+    /// Wywołaj przed kolejnym pojedynkiem, gdy zachowujesz tę samą instancję bota.
+    pub fn reset_duel(&mut self) {
+        self.model.reset_duel();
     }
 
     fn pick(&mut self, n: usize) -> usize {
@@ -114,7 +165,7 @@ impl Bot {
                 mv = previous;
             }
         }
-        if self.rng.next_u32() % 100 < EPSILON_PERCENT {
+        if self.rng.next_u32() % 100 < self.epsilon {
             let slot = self.pick(2 * SLOTS);
             let previous = mv;
             if slot < SLOTS {
@@ -229,6 +280,9 @@ fn best_card(view: &PlayerView, content: &Content<'_>) -> CardAction {
 
 /// Przybliżona wartość karty w punktach Ż z punktu widzenia rzucającego.
 fn card_value(view: &PlayerView, def: &CardDef) -> i32 {
+    if !card_ready(view, def) {
+        return 0;
+    }
     let remaining = i32::from(view.rules.duel.rounds.saturating_sub(view.round)) + 1;
     let repeats = match def.kind {
         CardKind::Enchantment(Trigger::OnRound | Trigger::OnRoundEnd) => remaining,
@@ -240,6 +294,19 @@ fn card_value(view: &PlayerView, def: &CardDef) -> i32 {
         .map(|effect| effect_value(view, effect, remaining))
         .sum::<i32>()
         * repeats
+}
+
+/// Warunki karty są sprawdzane przed jej efektami; warunki `ConditionalWin` dopiero
+/// na końcu rundy, dlatego nie odrzucamy ich tutaj na podstawie bieżącego stanu.
+fn card_ready(view: &PlayerView, def: &CardDef) -> bool {
+    def.condition.is_none_or(|condition| match condition {
+        Condition::RoundAtLeast(round) => view.round >= round,
+        Condition::OpponentExhausted => view.opponent.stamina == 0,
+        Condition::HpPercentAhead => {
+            i64::from(view.me.hp.max(0)) * i64::from(view.opponent.hp_start)
+                > i64::from(view.opponent.hp.max(0)) * i64::from(view.me.hp_start)
+        }
+    })
 }
 
 fn effect_value(view: &PlayerView, effect: &Effect, remaining: i32) -> i32 {

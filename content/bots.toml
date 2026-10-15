@@ -1,0 +1,48 @@
+# Wartości osobowości: 100 = neutralna, zakres 0–200; temperatura w tysięcznych.
+[[bots]]
+id = "novice"
+name_pl = "Nowicjusz"
+name_en = "Novice"
+level = "L0"
+aggression = 100
+spell_bias = 100
+epsilon_percent = 15
+temperature_milli = 300
+deck_archetype = "balanced"
+avatar_pool = [1, 2, 3, 4, 5, 6]
+
+[[bots]]
+id = "apprentice"
+name_pl = "Uczeń"
+name_en = "Apprentice"
+level = "L1"
+aggression = 120
+spell_bias = 100
+epsilon_percent = 15
+temperature_milli = 300
+deck_archetype = "burst"
+avatar_pool = [1, 2, 3, 4, 5, 6]
+
+[[bots]]
+id = "tactician"
+name_pl = "Taktyk"
+name_en = "Tactician"
+level = "L2"
+aggression = 200
+spell_bias = 80
+epsilon_percent = 15
+temperature_milli = 1000
+deck_archetype = "endurance"
+avatar_pool = [1, 2, 3, 4, 5, 6]
+
+[[bots]]
+id = "archmage"
+name_pl = "Arcymag"
+name_en = "Archmage"
+level = "L3"
+aggression = 130
+spell_bias = 120
+epsilon_percent = 15
+temperature_milli = 300
+deck_archetype = "enchantment"
+avatar_pool = [1, 2, 3, 4, 5, 6]

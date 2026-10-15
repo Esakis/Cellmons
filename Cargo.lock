@@ -343,7 +343,7 @@ checksum = "3d52eff69cd5e647efe296129160853a42795992097e8af39800e1060caeea9b"
 
 [[package]]
 name = "content-compiler"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "blake3",
  "engine",
@@ -523,7 +523,7 @@ dependencies = [
 
 [[package]]
 name = "engine"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "arrayvec",
  "blake3",
@@ -536,30 +536,32 @@ dependencies = [
 
 [[package]]
 name = "engine-ai"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "engine",
  "engine-content",
  "rand_chacha",
+ "serde",
+ "toml",
 ]
 
 [[package]]
 name = "engine-cards"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "engine",
 ]
 
 [[package]]
 name = "engine-content"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "engine",
 ]
 
 [[package]]
 name = "engine-wasm"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "engine",
  "engine-ai",
@@ -1057,7 +1059,7 @@ checksum = "47d9d19d1d6efa0109d2f65ff4c85cddd50bd572e5a00127ab10987290bcefae"
 
 [[package]]
 name = "loadtest"
-version = "0.1.0"
+version = "0.2.0"
 
 [[package]]
 name = "lock_api"
@@ -1272,7 +1274,7 @@ dependencies = [
 
 [[package]]
 name = "protocol"
-version = "0.1.0"
+version = "0.2.0"
 
 [[package]]
 name = "quick-error"
@@ -1498,7 +1500,7 @@ dependencies = [
 
 [[package]]
 name = "server"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "axum",
@@ -1562,7 +1564,7 @@ dependencies = [
 
 [[package]]
 name = "sim"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "engine",
  "engine-ai",

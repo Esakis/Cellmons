@@ -10,6 +10,8 @@ publish.workspace = true
 engine.workspace = true
 engine-content.workspace = true
 rand_chacha.workspace = true
+serde = { workspace = true, features = ["derive"] }
+toml.workspace = true
 
 [dev-dependencies]
 engine = { workspace = true, features = ["testkit"] }

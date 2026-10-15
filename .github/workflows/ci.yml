@@ -53,6 +53,8 @@ jobs:
         run: cargo test --workspace --locked
       - name: Balans postaci startowych (sim matrix, kryterium F3.5)
         run: cargo run -q -p sim --locked -- matrix --n 500
+      - name: Hierarchia botów i profili AI, czas decyzji (kryteria F4)
+        run: cargo run -q --release -p sim --locked -- ai --n 1200
       - name: Serwer z bazą (/healthz, /readyz)
         env:
           DATABASE_URL: postgres://game:game@127.0.0.1:5432/game

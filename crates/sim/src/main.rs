@@ -4,6 +4,7 @@
 //! i podsumowuje wyniki; oba losują postacie i talie z kart testowych silnika. `sim matrix` gra
 //! prawdziwą treścią z `content/`: postaciami startowymi i ich taliami.
 
+mod ai;
 mod matrix;
 
 use std::collections::BTreeMap;
@@ -19,12 +20,15 @@ use engine::{
 use engine_ai::{Bot, Level};
 
 const USAGE: &str = "Użycie:
-  sim duel [ziarno] [--a L0|L1] [--b L0|L1] [--starters postać,postać]
+  sim duel [ziarno] [--a L0|L1|L2|L3] [--b L0|L1|L2|L3] [--starters postać,postać]
       pojedynek botów opisany runda po rundzie (domyślnie ziarno 1, boty L1); z --starters
       grają postacie startowe z content/ (np. dune_wanderer,ember_drake) na poziomie 1
-  sim run [--n liczba] [--seed ziarno] [--a L0|L1] [--b L0|L1]
+  sim run [--n liczba] [--seed ziarno] [--a L0|L1|L2|L3] [--b L0|L1|L2|L3]
       seria pojedynków z podsumowaniem (domyślnie 1000 pojedynków od ziarna 0, boty L1)
-  sim matrix [--n liczba] [--level poziom] [--bot L0|L1]
+  sim ai [--n liczba] [--level poziom] [--seed ziarno]
+      siła L2–L1 i L3–L2 na równych postaciach: boty domyślne i profile z ich taliami;
+      domyślnie 1000 walk na parę, poziom 1; kod wyjścia 1 przy niespełnionych progach F4
+  sim matrix [--n liczba] [--level poziom] [--bot L0|L1|L2|L3]
       macierz wygranych postaci startowych z taliami startowymi (domyślnie 2000 pojedynków
       na parę, poziom 1, boty L1); kod wyjścia 1, gdy któraś postać ma ponad 60% wygranych";
 
@@ -46,12 +50,19 @@ enum Command {
         level: u8,
         bot: Level,
     },
+    Ai {
+        games: u64,
+        level: u8,
+        seed: u64,
+    },
 }
 
 fn parse_level(text: &str) -> Option<Level> {
     match text {
         "L0" | "l0" => Some(Level::L0),
         "L1" | "l1" => Some(Level::L1),
+        "L2" | "l2" => Some(Level::L2),
+        "L3" | "l3" => Some(Level::L3),
         _ => None,
     }
 }
@@ -75,8 +86,10 @@ fn parse(args: &[String]) -> Option<Command> {
             "--a" => levels[0] = parse_level(value)?,
             "--b" => levels[1] = parse_level(value)?,
             "--seed" => seed = Some(value.parse().ok()?),
-            "--n" if command == "run" || command == "matrix" => count = Some(value.parse().ok()?),
-            "--level" if command == "matrix" => {
+            "--n" if command == "run" || command == "matrix" || command == "ai" => {
+                count = Some(value.parse().ok()?)
+            }
+            "--level" if command == "matrix" || command == "ai" => {
                 level = Some(
                     value
                         .parse()
@@ -94,6 +107,17 @@ fn parse(args: &[String]) -> Option<Command> {
         rest = &tail[1..];
     }
     match command.as_str() {
+        "ai" if levels == [Level::L1; 2]
+            && bot.is_none()
+            && starters.is_none()
+            && count != Some(0) =>
+        {
+            Some(Command::Ai {
+                games: count.unwrap_or(1000),
+                level: level.unwrap_or(1),
+                seed: seed.unwrap_or(0),
+            })
+        }
         "duel" => Some(Command::Duel {
             seed: seed.unwrap_or(1),
             levels,
@@ -121,6 +145,11 @@ fn main() -> ExitCode {
     };
     let out = &mut io::stdout().lock();
     let result = match command {
+        Command::Ai { games, level, seed } => match ai::report(games, level, seed, out) {
+            Ok(true) => Ok(()),
+            Ok(false) => return ExitCode::FAILURE,
+            Err(error) => Err(error),
+        },
         Command::Duel {
             seed,
             levels,
@@ -179,9 +208,13 @@ impl Duel {
     fn play_round(&mut self, content: &Content<'_>, events: &mut EventBuf) -> [PlayerTotals; 2] {
         let moves = Side::BOTH
             .map(|side| self.bots[side.index()].choose(&view(&self.state, side), content));
-        resolve_round(&mut self.state, content, &moves, events)
+        let totals = resolve_round(&mut self.state, content, &moves, events)
             .expect("boty dają tylko poprawne ruchy")
-            .totals
+            .totals;
+        for side in Side::BOTH {
+            self.bots[side.index()].observe(&view(&self.state, side));
+        }
+        totals
     }
 }
 
@@ -189,6 +222,8 @@ const fn level_name(level: Level) -> &'static str {
     match level {
         Level::L0 => "L0",
         Level::L1 => "L1",
+        Level::L2 => "L2",
+        Level::L3 => "L3",
     }
 }
 
@@ -793,7 +828,16 @@ mod tests {
         assert_eq!(parse(&args("matrix --level 21")), None);
         assert_eq!(parse(&args("matrix --a L0")), None);
         assert_eq!(parse(&args("run 5")), None);
-        assert_eq!(parse(&args("duel --a L2")), None);
+        assert_eq!(parse(&args("duel --a L4")), None);
+        assert_eq!(parse(&args("ai --n 0")), None);
+        assert_eq!(
+            parse(&args("ai --n 1200 --level 10 --seed 7")),
+            Some(Command::Ai {
+                games: 1200,
+                level: 10,
+                seed: 7
+            })
+        );
         assert_eq!(parse(&args("run --n")), None);
         assert_eq!(parse(&args("")), None);
     }

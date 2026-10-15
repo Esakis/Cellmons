@@ -4,11 +4,11 @@
 
 use arrayvec::ArrayVec;
 
-use crate::card::{CardId, Content};
-use crate::enchant::MAX_ENCHANTMENTS;
+use crate::card::{CardId, Condition, Content};
+use crate::enchant::{ActiveEnchantment, MAX_ENCHANTMENTS};
 use crate::moves::{CardAction, Move, MoveCost, MoveError, Mover, Preview};
 use crate::rules::{MAX_DECK_SIZE, MAX_HAND_SIZE, MAX_ROUNDS, RulesConfig};
-use crate::state::{DuelState, Phase};
+use crate::state::{AttackOverride, DuelState, MAX_OVERRIDES, MAX_WIN_CHECKS, Phase, PlayerState};
 use crate::types::{Kind, SLOTS, Schools, Side, Specialization, Stats};
 
 /// Jawne dane jednej strony, widoczne dla obu graczy.
@@ -51,6 +51,18 @@ pub struct PlayerView {
     pub specialization: Option<Specialization>,
     /// Aktywne umagicznienia obu stron w kolejności rzucenia (lista jawna, R-CZA-02).
     pub enchantments: ArrayVec<(Side, CardId), MAX_ENCHANTMENTS>,
+    // Tylko dane jawne: bez rąk, talii i RNG. Zachowuje m.in. skalowanie sprzężeń,
+    // kolejność umagicznień i modyfikatory sprzed przycięcia statystyk do zera.
+    simulation: SimulationSnapshot,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct SimulationSnapshot {
+    players: [PlayerState; 2],
+    enchantments: ArrayVec<ActiveEnchantment, MAX_ENCHANTMENTS>,
+    overrides: ArrayVec<AttackOverride, MAX_OVERRIDES>,
+    win_checks: ArrayVec<(Side, Condition), MAX_WIN_CHECKS>,
+    next_order: u16,
 }
 
 /// Widok pojedynku od strony `side`.
@@ -67,6 +79,17 @@ pub fn view(state: &DuelState, side: Side) -> PlayerView {
         hand: state.player(side).hand.clone(),
         specialization: state.player(side).specialization,
         enchantments: state.enchantments().collect(),
+        simulation: SimulationSnapshot {
+            players: state.players.clone().map(|mut player| {
+                player.hand.clear();
+                player.deck.clear();
+                player
+            }),
+            enchantments: state.enchantments.clone(),
+            overrides: state.overrides.clone(),
+            win_checks: state.win_checks.clone(),
+            next_order: state.next_order,
+        },
     }
 }
 
@@ -90,6 +113,54 @@ fn side_view(state: &DuelState, side: Side) -> SideView {
 }
 
 impl PlayerView {
+    /// Tworzy hipotetyczny stan do przeszukiwania, wyłącznie z jawnego snapshotu i kart
+    /// dostarczonych przez wywołującego. Nie odzyskuje prawdziwej ręki, talii ani RNG.
+    /// `decks` są w kolejności stron A, B (wierzch na końcu); długości muszą zgadzać się
+    /// z widokiem. Rozstrzyganie takiego stanu nie zmienia prawdziwego pojedynku.
+    pub fn sample_state(
+        &self,
+        content: &Content<'_>,
+        opponent_hand: &[CardId],
+        decks: [&[CardId]; 2],
+        seed: [u8; 32],
+    ) -> Option<DuelState> {
+        let mut players = self.simulation.players.clone();
+        for side in Side::BOTH {
+            let seen = if side == self.side {
+                &self.me
+            } else {
+                &self.opponent
+            };
+            let hand = if side == self.side {
+                self.hand.as_slice()
+            } else {
+                opponent_hand
+            };
+            let deck = decks[side.index()];
+            if hand.len() != usize::from(seen.hand_len)
+                || deck.len() != usize::from(seen.deck_len)
+                || hand.iter().chain(deck).any(|&id| content.get(id).is_none())
+            {
+                return None;
+            }
+            let player = &mut players[side.index()];
+            player.hand.try_extend_from_slice(hand).ok()?;
+            player.deck.try_extend_from_slice(deck).ok()?;
+        }
+        Some(DuelState {
+            rules: self.rules.clone(),
+            round: self.round,
+            phase: self.phase,
+            initiative: self.initiative,
+            players,
+            enchantments: self.simulation.enchantments.clone(),
+            overrides: self.simulation.overrides.clone(),
+            win_checks: self.simulation.win_checks.clone(),
+            next_order: self.simulation.next_order,
+            rng: crate::rng::stream(&seed, crate::rng::Stream::Effects),
+        })
+    }
+
     /// Sprawdza własny ruch tak samo jak `validate_move` na pełnym stanie.
     pub fn validate_move(&self, content: &Content<'_>, mv: &Move) -> Result<MoveCost, MoveError> {
         self.mover().validate(content, mv)

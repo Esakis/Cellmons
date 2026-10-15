@@ -10,7 +10,7 @@ use crate::enchant;
 use crate::event::{Event, EventBuf};
 use crate::rng;
 use crate::state::{AttackOverride, DuelState};
-use crate::types::{Kind, School, Side, Stat};
+use crate::types::{Kind, SLOTS, School, Side, Stat};
 
 /// Najwięcej efektów na jednej karcie.
 pub const MAX_EFFECTS: usize = 4;
@@ -371,8 +371,21 @@ impl EffectCtx<'_> {
                 }
             }
             Effect::ConditionalWin { condition } => {
-                // Pojemność wystarcza na wszystkie efekty jednej rundy.
-                let _ = self.state.win_checks.try_push((caster, condition));
+                // Numer rundy nie zmienia się przed sprawdzeniem końca. Nie rejestrujemy
+                // niemożliwych warunków, a duplikaty nie zmieniają wyniku (Z-IWN).
+                if matches!(condition, Condition::RoundAtLeast(round) if round > self.state.round) {
+                    return;
+                }
+                let check = (
+                    caster,
+                    match condition {
+                        Condition::RoundAtLeast(_) => Condition::RoundAtLeast(self.state.round),
+                        other => other,
+                    },
+                );
+                if !self.state.win_checks.contains(&check) {
+                    self.state.win_checks.push(check);
+                }
             }
         }
     }
@@ -393,9 +406,12 @@ impl EffectCtx<'_> {
     /// Statystyka efektywna równa `value` do końca pojedynku; znika też zmiana z bieżącej rundy.
     fn set_stat(&mut self, side: Side, stat: Stat, value: i32) {
         let old = self.state.stats(side).get(stat);
+        let bonus = enchant::stat_bonus(self.state, side, stat);
         let player = self.state.player_mut(side);
         let index = stat as usize;
-        player.permanent[index] = value.saturating_sub(player.base.get(stat));
+        player.permanent[index] = value
+            .saturating_sub(player.base.get(stat))
+            .saturating_sub(bonus);
         player.round_delta[index] = 0;
         self.stat_changed(side, stat, old);
     }
@@ -494,23 +510,32 @@ impl EffectCtx<'_> {
         self.change_resource(caster, resource, taken);
     }
 
-    /// Wymuszony wynik ataków strony `attacker` w tej rundzie. Bufor mieści efekty wszystkich
-    /// czarów jednej rundy (2 karty × 4 efekty × 2 strony) z dużym zapasem.
+    /// Identyczne wymuszenia działają wspólnie, także przy `first_only`: zużywa je ten sam
+    /// atak. Nowe wyzwolenie już zużytego wymuszenia uzbraja je ponownie.
     fn add_override(&mut self, attacker: Side, hit: bool, filter: AttackFilter) {
+        if filter.slot.is_some_and(|slot| usize::from(slot) >= SLOTS) {
+            return; // Taki filtr nigdy nie pasuje do żadnego ataku.
+        }
         let added = AttackOverride {
             attacker,
             hit,
             filter,
             used: false,
         };
-        if self.state.overrides.try_push(added).is_ok() {
-            self.events.push(Event::AttackOverride {
-                attacker,
-                hit,
-                filter,
-                source: self.source,
-            });
+        if let Some(existing) = self.state.overrides.iter_mut().find(|forced| {
+            forced.attacker == attacker && forced.hit == hit && forced.filter == filter
+        }) {
+            existing.used = false;
+        } else {
+            // MAX_OVERRIDES obejmuje wszystkie kombinacje strony, wyniku i filtra.
+            self.state.overrides.push(added);
         }
+        self.events.push(Event::AttackOverride {
+            attacker,
+            hit,
+            filter,
+            source: self.source,
+        });
     }
 
     fn multiply_damage_taken(&mut self, side: Side, percent: u16, duration: Duration) {

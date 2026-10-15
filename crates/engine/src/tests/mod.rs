@@ -12,6 +12,7 @@ mod hash;
 mod invariants;
 mod keywords;
 mod moves;
+mod regressions;
 mod replay;
 mod rng;
 mod round;

@@ -186,6 +186,8 @@ pub fn report(
     let bot = match bot {
         Level::L0 => "L0",
         Level::L1 => "L1",
+        Level::L2 => "L2",
+        Level::L3 => "L3",
     };
     writeln!(
         out,

@@ -12,11 +12,12 @@ use crate::types::{
     Kind, MAX_SCHOOL_LEVEL, SCHOOLS, SLOTS, Schools, Side, Specialization, Stat, Stats,
 };
 
-/// Najwięcej wymuszonych wyników ataków w jednej rundzie.
-pub(crate) const MAX_OVERRIDES: usize = 32;
+/// Wszystkie unikalne wymuszenia: 2 strony × 2 wyniki × 3 typy filtra × 4 sloty × first_only.
+/// Duplikaty są scalane, więc liczba wyzwoleń umagicznień nie zwiększa pojemności.
+pub(crate) const MAX_OVERRIDES: usize = 2 * 2 * 3 * (SLOTS + 1) * 2;
 
-/// Najwięcej wygranych warunkowych zgłoszonych w jednej rundzie.
-pub(crate) const MAX_WIN_CHECKS: usize = 16;
+/// Po trzy warunki na stronę: runda (stała w tej fazie), przewaga Ż i wyczerpanie W.
+pub(crate) const MAX_WIN_CHECKS: usize = 2 * 3;
 
 /// Mnożnik otrzymywanych obrażeń bez efektów, w procentach.
 pub(crate) const NORMAL_DAMAGE_PERCENT: u32 = 100;

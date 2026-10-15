@@ -2,7 +2,7 @@
 //! (`docs/06-silnik-gry.md`, rozdz. 7).
 
 use crate::card::{CardId, Condition};
-use crate::effect::AttackFilter;
+use crate::effect::{AttackFilter, Duration, Effect, HandAction, Pool, StatPair, Target, Trigger};
 use crate::enchant::ActiveEnchantment;
 use crate::end::{Outcome, Reason};
 use crate::rules::{CounterResolution, DeckRules, DefaultSettings, DuelRules, RulesConfig};
@@ -46,17 +46,27 @@ pub fn state_hash(state: &DuelState) -> u64 {
     out.0.update(&rng.get_word_pos().to_le_bytes());
     out.u8(enchantments.len() as u8);
     for active in enchantments {
-        // Wyzwalacz i efekty wynikają z karty w treści gry o wersji zapisanej w powtórce.
         let ActiveEnchantment {
             owner,
             card,
             order,
-            trigger: _,
-            effects: _,
+            trigger,
+            effects,
         } = active;
         out.side(*owner);
         out.u16(*card);
         out.u16(*order);
+        out.u8(match trigger {
+            Trigger::OnRound => 0,
+            Trigger::OnHit => 1,
+            Trigger::OnBlocked => 2,
+            Trigger::OnDamageTaken => 3,
+            Trigger::OnRoundEnd => 4,
+        });
+        out.u8(effects.len() as u8);
+        for effect in effects {
+            out.effect(*effect);
+        }
     }
     out.u16(*next_order);
     out.u8(win_checks.len() as u8);
@@ -125,13 +135,18 @@ impl Encoder {
             filter,
             used,
         } = *forced;
+        self.side(attacker);
+        self.u8(u8::from(hit));
+        self.filter(filter);
+        self.u8(u8::from(used));
+    }
+
+    fn filter(&mut self, filter: AttackFilter) {
         let AttackFilter {
             kind,
             slot,
             first_only,
         } = filter;
-        self.side(attacker);
-        self.u8(u8::from(hit));
         match kind {
             None => self.u8(0),
             Some(kind) => {
@@ -141,7 +156,150 @@ impl Encoder {
         }
         self.u8(slot.unwrap_or(u8::MAX));
         self.u8(u8::from(first_only));
-        self.u8(u8::from(used));
+    }
+
+    fn target(&mut self, target: Target) {
+        self.u8(match target {
+            Target::Caster => 0,
+            Target::Opponent => 1,
+            Target::Both => 2,
+        });
+    }
+
+    fn duration(&mut self, duration: Duration) {
+        self.u8(match duration {
+            Duration::Duel => 0,
+            Duration::Round => 1,
+            Duration::WhileActive => 2,
+        });
+    }
+
+    /// Efekty po skalowaniu sprzężenia, nie tylko identyfikator karty źródłowej.
+    fn effect(&mut self, effect: Effect) {
+        match effect {
+            Effect::StatMod {
+                target,
+                stat,
+                amount,
+                duration,
+            } => {
+                self.u8(0);
+                self.target(target);
+                self.u8(stat as u8);
+                self.i32(i32::from(amount));
+                self.duration(duration);
+            }
+            Effect::StatSet {
+                target,
+                stat,
+                value,
+            } => {
+                self.u8(1);
+                self.target(target);
+                self.u8(stat as u8);
+                self.i32(i32::from(value));
+            }
+            Effect::SwapStats { target, pair } => {
+                self.u8(2);
+                self.target(target);
+                self.u8(match pair {
+                    StatPair::Attacks => 0,
+                    StatPair::Defenses => 1,
+                    StatPair::Both => 2,
+                });
+            }
+            Effect::Heal { target, amount } => {
+                self.u8(3);
+                self.target(target);
+                self.u16(amount);
+            }
+            Effect::Damage { target, amount } => {
+                self.u8(4);
+                self.target(target);
+                self.u16(amount);
+            }
+            Effect::Stamina { target, amount } => {
+                self.u8(5);
+                self.target(target);
+                self.i32(i32::from(amount));
+            }
+            Effect::Focus { target, amount } => {
+                self.u8(6);
+                self.target(target);
+                self.i32(i32::from(amount));
+            }
+            Effect::Drain { pool, amount } => {
+                self.u8(7);
+                self.u8(match pool {
+                    Pool::Hp => 0,
+                    Pool::Stamina => 1,
+                    Pool::Focus => 2,
+                });
+                self.u16(amount);
+            }
+            Effect::ForceHit { target, filter } => {
+                self.u8(8);
+                self.target(target);
+                self.filter(filter);
+            }
+            Effect::ForceMiss { target, filter } => {
+                self.u8(9);
+                self.target(target);
+                self.filter(filter);
+            }
+            Effect::Unblockable { target, filter } => {
+                self.u8(10);
+                self.target(target);
+                self.filter(filter);
+            }
+            Effect::SwapChoices { target } => {
+                self.u8(11);
+                self.target(target);
+            }
+            Effect::DamageTakenMult {
+                target,
+                percent,
+                duration,
+            } => {
+                self.u8(12);
+                self.target(target);
+                self.u16(percent);
+                self.duration(duration);
+            }
+            Effect::SchoolMod {
+                target,
+                school,
+                amount,
+                duration,
+            } => {
+                self.u8(13);
+                self.target(target);
+                self.u8(school as u8);
+                self.i32(i32::from(amount));
+                self.duration(duration);
+            }
+            Effect::Hand {
+                target,
+                action,
+                count,
+            } => {
+                self.u8(14);
+                self.target(target);
+                self.u8(match action {
+                    HandAction::DiscardRandom => 0,
+                    HandAction::Draw => 1,
+                });
+                self.u8(count);
+            }
+            Effect::Dispel { target } => {
+                self.u8(15);
+                self.target(target);
+            }
+            Effect::ConditionalWin { condition } => {
+                self.u8(16);
+                self.condition(condition);
+            }
+        }
     }
 
     fn rules(&mut self, rules: &RulesConfig) {

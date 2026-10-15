@@ -44,6 +44,8 @@ Poprawki z kroku F3.5: obrony L1 ustawia przeciw typowi, który zada więcej obr
 - Ograniczenie przez K: ruchy, na które przeciwnika nie stać, mają prawdopodobieństwo 0.
 - Odpowiedź: najlepsza odpowiedź na przewidywany rozkład, wybierana przez softmax z temperaturą τ (domyślnie τ = 0,3). Daje to zachowanie silne, ale nie w pełni deterministyczne.
 
+**Implementacja F4.1 (`engine-ai/src/adaptive.rs`).** Model zlicza przejścia osobno dla sześciu slotów, poprzedniego typu i trzech faz walki (rundy 1–3, 4–6, 7–9). Prior Dirichleta 17:3 przewiduje zachowanie heurystyczne; obserwacje stopniowo zmieniają ten rozkład. Po każdym rozstrzygnięciu, także ostatniej rundy, wywołujący przekazuje `bot.observe(&view)`. Obserwacja jest idempotentna; ucieczka, rozłączenie i walkower nie dopisują nieujawnionego ruchu. `choose()` również aktualizuje model przed decyzją. Rozkład jest wspólny dla całych ustawień i odrzuca wszystkie, których koszt przekracza jawne K przeciwnika. Bot ocenia legalne ruchy, pomijając rzucenia kart o niespełnionych warunkach działania; osobne warunki wygranej są nadal oceniane na koniec rundy. Softmax ma deterministyczne przybliżenie stałoprzecinkowe `(1 + x/32)^32`. `model()` / `set_model()` pozwalają zachować historię jednego przeciwnika; `reset_duel()` usuwa przejście między walkami, zachowując statystyki.
+
 ### L3: przeszukiwanie (gra macierzowa)
 
 Dla każdej rundy:
@@ -64,9 +66,15 @@ stan końcowy: wygrana +1, remis 0, przegrana −1
 
 Wagi dobiera się przez rozgrywki bot przeciw botowi (przeszukiwanie siatki albo CMA-ES w `sim tune`).
 
+**Implementacja F4.2 (`engine-ai/src/search.rs`).** Do 24 kandydatów zawiera ruch bez zmian, najlepszy ruch dla każdej dostępnej akcji kartą i pozostałe ruchy według oceny L2. Bot losuje 8 możliwych układów kart, uwzględniając szkoły, jawne karty i limit kopii; jawne odrzuty zwiększają wagę popularności kart. Przy braku dostatecznej puli szkolnej uwzględnia uzupełnienia z całej puli ze zwracaniem (R-TAL-05), bez ograniczania ich limitem kopii. Bez losowego uzupełniania respektuje limit także dla kart spoza szkół (R-TAL-04). Każdy kandydat własny jest ten sam we wszystkich próbkach. Kolumny przeciwnika są politykami wyboru według rankingu, więc mogą zależeć od jego wylosowanej ręki. Macierz sumuje oceny po `resolve_round`, a dwustronny regret matching wykonuje 1000 iteracji i zwraca średnią strategię. Funkcja oceny uwzględnia procent Ż, W, K, statystyki w pozostałych rundach, umagicznienia i karty w ręce. Wynik końcowy ma pierwszeństwo przed oceną zasobów. To przeszukiwanie jednej rundy; rollouty i `sim tune` pozostają rozszerzeniami.
+
+Algorytm regret matching opisują [Neller i Lanctot (2013)](https://www.cs.gettysburg.edu/~tneller/modelai/2013/cfr/index.html). Ograniczenia próbkowania informacji ukrytych, w tym problem łączenia strategii z różnych determinizacji, omawiają [Cowling, Powley i Whitehouse (2012)](https://eprints.whiterose.ac.uk/id/eprint/75048/1/CowlingPowleyWhitehouse2012.pdf).
+
 ### Uczciwość botów
 
 Bot dostaje wyłącznie `PlayerView` (`06-silnik-gry.md`, rozdz. 8), czyli te same informacje co człowiek. Nie zna ręki przeciwnika, kolejności talii ani ziarna. API `engine-ai` nie przyjmuje `DuelState`, więc pilnuje tego system typów.
+
+`PlayerView::sample_state` buduje hipotetyczny stan z jawnego snapshotu, dostarczonych kart i nowego ziarna bota. Snapshot zachowuje warstwy statystyk i skalowane efekty umagicznień, ale usuwa obie ręce, obie talie i RNG. Własną rękę uzupełnia dopiero z jawnego pola `hand` widoku. Testy porównują widoki i decyzje przy różnych prawdziwych kartach, kolejnościach talii i ziarnach.
 
 ## 4. Profile i osobowości
 
@@ -82,6 +90,8 @@ Plik `content/bots.toml` definiuje boty:
 | `avatar_pool` | postacie, którymi bot może grać (rotacja, R-TRE-02) |
 
 Archetypy talii (z poradnika graczy S9): „zjadanie wytrzymałości”, „gra na koncentracji”, „umagicznienia”, „zmasowany atak”, „kumulacja obrażeń”, „odbieranie kart”, „jedna karta”. Każdy archetyp to szablon talii dopasowywany do szkół postaci bota.
+
+**Implementacja F4.3.** `training_profiles()` wczytuje wbudowane `content/bots.toml`: Nowicjusz (L0, `balanced`), Uczeń (L1, `burst`), Taktyk (L2, `endurance`) i Arcymag (L3, `enchantment`). Nazwy są w PL i EN. `profile.bot(seed)` konfiguruje osobowość; `profile.player(level, rotation)` wybiera postać z puli i buduje pełną talię zgodną z jej szkołami i limitem kopii. Wartości `aggression` i `spell_bias` są procentami 0–200 (100 neutralne), `epsilon_percent` to 0–100, a `temperature_milli` to 1–1000. Są to profile dla przyszłego ekranu treningu F5. Nieznane pola, powtórzone identyfikatory, błędne zakresy i odwołania do nieistniejących postaci są odrzucane; wszystkie profile i talie są sprawdzane testami w CI.
 
 ## 5. Przeciwnicy w wyprawach
 
@@ -101,6 +111,7 @@ Kolor nazwy przeciwnika (R-WYP-02): zielony, gdy jest niżej od gracza, żółty
 |---|---|---|
 | `sim duel` | pojedyncza walka z pełnym zapisem zdarzeń | log tekstowy, powtórka |
 | `sim run --n 100000 --a L1 --b L0` | seria pojedynków botów (od F2.6, na kartach testowych) | wygrane, remisy, powody końca, średnia liczba rund, przewaga inicjatywy, czas |
+| `sim ai --n 1200 --level 1 --seed 0` | F4: cztery serie L2–L1 i L3–L2, osobno boty domyślne z taliami startowymi oraz profile z własnymi taliami; jednakowe postacie z części wspólnej pul, rotacja stron | wygrane (remisy nie są wygranymi), 95% CI Wilsona, mediana/p95/max decyzji; kod 1, gdy którakolwiek seria nie spełnia 60% / 55% lub p95 L3 > 50 ms w release |
 | `sim matrix --n 2000 --level 1 --bot L1` | od F3.5: postacie startowe z taliami startowymi z `content/`, każda przeciw każdej, ze zmianą stron co pojedynek | macierz odsetków wygranych (remis = ½), wynik każdej postaci z 95% przedziałem ufności; kod wyjścia 1, gdy któraś postać przekracza 60% |
 | `sim duel 3 --starters dune_wanderer,ember_drake` | od F3.5: jeden pojedynek postaci startowych opisany runda po rundzie | log tekstowy |
 | `sim matrix --level 10 --bot L2 --n 2000` | każda postać przeciw każdej na tym samym poziomie | macierz współczynników wygranych z przedziałami ufności |
@@ -144,3 +155,18 @@ Inicjatywa jest stała przez cały pojedynek (R-POJ-05), więc może dawać trwa
 - Te same ziarno i stan dają ten sam ruch.
 - Regresja siły: nowa wersja bota nie może być słabsza od poprzedniej o więcej niż 3 p.p. w meczu bezpośrednim (1000 walk).
 - Hierarchia: L3 > L2 > L1 > L0 z istotnością statystyczną (kryteria w F4, `16-plan-wdrozenia.md`).
+
+Testy F4 sprawdzają także uczenie się po ujawnieniu rundy (łącznie z ostatnią), brak podwójnego zliczania i uczenia z ucieczek, przenoszenie modelu między walkami, zerowe prawdopodobieństwo ustawień przekraczających K, zachowanie interwencji do spełnienia warunku karty, próbki talii z losowymi uzupełnieniami, mieszanie strategii na grze papier–kamień–nożyce i wybór ruchu dominującego. `engine-wasm/tests/ai.rs` porównuje stały skrót pełnych pojedynków L2–L3 natywnie i w Node/WASM. Testy symulatora sprawdzają, że serie profili używają ich talii oraz jednakowych postaci po obu stronach.
+
+Pomiar po przeglądzie F4 (2026-10-15, silnik 0.2.0, Windows, release, `sim ai --n 1200`, poziom postaci 1, ziarno 0):
+
+| Scenariusz | Wygrane / remisy / porażki | Wygrane (95% CI) | p95 decyzji |
+|---|---|---|---|
+| Domyślne L2–L1, talie startowe | 766 / 243 / 191 | 63,8% (61,1–66,5%) | 0,08 ms |
+| Domyślne L3–L2, talie startowe | 689 / 343 / 168 | 57,4% (54,6–60,2%) | 9,4 ms |
+| Taktyk–Uczeń, talie profili | 759 / 231 / 210 | 63,2% (60,5–65,9%) | 0,07 ms |
+| Arcymag–Taktyk, talie profili | 672 / 323 / 205 | 56,0% (53,2–58,8%) | 8,6 ms |
+
+Przed strojeniem Taktyk z parametrami 90/110/300 osiągał 58,4% w scenariuszu CI. Po strojeniu ma `aggression = 200`, `spell_bias = 80`, `temperature_milli = 1000`; Arcymag ma `aggression = 130`. Dodatkowe serie po 2400 walk od niezależnego ziarna 100000 dały Taktykowi 1507 zwycięstw (62,8%), a Arcymagowi 1326 (55,3%). Parametry Ucznia i jego talia nie zostały osłabione.
+
+To wyniki dla treści startowej na poziomie 1; zmiany treści i dodatkowe poziomy postaci wymagają osobnych pomiarów. `check.bat` i CI powtarzają wszystkie cztery scenariusze z tabeli i blokują zmianę, jeśli choć jeden nie spełnia progu.

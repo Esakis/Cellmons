@@ -25,12 +25,13 @@ Na Windowsie Rust potrzebuje narzędzi C++ z Visual Studio (Build Tools, składn
 | `run.bat -Stop` | zatrzymuje bazę; dane zostają w woluminie Dockera |
 | `check.bat` | wszystkie kontrole z CI: Rust, silnik do WebAssembly z testem natywne = WASM, klient, proto, testy e2e i serwer z bazą |
 | `check.bat -Quick` | szybsze sprawdzenie, bez testów e2e i testu serwera z bazą |
-| `cargo run -p sim -- duel [ziarno] [--a L0\|L1] [--b L0\|L1]` | pojedynek botów (domyślnie L1 przeciw L1) na losowych postaciach i kartach testowych, opisany runda po rundzie |
+| `cargo run -p sim -- duel [ziarno] [--a L0\|L1\|L2\|L3] [--b L0\|L1\|L2\|L3]` | pojedynek botów (domyślnie L1 przeciw L1) na losowych postaciach i kartach testowych, opisany runda po rundzie; `--starters nazwa,nazwa` wybiera prawdziwą treść |
 | `cargo run --release -p sim -- run [--n 1000] [--seed 0] [--a L1] [--b L1]` | seria pojedynków botów: wygrane, remisy, powody końca, średnia liczba rund, przewaga inicjatywy i czas |
 | `cargo run -p content-compiler -- check` | sprawdza treść w `content/` i to, czy wygenerowany kod w `engine-content` jest aktualny |
 | `cargo run -p content-compiler -- build` | po zmianie treści: generuje `crates/engine-content/src/generated.rs` i pliki klienta w `target/content/` |
 | `cargo run -p content-compiler -- curves --weights 35,30,20,15 --school 5:combat=2` | wypisuje tabelę rozwoju postaci (poziomy 2–20) do wklejenia w `content/avatars/*.toml` |
 | `cargo run --release -p sim -- matrix [--n 2000] [--level 1] [--bot L1]` | macierz wygranych postaci startowych z taliami startowymi; kod wyjścia 1, gdy któraś ma ponad 60% |
+| `cargo run --release -p sim -- ai [--n 1200] [--level 1] [--seed 0]` | F4: L2–L1 i L3–L2 na równych postaciach, osobno boty domyślne z taliami startowymi i profile z ich własnymi taliami; rotacja stron, 95% CI i czasy decyzji; kod 1 poniżej progów 60% / 55% lub przy p95 L3 > 50 ms |
 | `cargo run -p sim -- duel [ziarno] --starters dune_wanderer,ember_drake` | pojedynek postaci startowych opisany runda po rundzie |
 | `cargo bench -p engine` | pomiar rozstrzygania rundy i całego pojedynku (`docs/06-silnik-gry.md`, rozdz. 10) |
 
@@ -39,6 +40,7 @@ Na Windowsie Rust potrzebuje narzędzi C++ z Visual Studio (Build Tools, składn
 - Konfiguracja lokalna jest w pliku `.env`, który `run.bat` tworzy z `.env.example`. Plik `.env` nie trafia do repozytorium.
 - Lokalna baza używa portu 5433, a serwer gry portu 8090, bo porty domyślne (5432 i 8080) często zajmują inne programy.
 - `check.bat` uruchamiaj po każdym kroku planu i przed każdym commitem. Kończy się podsumowaniem i kodem wyjścia 0 albo 1.
+- Kontrola AI buduje `sim` w trybie release i rozgrywa cztery serie po 1200 walk: dwie pary poziomów dla botów domyślnych i dwie dla rzeczywistych profili. Profile z `content/bots.toml` są wbudowane w `engine-ai`; ich składnię, parametry, rotację postaci i legalność talii sprawdza `cargo test`.
 - Poza Windowsem kontrole można uruchomić ręcznie; pełną listę poleceń zawiera `.github/workflows/ci.yml`.
 
 ## 3. Gałęzie, commity i PR

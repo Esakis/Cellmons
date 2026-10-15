@@ -49,6 +49,18 @@ fn replay_checks_engine_and_content_versions() {
         Err(ReplayError::EngineVersion(newer.engine_version))
     );
 
+    // Poprawki stat_set/swap_stats i pełne hashowanie umagicznień wymagają silnika 0.2.
+    let mut before_fixes = record.clone();
+    before_fixes.engine_version = Version {
+        major: 0,
+        minor: 1,
+        patch: 0,
+    };
+    assert_eq!(
+        replay(&before_fixes, &content, &mut EventBuf::new()),
+        Err(ReplayError::EngineVersion(before_fixes.engine_version))
+    );
+
     let mut other_content = record;
     other_content.content_version = [1; 32];
     assert_eq!(

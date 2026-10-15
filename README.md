@@ -2,7 +2,7 @@
 
 Projekt gry karcianej z elementami RPG (przeglądarka i Android), odtwarzającej zasady polskiej gry sieciowej **Cellmons** (Pogram, 2004–2009). Mechanika pochodzi z oryginału, a nazwy, teksty, fabuła i grafiki są własne. „Cellmons” zostaje tylko nazwą repozytorium. Nazwę produktu, znak towarowy i domeny opisuje `docs/20-nazwa-i-znak-towarowy.md`.
 
-**Status:** faza F3 z `docs/16-plan-wdrozenia.md`: treść, narzędzia i pierwsze grafiki. Treść gry jest w `content/` (72 karty, 6 postaci startowych, zestawy startowe, teksty PL i EN), a `content-compiler` sprawdza ją i generuje z niej kod silnika. Silnik z F1–F2 rozgrywa pojedynki deterministycznie natywnie i w WebAssembly, a boty L0 i L1 grają nimi w symulatorze `sim`, który mierzy też balans postaci startowych. Zatwierdzone grafiki (przewodnik stylu, ikony, ramki, portrety) są w `art/`.
+**Status:** faza F4 z `docs/16-plan-wdrozenia.md`: boty L0–L3 i cztery profile treningowe. L2 uczy się ujawnionych zachowań przeciwnika, a L3 rozstrzyga hipotetyczne rundy i losuje ze strategii mieszanej. Boty korzystają wyłącznie z widoku gracza i działają deterministycznie natywnie oraz w WebAssembly. `sim ai` sprawdza ich siłę i czas decyzji. Treść gry z F3 jest w `content/` (72 karty, 6 postaci startowych, zestawy startowe, teksty PL i EN), a zatwierdzone grafiki w `art/`. Następna faza, F5, to trening offline w przeglądarce.
 
 ## Uruchomienie lokalne
 
@@ -13,6 +13,8 @@ Potrzebne są: Rust (rustup), Node.js 24 LTS z pnpm (`corepack enable pnpm`) i D
 - `cargo run -p sim -- duel [ziarno]` rozgrywa pojedynek botów i opisuje go runda po rundzie.
 - `cargo run --release -p sim -- run --n 100000` rozgrywa serię pojedynków botów i podsumowuje wyniki.
 - `cargo run --release -p sim -- matrix` pokazuje macierz wygranych postaci startowych.
+- `cargo run --release -p sim -- ai --n 1200` sprawdza hierarchię L2–L1 i L3–L2 dla botów domyślnych oraz profili z ich własnymi taliami i mierzy czas decyzji.
+- `cargo run -p sim -- duel 3 --a L3 --b L2 --starters dune_wanderer,ember_drake` opisuje walkę nowych botów na prawdziwej treści gry.
 - `cargo run -p content-compiler -- build` sprawdza treść z `content/` i generuje z niej kod silnika.
 
 ## Najważniejsze decyzje

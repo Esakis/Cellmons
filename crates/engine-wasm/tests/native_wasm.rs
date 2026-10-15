@@ -11,7 +11,7 @@ const DUELS: u64 = 10_000;
 /// Skrót przebiegu pojedynków o ziarnach `0..DUELS`. Zmienia się razem z zasadami, kodowaniem stanu
 /// albo losowaniem w `engine::testkit`; zmiana zasad wymaga też nowej wersji silnika
 /// (`docs/06-silnik-gry.md`, rozdz. 9).
-const EXPECTED: u64 = 0x1fe0_ce73_5b19_fa0e;
+const EXPECTED: u64 = 3_830_139_636_905_945_968;
 
 #[test]
 fn random_duels_give_the_same_hashes_natively_and_in_wasm() {

@@ -95,6 +95,13 @@ flowchart LR
 | F4.2 L3: gra macierzowa | przeszukiwanie z próbkowaniem ręki przeciwnika, rozwiązywanie strategii mieszanej | L3 wygrywa z L2 ≥ 55%; decyzja ≤ 50 ms natywnie |
 | F4.3 Profile botów | poziomy trudności, osobowości, talie botów (`bots.toml`) | 4 poziomy trudności w treningu |
 
+**Stan (2026-10-15).** Kroki F4.1–F4.3 zrobione. `engine-ai` udostępnia L0–L3 oraz cztery profile treningowe z `content/bots.toml`; ich wybór w interfejsie dojdzie z ekranem treningu F5.5.
+- F4.1: model ujawnionych przejść ustawień, prior Dirichleta, ograniczenie przez K i softmax w stałym przecinku. `sim ai --n 1200` (poziom 1, ziarno 0): L2 wygrał 766/1200 walk z L1, czyli 63,8% (próg 60%).
+- F4.2: 8 próbek kart, do 24 kandydatów na stronę, rozstrzygnięcia prawdziwym silnikiem i 1000 iteracji regret matching. L3 wygrał 689/1200 walk z L2, czyli 57,4% (próg 55%); p95 decyzji poniżej 10 ms natywnie w release (limit 50 ms).
+- F4.3: profile Nowicjusz, Uczeń, Taktyk i Arcymag, nazwy PL/EN, parametry osobowości, cztery archetypy talii i rotacja sześciu postaci startowych. Testy legalności, powtarzalności, uczciwości i zgodności natywne/WASM; hierarchia AI kontrolowana przez `check.bat` i CI. Szczegóły i ograniczenia pomiaru w `11-ai-i-symulacje.md`.
+
+**Po przeglądzie F4 (2026-10-15).** Poprawiono siedem zgłoszonych problemów: podwójne premie przy zmianie statystyk, warunki kart w AI, kontrolę siły rzeczywistych profili, próbkowanie losowych uzupełnień talii, uczenie z ostatniej rundy, niepełny hash umagicznień i utratę wymuszonych wyników ataków. Silnik ma wersję 0.2.0. Dodano testy regresji i rozszerzono `sim ai` do czterech serii po 1200 walk. Profile z własnymi taliami: Taktyk–Uczeń 63,2%, Arcymag–Taktyk 56,0%; obie pary przekraczają progi. Pełne `check.bat` przeszło bez pominięć, łącznie z Node/WASM, e2e i serwerem z PostgreSQL.
+
 ## F5. Klient: trening offline (≈ 3 tydz.) → M2
 
 | Krok | Zadania | Kryteria akceptacji |

@@ -33,6 +33,46 @@ fn view_hides_the_opponents_hand_deck_order_and_seed() {
     assert_ne!(view(&one, Side::B), view(&other, Side::B));
 }
 
+#[test]
+fn sampled_state_preserves_public_effects_without_copying_hidden_cards_or_rng() {
+    let cards = sample_cards();
+    let content = content(&cards);
+    for seed in 0..40 {
+        let mut rng = seeded_rng(seed);
+        let setup = random_setup(&mut rng, &content);
+        let mut state = new_duel(&setup, &content).unwrap();
+        let mut events = EventBuf::new();
+        while !state.is_finished() {
+            let moves = Side::BOTH.map(|side| random_move(&state, &content, side, &mut rng));
+            for side in Side::BOTH {
+                let seen = view(&state, side);
+                let sampled = seen
+                    .sample_state(
+                        &content,
+                        state.player(side.other()).hand(),
+                        [state.player(Side::A).deck(), state.player(Side::B).deck()],
+                        [42; 32],
+                    )
+                    .unwrap();
+                let mut expected = state.clone();
+                expected.rng = sampled.rng.clone();
+                assert_eq!(sampled, expected);
+                let mut actual = sampled;
+                resolve_round(&mut actual, &content, &moves, &mut events).unwrap();
+                events.clear();
+                resolve_round(&mut expected, &content, &moves, &mut events).unwrap();
+                assert_eq!(actual, expected);
+                assert!(
+                    seen.sample_state(&content, &[], [&[], &[]], [0; 32])
+                        .is_none()
+                );
+            }
+            events.clear();
+            resolve_round(&mut state, &content, &moves, &mut events).unwrap();
+        }
+    }
+}
+
 /// Wszystkie ruchy z daną akcją karty i losowymi ustawieniami.
 fn candidate_moves(hand: usize, bits: u32) -> Vec<Move> {
     let kind = |bit: u32| {

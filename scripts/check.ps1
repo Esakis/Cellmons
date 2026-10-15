@@ -74,6 +74,7 @@ $steps = @(
     @{ Name = 'Treść: walidacja (content-compiler)'; Run = { cargo run -q -p content-compiler --locked -- check } }
     @{ Name = 'Rust: testy'; Run = { cargo test --workspace --locked } }
     @{ Name = 'Balans: postacie startowe (sim matrix)'; Run = { cargo run -q -p sim --locked -- matrix --n 500 } }
+    @{ Name = 'AI: hierarchia botów i profili (sim ai, release)'; Run = { cargo run -q --release -p sim --locked -- ai --n 1200 } }
     @{ Name = 'Rust: silnik do WebAssembly'; Run = { cargo build -p engine-wasm --target wasm32-unknown-unknown --locked } }
     @{
         Name = 'Silnik: natywne = WASM (Node)'
