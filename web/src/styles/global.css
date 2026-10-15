@@ -136,6 +136,9 @@ dialog {
     var(--panel-shadow),
     0 20px 100px #0008;
 }
+dialog.modal-wide {
+  width: min(94vw, 960px);
+}
 dialog::backdrop {
   background: #0b080dcc;
 }

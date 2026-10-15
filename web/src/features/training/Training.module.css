@@ -255,76 +255,81 @@
   font-size: 0.7rem;
   padding-top: 2px;
 }
-.roundHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 22px;
+/* The board: both sides with their stat columns in the middle. */
+.board {
+  position: relative;
+  padding: 0 18px 18px;
+  border: 1px solid var(--gold-dark);
+  border-radius: 16px;
+  background:
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgb(217 180 90 / 0.12), transparent 70%),
+    var(--panel-bg);
+  box-shadow: var(--panel-shadow);
+  outline: 1px solid rgb(217 180 90 / 0.22);
+  outline-offset: -8px;
 }
-.roundHeader h1 {
-  font-size: 1.9rem;
-  margin: 7px 0 0;
-}
-.roundMeta {
-  text-align: right;
-  display: grid;
-  gap: 8px;
-  font-size: 0.8rem;
-}
-.roundMeta small {
-  color: var(--color-text-muted);
+.boardTitle {
+  width: fit-content;
+  margin: -1px auto 16px;
+  padding: 8px 48px 9px;
+  font-size: 1rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--heading);
+  background: var(--inset-bg);
+  border: 1px solid var(--gold-dark);
+  border-top: 0;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 6px 16px rgb(0 0 0 / 0.35);
 }
 .fighters {
   position: relative;
   display: grid;
-  grid-template-columns: 1fr 56px 1fr;
-  align-items: center;
-}
-.vs {
-  justify-self: center;
-  display: grid;
-  place-items: center;
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  font-family: var(--font-display);
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--primary-text);
-  background: var(--primary-bg);
-  border: 1px solid var(--primary-border);
-  box-shadow: 0 0 18px rgb(217 180 90 / 0.4);
+  grid-template-columns: minmax(0, 1fr) 92px 92px minmax(0, 1fr);
+  grid-template-areas:
+    "me statsMe statsOpponent opponent"
+    "me exchange exchange opponent";
+  gap: 12px;
+  align-items: stretch;
 }
 .combatant {
+  grid-area: me;
   display: flex;
-  gap: 18px;
-  padding: 20px;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
   border: 1px solid var(--color-border);
-  background: var(--panel-bg);
-  box-shadow: var(--panel-shadow);
   border-radius: 12px;
-  align-self: stretch;
   min-width: 0;
+  background:
+    radial-gradient(ellipse 80% 40% at 50% 0%, rgb(57 73 171 / 0.22), transparent 70%),
+    var(--surface);
 }
 .combatant[data-owner="1"] {
+  grid-area: opponent;
   background:
-    radial-gradient(ellipse 80% 60% at 100% 0%, rgb(178 58 46 / 0.22), transparent 70%),
-    var(--panel-bg);
+    radial-gradient(ellipse 80% 40% at 50% 0%, rgb(178 58 46 / 0.22), transparent 70%),
+    var(--surface);
 }
-.combatant[data-owner="0"] {
-  background:
-    radial-gradient(ellipse 80% 60% at 0% 0%, rgb(57 73 171 / 0.25), transparent 70%),
-    var(--panel-bg);
+.nameplate {
+  text-align: center;
 }
 .portraitFrame {
   position: relative;
-  flex-shrink: 0;
-  align-self: flex-start;
+  align-self: center;
+  padding: 10px;
+  border: 2px solid var(--gold);
+  border-radius: 14px;
+  background: radial-gradient(circle, rgb(217 180 90 / 0.2), transparent 70%), var(--inset-bg);
+  box-shadow:
+    inset 0 0 0 4px var(--surface),
+    inset 0 0 0 5px var(--gold-dark),
+    0 6px 18px rgb(0 0 0 / 0.4);
 }
 .portrait {
   display: block;
-  width: 96px;
-  height: 96px;
+  width: 132px;
+  height: 132px;
   border-radius: 50%;
   box-shadow:
     0 0 0 3px var(--surface),
@@ -443,10 +448,6 @@
     opacity: 0;
   }
 }
-.combatantBody {
-  flex: 1;
-  min-width: 0;
-}
 .ownerLabel {
   font-size: 0.65rem;
   letter-spacing: 0.1em;
@@ -454,8 +455,8 @@
   color: var(--accent);
 }
 .combatant h2 {
-  font-size: 1rem;
-  margin: 6px 0 14px;
+  font-size: 1.05rem;
+  margin: 4px 0 0;
 }
 .healthLabel {
   display: flex;
@@ -500,22 +501,11 @@
 .healthFill[data-low="true"] {
   background: var(--hp-low);
 }
-.resources {
-  display: flex;
-  gap: 18px;
-  font-weight: 650;
-  font-size: 0.82rem;
-  margin: 13px 0;
-}
-.resources span,
-.stats span,
 .schools span {
   display: inline-flex;
   align-items: center;
   gap: 4px;
 }
-.resources img,
-.stats img,
 .schools img,
 .requirements img {
   width: 18px;
@@ -524,16 +514,138 @@
 .panelIcon {
   filter: var(--icon-filter);
 }
-.stats {
+.statColumn {
+  grid-area: statsMe;
   display: flex;
-  flex-wrap: wrap;
-  gap: 7px 12px;
-  font-size: 0.65rem;
-  padding-bottom: 12px;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 14px 6px;
+  border: 1px solid var(--gold-dark);
+  border-radius: 46px;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.04), transparent 40%), var(--inset-bg);
+  box-shadow: inset 0 2px 12px rgb(0 0 0 / 0.5);
 }
-.stats img {
-  width: 15px;
-  height: 15px;
+.statColumn[data-owner="1"] {
+  grid-area: statsOpponent;
+}
+.statRow,
+.statDealt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.statRow dt,
+.statRow dd,
+.statDealt dt,
+.statDealt dd {
+  margin: 0;
+}
+.medal {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--gold);
+  background: radial-gradient(circle at 35% 30%, var(--surface-raised), var(--inset-bg));
+  box-shadow: 0 0 10px rgb(217 180 90 / 0.25);
+}
+.medalIcon {
+  width: 20px;
+  height: 20px;
+}
+.statRow dd {
+  margin-bottom: 8px;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--heading);
+}
+.statDealt {
+  margin-top: auto;
+  padding-top: 10px;
+  width: 100%;
+  border-top: 1px solid var(--gold-dark);
+}
+.statDealt dt {
+  font-size: 0.56rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.statDealt dd {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary-text);
+  background: var(--primary-bg);
+  border: 1px solid var(--primary-border);
+}
+.played {
+  margin-top: 4px;
+}
+.playedLabel {
+  display: block;
+  margin-bottom: 6px;
+  text-align: center;
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.playedEmpty {
+  margin: 0;
+  padding: 18px 10px;
+  text-align: center;
+  font-size: 0.68rem;
+  color: var(--color-text-muted);
+  border: 1px dashed var(--color-border);
+  border-radius: 10px;
+}
+.playedCard {
+  --rarity: var(--rarity-bronze);
+  display: grid;
+  width: min(100%, 230px);
+  margin: 0 auto;
+  gap: 6px;
+  padding: 8px;
+  color: var(--card-text);
+  background:
+    var(--card-bg) padding-box,
+    var(--rarity) border-box;
+  border: 3px solid transparent;
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgb(0 0 0 / 0.4);
+}
+.playedCard[data-rarity="silver"] {
+  --rarity: var(--rarity-silver);
+}
+.playedCard[data-rarity="gold"] {
+  --rarity: var(--rarity-gold);
+}
+.playedCard > strong {
+  font-family: var(--font-display);
+  font-size: 0.76rem;
+}
+.playedPicture {
+  display: block;
+  width: 100%;
+  aspect-ratio: 8 / 5;
+  border: 2px solid var(--card-line);
+  border-radius: 4px;
+}
+.playedCard > p {
+  margin: 0;
+  font-size: 0.66rem;
+  line-height: 1.5;
 }
 .schools {
   display: flex;
@@ -554,37 +666,23 @@
   border-radius: 4px;
   padding: 4px;
 }
-.decisions {
-  display: grid;
-  grid-template-columns: 1.75fr 1fr;
-  gap: 22px;
-  margin-top: 24px;
-}
-.slotsPanel {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-}
-.slotGroup h2,
-.costPanel h2 {
-  font-size: 0.95rem;
-  margin: 0 0 12px;
-}
 .slots {
   display: flex;
-  gap: 8px;
+  justify-content: center;
+  gap: 14px;
 }
 .slot {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
-  flex: 1;
-  border-radius: 10px;
-  border: 1px solid var(--physical-border);
+  justify-content: center;
+  flex: 0 1 var(--slot-width);
+  aspect-ratio: 2 / 3;
+  border-radius: 42px;
+  border: 2px solid var(--physical-border);
   min-width: 0;
-  padding: 16px 5px 10px;
+  padding: 10px 5px;
   background: var(--physical-bg);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.12),
@@ -595,9 +693,9 @@
   border-color: var(--magical-border);
 }
 .slot img {
-  width: 26px;
-  height: 26px;
-  filter: var(--icon-filter);
+  width: 50px;
+  height: 50px;
+  filter: var(--icon-filter) drop-shadow(0 2px 4px rgb(0 0 0 / 0.5));
 }
 .slot kbd {
   position: absolute;
@@ -605,44 +703,6 @@
   left: 5px;
   font-size: 0.56rem;
   color: var(--color-text-muted);
-}
-.slot b {
-  font-size: 0.8rem;
-}
-.slot small {
-  font-size: 0.58rem;
-}
-.previous {
-  display: block;
-  margin-top: 9px;
-  color: var(--color-text-muted);
-  font-size: 0.61rem;
-}
-.costPanel {
-  padding: 16px 18px;
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  background: var(--panel-bg);
-  box-shadow: var(--panel-shadow);
-}
-.costPanel > p {
-  margin: 8px 0;
-  font-size: 0.83rem;
-}
-.costPanel > small {
-  font-size: 0.68rem;
-  color: var(--color-text-muted);
-}
-.costPanel > .validation {
-  font-size: 0.67rem;
-  min-height: 18px;
-  color: var(--accent);
-}
-.costPanel > button {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 .hand {
   margin-top: 26px;
@@ -834,15 +894,6 @@
   color: var(--gold);
   font-size: 1.3rem;
 }
-.duelFooter {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-}
-.duelFooter > div {
-  display: flex;
-  gap: 8px;
-}
 .log {
   margin-top: 16px;
   font-size: 0.76rem;
@@ -916,18 +967,11 @@
     flex-direction: column;
   }
   .portrait {
-    width: 55px;
-    height: 55px;
+    width: 96px;
+    height: 96px;
   }
   .combatant {
-    gap: 10px;
-    padding: 14px;
-  }
-  .decisions {
-    grid-template-columns: 1.4fr 1fr;
-  }
-  .slotsPanel {
-    gap: 12px;
+    padding: 12px;
   }
   .cards {
     gap: 8px;
@@ -980,61 +1024,41 @@
     grid-template-columns: 1fr;
     gap: 16px;
   }
-  .roundHeader {
-    gap: 12px;
-    align-items: flex-start;
-  }
-  .roundHeader h1 {
-    font-size: 1.5rem;
-  }
-  .roundMeta {
-    font-size: 0.66rem;
-    max-width: 45%;
-    line-height: 1.6;
+  .board {
+    padding: 0 8px 8px;
   }
   .fighters {
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-  .vs {
-    display: none;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      "me opponent"
+      "statsMe statsOpponent"
+      "exchange exchange";
+    gap: 8px;
   }
   .combatant {
-    flex-direction: column;
     gap: 8px;
-    padding: 12px;
+    padding: 10px;
+  }
+  .portraitFrame {
+    padding: 6px;
   }
   .portrait {
-    width: 48px;
-    height: 48px;
+    width: 72px;
+    height: 72px;
   }
   .combatant h2 {
     font-size: 0.85rem;
     min-height: 34px;
-    margin-bottom: 6px;
   }
-  .stats {
-    gap: 8px;
+  .statColumn {
+    flex-flow: row wrap;
+    justify-content: center;
+    border-radius: 14px;
+    padding: 10px 6px;
   }
-  .stats span {
-    width: calc(50% - 4px);
-  }
-  .resources {
-    gap: 10px;
-    font-size: 0.74rem;
-  }
-  .decisions {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-  .slotsPanel {
-    gap: 18px;
-  }
-  .slot {
-    min-height: 90px;
-  }
-  .slot small {
-    font-size: 0.53rem;
+  .statDealt {
+    border-top: 0;
+    padding-top: 0;
   }
   .cards {
     display: flex;
@@ -1050,22 +1074,6 @@
   .cardMain {
     min-height: 252px;
   }
-  .costPanel {
-    padding: 14px;
-  }
-  .duelFooter {
-    align-items: flex-start;
-    flex-wrap: wrap;
-  }
-}
-
-.revealedChoices {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  font-size: 0.63rem;
-  margin-top: 12px;
-  color: var(--color-text-muted);
 }
 
 .cardActions button {
@@ -1170,5 +1178,573 @@
 @media (max-width: 650px) {
   .chronicleRound {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Decision screen: character cards on the sides, the sequence of attacks and defenses in the middle. */
+.table {
+  position: relative;
+  padding: 0 18px 18px;
+  border: 1px solid var(--gold-dark);
+  border-radius: 16px;
+  background:
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgb(217 180 90 / 0.12), transparent 70%),
+    var(--panel-bg);
+  box-shadow: var(--panel-shadow);
+  outline: 1px solid rgb(217 180 90 / 0.22);
+  outline-offset: -8px;
+}
+.tableGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(330px, 380px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: stretch;
+}
+.sideCard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  min-width: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background:
+    radial-gradient(ellipse 80% 40% at 50% 0%, rgb(57 73 171 / 0.22), transparent 70%),
+    var(--surface);
+}
+.sideCard[data-owner="1"] {
+  background:
+    radial-gradient(ellipse 80% 40% at 50% 0%, rgb(178 58 46 / 0.22), transparent 70%),
+    var(--surface);
+}
+.sideCard h2 {
+  font-size: 1.05rem;
+  margin: 4px 0 0;
+}
+.sideCard .schools {
+  justify-content: center;
+}
+.sideCard .portraitFrame {
+  display: grid;
+  place-items: center;
+  width: min(100%, 220px);
+  padding: 22px 12px;
+  border-radius: 90px 90px 14px 14px;
+}
+.sidePortrait {
+  display: block;
+  width: min(100%, 190px);
+  height: auto;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 3px var(--surface),
+    0 0 0 5px var(--gold),
+    0 0 24px rgb(217 180 90 / 0.4);
+}
+.pills {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0;
+}
+.pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 2px;
+  border: 1px solid var(--gold-dark);
+  border-radius: 999px;
+  background: var(--inset-bg);
+}
+.pill dt,
+.pill dd {
+  margin: 0;
+}
+.pill dd {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: var(--heading);
+}
+.command {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 1px solid var(--gold-dark);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.04), transparent 40%), var(--inset-bg);
+  box-shadow: inset 0 2px 12px rgb(0 0 0 / 0.5);
+}
+.roundTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.roundTitle {
+  text-align: center;
+}
+.roundTitle h1 {
+  margin: 2px 0;
+  font-size: 1.6rem;
+}
+.roundTitle small {
+  font-size: 0.68rem;
+  color: var(--color-text-muted);
+}
+.focusOrb {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 48px;
+  height: 72px;
+  border-radius: 24px;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--primary-text);
+  background: var(--primary-bg);
+  border: 1px solid var(--primary-border);
+  box-shadow: 0 0 14px rgb(217 180 90 / 0.35);
+}
+.focusOrb small {
+  font-size: 0.5rem;
+}
+.sequence {
+  --slot-width: 84px;
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+}
+.rowLabel {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.slots {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.opponentRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  width: 100%;
+}
+.opponentCaption {
+  font-size: 0.58rem;
+  color: var(--color-text-muted);
+}
+.ghostSlot {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 58px;
+  margin: 0 calc((var(--slot-width) - 40px) / 2);
+  border-radius: 20px;
+  border: 1px dashed var(--color-border);
+  color: var(--color-text-muted);
+  background: var(--surface);
+}
+.ghostSlot[data-kind="0"] {
+  border: 1px solid var(--physical-border);
+  background: var(--physical-bg);
+}
+.ghostSlot[data-kind="1"] {
+  border: 1px solid var(--magical-border);
+  background: var(--magical-bg);
+}
+.ghostIcon {
+  width: 26px;
+  height: 26px;
+}
+.timerBox {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 8px;
+  border-top: 1px solid var(--gold-dark);
+  text-align: center;
+}
+.timerBox strong {
+  display: grid;
+  place-items: center;
+  min-width: 90px;
+  padding: 6px 20px;
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  border: 1px solid var(--gold-dark);
+  border-radius: 999px;
+  background: var(--surface);
+}
+.timerBox span {
+  font-size: 0.8rem;
+}
+.timerBox small {
+  font-size: 0.66rem;
+  color: var(--color-text-muted);
+}
+.commandBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin-top: 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--gold-dark);
+  border-radius: 12px;
+  background: var(--inset-bg);
+}
+.validation {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--accent);
+}
+.commandButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* Simulation screen: the exchange box and the wide strip with the current attack. */
+.statRow[data-changed="true"] dd {
+  color: var(--hit);
+}
+.exchange {
+  grid-area: exchange;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--gold-dark);
+  border-radius: 14px;
+  background: var(--inset-bg);
+}
+.slotOrb {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--primary-text);
+  background: var(--primary-bg);
+  border: 1px solid var(--primary-border);
+}
+.exchangeIdle {
+  color: var(--gold);
+}
+.exchangeHit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  animation: pop 0.35s ease-out;
+}
+.exchangeIcon {
+  width: 26px;
+  height: 26px;
+}
+.exchangeHit[data-result="hit"],
+.arenaStrike[data-result="hit"] {
+  color: var(--hit);
+}
+.exchangeHit[data-result="block"],
+.arenaStrike[data-result="block"] {
+  color: var(--block);
+}
+.exchangeHit[data-result="miss"],
+.arenaStrike[data-result="miss"] {
+  color: var(--color-text-muted);
+}
+.arenaStrike {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 14px;
+  font-size: 1.6rem;
+  font-weight: 700;
+  animation: pop 0.35s ease-out;
+}
+.arenaIcon {
+  width: 32px;
+  height: 32px;
+}
+.arenaText {
+  font-size: 0.88rem;
+}
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@media (max-width: 900px) {
+  .tableGrid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .command {
+    grid-column: 1 / -1;
+    order: 3;
+  }
+}
+@media (max-width: 650px) {
+  .table {
+    padding: 0 8px 8px;
+  }
+  .tableGrid {
+    gap: 8px;
+  }
+  .sideCard {
+    padding: 10px;
+  }
+  .pills {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .sequence {
+    --slot-width: 72px;
+  }
+  .commandButtons {
+    width: 100%;
+  }
+}
+
+/* On desktop the whole duel fits the window: sizes follow the viewport height. */
+@media (min-width: 901px) and (min-height: 600px) {
+  .duel {
+    max-width: 1440px;
+    padding: 8px 24px 0;
+  }
+  .table,
+  .board {
+    display: flex;
+    flex-direction: column;
+    height: calc(100dvh - 100px);
+    padding: 0 14px 12px;
+  }
+  .boardTitle {
+    flex-shrink: 0;
+    margin-bottom: 8px;
+    padding: 4px 40px 5px;
+    font-size: 0.85rem;
+  }
+  .tableGrid {
+    flex: 1 1 0;
+    min-height: 0;
+    gap: 12px;
+  }
+  .sideCard {
+    gap: 1dvh;
+    padding: 1.2dvh 12px;
+    overflow: hidden;
+  }
+  .sideCard h2 {
+    font-size: 0.95rem;
+  }
+  .sideCard .portraitFrame {
+    width: auto;
+    padding: 1.4dvh 1dvh;
+  }
+  .sidePortrait {
+    width: 16dvh;
+  }
+  .pill {
+    gap: 2px;
+    padding: 0.9dvh 2px;
+  }
+  .pill dd {
+    font-size: 0.95rem;
+  }
+  .medalIcon {
+    width: 16px;
+    height: 16px;
+  }
+  .command {
+    gap: 0.6dvh;
+    padding: 1dvh 14px;
+    justify-content: space-between;
+    overflow: hidden;
+  }
+  .roundTitle h1 {
+    font-size: 1.35rem;
+  }
+  .focusOrb {
+    width: 4dvh;
+    height: 6dvh;
+    font-size: 1.1rem;
+  }
+  .sequence {
+    --slot-width: 5.6dvh;
+    gap: 0.5dvh;
+  }
+  .rowLabel {
+    font-size: 0.68rem;
+  }
+  .slot {
+    padding: 0;
+  }
+  .slot img {
+    width: 55%;
+    height: auto;
+  }
+  .ghostSlot {
+    width: 3dvh;
+    height: 4.2dvh;
+    margin: 0 calc((var(--slot-width) - 3dvh) / 2);
+  }
+  .ghostIcon {
+    width: 2.2dvh;
+    height: 2.2dvh;
+  }
+  .timerBox {
+    grid-auto-flow: column;
+    align-items: center;
+    gap: 12px;
+    padding: 0.8dvh 0 0;
+  }
+  .timerBox strong {
+    min-width: 0;
+    padding: 2px 14px;
+    font-size: 1.3rem;
+  }
+  .hand {
+    display: flex;
+    flex: 0 0 25dvh;
+    flex-direction: column;
+    min-height: 0;
+    margin-top: 1dvh;
+  }
+  .hand .sectionHeading {
+    display: none;
+  }
+  .cards {
+    flex: 1 1 0;
+    min-height: 0;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .card {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .card:hover,
+  .card[data-selected="true"] {
+    transform: none;
+  }
+  .cardMain {
+    flex: 1 1 0;
+    min-height: 0;
+    gap: 0.6dvh;
+    padding: 0.8dvh 8px;
+    overflow: hidden;
+  }
+  .cardTop {
+    min-height: 0;
+  }
+  .costBadges {
+    flex-direction: row;
+  }
+  .cardArt[data-picture="true"] {
+    flex: 1 1 0;
+    min-height: 0;
+    aspect-ratio: auto;
+  }
+  .cardArt[data-picture="true"] img {
+    object-fit: contain;
+  }
+  .cardText {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 0.66rem;
+    line-height: 1.45;
+  }
+  .cardActions button {
+    min-height: 30px;
+    padding: 2px 6px;
+  }
+  .commandBar {
+    flex-shrink: 0;
+    margin-top: 1dvh;
+    padding: 6px 12px;
+  }
+  .commandBar button {
+    min-height: 40px;
+    padding: 8px 14px;
+  }
+  .fighters {
+    flex: 1 1 0;
+    min-height: 0;
+  }
+  .combatant {
+    min-height: 0;
+    overflow: hidden;
+    padding: 1.2dvh 12px;
+  }
+  .portrait {
+    width: 16dvh;
+    height: 16dvh;
+  }
+  .played {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .playedCard {
+    flex: 1 1 0;
+    min-height: 0;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+  }
+  .playedPicture {
+    height: 100%;
+    min-height: 0;
+    aspect-ratio: auto;
+    object-fit: cover;
+  }
+  .statColumn {
+    gap: 0;
+    padding: 1dvh 6px;
+  }
+  .medal {
+    width: 4.4dvh;
+    height: 4.4dvh;
+  }
+  .statRow dd {
+    margin-bottom: 0.6dvh;
+    font-size: 1.1rem;
+  }
+  .statDealt dd {
+    width: 4.6dvh;
+    height: 4.6dvh;
+  }
+  .arena {
+    flex-shrink: 0;
+    min-height: 0;
+    margin: 1dvh 0 0;
+    padding: 0.8dvh 20px;
   }
 }

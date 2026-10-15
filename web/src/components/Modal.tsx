@@ -1,7 +1,7 @@
 import { createUniqueId, onCleanup, onMount, type ParentProps } from 'solid-js';
 import { t } from '../i18n';
 
-export function Modal(props: ParentProps<{ title: string; close: () => void }>) {
+export function Modal(props: ParentProps<{ title: string; close: () => void; wide?: boolean }>) {
   let dialog!: HTMLDialogElement;
   const id = createUniqueId();
   const previous = document.activeElement as HTMLElement | null;
@@ -15,6 +15,7 @@ export function Modal(props: ParentProps<{ title: string; close: () => void }>) 
   return (
     <dialog
       ref={dialog}
+      class={props.wide ? 'modal-wide' : undefined}
       aria-labelledby={id}
       onCancel={(event) => {
         event.preventDefault();

@@ -36,6 +36,7 @@ test('plays a full human training duel with keyboard, cost preview and card insp
     await expect(confirm.or(page.getByRole('button', { name: 'Play again' }))).toBeEnabled();
   }
   await expect(page.locator('#duel-result')).toBeVisible();
+  await page.getByRole('button', { name: 'Battle chronicle' }).click();
   await page.getByText('Round log', { exact: true }).click();
   await expect(page.getByText('Duel ended.', { exact: true })).toBeVisible();
   expect(errors).toEqual([]);

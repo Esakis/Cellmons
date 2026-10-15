@@ -1,6 +1,6 @@
 import { create } from '@bufbuild/protobuf';
 import { A, useBeforeLeave, useSearchParams } from '@solidjs/router';
-import { batch, createEffect, createSignal, For, onCleanup, onMount, Show } from 'solid-js';
+import { batch, createEffect, createSignal, For, Index, onCleanup, onMount, Show } from 'solid-js';
 import {
   avatars,
   type Card,
@@ -31,8 +31,6 @@ import styles from './Training.module.css';
 
 const profiles = ['novice', 'apprentice', 'tactician', 'archmage'];
 const statKeys = ['PhysAtk', 'PhysDef', 'MagAtk', 'MagDef'];
-const statIcons = ['phys-atk', 'phys-def', 'mag-atk', 'mag-def'];
-const statLabels = ['AF', 'OF', 'AM', 'OM'];
 const cardKeys = ['q', 'w', 'e', 'r', 't'];
 const attackEvents = ['hit', 'block', 'miss'];
 type Fx = { tone: 'damage' | 'heal' | 'block' | 'miss'; text: string; ms: number; delay: number };
@@ -46,13 +44,25 @@ const cardPicture = (key: string) => pictures().get(key);
 export const errorText = (code: string) =>
   t(hasTranslation(`error-${code}`) ? `error-${code}` : 'error-generic');
 
+// Damage dealt by `side`: its hits plus spell damage taken by the other side.
+function dealtBy(list: DuelEvent[], side: number) {
+  return list.reduce(
+    (sum, e) =>
+      (e.kind === 'hit' && e.side === side) || (e.kind === 'damage' && e.side !== side)
+        ? sum + e.amount
+        : sum,
+    0,
+  );
+}
+
+// One side of the board: framed portrait, health, schools, choices and the card it played.
 function Combatant(props: {
   side: DuelSide;
   avatar: number;
   owner: number;
   initiative: number;
-  enchanted: TrainingView['enchantments'];
   label: string;
+  played: number;
   fx?: Fx;
   portraitRef: (element: HTMLDivElement) => void;
 }) {
@@ -60,13 +70,19 @@ function Combatant(props: {
     `${Math.min(100, (Math.max(0, props.side.hp) / Math.max(1, props.side.hpStart)) * 100)}%`;
   return (
     <section class={styles.combatant} aria-label={props.label} data-owner={props.owner}>
+      <div class={styles.nameplate}>
+        <span class={styles.ownerLabel}>
+          {props.label} {props.initiative === props.owner ? '◆' : ''}
+        </span>
+        <h2>{name(props.avatar)}</h2>
+      </div>
       <div class={styles.portraitFrame} ref={props.portraitRef}>
         <img
           class={styles.portrait}
           src={portrait(avatars.get(props.avatar)?.key ?? '')}
           alt=""
-          width="88"
-          height="88"
+          width="132"
+          height="132"
         />
         <Show when={props.fx} keyed>
           {(fx) => (
@@ -81,89 +97,219 @@ function Combatant(props: {
           )}
         </Show>
       </div>
-      <div class={styles.combatantBody}>
+      <div class={styles.healthLabel}>
+        <span>{t('hp')}</span>
+        <strong>
+          {props.side.hp} / {props.side.hpStart}
+        </strong>
+      </div>
+      <meter
+        class={styles.srOnly}
+        min="0"
+        max={props.side.hpStart}
+        value={Math.max(0, props.side.hp)}
+        aria-label={t('hp')}
+      />
+      <div class={styles.health} aria-hidden="true">
+        <span class={styles.healthGhost} style={{ width: percent() }} />
+        <span
+          class={styles.healthFill}
+          style={{ width: percent() }}
+          data-low={props.side.hp * 10 < props.side.hpStart * 3}
+        />
+      </div>
+      <PlayedCard id={props.played} />
+    </section>
+  );
+}
+
+// Decision screen: a character card with its schools, four stats and enchantments.
+function SideCard(props: {
+  side: DuelSide;
+  avatar: number;
+  owner: number;
+  initiative: number;
+  enchanted: TrainingView['enchantments'];
+  label: string;
+}) {
+  const pills = () => [
+    {
+      icon: 'stat-phys-atk',
+      label: `${t('stat-PhysAtk')} / ${t('stat-PhysDef')}`,
+      value: `${props.side.stats[0]}/${props.side.stats[1]}`,
+    },
+    {
+      icon: 'stat-mag-atk',
+      label: `${t('stat-MagAtk')} / ${t('stat-MagDef')}`,
+      value: `${props.side.stats[2]}/${props.side.stats[3]}`,
+    },
+    { icon: 'stat-hp', label: t('hp'), value: `${Math.max(0, props.side.hp)}` },
+    { icon: 'stat-stamina', label: t('stat-Stamina'), value: `${props.side.stamina}` },
+  ];
+  return (
+    <section class={styles.sideCard} aria-label={props.label} data-owner={props.owner}>
+      <div class={styles.nameplate}>
         <span class={styles.ownerLabel}>
           {props.label} {props.initiative === props.owner ? '◆' : ''}
         </span>
         <h2>{name(props.avatar)}</h2>
-        <div class={styles.healthLabel}>
-          <span>{t('hp')}</span>
-          <strong>
-            {props.side.hp} / {props.side.hpStart}
-          </strong>
-        </div>
-        <meter
-          class={styles.srOnly}
-          min="0"
-          max={props.side.hpStart}
-          value={Math.max(0, props.side.hp)}
-          aria-label={t('hp')}
-        />
-        <div class={styles.health} aria-hidden="true">
-          <span class={styles.healthGhost} style={{ width: percent() }} />
-          <span
-            class={styles.healthFill}
-            style={{ width: percent() }}
-            data-low={props.side.hp * 10 < props.side.hpStart * 3}
-          />
-        </div>
-        <div class={styles.resources}>
-          <span>
-            <img class={styles.panelIcon} src={icon('stat-stamina')} alt="" />
-            {props.side.stamina} W
-          </span>
-          <span>
-            <img class={styles.panelIcon} src={icon('stat-focus')} alt="" />
-            {props.side.focus} K
-          </span>
-        </div>
-        <div class={styles.stats}>
-          <For each={statKeys}>
-            {(key, i) => (
-              <span title={t(`stat-${key}`)}>
-                <img
-                  class={styles.panelIcon}
-                  src={icon(`stat-${statIcons[i()]}`)}
-                  alt={t(`stat-${key}`)}
-                />
-                {statLabels[i()]} <b>{props.side.stats[i()]}</b>
-              </span>
-            )}
-          </For>
-        </div>
-        <div class={styles.schools}>
-          <For each={content.schools}>
-            {(school, i) => (
-              <Show when={(props.side.schools[i()] ?? 0) > 0}>
-                <span>
-                  <img class={styles.panelIcon} src={icon(`school-${school.key}`)} alt="" />
-                  {t(`school-${school.key}-name`)} {props.side.schools[i()]}
-                </span>
-              </Show>
-            )}
-          </For>
-        </div>
-        <div class={styles.revealedChoices}>
-          <span>
-            {t('attack')}: {props.side.attacks.map((kind) => (kind === 0 ? 'F' : 'M')).join(' ? ')}
-          </span>
-          <span>
-            {t('defense')}:{' '}
-            {props.side.defenses.map((kind) => (kind === 0 ? 'F' : 'M')).join(' ? ')}
-          </span>
-        </div>
-        <section class={styles.enchantments} aria-label={t('enchantments')}>
-          <For
-            each={props.enchanted.filter((e) => e.side === props.owner)}
-            fallback={<small>{t('no-enchantments')}</small>}
-          >
-            {(e) => (
-              <span title={cardDescription(cards.get(e.cardId))}>✦ {cardName(e.cardId)}</span>
-            )}
-          </For>
-        </section>
       </div>
+      <div class={styles.portraitFrame}>
+        <img
+          class={styles.sidePortrait}
+          src={portrait(avatars.get(props.avatar)?.key ?? '')}
+          alt=""
+          width="190"
+          height="190"
+        />
+      </div>
+      <div class={styles.schools}>
+        <For each={content.schools}>
+          {(school, i) => (
+            <Show when={(props.side.schools[i()] ?? 0) > 0}>
+              <span>
+                <img class={styles.panelIcon} src={icon(`school-${school.key}`)} alt="" />
+                {t(`school-${school.key}-name`)} {props.side.schools[i()]}
+              </span>
+            </Show>
+          )}
+        </For>
+      </div>
+      <dl class={styles.pills}>
+        <Index each={pills()}>
+          {(pill) => (
+            <div class={styles.pill} title={pill().label}>
+              <dt>
+                <img
+                  class={`${styles.panelIcon} ${styles.medalIcon}`}
+                  src={icon(pill().icon)}
+                  alt={pill().label}
+                />
+              </dt>
+              <dd>{pill().value}</dd>
+            </div>
+          )}
+        </Index>
+      </dl>
+      <meter
+        class={styles.srOnly}
+        min="0"
+        max={props.side.hpStart}
+        value={Math.max(0, props.side.hp)}
+        aria-label={t('hp')}
+      />
+      <section class={styles.enchantments} aria-label={t('enchantments')}>
+        <For
+          each={props.enchanted.filter((e) => e.side === props.owner)}
+          fallback={<small>{t('no-enchantments')}</small>}
+        >
+          {(e) => <span title={cardDescription(cards.get(e.cardId))}>✦ {cardName(e.cardId)}</span>}
+        </For>
+      </section>
     </section>
+  );
+}
+
+function OpponentRow(props: { label: string; kinds?: number[] }) {
+  return (
+    <div class={styles.opponentRow} title={props.label}>
+      <span class={styles.srOnly}>{props.label}</span>
+      <For each={props.kinds ?? [-1, -1, -1]}>
+        {(kind) => (
+          <span class={styles.ghostSlot} data-kind={kind}>
+            <Show when={kind >= 0} fallback="·">
+              <img
+                class={`${styles.panelIcon} ${styles.ghostIcon}`}
+                src={icon(kind === 0 ? 'attack-phys' : 'attack-mag')}
+                alt={t(kind === 0 ? 'physical' : 'magical')}
+              />
+            </Show>
+          </span>
+        )}
+      </For>
+    </div>
+  );
+}
+
+function PlayedCard(props: { id: number }) {
+  return (
+    <div class={styles.played}>
+      <span class={styles.playedLabel}>{t('played-card')}</span>
+      <Show
+        when={cards.get(props.id)}
+        fallback={<p class={styles.playedEmpty}>{t('no-card-played')}</p>}
+      >
+        {(card) => (
+          <article class={styles.playedCard} data-rarity={card().rarity}>
+            <strong>{cardName(card().id)}</strong>
+            <Show when={cardPicture(card().key)}>
+              {(src) => <img class={styles.playedPicture} src={src()} alt="" />}
+            </Show>
+            <p>{cardDescription(card())}</p>
+          </article>
+        )}
+      </Show>
+    </div>
+  );
+}
+
+// The centre of the board: one narrow column of numbers per side.
+function statValues(side: DuelSide) {
+  return [
+    `${side.stats[0]}/${side.stats[1]}`,
+    `${side.stats[2]}/${side.stats[3]}`,
+    `${Math.max(0, side.hp)}`,
+    `${side.stamina}`,
+    `${side.focus}`,
+  ];
+}
+
+function StatColumn(props: {
+  side: DuelSide;
+  base?: DuelSide;
+  owner: number;
+  label: string;
+  dealt: number;
+}) {
+  const labels = () => [
+    `${t('stat-PhysAtk')} / ${t('stat-PhysDef')}`,
+    `${t('stat-MagAtk')} / ${t('stat-MagDef')}`,
+    t('hp'),
+    t('stat-Stamina'),
+    t('stat-Focus'),
+  ];
+  const statIcons = ['stat-phys-atk', 'stat-mag-atk', 'stat-hp', 'stat-stamina', 'stat-focus'];
+  const rows = () => {
+    const values = statValues(props.side);
+    const before = props.base ? statValues(props.base) : values;
+    return values.map((value, i) => ({
+      icon: statIcons[i] ?? '',
+      label: labels()[i] ?? '',
+      value,
+      changed: value !== before[i],
+    }));
+  };
+  return (
+    <dl class={styles.statColumn} data-owner={props.owner} aria-label={props.label}>
+      <Index each={rows()}>
+        {(row) => (
+          <div class={styles.statRow} title={row().label} data-changed={row().changed}>
+            <dt class={styles.medal}>
+              <img
+                class={`${styles.panelIcon} ${styles.medalIcon}`}
+                src={icon(row().icon)}
+                alt={row().label}
+              />
+            </dt>
+            <dd>{row().value}</dd>
+          </div>
+        )}
+      </Index>
+      <div class={styles.statDealt} title={t('chronicle-total')}>
+        <dt>{t('dealt-short')}</dt>
+        <dd>{props.dealt}</dd>
+      </div>
+    </dl>
   );
 }
 
@@ -175,8 +321,7 @@ function Chronicle(props: {
   text: (event: DuelEvent) => string;
 }) {
   return (
-    <section class={styles.chronicle} aria-labelledby="chronicle-title">
-      <h2 id="chronicle-title">{t('chronicle')}</h2>
+    <section class={styles.chronicle} aria-label={t('chronicle')}>
       <For
         each={props.history}
         fallback={<p class={styles.chronicleEmpty}>{t('chronicle-empty')}</p>}
@@ -192,13 +337,9 @@ function Chronicle(props: {
             return event && visible(index) ? { event, index } : undefined;
           };
           const dealt = (side: number) =>
-            record.events.reduce(
-              (sum, e, index) =>
-                visible(index) &&
-                ((e.kind === 'hit' && e.side === side) || (e.kind === 'damage' && e.side !== side))
-                  ? sum + e.amount
-                  : sum,
-              0,
+            dealtBy(
+              record.events.filter((_, index) => visible(index)),
+              side,
             );
           const others = () =>
             record.events.filter(
@@ -326,6 +467,7 @@ export function Duel() {
   const [error, setError] = createSignal('');
   const [inspect, setInspect] = createSignal<Card>();
   const [confirmLeave, setConfirmLeave] = createSignal(false);
+  const [showChronicle, setShowChronicle] = createSignal(false);
   const [events, setEvents] = createSignal<DuelEvent[]>([]);
   const [history, setHistory] = createSignal<RoundRecord[]>([]);
   const [playIndex, setPlayIndex] = createSignal(0);
@@ -334,6 +476,44 @@ export function Duel() {
   const [animationView, setAnimationView] = createSignal<TrainingView>();
   const [fx, setFx] = createSignal<(Fx | undefined)[]>([]);
   const [strikePath, setStrikePath] = createSignal<Record<string, string>>({});
+  // While the newest round animates, only its events up to the current one count.
+  const shown = (list: DuelEvent[], newest: boolean) =>
+    newest && animating() ? list.slice(0, playIndex() + 1) : list;
+  const playedCard = (side: number) =>
+    shown(events(), true).findLast((e) => e.kind === 'cast' && e.side === side)?.cardId ?? 0;
+  const dealtTotal = (side: number) =>
+    history().reduce((sum, record, i) => sum + dealtBy(shown(record.events, i === 0), side), 0);
+  const lastSlot = (side: number) => {
+    const event = shown(events(), true).findLast(
+      (e) => attackEvents.includes(e.kind) && e.side === side,
+    );
+    return event ? event.slot + 1 : '–';
+  };
+  const strikeResult = (event: DuelEvent) =>
+    event.kind === 'hit' ? `−${event.amount}` : t(event.kind === 'block' ? 'fx-block' : 'fx-miss');
+  const slotRow = (group: 'attacks' | 'defenses') => (
+    <fieldset class={styles.slots} aria-label={t(group === 'attacks' ? 'attack' : 'defense')}>
+      <For each={draft()[group]}>
+        {(kind, i) => (
+          <button
+            type="button"
+            disabled={locked() || demo()}
+            aria-label={t('slot', {
+              group: t(group === 'attacks' ? 'attack' : 'defense'),
+              number: i() + 1,
+              kind: kindName(kind),
+            })}
+            class={styles.slot}
+            data-kind={kind}
+            onClick={() => toggle(group, i())}
+          >
+            <kbd>{i() + 1 + (group === 'attacks' ? 0 : 3)}</kbd>
+            <img src={icon(kind === 0 ? 'attack-phys' : 'attack-mag')} alt="" />
+          </button>
+        )}
+      </For>
+    </fieldset>
+  );
   const strike = () => {
     const event = activeEvent();
     return event && attackEvents.includes(event.kind) ? event : undefined;
@@ -567,6 +747,9 @@ export function Duel() {
       advanceAnimation(event);
       await wait(ms - impact);
     }
+    if (disposed || generation !== animationGeneration) return;
+    setActiveEvent(undefined);
+    await wait(1200 / factor);
     if (generation === animationGeneration && !disposed) {
       setAnimating(false);
       setActiveEvent(undefined);
@@ -691,6 +874,7 @@ export function Duel() {
       event.metaKey ||
       event.repeat ||
       inspect() ||
+      showChronicle() ||
       confirmLeave()
     )
       return;
@@ -768,364 +952,468 @@ export function Duel() {
       >
         {(state) => (
           <>
-            <div class={styles.roundHeader}>
-              <div>
-                <p class="eyebrow">
-                  {t('training')} · {t(profile())} {demo() ? '· AI / AI' : ''}
-                </p>
-                <h1>{t('round', { round: state().round, total: state().totalRounds })}</h1>
-              </div>
-              <div class={styles.roundMeta}>
-                <strong>
-                  {t('initiative', { name: t(state().initiative === 0 ? 'you' : 'opponent') })}
-                </strong>
-                <small>{t('elapsed', { seconds: seconds() })}</small>
-              </div>
-            </div>
-            <div class={styles.fighters} ref={fighters}>
-              <Show when={strike()} keyed>
-                {(event) => (
-                  <span
-                    class={styles.strike}
-                    data-kind={event.attackKind}
-                    style={strikePath()}
-                    aria-hidden="true"
-                  >
-                    <img src={icon(event.attackKind === 0 ? 'attack-phys' : 'attack-mag')} alt="" />
-                    <b>{event.slot + 1}</b>
-                  </span>
-                )}
-              </Show>
-              <Show when={state().me}>
-                {(me) => (
-                  <Combatant
-                    side={animationView()?.me ?? me()}
-                    avatar={avatarId()}
-                    owner={0}
-                    initiative={state().initiative}
-                    enchanted={state().enchantments}
-                    label={t('you')}
-                    fx={fx()[0]}
-                    portraitRef={(element) => {
-                      portraits[0] = element;
-                    }}
-                  />
-                )}
-              </Show>
-              <span class={styles.vs} aria-hidden="true">
-                VS
-              </span>
-              <Show when={state().opponent}>
-                {(opponent) => (
-                  <Combatant
-                    side={animationView()?.opponent ?? opponent()}
-                    avatar={state().opponentAvatarId}
-                    owner={1}
-                    initiative={state().initiative}
-                    enchanted={state().enchantments}
-                    label={t('opponent')}
-                    fx={fx()[1]}
-                    portraitRef={(element) => {
-                      portraits[1] = element;
-                    }}
-                  />
-                )}
-              </Show>
-            </div>
-            <Show when={state().outcome}>
-              {(result) => (
-                <section
-                  class={styles.result}
-                  id="duel-result"
-                  tabIndex={-1}
-                  aria-labelledby="result-title"
-                >
-                  <p class="eyebrow">{t('training')}</p>
-                  <h2 id="result-title">
-                    {t(
-                      result().winner === 1 ? 'victory' : result().winner === 2 ? 'defeat' : 'draw',
-                    )}
-                  </h2>
-                  <p>{t(`reason-${result().reason}`)}</p>
-                  <button
-                    type="button"
-                    class="primary"
-                    onClick={() => void start()}
-                    disabled={busy()}
-                  >
-                    {t('again')}
-                  </button>
-                  <A class="button secondary" href="/">
-                    {t('back')}
-                  </A>
-                </section>
-              )}
-            </Show>
-            <Show when={!state().outcome}>
-              <div class={styles.decisions}>
-                <section class={styles.slotsPanel}>
-                  <For each={['attacks', 'defenses'] as const}>
-                    {(group, groupIndex) => (
-                      <div class={styles.slotGroup}>
-                        <h2>{t(group === 'attacks' ? 'attack' : 'defense')}</h2>
-                        <div class={styles.slots}>
-                          <For each={draft()[group]}>
-                            {(kind, i) => (
-                              <button
-                                type="button"
-                                disabled={locked() || demo()}
-                                aria-label={t('slot', {
-                                  group: t(group === 'attacks' ? 'attack' : 'defense'),
-                                  number: i() + 1,
-                                  kind: kindName(kind),
-                                })}
-                                class={styles.slot}
-                                data-kind={kind}
-                                onClick={() => toggle(group, i())}
-                              >
-                                <kbd>{i() + 1 + groupIndex() * 3}</kbd>
-                                <img src={icon(kind === 0 ? 'attack-phys' : 'attack-mag')} alt="" />
-                                <b>{kind === 0 ? 'F' : 'M'}</b>
-                                <small>{kindName(kind)}</small>
-                              </button>
-                            )}
-                          </For>
+            <Show
+              when={animating()}
+              fallback={
+                <section class={styles.table} aria-labelledby="round-title">
+                  <p class={styles.boardTitle}>
+                    {t('duel-title')} · {t(profile())} {demo() ? '· AI / AI' : ''}
+                  </p>
+                  <div class={styles.tableGrid}>
+                    <Show when={state().me}>
+                      {(me) => (
+                        <SideCard
+                          side={me()}
+                          avatar={avatarId()}
+                          owner={0}
+                          initiative={state().initiative}
+                          enchanted={state().enchantments}
+                          label={t('you')}
+                        />
+                      )}
+                    </Show>
+                    <div class={styles.command}>
+                      <div class={styles.roundTop}>
+                        <span class={styles.focusOrb} title={t('stat-Focus')}>
+                          {state().me?.focus}
+                          <small>K</small>
+                        </span>
+                        <div class={styles.roundTitle}>
+                          <h1 id="round-title">
+                            {t('round', { round: state().round, total: state().totalRounds })}
+                          </h1>
+                          <small>
+                            {t('initiative', {
+                              name: t(state().initiative === 0 ? 'you' : 'opponent'),
+                            })}
+                          </small>
                         </div>
-                        <small class={styles.previous}>
-                          {t('previous')}:{' '}
-                          {state()
-                            .opponent?.[group === 'attacks' ? 'defenses' : 'attacks'].map((k) =>
-                              k === 0 ? 'F' : 'M',
-                            )
-                            .join(' · ')}
-                        </small>
+                        <span class={styles.focusOrb} title={t('stat-Focus')}>
+                          {state().opponent?.focus}
+                          <small>K</small>
+                        </span>
                       </div>
-                    )}
-                  </For>
-                </section>
-                <section class={styles.costPanel} aria-labelledby="cost-title">
-                  <h2 id="cost-title">{t('costs')}</h2>
-                  <p>
-                    {t('focus-cost', {
-                      cost: preview()?.focusCost ?? 0,
-                      after: preview()?.focusAfter ?? 0,
-                    })}
-                  </p>
-                  <small>
-                    {t('stamina-cost', {
-                      spell: preview()?.staminaCost ?? 0,
-                      attacks: preview()?.maxAttackStamina ?? 0,
-                    })}
-                  </small>
-                  <p class={styles.validation} aria-live="polite">
-                    {preview()?.error
-                      ? errorText(preview()?.error ?? '')
-                      : draft().action
-                        ? `${t(draft().action === 1 ? 'cast' : 'discard')}: ${cardName(state().hand[draft().handIndex] ?? 0)}`
-                        : t('none')}
-                  </p>
-                  <button
-                    type="button"
-                    class="primary"
-                    disabled={locked() || pendingPreview() || !!preview()?.error || !!error()}
-                    onClick={() => void submit()}
-                  >
-                    {busy() ? t('loading') : t(demo() ? 'next-demo' : 'submit')}
-                    <span aria-hidden="true">↗</span>
-                  </button>
-                </section>
-              </div>
-              <section class={styles.hand} aria-labelledby="hand-title">
-                <div class={styles.sectionHeading}>
-                  <h2 id="hand-title">{t('hand')}</h2>
-                  <span>{state().me?.deckLen} / 20</span>
-                </div>
-                <div class={styles.cards}>
-                  <For each={state().hand}>
-                    {(id, index) => (
-                      <Show when={cards.get(id)}>
-                        {(card) => (
-                          <article
-                            class={styles.card}
-                            data-selected={draft().action !== 0 && draft().handIndex === index()}
-                            data-rarity={card().rarity}
+                      <Show when={state().outcome}>
+                        {(result) => (
+                          <section
+                            class={styles.result}
+                            id="duel-result"
+                            tabIndex={-1}
+                            aria-labelledby="result-title"
                           >
+                            <h2 id="result-title">
+                              {t(
+                                result().winner === 1
+                                  ? 'victory'
+                                  : result().winner === 2
+                                    ? 'defeat'
+                                    : 'draw',
+                              )}
+                            </h2>
+                            <p>{t(`reason-${result().reason}`)}</p>
                             <button
                               type="button"
-                              class={styles.cardMain}
-                              disabled={locked() || demo() || pendingPreview()}
-                              onClick={() => {
-                                if (!held) cycle(index());
-                                held = false;
-                              }}
-                              onContextMenu={(event) => {
-                                event.preventDefault();
-                                setInspect(card());
-                              }}
-                              onPointerDown={() => {
-                                held = false;
-                                hold = setTimeout(() => {
-                                  held = true;
-                                  setInspect(card());
-                                }, 600);
-                              }}
-                              onPointerUp={() => clearTimeout(hold)}
-                              onPointerCancel={() => clearTimeout(hold)}
-                              onPointerLeave={() => clearTimeout(hold)}
-                              aria-label={`${cardName(id)}. ${cardFocus(index(), card())} K, ${castOptions()[index()]?.staminaCost ?? card().cost.stamina} W. ${cardDescription(card())}. ${castOptions()[index()]?.error ? errorText(castOptions()[index()]?.error ?? '') : t('cast')}`}
+                              class="primary"
+                              onClick={() => void start()}
+                              disabled={busy()}
                             >
-                              <span class={styles.cardTop}>
-                                <span class={styles.costBadges}>
-                                  <b>
-                                    {cardFocus(index(), card())}
-                                    <small>K</small>
-                                  </b>
-                                  <b>
-                                    {castOptions()[index()]?.staminaCost ?? card().cost.stamina}
-                                    <small>W</small>
-                                  </b>
-                                </span>
-                                <strong>{cardName(id)}</strong>
-                                <kbd>{cardKeys[index()]?.toUpperCase()}</kbd>
-                              </span>
-                              <span
-                                class={styles.cardArt}
-                                data-picture={!!cardPicture(card().key)}
-                                aria-hidden="true"
-                              >
-                                <img
-                                  src={
-                                    cardPicture(card().key) ??
-                                    icon(`school-${Object.keys(card().requires)[0] ?? 'arcane'}`)
-                                  }
-                                  alt=""
-                                />
-                              </span>
-                              <Requirements card={card()} />
-                              <span class={styles.cardText}>{cardDescription(card())}</span>
+                              {t('again')}
                             </button>
-                            <div class={styles.cardActions}>
-                              <button
-                                type="button"
-                                class="quiet"
-                                aria-pressed={draft().action === 1 && draft().handIndex === index()}
-                                disabled={
-                                  locked() ||
-                                  demo() ||
-                                  pendingPreview() ||
-                                  !!castOptions()[index()]?.error
-                                }
-                                onClick={() =>
-                                  void updateDraft(
-                                    create(DuelMoveSchema, {
-                                      ...draft(),
-                                      action:
-                                        draft().action === 1 && draft().handIndex === index()
-                                          ? 0
-                                          : 1,
-                                      handIndex: index(),
-                                    }),
-                                  )
-                                }
-                              >
-                                {t('cast')}
-                              </button>
-                              <button
-                                type="button"
-                                class="quiet"
-                                aria-pressed={draft().action === 2 && draft().handIndex === index()}
-                                disabled={locked() || demo() || pendingPreview()}
-                                onClick={() =>
-                                  void updateDraft(
-                                    create(DuelMoveSchema, {
-                                      ...draft(),
-                                      action:
-                                        draft().action === 2 && draft().handIndex === index()
-                                          ? 0
-                                          : 2,
-                                      handIndex: index(),
-                                    }),
-                                  )
-                                }
-                              >
-                                {t('discard')}
-                              </button>
-                              <button
-                                type="button"
-                                class="quiet"
-                                aria-label={`${t('inspect')}: ${cardName(id)}`}
-                                onClick={() => setInspect(card())}
-                              >
-                                ⓘ
-                              </button>
-                            </div>
-                            <Show when={castOptions()[index()]?.error}>
-                              <small class={styles.cardUnavailable}>
-                                {errorText(castOptions()[index()]?.error ?? '')}
-                              </small>
-                            </Show>
-                          </article>
+                            <A class="button secondary" href="/">
+                              {t('back')}
+                            </A>
+                          </section>
                         )}
                       </Show>
+                      <Show when={!state().outcome}>
+                        <div class={styles.sequence}>
+                          <span class={styles.rowLabel}>{t('attack')}</span>
+                          {slotRow('attacks')}
+                          <OpponentRow
+                            label={t('opponent-prev-defenses')}
+                            kinds={history().length ? state().opponent?.defenses : undefined}
+                          />
+                          <small class={styles.opponentCaption}>{t('opponent-prev')}</small>
+                          <OpponentRow
+                            label={t('opponent-prev-attacks')}
+                            kinds={history().length ? state().opponent?.attacks : undefined}
+                          />
+                          {slotRow('defenses')}
+                          <span class={styles.rowLabel}>{t('defense')}</span>
+                        </div>
+                        <div class={styles.timerBox}>
+                          <strong title={t('elapsed', { seconds: seconds() })}>{seconds()}</strong>
+                          <span>
+                            {t('focus-cost', {
+                              cost: preview()?.focusCost ?? 0,
+                              after: preview()?.focusAfter ?? 0,
+                            })}
+                          </span>
+                          <small>
+                            {t('stamina-cost', {
+                              spell: preview()?.staminaCost ?? 0,
+                              attacks: preview()?.maxAttackStamina ?? 0,
+                            })}
+                          </small>
+                        </div>
+                      </Show>
+                    </div>
+                    <Show when={state().opponent}>
+                      {(opponent) => (
+                        <SideCard
+                          side={opponent()}
+                          avatar={state().opponentAvatarId}
+                          owner={1}
+                          initiative={state().initiative}
+                          enchanted={state().enchantments}
+                          label={t('opponent')}
+                        />
+                      )}
+                    </Show>
+                  </div>
+                  <Show when={!state().outcome}>
+                    <section class={styles.hand} aria-labelledby="hand-title">
+                      <div class={styles.sectionHeading}>
+                        <h2 id="hand-title">{t('hand')}</h2>
+                        <span>{state().me?.deckLen} / 20</span>
+                      </div>
+                      <div class={styles.cards}>
+                        <For each={state().hand}>
+                          {(id, index) => (
+                            <Show when={cards.get(id)}>
+                              {(card) => (
+                                <article
+                                  class={styles.card}
+                                  data-selected={
+                                    draft().action !== 0 && draft().handIndex === index()
+                                  }
+                                  data-rarity={card().rarity}
+                                >
+                                  <button
+                                    type="button"
+                                    class={styles.cardMain}
+                                    disabled={locked() || demo() || pendingPreview()}
+                                    onClick={() => {
+                                      if (!held) cycle(index());
+                                      held = false;
+                                    }}
+                                    onContextMenu={(event) => {
+                                      event.preventDefault();
+                                      setInspect(card());
+                                    }}
+                                    onPointerDown={() => {
+                                      held = false;
+                                      hold = setTimeout(() => {
+                                        held = true;
+                                        setInspect(card());
+                                      }, 600);
+                                    }}
+                                    onPointerUp={() => clearTimeout(hold)}
+                                    onPointerCancel={() => clearTimeout(hold)}
+                                    onPointerLeave={() => clearTimeout(hold)}
+                                    aria-label={`${cardName(id)}. ${cardFocus(index(), card())} K, ${castOptions()[index()]?.staminaCost ?? card().cost.stamina} W. ${cardDescription(card())}. ${castOptions()[index()]?.error ? errorText(castOptions()[index()]?.error ?? '') : t('cast')}`}
+                                  >
+                                    <span class={styles.cardTop}>
+                                      <span class={styles.costBadges}>
+                                        <b>
+                                          {cardFocus(index(), card())}
+                                          <small>K</small>
+                                        </b>
+                                        <b>
+                                          {castOptions()[index()]?.staminaCost ??
+                                            card().cost.stamina}
+                                          <small>W</small>
+                                        </b>
+                                      </span>
+                                      <strong>{cardName(id)}</strong>
+                                      <kbd>{cardKeys[index()]?.toUpperCase()}</kbd>
+                                    </span>
+                                    <span
+                                      class={styles.cardArt}
+                                      data-picture={!!cardPicture(card().key)}
+                                      aria-hidden="true"
+                                    >
+                                      <img
+                                        src={
+                                          cardPicture(card().key) ??
+                                          icon(
+                                            `school-${Object.keys(card().requires)[0] ?? 'arcane'}`,
+                                          )
+                                        }
+                                        alt=""
+                                      />
+                                    </span>
+                                    <Requirements card={card()} />
+                                    <span class={styles.cardText}>{cardDescription(card())}</span>
+                                  </button>
+                                  <div class={styles.cardActions}>
+                                    <button
+                                      type="button"
+                                      class="quiet"
+                                      aria-pressed={
+                                        draft().action === 1 && draft().handIndex === index()
+                                      }
+                                      disabled={
+                                        locked() ||
+                                        demo() ||
+                                        pendingPreview() ||
+                                        !!castOptions()[index()]?.error
+                                      }
+                                      onClick={() =>
+                                        void updateDraft(
+                                          create(DuelMoveSchema, {
+                                            ...draft(),
+                                            action:
+                                              draft().action === 1 && draft().handIndex === index()
+                                                ? 0
+                                                : 1,
+                                            handIndex: index(),
+                                          }),
+                                        )
+                                      }
+                                    >
+                                      {t('cast')}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      class="quiet"
+                                      aria-pressed={
+                                        draft().action === 2 && draft().handIndex === index()
+                                      }
+                                      disabled={locked() || demo() || pendingPreview()}
+                                      onClick={() =>
+                                        void updateDraft(
+                                          create(DuelMoveSchema, {
+                                            ...draft(),
+                                            action:
+                                              draft().action === 2 && draft().handIndex === index()
+                                                ? 0
+                                                : 2,
+                                            handIndex: index(),
+                                          }),
+                                        )
+                                      }
+                                    >
+                                      {t('discard')}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      class="quiet"
+                                      aria-label={`${t('inspect')}: ${cardName(id)}`}
+                                      onClick={() => setInspect(card())}
+                                    >
+                                      ⓘ
+                                    </button>
+                                  </div>
+                                  <Show when={castOptions()[index()]?.error}>
+                                    <small class={styles.cardUnavailable}>
+                                      {errorText(castOptions()[index()]?.error ?? '')}
+                                    </small>
+                                  </Show>
+                                </article>
+                              )}
+                            </Show>
+                          )}
+                        </For>
+                      </div>
+                    </section>
+                  </Show>
+                  <div class={styles.commandBar}>
+                    <p class={styles.validation} aria-live="polite">
+                      {preview()?.error
+                        ? errorText(preview()?.error ?? '')
+                        : draft().action
+                          ? `${t(draft().action === 1 ? 'cast' : 'discard')}: ${cardName(state().hand[draft().handIndex] ?? 0)}`
+                          : t('choose-sequence')}
+                    </p>
+                    <div class={styles.commandButtons}>
+                      <Show when={!state().outcome}>
+                        <button
+                          type="button"
+                          class="quiet"
+                          disabled={busy()}
+                          onClick={() => setConfirmLeave(true)}
+                        >
+                          {t('forfeit')}
+                        </button>
+                      </Show>
+                      <button
+                        type="button"
+                        class="secondary"
+                        onClick={() => setShowChronicle(true)}
+                      >
+                        {t('chronicle')}
+                      </button>
+                      <button
+                        type="button"
+                        class="secondary"
+                        disabled={busy() || !events().length}
+                        onClick={() => void animate(events())}
+                      >
+                        {t('replay')}
+                      </button>
+                      <Show when={!state().outcome}>
+                        <button
+                          type="button"
+                          class="primary"
+                          disabled={locked() || pendingPreview() || !!preview()?.error || !!error()}
+                          onClick={() => void submit()}
+                        >
+                          {busy() ? t('loading') : t(demo() ? 'next-demo' : 'submit')}
+                          <span aria-hidden="true">✓</span>
+                        </button>
+                      </Show>
+                    </div>
+                  </div>
+                </section>
+              }
+            >
+              <section class={styles.board} aria-labelledby="board-title">
+                <h1 id="board-title" class={styles.boardTitle}>
+                  {t('duel-title')} ·{' '}
+                  {t('round', { round: state().round, total: state().totalRounds })}
+                </h1>
+                <div class={styles.fighters} ref={fighters}>
+                  <Show when={strike()} keyed>
+                    {(event) => (
+                      <span
+                        class={styles.strike}
+                        data-kind={event.attackKind}
+                        style={strikePath()}
+                        aria-hidden="true"
+                      >
+                        <img
+                          src={icon(event.attackKind === 0 ? 'attack-phys' : 'attack-mag')}
+                          alt=""
+                        />
+                        <b>{event.slot + 1}</b>
+                      </span>
                     )}
-                  </For>
+                  </Show>
+                  <Show when={state().me}>
+                    {(me) => (
+                      <>
+                        <Combatant
+                          side={animationView()?.me ?? me()}
+                          avatar={avatarId()}
+                          owner={0}
+                          initiative={state().initiative}
+                          label={t('you')}
+                          played={playedCard(0)}
+                          fx={fx()[0]}
+                          portraitRef={(element) => {
+                            portraits[0] = element;
+                          }}
+                        />
+                        <StatColumn
+                          side={animationView()?.me ?? me()}
+                          base={lastRoundStart?.me}
+                          owner={0}
+                          label={t('you')}
+                          dealt={dealtTotal(0)}
+                        />
+                      </>
+                    )}
+                  </Show>
+                  <Show when={state().opponent}>
+                    {(opponent) => (
+                      <>
+                        <StatColumn
+                          side={animationView()?.opponent ?? opponent()}
+                          base={lastRoundStart?.opponent}
+                          owner={1}
+                          label={t('opponent')}
+                          dealt={dealtTotal(1)}
+                        />
+                        <Combatant
+                          side={animationView()?.opponent ?? opponent()}
+                          avatar={state().opponentAvatarId}
+                          owner={1}
+                          initiative={state().initiative}
+                          label={t('opponent')}
+                          played={playedCard(1)}
+                          fx={fx()[1]}
+                          portraitRef={(element) => {
+                            portraits[1] = element;
+                          }}
+                        />
+                      </>
+                    )}
+                  </Show>
+                  <div class={styles.exchange} aria-hidden="true">
+                    <span class={styles.slotOrb}>{lastSlot(0)}</span>
+                    <Show
+                      when={strike()}
+                      keyed
+                      fallback={<span class={styles.exchangeIdle}>✦</span>}
+                    >
+                      {(event) => (
+                        <span class={styles.exchangeHit} data-result={event.kind}>
+                          <img
+                            class={`${styles.panelIcon} ${styles.exchangeIcon}`}
+                            src={icon(event.attackKind === 0 ? 'attack-phys' : 'attack-mag')}
+                            alt=""
+                          />
+                          <b>{strikeResult(event)}</b>
+                        </span>
+                      )}
+                    </Show>
+                    <span class={styles.slotOrb}>{lastSlot(1)}</span>
+                  </div>
+                </div>
+                <div class={styles.arena} ref={arena} aria-live="polite" role="status">
+                  <Show when={activeEvent()} fallback={<span>{t('round-over')}</span>}>
+                    {(event) => (
+                      <>
+                        <Show when={strike()} keyed>
+                          {(hit) => (
+                            <span class={styles.arenaStrike} data-result={hit.kind}>
+                              <img
+                                class={`${styles.panelIcon} ${styles.arenaIcon}`}
+                                src={icon(hit.attackKind === 0 ? 'attack-phys' : 'attack-mag')}
+                                alt=""
+                              />
+                              <b>{strikeResult(hit)}</b>
+                            </span>
+                          )}
+                        </Show>
+                        <span class={styles.arenaText}>{eventText(event())}</span>
+                      </>
+                    )}
+                  </Show>
+                </div>
+                <div class={styles.commandBar}>
+                  <p class={styles.validation}>{t('simulation')}</p>
+                  <div class={styles.commandButtons}>
+                    <button type="button" class="secondary" onClick={skip}>
+                      {t('skip')}
+                    </button>
+                  </div>
                 </div>
               </section>
             </Show>
-            <div class={styles.arena} ref={arena} aria-live="polite" role="status">
-              <Show when={activeEvent()} fallback={<span>✦</span>}>
-                {(event) => <>{eventText(event())}</>}
-              </Show>
-            </div>
-            <Chronicle
-              history={history()}
-              playing={animating() ? playIndex() : undefined}
-              text={eventText}
-            />
             <Show when={error()}>
               <p role="alert" class={styles.error}>
                 {errorText(error())}
               </p>
               <A href="/">{t('back')}</A>
             </Show>
-            <div class={styles.duelFooter}>
-              <div>
-                <button
-                  type="button"
-                  class="secondary"
-                  disabled={busy() || animating() || !events().length}
-                  onClick={() => void animate(events())}
-                >
-                  {t('replay')}
-                </button>
-                <Show when={animating()}>
-                  <button type="button" class="secondary" onClick={skip}>
-                    {t('skip')}
-                  </button>
-                </Show>
-              </div>
-              <Show when={!state().outcome}>
-                <button
-                  type="button"
-                  class="quiet"
-                  disabled={busy() && !animating()}
-                  onClick={() => setConfirmLeave(true)}
-                >
-                  {t('forfeit')}
-                </button>
-              </Show>
-            </div>
-            <Show when={events().length}>
-              <details class={styles.log}>
-                <summary>{t('log')}</summary>
-                <ol>
-                  <For each={events()}>{(event) => <li>{eventText(event)}</li>}</For>
-                </ol>
-              </details>
-            </Show>
-            <p class={styles.shortcuts}>{t('shortcuts')}</p>
           </>
         )}
+      </Show>
+      <Show when={showChronicle()}>
+        <Modal title={t('chronicle')} wide close={() => setShowChronicle(false)}>
+          <Chronicle history={history()} text={eventText} />
+          <Show when={events().length}>
+            <details class={styles.log}>
+              <summary>{t('log')}</summary>
+              <ol>
+                <For each={events()}>{(event) => <li>{eventText(event)}</li>}</For>
+              </ol>
+            </details>
+          </Show>
+          <p class={styles.shortcuts}>{t('shortcuts')}</p>
+        </Modal>
       </Show>
       <Show when={inspect()}>
         {(card) => (

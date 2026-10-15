@@ -76,20 +76,22 @@ export function Shell(props: ParentProps) {
           {props.children}
         </ErrorBoundary>
       </main>
-      <footer class={styles.footer}>
-        <span>Spellgambit: Arcane Class</span>
-        <span role="status" data-testid="offline-status">
-          {t(
-            offlineStatus() === 'ready'
-              ? 'offline'
-              : offlineStatus() === 'failed'
-                ? 'offline-failed'
-                : offlineStatus() === 'local'
-                  ? 'offline-local'
-                  : 'caching',
-          )}
-        </span>
-      </footer>
+      <Show when={!duelActive()}>
+        <footer class={styles.footer}>
+          <span>Spellgambit: Arcane Class</span>
+          <span role="status" data-testid="offline-status">
+            {t(
+              offlineStatus() === 'ready'
+                ? 'offline'
+                : offlineStatus() === 'failed'
+                  ? 'offline-failed'
+                  : offlineStatus() === 'local'
+                    ? 'offline-local'
+                    : 'caching',
+            )}
+          </span>
+        </footer>
+      </Show>
       <Show when={updateReady() && !duelActive()}>
         <div class={styles.update} role="status">
           {t('update')}{' '}
