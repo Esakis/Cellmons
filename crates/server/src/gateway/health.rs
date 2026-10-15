@@ -30,7 +30,7 @@ pub struct Readiness {
     database: &'static str,
 }
 
-/// `/readyz`: serwer może przyjmować ruch. 503, gdy baza nie odpowiada; Caddy kieruje wtedy
+/// `/readyz`: serwer może przyjmować ruch. 503, gdy baza nie odpowiada lub wymaga migracji; Caddy kieruje wtedy
 /// nowe połączenia do drugiego slotu.
 pub async fn readyz(State(state): State<AppState>) -> (StatusCode, Json<Readiness>) {
     match db::ping(&state.db).await {
@@ -72,7 +72,7 @@ mod tests {
             .acquire_timeout(Duration::from_millis(500))
             .connect_lazy("postgres://game:game@127.0.0.1:1/game")
             .expect("valid database URL");
-        AppState { db }
+        AppState::local(db)
     }
 
     async fn get(path: &str) -> (StatusCode, serde_json::Value) {

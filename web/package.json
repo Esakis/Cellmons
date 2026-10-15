@@ -3,13 +3,17 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "prepare:assets": "node ../scripts/prepare-web.mjs",
+    "dev": "pnpm prepare:assets && vite",
+    "build": "pnpm prepare:assets && vite build && node ../scripts/check-web-budget.mjs",
     "preview": "vite preview",
     "test": "vitest run",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json"
   },
   "dependencies": {
+    "@bufbuild/protobuf": "2.16.0",
+    "@fluent/bundle": "0.19.1",
+    "@solidjs/router": "1.0.0",
     "solid-js": "1.9.17"
   },
   "devDependencies": {

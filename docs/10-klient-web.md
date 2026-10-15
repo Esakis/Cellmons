@@ -1,5 +1,7 @@
 # 10. Klient webowy
 
+**Stan F5:** klient treningu, Worker/WASM i PWA są zaimplementowane. Ten dokument opisuje także przyszłe ekrany online. Bieżący zakres, pomiary i ograniczenia: [raport F5](21-trening-offline-testy.md).
+
 Klient to aplikacja SolidJS w TypeScript, budowana przez Vite i instalowalna jako PWA (ADR-004). Rozgrywka online idzie przez serwer (`07-protokol-sieciowy.md`), a trening offline przez silnik w WebAssembly (`06-silnik-gry.md`, rozdz. 13). Budżety wydajności: `13-wydajnosc.md`.
 
 ## 1. Technologie

@@ -1,6 +1,6 @@
 // Plik wygenerowany przez `cargo run -p content-compiler -- build` z katalogu `content/`.
 // Nie edytuj go ręcznie: zmiany wprowadzaj w plikach treści.
-// content_version: f54ca17cc4c68ea9be8e76ab145ed724cc6d136ebf8cb48ab42a944f81901cff
+// content_version: ff632bf0ac21cc9235523751a9d80baa1d1a6644e2196d31a42d73d7ae54be87
 
 #![allow(unused_imports)]
 
@@ -14,8 +14,8 @@ use crate::{AvatarDef, Growth, StarterDef, effects};
 
 /// Wersja treści (`content_version`).
 pub const CONTENT_VERSION: [u8; 32] = [
-    245, 76, 161, 124, 196, 198, 142, 169, 190, 142, 118, 171, 20, 94, 215, 36, 204, 109, 19, 110,
-    191, 140, 180, 138, 180, 42, 148, 79, 129, 144, 28, 255,
+    255, 99, 43, 240, 172, 33, 204, 146, 53, 82, 55, 81, 169, 216, 11, 170, 29, 26, 102, 68, 226,
+    25, 109, 49, 164, 45, 115, 215, 174, 84, 190, 135,
 ];
 
 /// Zasady z `content/rules.toml`.

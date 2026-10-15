@@ -15,6 +15,7 @@ engine-ai.workspace = true
 engine-cards.workspace = true
 engine-content.workspace = true
 wasm-bindgen.workspace = true
+protocol = { path = "../protocol" }
 
 [dev-dependencies]
 engine = { workspace = true, features = ["testkit"] }

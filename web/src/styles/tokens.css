@@ -1,0 +1,89 @@
+/* Dark fantasy theme is the default; the light parchment theme is chosen in settings (data-theme). */
+:root {
+  color-scheme: dark;
+  --font-display: "Cinzel", "Inter Variable", Georgia, serif;
+  --color-bg: #120e14;
+  --page-glow:
+    radial-gradient(ellipse 90% 55% at 50% -12%, rgb(126 74 150 / 0.38), transparent 70%),
+    radial-gradient(ellipse 70% 40% at 50% 112%, rgb(150 92 30 / 0.28), transparent 70%);
+  --surface: #1f1820;
+  --surface-raised: #2b2129;
+  --panel-bg: linear-gradient(180deg, #2b2129, #1a1419);
+  --panel-shadow:
+    0 0 0 1px #050306, inset 0 0 0 1px rgb(226 191 106 / 0.14), 0 10px 30px rgb(0 0 0 / 0.45);
+  --color-text: #f1e6d0;
+  --heading: #f6dd93;
+  --heading-shadow: 0 2px 12px rgb(0 0 0 / 0.35);
+  --color-text-muted: #b8a88e;
+  --color-border: #4d3b2b;
+  --gold: #d9b45a;
+  --gold-bright: #f6dd93;
+  --gold-dark: #7a5a1c;
+  --accent: #e5c36f;
+  --focus-ring: #8fb3ff;
+  --selected: #3b2d1b;
+  --selected-border: #e5c36f;
+  --physical-bg: linear-gradient(180deg, #4a2a22, #2c1a16);
+  --physical-border: #8a4a36;
+  --magical-bg: linear-gradient(180deg, #27305a, #181c36);
+  --magical-border: #4f5ea8;
+  --inset-bg: #0d0a0f;
+  --error: #ff9a85;
+  --primary-bg: linear-gradient(180deg, #f6dd93, #d9b45a 45%, #9c7424);
+  --primary-border: #5e430f;
+  --primary-text: #2a1a08;
+  --hp-fill: linear-gradient(180deg, #ff7a62, #c4352a 55%, #861a14);
+  --hp-low: linear-gradient(180deg, #ff5a5a, #a3101a);
+  --hp-ghost: #f0b45a;
+  --hit: #ff7a66;
+  --block: #9fb8ff;
+  --heal: #7fe08a;
+  --card-bg: linear-gradient(180deg, #f7eed8, #e8d7b0);
+  --card-text: #2b2118;
+  --card-muted: #6b5a42;
+  --card-line: #cdb88e;
+  --card-error: #8a2a17;
+  --icon-filter: invert(92%) sepia(18%) saturate(420%) hue-rotate(358deg) brightness(98%);
+  --rarity-bronze: linear-gradient(160deg, #f0bd85, #a8672f 45%, #5a3315);
+  --rarity-silver: linear-gradient(160deg, #f4f7fa, #9aa4b0 45%, #4c535c);
+  --rarity-gold: linear-gradient(160deg, #fff0a8, #d4a72c 45%, #6e5000);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --color-bg: #f3ead7;
+  --page-glow:
+    radial-gradient(ellipse 90% 55% at 50% -12%, rgb(217 180 90 / 0.3), transparent 70%),
+    radial-gradient(ellipse 70% 40% at 50% 112%, rgb(150 92 30 / 0.12), transparent 70%);
+  --surface: #fffaf0;
+  --surface-raised: #fffdf8;
+  --panel-bg: linear-gradient(180deg, #fffdf8, #f6eedd);
+  --panel-shadow:
+    0 0 0 1px #d8c7a4, inset 0 0 0 1px rgb(255 255 255 / 0.7), 0 8px 22px rgb(80 56 20 / 0.12);
+  --color-text: #2b2118;
+  --heading: #2b2118;
+  --heading-shadow: none;
+  --color-text-muted: #6b5d4f;
+  --color-border: #d8c7a4;
+  --gold: #a8801f;
+  --gold-bright: #d9b45a;
+  --gold-dark: #6e5000;
+  --accent: #7a5512;
+  --focus-ring: #3949ab;
+  --selected: #f2e3bd;
+  --selected-border: #8a6416;
+  --physical-bg: linear-gradient(180deg, #fbefe2, #f0dcc6);
+  --physical-border: #c79a78;
+  --magical-bg: linear-gradient(180deg, #eef0ff, #dcdff5);
+  --magical-border: #9aa3d6;
+  --inset-bg: #ebe1cb;
+  --error: #8a3926;
+  --primary-bg: linear-gradient(180deg, #4a3a28, #2e2318);
+  --primary-border: #2e2318;
+  --primary-text: #f8e8bf;
+  --hp-ghost: #e0a34a;
+  --hit: #c62828;
+  --block: #3d5a80;
+  --heal: #2e7d32;
+  --icon-filter: none;
+}

@@ -1,15 +1,18 @@
 //! Serwer gry (`docs/08-serwer.md`).
 
-mod config;
-mod db;
-mod gateway;
-mod telemetry;
-
 use anyhow::Context as _;
-
-use crate::config::Config;
+use server::{config::Config, db, gateway, telemetry};
 
 fn main() -> anyhow::Result<()> {
+    let migrate = match std::env::args().skip(1).collect::<Vec<_>>().as_slice() {
+        [] => false,
+        [arg] if arg == "migrate" => true,
+        [arg] if arg == "--help" || arg == "-h" => {
+            println!("server [migrate]\n  migrate: apply embedded database migrations, then exit");
+            return Ok(());
+        }
+        _ => anyhow::bail!("usage: server [migrate]"),
+    };
     // `.env` wczytujemy przed startem wątków Tokio, bo dotenvy zmienia zmienne środowiskowe procesu.
     load_dotenv()?;
     let config = Config::from_env()?;
@@ -19,12 +22,32 @@ fn main() -> anyhow::Result<()> {
         .enable_all()
         .build()
         .context("cannot start the Tokio runtime")?
-        .block_on(run(config))
+        .block_on(async {
+            if migrate {
+                let pool = db::migration_pool(&config)?;
+                db::migrate(&pool).await?;
+                pool.close().await;
+                tracing::info!("database migrations applied");
+                Ok(())
+            } else {
+                run(config).await
+            }
+        })
 }
 
 async fn run(config: Config) -> anyhow::Result<()> {
     let db = db::connect_lazy(&config)?;
-    let app = gateway::router(gateway::AppState { db: db.clone() });
+    let auth_config = server::auth::AuthConfig::from_lookup(|key| {
+        std::env::var(key).ok().or_else(|| {
+            (key == "PUBLIC_ORIGIN" && config.listen_addr.ip().is_loopback())
+                .then(|| "http://localhost:5173".into())
+        })
+    })?;
+    let auth = server::auth::Auth::from_config(auth_config)?;
+    let app = gateway::router(gateway::AppState {
+        db: db.clone(),
+        auth,
+    });
 
     let listener = tokio::net::TcpListener::bind(config.listen_addr)
         .await
@@ -35,10 +58,13 @@ async fn run(config: Config) -> anyhow::Result<()> {
         "server started"
     );
 
-    axum::serve(listener, app)
-        .with_graceful_shutdown(shutdown_signal())
-        .await
-        .context("HTTP server failed")?;
+    axum::serve(
+        listener,
+        app.into_make_service_with_connect_info::<std::net::SocketAddr>(),
+    )
+    .with_graceful_shutdown(shutdown_signal())
+    .await
+    .context("HTTP server failed")?;
 
     db.close().await;
     tracing::info!("server stopped");

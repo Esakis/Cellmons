@@ -11,7 +11,8 @@ Wydajność jest głównym wymaganiem projektu. Ten dokument określa budżety (
 | JS na start (trasa logowania i mapy), po Brotli | ≤ 70 KB | kontrola rozmiaru w CI |
 | CSS na start, po Brotli | ≤ 20 KB | kontrola rozmiaru w CI |
 | Czcionki | ≤ 40 KB | kontrola rozmiaru w CI |
-| Pierwsze załadowanie łącznie (bez ilustracji kart) | ≤ 200 KB | Lighthouse CI |
+| Pierwsze załadowanie łącznie (bez ilustracji kart) | ≤ 200 KB | Lighthouse CI; kontrola rozmiaru w CI (cała aplikacja offline bez modułu ilustracji) |
+| Ilustracje kart (jeden leniwie ładowany moduł `cardArt`), po Brotli | ≤ 80 KB | kontrola rozmiaru w CI |
 | Pakiet ekranu walki (ładowany leniwie) | ≤ 40 KB | kontrola rozmiaru w CI |
 | `engine-wasm` po Brotli | ≤ 90 KB | kontrola rozmiaru w CI |
 | Dane treści (`content.<hash>.json`) po Brotli | ≤ 50 KB | kontrola rozmiaru w CI |

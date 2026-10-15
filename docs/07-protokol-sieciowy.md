@@ -206,7 +206,7 @@ stateDiagram-v2
 | `INVALID_MESSAGE` | nie da się zdekodować wiadomości albo pola są poza zakresem |
 | `RATE_LIMITED` | przekroczony limit (rozdz. 6) |
 | `FORBIDDEN` | brak uprawnień (np. operacja klanowa bez roli) |
-| `GUEST_RESTRICTED` | funkcja niedostępna dla konta gościa (R-KNT-02) |
+| `GUEST_RESTRICTED` | funkcja niedostępna dla konta z niepotwierdzonym e-mailem (R-KNT-02, historyczna nazwa kodu); lokalny gość nie używa API |
 | `NOT_FOUND` | nieistniejący obiekt |
 | `CONFLICT` | stan się zmienił (np. ruch już wysłany, nieaktualna wersja oferty) |
 | `BUSY` | gracz jest już w pojedynku albo ma aktywne wyzwanie (R-LOB-06) |
@@ -248,6 +248,9 @@ Wszystkie pola tekstowe mają limity długości i są sprawdzane po stronie serw
 | `POST /api/auth/rotate` | wymiana tokenu aplikacji na nowy (co 7 dni) | `Authorization: Bearer` |
 | `POST /api/auth/logout` | — | sesja |
 | `POST /api/auth/verify-email` | token z e-maila | — |
+| `POST /api/auth/verify-email/request` | ponowne wysłanie linku; odpowiedź nie ujawnia istnienia konta | — |
+| `GET /api/auth/options` | publiczny klucz CAPTCHA lub `null` w środowisku lokalnym | — |
+| `GET /api/auth/sessions` / `DELETE /api/auth/sessions/{id}` | lista aktywnych sesji / zakończenie własnej sesji | sesja |
 | `POST /api/auth/password-reset/request` / `confirm` | reset hasła | — |
 | `GET /api/me` | stan sesji i profilu (start aplikacji) | sesja |
 | `GET /api/me/export` | eksport danych osobowych (RODO) | sesja + ponowne podanie hasła |
@@ -260,6 +263,8 @@ Wszystkie pola tekstowe mają limity długości i są sprawdzane po stronie serw
 | `/api/admin/*` | panel administracyjny (`08-serwer.md`, rozdz. 12) | rola admin + 2FA + lista IP |
 
 Żądania zmieniające stan wymagają nagłówka `X-Requested-With: app` (ADR-010). Odpowiedzi błędów mają postać `{ "error": "<KOD>" }` z kodami jak w rozdz. 5.
+
+W F6.2 logowanie przyjmuje JSON `{identity,password,client?:"web"|"android"}`, rejestracja `{login,email,password,school,client?,captcha_token?}`. Logowanie web zwraca `{profile}` i ciasteczko, aplikacja `{profile,token,expires_in}` bez ciasteczka. Rejestracja zwraca 201 `{registered:true}`; nie tworzy automatycznie sesji. Szczegóły wdrożonego kontraktu: [raport F6.2](23-konta-i-gosc-testy.md). Gość lokalny nie ma endpointu i nie wysyła żądań (ADR-018).
 
 Endpointy wymagające sesji przyjmują ciasteczko (przeglądarka) albo nagłówek `Authorization: Bearer` (aplikacja Android). CORS jest włączony tylko dla pochodzenia aplikacji `https://localhost`, bez ciasteczek. Manifest i paczki aktualizacji aplikacji (`/app-bundles/manifest.json`, `/app-bundles/<wersja>.zip`) to pliki statyczne na CDN (`19-aplikacja-android.md`, rozdz. 5). Serwer odrzuca powłokę starszą niż `APP_MIN_NATIVE_VERSION` błędem `VERSION_MISMATCH`.
 

@@ -2,6 +2,8 @@
 
 Serwer to jedna binarka Rust (crate `server`): HTTP i WebSocket (Axum), cała logika domenowa, aktory stanu współbieżnego i dostęp do PostgreSQL (ADR-002, ADR-005). Protokół opisuje `07-protokol-sieciowy.md`, a schemat bazy `09-baza-danych.md`.
 
+**Stan F6.2 (2026-10-15).** Działają konfiguracja, telemetria, `/healthz`, `/readyz`, `server migrate` i API kont: rejestracja, logowanie web/aplikacji, sesje, tokeny e-mail, reset, rotacja i bilety WebSocket. Schemat i zapytania sprawdzają testy PostgreSQL oraz SQLx. Lokalny gość działa wyłącznie na froncie, bez konta w bazie (ADR-018). `/readyz` zwraca 503 także przy braku migracji. Pozostałe moduły poniżej opisują docelowy serwer; następny krok to gateway F6.3. Szczegóły: [raport F6.2](23-konta-i-gosc-testy.md).
+
 ## 1. Proces i runtime
 
 - Tokio w trybie wielowątkowym: liczba wątków = liczba rdzeni.
@@ -152,7 +154,9 @@ Aktor wyprawy (jeden na gracza, R-WYP-01…06):
 
 ## 9. Start, zamykanie, wygaszanie (drain)
 
-**Start:** wczytanie konfiguracji → połączenie z bazą i migracje (tylko jeśli `RUN_MIGRATIONS=true`; w produkcji osobny krok wdrożenia) → odtworzenie pojedynków, turniejów i wypraw → start menedżera botów → otwarcie portu → `/readyz` zwraca 200.
+**Migracje przed startem:** osobne polecenie `server migrate` (lokalnie wywołuje je `run.bat`, w produkcji krok wdrożenia z rolą DDL).
+
+**Docelowy start:** wczytanie konfiguracji → przygotowanie puli bazy i sprawdzenie schematu → odtworzenie pojedynków, turniejów i wypraw → start menedżera botów → otwarcie portu → `/readyz` zwraca 200. W obecnym F6.1 serwer otwiera port także przy niedostępnej bazie, a stan połączenia i schematu pokazuje `/readyz`.
 
 **Wygaszanie** (sygnał `SIGTERM` albo `POST /admin/drain`), używane przy każdym wdrożeniu:
 1. `/readyz` zwraca 503, więc Caddy kieruje nowe połączenia do nowej instancji.
@@ -203,6 +207,7 @@ Każda operacja administracyjna trafia do `audit_log` (kto, co, kiedy, przed i p
 | Zmienna | Opis | Domyślnie |
 |---|---|---|
 | `DATABASE_URL` | połączenie z PostgreSQL | — (wymagana) |
+| `MIGRATION_DATABASE_URL` | połączenie roli DDL, używane wyłącznie przez `server migrate` | `DATABASE_URL` |
 | `DB_POOL_SIZE` | rozmiar puli | 2 × liczba rdzeni |
 | `LISTEN_ADDR` | adres i port | `0.0.0.0:8080` |
 | `PUBLIC_ORIGIN` | dozwolony nagłówek `Origin` | — (wymagana) |
@@ -211,8 +216,11 @@ Każda operacja administracyjna trafia do `audit_log` (kto, co, kiedy, przed i p
 | `APP_MIN_NATIVE_VERSION` | najstarsza akceptowana wersja powłoki Android | `1.0.0` |
 | `SESSION_TTL_DAYS` | ważność sesji | 30 |
 | `SMTP_*` / `EMAIL_API_KEY` | dostawca e-mail | — |
+| `MAIL_MODE` / `MAIL_OUTBOX` | F6.2: `file` tylko na loopback; lokalne wiadomości w plikach JSON / katalog wyjściowy | `file` / `target/mail` na loopback; poza nim `smtp` |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM` | F6.2: serwer SMTP z obowiązkowym STARTTLS, konto, hasło i nadawca | port 587; pozostałe wymagane dla SMTP |
+| `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET` | F6.2: publiczny/prywatny klucz antyspamu; wymagane poza loopback | wyłączone na loopback |
+| `TRUSTED_PROXY_IPS` | F6.2: adresy IP pośredników, od których można przyjąć `X-Forwarded-For`, rozdzielone przecinkami | puste; nagłówek jest ignorowany |
 | `DRAIN_TIMEOUT_S` | maks. czas wygaszania | 480 |
-| `RUN_MIGRATIONS` | migracje przy starcie | `false` w produkcji |
 | `FEATURES` | flagi funkcji, np. `trading,tournaments` | wszystkie włączone |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | eksport śladów | puste (wyłączone) |
 | `LOG_LEVEL` | poziom logów (`error`, `warn`, `info`, `debug`, `trace`, `off`), opcjonalnie z poziomami modułów, np. `info,sqlx=warn`; nieznane słowo albo spacja po przecinku zatrzymują start z błędem | `info` |

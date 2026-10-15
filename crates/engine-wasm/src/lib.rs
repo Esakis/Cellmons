@@ -2,6 +2,9 @@
 
 use wasm_bindgen::prelude::wasm_bindgen;
 
+mod training;
+pub use training::Training;
+
 /// Wersja silnika skompilowanego do WebAssembly.
 #[wasm_bindgen]
 pub fn engine_version() -> String {

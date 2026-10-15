@@ -20,6 +20,8 @@ Każda decyzja ma status, kontekst, rozważone alternatywy i konsekwencje. Zmian
 | 014 | Aplikacja Android: Capacitor opakowujący klienta web; Google Play (AAB) + APK ze strony | przyjęta (decyzja właściciela) |
 | 015 | Logowanie w aplikacji: token sesji + jednorazowy bilet WebSocket (uzupełnia ADR-010) | przyjęta |
 | 016 | Grafika wektorowa (SVG) tworzona przez asystenta AI, element po elemencie | przyjęta (decyzja właściciela) |
+| 017 | Trening offline: sesja WASM z binarnym dispatch, treść wersjonowana razem z klientem | przyjęta |
+| 018 | Gość lokalny bez konta, sieci i zapisu danych; osobno konto z niepotwierdzonym e-mailem | przyjęta (decyzja właściciela) |
 
 ---
 
@@ -211,7 +213,7 @@ Każda decyzja ma status, kontekst, rozważone alternatywy i konsekwencje. Zmian
 - Sesja po stronie serwera (tabela `sessions` + cache w pamięci), identyfikator w ciasteczku `HttpOnly; Secure; SameSite=Lax`.
 - WebSocket na tej samej domenie: przeglądarka wysyła ciasteczko przy nawiązywaniu połączenia, a serwer sprawdza sesję i nagłówek `Origin` (ochrona przed CSWSH).
 - Żądania HTTP zmieniające stan wymagają nagłówka `X-Requested-With` (dodatkowa ochrona CSRF).
-- Potwierdzenie e-maila zmienia konto gościa w pełne (R-KNT-02).
+- Potwierdzenie e-maila zmienia konto z niepotwierdzonym adresem w pełne (R-KNT-02). Znaczenie terminu „gość” uściśla ADR-018.
 
 **Alternatywy:** JWT w `localStorage` (odrzucone: ryzyko XSS, trudne unieważnianie); tylko logowanie zewnętrzne OAuth (zależność od dostawcy; możliwe jako dodatek później); passkeys / WebAuthn (dodatek w przyszłości).
 
@@ -301,3 +303,25 @@ Szczegóły: `19-aplikacja-android.md`.
 - (+) Bardzo małe pliki (zwykle kilka–kilkadziesiąt KB). Ostre na każdym ekranie, łatwe zmiany kolorów i motywów, brak kosztów zamówień.
 - (−) Ograniczony realizm: styl musi być świadomie umowny. Spójność pilnuje przewodnik stylu (krok F3.6 planu).
 - (−) Niepewna ochrona prawnoautorska grafik tworzonych głównie przez AI. Dokumentujemy wkład właściciela, a markę chronimy znakiem towarowym.
+
+## ADR-017. Sesja treningu w WASM i wspólny pakiet treści
+
+**Kontekst.** F5 potrzebuje trwałego stanu walki w workerze, wyliczania kosztów przez ten sam silnik i działania po odłączeniu sieci. Osobne ładowanie niezgodnych wersji klienta, treści i WASM prowadziłoby do rozbieżności kart i zasad.
+
+**Decyzja.** `Training` w `engine-wasm` przechowuje sesję i przyjmuje binarne wiadomości przez `dispatch`. Protobuf `game.v1.TrainingRequest/TrainingReply` jest generowany dla Rust i TypeScript. Start weryfikuje wersję treści klienta z wersją `engine-content`. Budowanie tworzy jeden pakiet z JSON, tekstów Fluent, grafik i WASM. PWA instaluje cały ten pakiet, a Android dołącza go do APK. Ukryte dane i ruch AI pozostają w workerze; UI otrzymuje widok gracza i jawne zdarzenia. Profile botów są kompilowane z `bots.toml` w czasie budowania; test porównuje je z wynikiem walidowanego parsera. Ziarno treningu pochodzi z `crypto.getRandomValues`.
+
+**Alternatywy.** Stan silnika w UI i serializowanie go po każdym ruchu zwiększa ryzyko ujawnienia danych i koszt transferów. Oddzielny parser zasad w TypeScript powielałby silnik. Parsowanie profili TOML w WASM dodawało ok. 68 KiB Brotli, mimo niezmiennej konfiguracji w danym wydaniu.
+
+**Konsekwencje.** Jeden silnik i spójny, kontrolowany rozmiar pakietu offline. Zmiana treści wymaga przebudowania WASM oraz klienta. Aktualizacja nie przerywa aktywnego treningu, ale odświeżenie strony rozpoczyna nową sesję. Ten etap nie dodaje jeszcze zdalnego dostarczania treści, API podglądu online, konstruktora talii ani pełnego odtwarzania zapisanych powtórek; pozostają w swoich fazach planu.
+
+## ADR-018. Gość wyłącznie lokalny, bez zapisu danych
+
+**Kontekst.** Właściciel przy F6.2 zażądał wejścia jako gość bez logowania: dane i postęp mają istnieć wyłącznie na froncie i nigdzie nie być zapisywane. Wcześniej dokumentacja nazywała gościem konto zapisane w bazie, którego e-mail nie został potwierdzony.
+
+**Decyzja.** „Graj jako gość” tworzy stan w pamięci klienta. Nie tworzy użytkownika, sesji ani tokenu na serwerze, nie wywołuje API i nie zapisuje danych w localStorage, sessionStorage, IndexedDB ani ciasteczkach. Ustawienia wybrane w tym trybie również pozostają w pamięci. Odświeżenie lub zamknięcie strony usuwa gościa i jego stan. Obecnie gość korzysta z treningu Rust/WASM offline. PWA może przechowywać statyczne pliki aplikacji do gry offline; nie zawierają danych gościa.
+
+Konto z niepotwierdzonym e-mailem pozostaje trwałym kontem z ograniczeniami R-KNT-02. Potwierdzenie adresu usuwa te ograniczenia. Lokalny gość nie jest takim kontem i nie ma dostępu do operacji online. Ta decyzja uzupełnia ADR-010/015 w zakresie nazwy i zachowania gościa; sposoby uwierzytelniania zarejestrowanych kont pozostają w mocy.
+
+**Alternatywy.** Anonimowy użytkownik w bazie lub token aplikacji wymagałyby zapisu na serwerze. Zapis klienta w pamięci trwałej pozwalałby wznowić grę, ale nie spełniałby wymagania właściciela.
+
+**Konsekwencje.** Gość działa bez sieci i rejestracji, ale nie ma odzyskiwania ani automatycznego przenoszenia jego stanu na konto. Limity, ranking i nagrody online dotyczą kont uwierzytelnionych. Testy sprawdzają brak API i zapisu oraz utratę trybu po przeładowaniu strony.

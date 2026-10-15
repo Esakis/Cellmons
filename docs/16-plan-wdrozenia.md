@@ -113,15 +113,21 @@ flowchart LR
 | F5.5 Trening i PWA | wybór postaci startowej i bota, Service Worker, tryb offline | **M2:** gra offline po instalacji PWA; test e2e „trening do końca” |
 | F5.6 Test na telefonie | wczesna wersja aplikacji Capacitor (debug) z treningiem offline; pomiary na 2–3 telefonach z macierzy (`19-aplikacja-android.md`, rozdz. 10) | start ≤ 2 s, 60 FPS w walce, silnik WASM działa w WebView; problemy wpisane do rejestru ryzyk |
 
+**Stan F5 (2026-10-15).** Zaimplementowano F5.1–F5.5: routing, PL/EN, jasny/ciemny motyw, worker Protobuf/WASM, pełny trening, podgląd kosztów z Rust, animacje i powtórkę rundy, PWA i offline. Testy przechodzą w Chromium oraz emulacji Pixel 5, w tym pełna walka po odłączeniu sieci i przeładowaniu strony. Lighthouse mobile: 100/100/100/100; budżety rozmiaru sprawdzane przy budowaniu. W F5.6 zbudowano APK debug i rozegrano trening bez sieci w WebView 113 na emulatorze Android 14. **F5.4/F5.6 pozostają otwarte w części sprzętowej:** 60 FPS i start do interaktywności wymagają pomiarów na 2–3 fizycznych telefonach; pierwszy start aktywności emulatora wyniósł 3,4 s. Szczegóły: [raport F5](21-trening-offline-testy.md).
+
 ## F6. Serwer: konta, połączenie, lobby (≈ 3,5 tydz.)
 
 | Krok | Zadania | Kryteria akceptacji |
 |---|---|---|
 | F6.1 Baza i migracje | schemat kont, sesji, postaci, kolekcji, ratingów (`09-baza-danych.md`) | migracje w CI na czystej bazie |
-| F6.2 Konta | rejestracja, logowanie, wylogowanie, weryfikacja e-mail, reset hasła, konto gościa (ADR-010, R-KNT-01…02); od razu także ścieżka aplikacji: token, bilet WebSocket, wymiana tokenu, CORS dla pochodzenia aplikacji (ADR-015) | testy integracyjne obu ścieżek logowania; limity prób logowania |
+| F6.2 Konta | rejestracja, logowanie, wylogowanie, weryfikacja e-mail, reset hasła (ADR-010, R-KNT-01…02); lokalny gość bez API i zapisu danych (ADR-018, R-KNT-04); od razu także ścieżka aplikacji: token, bilet WebSocket, wymiana tokenu, CORS dla pochodzenia aplikacji (ADR-015) | testy integracyjne obu ścieżek logowania; limity prób; gość działa offline bez zapisu |
 | F6.3 Gateway WebSocket | sesje, `Hello`/`Welcome`, puls, wznawianie, limity (rozdz. 1–6 w `07-protokol-sieciowy.md`) | test: 1000 połączeń lokalnie bez błędów |
 | F6.4 Pokoje i czat | aktory pokojów, obecność, czat, filtry, znajomi i ignorowani, poczta | testy e2e czatu dwóch klientów |
 | F6.5 Klient: logowanie i lobby | ekrany logowania, mapy, pokoju, czatu, komendy czatu | test e2e „rejestracja → lobby” |
+
+**Stan F6 (2026-10-15).** F6.1 wykonany: cztery migracje tworzą dziewięć tabel kont, sesji, postaci, kolekcji, talii i rankingu. Testy PostgreSQL obejmują pustą bazę, aktualizację z istniejącymi danymi, ponowne uruchomienie, ograniczenia, współbieżne zajęcie slotu i uprawnienia ról. CI sprawdza także metadane SQLx. Normalny start serwera nie wykonuje DDL; `run.bat` wcześniej wywołuje osobne polecenie migracji. Szczegóły: [raport F6.1](22-baza-migracje-testy.md).
+
+**Aktualizacja F6.2 (2026-10-15).** Zaimplementowano rejestrację z zestawem startowym, logowanie i wylogowanie web/aplikacji, sesje i ich unieważnianie, potwierdzanie e-maila, reset hasła, rotację tokenu, bilet WebSocket, CORS i limity prób. Dodano formularze konta oraz lokalnego gościa bez API i zapisu danych (decyzja właściciela, ADR-018). Testy akceptacyjne obejmują obie ścieżki logowania i tryb gościa offline. SMTP i Turnstile wymagają konfiguracji przed wdrożeniem publicznym. Następny krok: F6.3. Szczegóły i granice: [raport F6.2](23-konta-i-gosc-testy.md).
 
 ## F7. Pojedynki online (≈ 3 tydz.) → M3
 

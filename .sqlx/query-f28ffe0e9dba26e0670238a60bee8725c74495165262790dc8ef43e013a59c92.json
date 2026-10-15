@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM sessions WHERE id_hash=$1 AND user_id=$2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Bytea", "Uuid"]
+    },
+    "nullable": []
+  },
+  "hash": "f28ffe0e9dba26e0670238a60bee8725c74495165262790dc8ef43e013a59c92"
+}

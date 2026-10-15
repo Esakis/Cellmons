@@ -2,13 +2,13 @@
 
 Projekt gry karcianej z elementami RPG (przeglądarka i Android), odtwarzającej zasady polskiej gry sieciowej **Cellmons** (Pogram, 2004–2009). Mechanika pochodzi z oryginału, a nazwy, teksty, fabuła i grafiki są własne. „Cellmons” zostaje tylko nazwą repozytorium. Nazwę produktu, znak towarowy i domeny opisuje `docs/20-nazwa-i-znak-towarowy.md`.
 
-**Status:** faza F4 z `docs/16-plan-wdrozenia.md`: boty L0–L3 i cztery profile treningowe. L2 uczy się ujawnionych zachowań przeciwnika, a L3 rozstrzyga hipotetyczne rundy i losuje ze strategii mieszanej. Boty korzystają wyłącznie z widoku gracza i działają deterministycznie natywnie oraz w WebAssembly. `sim ai` sprawdza ich siłę i czas decyzji. Treść gry z F3 jest w `content/` (72 karty, 6 postaci startowych, zestawy startowe, teksty PL i EN), a zatwierdzone grafiki w `art/`. Następna faza, F5, to trening offline w przeglądarce.
+**Status:** F6.2 — rejestracja, logowanie, sesje przeglądarki i aplikacji, potwierdzanie e-maila, reset hasła oraz lokalny tryb „Graj jako gość”. Gość działa wyłącznie w pamięci klienta, bez API i zapisu danych lub postępu. Szczegóły i konfigurację poczty opisuje [raport F6.2](docs/23-konta-i-gosc-testy.md). Następny krok to F6.3: połączenia WebSocket. Działa też trening offline F5 w przeglądarce/PWA i Android debug; do zamknięcia F5 pozostają pomiary na fizycznych telefonach (start, 60 FPS i dostępność), opisane w [raporcie F5](docs/21-trening-offline-testy.md). Treść gry (72 karty i zestawy startowe) jest w `content/`, a zatwierdzone grafiki w `art/`.
 
 ## Uruchomienie lokalne
 
-Potrzebne są: Rust (rustup), Node.js 24 LTS z pnpm (`corepack enable pnpm`) i Docker Desktop. Szczegóły są w [CONTRIBUTING.md](CONTRIBUTING.md).
+Potrzebne są: Rust (rustup), Node.js 24 LTS z pnpm (`corepack enable pnpm`) i Docker Desktop; klient wymaga też `wasm-bindgen-cli` 0.2.129. Szczegóły są w [CONTRIBUTING.md](CONTRIBUTING.md).
 
-- `run.bat` uruchamia bazę danych, serwer gry i klienta, a potem otwiera przeglądarkę na http://localhost:5173.
+- `run.bat` uruchamia bazę danych, stosuje migracje, uruchamia serwer gry i klienta, a potem otwiera przeglądarkę na http://localhost:5173.
 - `check.bat` wykonuje wszystkie kontrole z CI i kończy się podsumowaniem.
 - `cargo run -p sim -- duel [ziarno]` rozgrywa pojedynek botów i opisuje go runda po rundzie.
 - `cargo run --release -p sim -- run --n 100000` rozgrywa serię pojedynków botów i podsumowuje wyniki.
@@ -64,3 +64,6 @@ Zalecana kolejność czytania: 01 → 02 → 03 → 04 → 16, potem pozostałe 
 | [19. Aplikacja Android](docs/19-aplikacja-android.md) | Capacitor, logowanie w aplikacji, aktualizacje, podpisywanie, Google Play i APK |
 | [20. Nazwa i znak towarowy](docs/20-nazwa-i-znak-towarowy.md) | nazwa produktu, sprawdzenie znaków i domen, wykaz towarów i usług, kroki zgłoszenia |
 | [Dane referencyjne](docs/dane/README.md) | dane z archiwum oryginalnej gry (tylko do projektowania) |
+| [21. Trening offline — testy](docs/21-trening-offline-testy.md) | zakres F5, pomiary, PWA i Android debug, otwarte testy sprzętowe |
+| [22. Baza i migracje — testy](docs/22-baza-migracje-testy.md) | zakres F6.1, migracje, role bazy, SQLx offline i testy integralności |
+| [23. Konta i gość — testy](docs/23-konta-i-gosc-testy.md) | F6.2, logowanie web/aplikacji, e-mail, limity, gość bez zapisu danych |

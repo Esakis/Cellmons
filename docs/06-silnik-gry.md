@@ -372,7 +372,11 @@ Rodzaje testów silnika (szczegóły w `14-testy-i-jakosc.md`): jednostkowe dla 
 
 ## 13. Interfejs WebAssembly
 
-Silnik w przeglądarce działa w Web Workerze. Komunikacja wątek główny ↔ worker odbywa się przez wiadomości (`postMessage`) z danymi binarnymi Protobuf (te same typy co protokół sieciowy). Dzięki temu nie ma ręcznego mapowania obiektów i kosztownych przejść między JS a WASM.
+Silnik w przeglądarce działa w Web Workerze. Komunikacja wątek główny ↔ worker odbywa się przez wiadomości (`postMessage`) z danymi binarnymi Protobuf (te same typy co protokół sieciowy). Generowane typy utrzymują wspólny format wiadomości, a przenoszone `ArrayBuffer` unikają kopiowania danych między wątkami.
+
+**Implementacja F5 (ADR-017).** Eksport `Training` ma konstruktor i `dispatch(request_bytes) -> reply_bytes`. Schemat `proto/game/v1/training.proto` obejmuje start, ruch, podgląd, poddanie i powtórkę ostatniej rundy. Treść silnika jest kompilowana z `engine-content`, a żądanie startu musi podać ten sam `content_version` co JSON klienta. UI i worker pochodzą z jednego pakietu. Podgląd w F5 działa na widoku gracza sesji treningowej; nie jest jeszcze publicznym API podglądu pojedynków online. Walidator konstruktora talii i pełne odtwarzanie rekordu dojdą z odpowiednimi ekranami.
+
+Docelowe operacje interfejsu (dodawane wraz z ich funkcjami):
 
 | Funkcja eksportowana | Zastosowanie |
 |---|---|

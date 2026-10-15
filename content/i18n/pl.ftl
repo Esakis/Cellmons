@@ -3,21 +3,21 @@
 
 ## Szkoły
 
-school-combat-name = Walka
-school-divine-name = Kapłaństwo
-school-element-name = Elementalizm
-school-arcane-name = Magia
+school-combat-name = Oręż
+school-divine-name = Światłość
+school-element-name = Żywioły
+school-arcane-name = Arkana
 school-necro-name = Nekromancja
-school-tech-name = Technologia
+school-tech-name = Runotechnika
 
 ## Postacie
 
-avatar-dune_wanderer-name = Wędrowiec Wydm
-avatar-dawn_warden-name = Strażnik Świtu
-avatar-ember_drake-name = Żarosmok
-avatar-star_adept-name = Adeptka Gwiazd
-avatar-ash_widow-name = Wdowa Popiołu
-avatar-cogwright-name = Mistrz Trybów
+avatar-dune_wanderer-name = Wojownik
+avatar-dawn_warden-name = Kapłan
+avatar-ember_drake-name = Druid
+avatar-star_adept-name = Mag
+avatar-ash_widow-name = Nekromantka
+avatar-cogwright-name = Runotechnik
 
 ## Walka
 
@@ -204,15 +204,15 @@ card-attack_calibration-name = Kalibracja Ataku
 card-attack_calibration-text = W tej rundzie wszystkie twoje ataki fizyczne trafiają.
 card-defense_calibration-name = Kalibracja Obrony
 card-defense_calibration-text = W tej rundzie +{ $amount } do obrony fizycznej i +{ $amount_2 } do magicznej.
-card-combat_amplifier-name = Wzmacniacz: Walka
-card-combat_amplifier-text = +{ $amount } do poziomu szkoły „Walka” do końca pojedynku.
-card-divine_amplifier-name = Wzmacniacz: Kapłaństwo
-card-divine_amplifier-text = +{ $amount } do poziomu szkoły „Kapłaństwo” do końca pojedynku.
-card-element_amplifier-name = Wzmacniacz: Elementalizm
-card-element_amplifier-text = +{ $amount } do poziomu szkoły „Elementalizm” do końca pojedynku.
-card-arcane_amplifier-name = Wzmacniacz: Magia
-card-arcane_amplifier-text = +{ $amount } do poziomu szkoły „Magia” do końca pojedynku.
+card-combat_amplifier-name = Wzmacniacz: Oręż
+card-combat_amplifier-text = +{ $amount } do poziomu szkoły „Oręż” do końca pojedynku.
+card-divine_amplifier-name = Wzmacniacz: Światłość
+card-divine_amplifier-text = +{ $amount } do poziomu szkoły „Światłość” do końca pojedynku.
+card-element_amplifier-name = Wzmacniacz: Żywioły
+card-element_amplifier-text = +{ $amount } do poziomu szkoły „Żywioły” do końca pojedynku.
+card-arcane_amplifier-name = Wzmacniacz: Arkana
+card-arcane_amplifier-text = +{ $amount } do poziomu szkoły „Arkana” do końca pojedynku.
 card-necro_amplifier-name = Wzmacniacz: Nekromancja
 card-necro_amplifier-text = +{ $amount } do poziomu szkoły „Nekromancja” do końca pojedynku.
-card-tech_amplifier-name = Wzmacniacz: Technologia
-card-tech_amplifier-text = +{ $amount } do poziomu szkoły „Technologia” do końca pojedynku.
+card-tech_amplifier-name = Wzmacniacz: Runotechnika
+card-tech_amplifier-text = +{ $amount } do poziomu szkoły „Runotechnika” do końca pojedynku.

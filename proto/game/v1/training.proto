@@ -1,0 +1,94 @@
+syntax = "proto3";
+package game.v1;
+
+// Offline worker boundary. No hidden opponent hand, deck order or RNG is returned.
+message TrainingRequest {
+  uint32 seq = 1;
+  oneof body {
+    TrainingSetup start = 2;
+    DuelMove play = 3;
+    DuelMove preview = 4;
+    TrainingForfeit forfeit = 5;
+    TrainingReplay replay = 6;
+  }
+}
+message TrainingSetup {
+  uint32 avatar_id = 1;
+  string profile_id = 2;
+  bytes seed = 3;
+  uint32 rotation = 4;
+  bool autoplay = 5;
+  string content_version = 6;
+}
+message TrainingForfeit {}
+message TrainingReplay {}
+// Slot values: 0 physical, 1 magical. Action: 0 none, 1 cast, 2 discard.
+message DuelMove {
+  repeated uint32 attacks = 1;
+  repeated uint32 defenses = 2;
+  uint32 action = 3;
+  uint32 hand_index = 4;
+}
+message MovePreview {
+  uint32 changes = 1;
+  int32 focus_cost = 2;
+  int32 stamina_cost = 3;
+  int32 focus_after = 4;
+  int32 max_attack_stamina = 5;
+  string error = 6;
+}
+message DuelSide {
+  int32 hp = 1;
+  int32 hp_start = 2;
+  int32 stamina = 3;
+  int32 focus = 4;
+  // AF, OF, AM, OM, hp_max, stamina_max.
+  repeated int32 stats = 5;
+  repeated uint32 schools = 6;
+  repeated uint32 attacks = 7;
+  repeated uint32 defenses = 8;
+  uint32 deck_len = 9;
+  uint32 hand_len = 10;
+  repeated uint32 discard = 11;
+}
+message DuelEnchantment {
+  uint32 side = 1;
+  uint32 card_id = 2;
+}
+message DuelOutcome {
+  // 0 draw, 1 player, 2 opponent.
+  uint32 winner = 1;
+  string reason = 2;
+}
+// Language-neutral events; parameters depend on kind. Side: 0 player, 1 opponent.
+message DuelEvent {
+  string kind = 1;
+  uint32 side = 2;
+  uint32 card_id = 3;
+  int32 amount = 4;
+  uint32 slot = 5;
+  uint32 attack_kind = 6;
+  int32 old_value = 7;
+  int32 new_value = 8;
+  string detail = 9;
+  repeated DuelMove moves = 10;
+}
+message TrainingView {
+  uint32 round = 1;
+  uint32 total_rounds = 2;
+  uint32 initiative = 3;
+  DuelSide me = 4;
+  DuelSide opponent = 5;
+  repeated uint32 hand = 6;
+  repeated DuelEnchantment enchantments = 7;
+  DuelOutcome outcome = 8;
+  uint32 opponent_avatar_id = 9;
+}
+message TrainingReply {
+  uint32 seq = 1;
+  string error = 2;
+  TrainingView view = 3;
+  MovePreview preview = 4;
+  repeated MovePreview cast_options = 5;
+  repeated DuelEvent events = 6;
+}

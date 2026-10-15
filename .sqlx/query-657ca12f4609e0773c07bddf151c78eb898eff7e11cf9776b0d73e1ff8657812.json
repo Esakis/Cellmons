@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM sessions WHERE user_id=$1 AND expires_at<=now()",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid"]
+    },
+    "nullable": []
+  },
+  "hash": "657ca12f4609e0773c07bddf151c78eb898eff7e11cf9776b0d73e1ff8657812"
+}

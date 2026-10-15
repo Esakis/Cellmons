@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT EXISTS (SELECT 1 FROM _sqlx_migrations WHERE version = $1 AND success) AS \"migrated!\"",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "migrated!",
+        "type_info": "Bool",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": ["Int8"]
+    },
+    "nullable": [null]
+  },
+  "hash": "2c5ca969d39d2f43fe2a7ebaf719ad34b854ef15574f35e117ac87eef935cf15"
+}

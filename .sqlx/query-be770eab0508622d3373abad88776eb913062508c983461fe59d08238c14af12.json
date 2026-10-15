@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE users SET password_hash=$2 WHERE id=$1 AND status='active' RETURNING id",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid", "Text"]
+    },
+    "nullable": [false]
+  },
+  "hash": "be770eab0508622d3373abad88776eb913062508c983461fe59d08238c14af12"
+}

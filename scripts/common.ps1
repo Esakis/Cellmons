@@ -15,6 +15,7 @@ function Initialize-DevShell {
     }
     # Cargo, pnpm i Vitest wypisują tekst w UTF-8.
     try { [Console]::OutputEncoding = [Text.Encoding]::UTF8 } catch { }
+    $global:OutputEncoding = [Text.UTF8Encoding]::new($false)
     # Pasek postępu Invoke-WebRequest spowalnia zapytania i zaśmieca wynik.
     $global:ProgressPreference = 'SilentlyContinue'
     Set-Location $RepoRoot
@@ -27,6 +28,8 @@ function Test-Tools([string[]] $Names) {
         pnpm   = 'pnpm: polecenie "corepack enable pnpm" (Node.js 24 LTS z https://nodejs.org)'
         node   = 'Node.js 24 LTS: https://nodejs.org'
         docker = 'Docker Desktop: https://www.docker.com/products/docker-desktop'
+        'wasm-bindgen' = 'cargo install wasm-bindgen-cli --version 0.2.129 --locked (CONTRIBUTING.md)'
+        'cargo-sqlx' = 'cargo install sqlx-cli --version 0.9.0 --locked --no-default-features --features rustls,postgres'
     }
     $missing = @($Names | Where-Object { -not (Get-Command $_ -ErrorAction SilentlyContinue) })
     foreach ($name in $missing) {

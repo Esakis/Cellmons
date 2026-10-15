@@ -51,6 +51,19 @@ jobs:
         run: cargo run -q -p content-compiler --locked -- check
       - name: Testy
         run: cargo test --workspace --locked
+      - name: Migracje na czystej bazie i testy integralności
+        env:
+          DATABASE_URL: postgres://game:game@127.0.0.1:5432/game
+        run: |
+          cargo run -q -p server --locked -- migrate
+          cargo test -p server --tests --locked -- --ignored
+      - name: SQLx CLI (wersja zgodna z biblioteką)
+        run: cargo install sqlx-cli --version 0.9.0 --locked --no-default-features --features rustls,postgres
+      - name: Metadane zapytań SQL są aktualne
+        env:
+          DATABASE_URL: postgres://game:game@127.0.0.1:5432/game
+          SQLX_OFFLINE: 'false'
+        run: cargo sqlx prepare --check --workspace -- --all-targets --locked
       - name: Balans postaci startowych (sim matrix, kryterium F3.5)
         run: cargo run -q -p sim --locked -- matrix --n 500
       - name: Hierarchia botów i profili AI, czas decyzji (kryteria F4)
@@ -116,6 +129,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Biome
         run: pnpm exec biome ci
+      - uses: ./.github/actions/browser-engine
       - name: Typy
         run: pnpm --recursive --if-present typecheck
       - name: Testy
@@ -142,6 +156,10 @@ jobs:
         run: pnpm exec buf lint
       - name: Formatowanie
         run: pnpm exec buf format --diff --exit-code
+      - name: Wygenerowane typy TypeScript są aktualne
+        run: |
+          pnpm proto:generate
+          git diff --exit-code -- web/src/generated/proto
 
   e2e:
     name: E2E (Playwright)
@@ -161,12 +179,18 @@ jobs:
       - name: Przeglądarka Chromium
         run: pnpm --filter e2e exec playwright install --with-deps chromium
       - name: Budowanie klienta
+        uses: ./.github/actions/browser-engine
+      - name: Pakiet klienta
         run: pnpm --filter web build
       - name: Testy e2e
         run: pnpm --filter e2e test
+      - name: Lighthouse mobile (>=95)
+        run: pnpm audit:web
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: failure()
         with:
           name: playwright-report
-          path: e2e/playwright-report/
+          path: |
+            e2e/playwright-report/
+            target/lighthouse/
           retention-days: 7

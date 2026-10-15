@@ -7,8 +7,8 @@
 ## 1. Kierunek
 
 - Motywem przewodnim są emblematy i sygile szkół.
-- Portrety są geometryczne i stylizowane: sylwetka, symbol szkoły i jej kolor. Nie ma realistycznego malarstwa.
-- Kształty są proste i płaskie, bez cieni i faktur. Grafiki mają być czytelne od 32 px (ikony) do pełnej karty na ekranie telefonu.
+- Portrety i ilustracje kart są ilustracjami wektorowymi w klimacie fantasy (gradienty, światło, tło sceny). Nie ma realistycznego malarstwa ani faktur.
+- Ikony są proste i płaskie, bez cieni i faktur. Grafiki mają być czytelne od 32 px (ikony) do pełnej karty na ekranie telefonu.
 - Nie wzorujemy się na grafikach z oryginalnego Cellmons ani na innych chronionych grafikach (`docs/12-bezpieczenstwo-i-prawo.md`, rozdz. 8).
 
 ## 2. Paleta
@@ -66,21 +66,29 @@ Format 250 × 350 (proporcje 5 : 7). Układ pokazuje `frames/card-layout.svg`:
 | Koszt K | lewy górny róg, koło Ø 34 | liczba K |
 | Koszt W | pod kosztem K, koło Ø 26 | liczba W |
 | Nazwa | pasek u góry, obok kosztów | nazwa karty w języku gracza |
-| Ilustracja | okno 210 × 122 | ilustracja karty (od fazy F9) albo ikona szkoły |
+| Ilustracja | okno 210 × 122 | ilustracja karty z `cards/` albo ikona szkoły |
 | Wymagania | pasek pod ilustracją | ikony szkół z wymaganym poziomem |
 | Tekst | pole 210 × 84 | tekst efektu i słowa kluczowe |
 | Rzadkość | klejnot na dolnej krawędzi | kolor metalu ramki |
 
 Ramki (`frame-bronze.svg`, `frame-silver.svg`, `frame-gold.svg`) nie zawierają tekstu: nazwę, koszty i opis wstawia klient z `content.json` i plików tekstów, więc ta sama ramka działa po polsku i po angielsku.
 
+## 5a. Ilustracje kart (`cards/`)
+
+- Scena 160 × 100 (proporcje 8 : 5): tło z gradientem w kolorach szkoły, promienie światła, tło sceny szkoły (arena, świątynia, wzgórza, gwiazdy, cmentarz, warsztat), drobinki, cień na ziemi, winieta i złota ozdobna ramka.
+- Motyw na środku: przedmiot, istota lub zjawisko z działania karty. Kontur ciemny 1,2–1,8 px, połysk metalu i szkła gradientami.
+- W odróżnieniu od ikon ilustracje mają gradienty i światło, ale nadal bez faktur i realistycznego malarstwa.
+- Nazwy plików to klucze kart z `content/cards` bez prefiksu `card.`. Karta bez ilustracji pokazuje ikonę szkoły.
+- W kliencie wszystkie ilustracje trafiają do jednego, leniwie ładowanego modułu (`web/src/app/cardArt.ts`), bo razem kompresują się kilka razy lepiej niż osobne pliki (budżet aplikacji offline).
+
 ## 6. Portrety postaci (`avatars/`)
 
-- Koło 200 × 200 z obwódką w kolorze szkoły i jasnym tłem w odcieniu szkoły.
-- Sylwetka postaci z jednym wyraźnym atrybutem szkoły: miecze (Walka), aureola i promienie (Kapłaństwo), płomień (Elementalizm), gwiazdy i różdżka (Magia), welon i pióra kruka (Nekromancja), gogle i koło zębate (Technologia).
+- Koło 200 × 200 z obwódką w kolorze szkoły; tło sceny w gradiencie szkoły (promienie, gwiazdy, las, warsztat).
+- Ilustrowane popiersie klasy (od 2026-10-15): twarz z oczami i cieniowaniem, strój i rekwizyt szkoły: hełm z pióropuszem i miecz (Wojownik), aureola i laska słońca (Kapłan), wieniec z poroża i liści (Druid), kapelusz z gwiazdami i kula światła (Mag), kaptur i czaszka (Nekromantka), gogle i koło zębate (Runotechnik).
 - Nazwy plików to klucze postaci z `content/avatars` bez prefiksu `avatar.`.
 
 ## 7. Pliki i optymalizacja
 
-- `icons/`, `frames/`, `avatars/`: źródła SVG pisane ręcznie, bez zbędnych atrybutów edytorów.
+- `icons/`, `frames/`, `avatars/`, `cards/`: źródła SVG pisane ręcznie, bez zbędnych atrybutów edytorów.
 - Przed włączeniem do klienta (faza F5) pliki przechodzą przez SVGO; wersje zoptymalizowane trafiają do `web/src/assets/`, a źródła zostają tutaj.
 - Nowa grafika: opis → 2–3 warianty → wybór właściciela → poprawki → plik w `art/` → wpis w `PROVENANCE.md`.

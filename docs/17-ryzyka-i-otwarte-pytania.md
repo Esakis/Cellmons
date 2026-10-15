@@ -15,7 +15,7 @@ Skala: P = prawdopodobieństwo, W = wpływ (N niski, Ś średni, W wysoki). Reje
 | RY-07 | Oszustwa („podkładanie się”, wiele kont, boty) | Ś | Ś | wykrywanie i sankcje (`12-bezpieczenstwo-i-prawo.md`, rozdz. 4) | F12, F15 |
 | RY-08 | Niespójna lub zbyt prosta grafika (grafiki SVG tworzone przez asystenta AI, ADR-016) | Ś | Ś | przewodnik stylu zatwierdzony na starcie (F3.6), warianty do wyboru przy każdym elemencie, zatwierdzanie przez właściciela, ograniczona i spójna paleta | F3, F9, F10 |
 | RY-09 | Wolniejszy rozwój w Rust (krzywa uczenia, czas kompilacji) | Ś | Ś | mały, dobrze wydzielony silnik; szablony modułów serwera; ponowne rozważenie ADR-001/002 po F1, jeśli tempo jest wyraźnie za niskie | po F1 |
-| RY-10 | WASM lub animacje za wolne na słabych telefonach | N | Ś | budżety i pomiary już w F5, prostsze animacje w ustawieniach | F5, F13 |
+| RY-10 | WASM lub animacje za wolne na słabych telefonach | N | Ś | F5: WASM 68 KiB Brotli, Lighthouse 100 i trening offline potwierdzone w emulatorze; pierwszy start aktywności 3,4 s, kolejne 1,5/1,1 s. Brak pomiarów 60 FPS i gotowości UI na fizycznych telefonach — wymagane 2–3 urządzenia przed zamknięciem F5.6; szczegóły w `21-trening-offline-testy.md` | F5.6, F13 |
 | RY-11 | Jeden serwer to pojedynczy punkt awarii | Ś | W | kopie z PITR, monitoring na osobnej maszynie, procedura R4 (nowy serwer ≤ 1 h) | F14 |
 | RY-12 | Sieci szkolne i firmowe blokują WebSocket | N | Ś | WSS na porcie 443 przez Cloudflare; pomiar odsetka nieudanych połączeń w becie | M4 |
 | RY-13 | Wymogi prawne (RODO, DSA) niespełnione przy starcie | Ś | W | dokumenty i mechanizmy w F13.5, konsultacja prawna | F13 |

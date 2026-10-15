@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE email_tokens SET used_at=now() WHERE token_hash=$1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Bytea"]
+    },
+    "nullable": []
+  },
+  "hash": "3e132396287fef9dc0cdeba26c27947f704305074e9c73ff94f52cffed30c513"
+}

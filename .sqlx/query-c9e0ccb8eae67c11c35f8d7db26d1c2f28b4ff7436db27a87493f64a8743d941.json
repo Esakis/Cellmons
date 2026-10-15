@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO avatars(id,user_id,slot,template_id,is_active) VALUES ($1,$2,0,$3,true)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Uuid", "Int4"]
+    },
+    "nullable": []
+  },
+  "hash": "c9e0ccb8eae67c11c35f8d7db26d1c2f28b4ff7436db27a87493f64a8743d941"
+}

@@ -14,7 +14,7 @@ pub enum Archetype {
     Enchantment,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct BotProfile {
     pub id: String,
@@ -29,7 +29,7 @@ pub struct BotProfile {
     pub avatar_pool: Vec<u16>,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Profiles {
     pub bots: Vec<BotProfile>,
@@ -69,8 +69,7 @@ impl Profiles {
 }
 
 pub fn training_profiles() -> Profiles {
-    Profiles::parse(include_str!("../../../content/bots.toml"))
-        .expect("poprawne profile treningowe")
+    include!(concat!(env!("OUT_DIR"), "/profiles.rs"))
 }
 
 impl BotProfile {
@@ -137,6 +136,14 @@ impl BotProfile {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn compiled_profiles_match_the_validated_source() {
+        assert_eq!(
+            training_profiles(),
+            Profiles::parse(include_str!("../../../content/bots.toml")).unwrap()
+        );
+    }
 
     #[test]
     fn four_levels_have_valid_rotating_decks() {

@@ -18,14 +18,16 @@ Każdy element treści ma **klucz** (stały identyfikator w kodzie, np. `card.em
 
 ## 2. Szkoły
 
-| Klucz | Robocza nazwa | Charakter mechaniczny (z analizy 338 kart) | Liczba kart ref. |
+| Klucz | Nazwa w grze (PL / EN) | Charakter mechaniczny (z analizy 338 kart) | Liczba kart ref. |
 |---|---|---|---|
-| `combat` | Walka | wzmocnienia AF/OF (broń, pancerze), uniki i pewne trafienia, odnowa W, ciosy specjalne, gra na koncentracji przeciwnika | 73 |
-| `divine` | Kapłaństwo | leczenie i wskrzeszanie, ochrona, aury, obrażenia „święte”, efekty wyrównujące, odbieranie koncentracji | 45 |
-| `element` | Elementalizm | bezpośrednie obrażenia (ogień, piorun, kamień), trucizny, natura (regeneracja, tarcze), chaos i losowość, wysysanie W obu stron | 58 |
-| `arcane` | Magia | wzmocnienia AM/OM, przeciwzaklęcia, manipulacja czasem i ręką, obrażenia umysłowe, transformacje, obniżanie kosztów czarów | 62 |
-| `necro` | Nekromancja | osłabienia i podatności, wysysanie Ż/W, klątwy (przeklęte przedmioty), odbieranie kart z ręki, wampiryzm, strach, umagicznienia długotrwałe | 59 |
-| `tech` | Technologia | matryce ataku/obrony (I–III), optymalizacje statystyk, podnoszenie poziomów innych szkół, ładunki wybuchowe, rozpraszanie, „wszystkie ataki trafiają” | 58 |
+| `combat` | Oręż / Arms | wzmocnienia AF/OF (broń, pancerze), uniki i pewne trafienia, odnowa W, ciosy specjalne, gra na koncentracji przeciwnika | 73 |
+| `divine` | Światłość / Radiance | leczenie i wskrzeszanie, ochrona, aury, obrażenia „święte”, efekty wyrównujące, odbieranie koncentracji | 45 |
+| `element` | Żywioły / Elements | bezpośrednie obrażenia (ogień, piorun, kamień), trucizny, natura (regeneracja, tarcze), chaos i losowość, wysysanie W obu stron | 58 |
+| `arcane` | Arkana / Arcana | wzmocnienia AM/OM, przeciwzaklęcia, manipulacja czasem i ręką, obrażenia umysłowe, transformacje, obniżanie kosztów czarów | 62 |
+| `necro` | Nekromancja / Necromancy | osłabienia i podatności, wysysanie Ż/W, klątwy (przeklęte przedmioty), odbieranie kart z ręki, wampiryzm, strach, umagicznienia długotrwałe | 59 |
+| `tech` | Runotechnika / Runecraft | matryce ataku/obrony (I–III), optymalizacje statystyk, podnoszenie poziomów innych szkół, ładunki wybuchowe, rozpraszanie, „wszystkie ataki trafiają” | 58 |
+
+Nazwy szkół zmieniono 2026-10-15 na bardziej fantastyczne (wcześniej robocze: Walka, Kapłaństwo, Elementalizm, Magia, Nekromancja, Technologia). Klucze w danych zostają bez zmian. W dalszej części dokumentacji mogą jeszcze występować nazwy robocze.
 
 Kapłaństwo i Nekromancja są w fabule przeciwstawne. Mechanicznie nie ma ogólnego zakazu łączenia ich: decydują o tym szablony postaci i drogi (np. cienie „Obłędu” łączą obie).
 
@@ -44,6 +46,10 @@ Pełna tabela: `docs/dane/postacie.csv` (31 szablonów, nazwy oryginalne tylko j
 | cień | 6 | tylko z poświęcenia Ascenta | 2/2/2/2, rozwój tylko przez PR |
 
 **Postacie startowe szkół** (szablon referencyjny → szkoła): Nomad → Walka, Mnich → Kapłaństwo, Draco → Elementalizm, Czarodziej → Magia, Lady Kruk → Nekromancja, Doc → Technologia.
+
+**Nazwy postaci w grze** (od 2026-10-15) to nazwy klas, a nie imiona: Wojownik / Warrior (`dune_wanderer`, Oręż), Kapłan / Priest (`dawn_warden`, Światłość), Druid / Druid (`ember_drake`, Żywioły), Mag / Mage (`star_adept`, Arkana), Nekromantka / Necromancer (`ash_widow`, Nekromancja), Runotechnik / Runesmith (`cogwright`, Runotechnika). Klucze w danych zostają bez zmian.
+
+**Nazwy po reinkarnacji** (do zaprojektowania w F10, decyzja właściciela z 2026-10-15): klasa bazowa łączy się ze szkołą, którą dokłada wybrana droga (3.3), przez przyrostek, np. Wojownik + Nekromancja → „Wojownik Mroku”, Kapłan + Oręż → „Kapłan Bitwy”. Poziom reinkarnacji może dodawać przedrostek (np. „Mistrz”). Pełną listę nazw dróg ustala się razem z danymi dróg.
 
 Rozrzut statystyk na poz. 1 (bez cieni): AF 2–6, OF 0–4, AM 2–4, OM 0–3, Ż 25–45, W 25–45. Suma czterech statystyk walki: 7–12.
 

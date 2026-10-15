@@ -8,6 +8,7 @@
     "defaultBranch": "main"
   },
   "files": {
+    "includes": ["**", "!web/src/generated", "!mobile/android"],
     "ignoreUnknown": true
   },
   "formatter": {

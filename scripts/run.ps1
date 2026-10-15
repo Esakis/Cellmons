@@ -46,7 +46,7 @@ if ($Stop) {
     exit 0
 }
 
-if (-not (Test-Tools @('cargo', 'node', 'pnpm', 'docker'))) { Exit-WithError 'Uzupełnij brakujące programy i uruchom ponownie.' }
+if (-not (Test-Tools @('cargo', 'node', 'pnpm', 'docker', 'wasm-bindgen'))) { Exit-WithError 'Uzupełnij brakujące programy i uruchom ponownie.' }
 
 if (-not (Test-Path (Join-Path $RepoRoot '.env'))) {
     Copy-Item (Join-Path $RepoRoot '.env.example') (Join-Path $RepoRoot '.env')
@@ -58,7 +58,7 @@ if (-not (Test-DockerRunning)) {
     $dockerDesktop = Join-Path $env:ProgramFiles 'Docker\Docker\Docker Desktop.exe'
     if (-not (Test-Path $dockerDesktop)) { Exit-WithError 'Docker nie działa. Uruchom Docker Desktop i spróbuj ponownie.' }
     Write-Host 'Uruchamiam Docker Desktop (może to potrwać do 2 minut)...'
-    Start-Process $dockerDesktop
+    Start-Process $dockerDesktop -WindowStyle Hidden
     $deadline = (Get-Date).AddMinutes(2)
     while (-not (Test-DockerRunning)) {
         if ((Get-Date) -gt $deadline) { Exit-WithError 'Docker nie uruchomił się w ciągu 2 minut.' }
@@ -69,6 +69,10 @@ if (-not (Test-DockerRunning)) {
 Write-Host '==> Baza danych (PostgreSQL w Dockerze)' -ForegroundColor Cyan
 docker @ComposeArgs up -d --wait
 if ($LASTEXITCODE -ne 0) { Exit-WithError 'Baza danych nie wystartowała. Szczegóły są wyżej.' }
+
+Write-Host '==> Migracje bazy danych' -ForegroundColor Cyan
+cargo run -p server --locked -- migrate
+if ($LASTEXITCODE -ne 0) { Exit-WithError 'Migracje bazy danych nie powiodły się. Serwer nie został uruchomiony.' }
 
 $listenAddr = Get-DotEnvValue 'LISTEN_ADDR' '0.0.0.0:8080'
 $serverUrl = 'http://' + $listenAddr.Replace('0.0.0.0', '127.0.0.1')
@@ -101,7 +105,10 @@ if (Wait-HttpOk $clientUrl 1) {
 } else {
     pnpm install --frozen-lockfile
     if ($LASTEXITCODE -ne 0) { Exit-WithError 'Instalacja zależności klienta nie powiodła się.' }
-    Start-ServiceWindow 'Spellgambit: klient' 'pnpm --filter web dev'
+    # Pierwsze budowanie Rust/WASM może trwać dłużej niż limit oczekiwania na Vite.
+    pnpm --filter web prepare:assets
+    if ($LASTEXITCODE -ne 0) { Exit-WithError 'Budowanie silnika i zasobów klienta nie powiodło się.' }
+    Start-ServiceWindow 'Spellgambit: klient' 'pnpm --filter web exec vite'
     if (-not (Wait-HttpOk $clientUrl 60)) {
         Exit-WithError "Klient nie odpowiada na $clientUrl. Sprawdź okno 'Spellgambit: klient'."
     }

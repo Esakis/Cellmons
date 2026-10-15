@@ -1,8 +1,8 @@
 # Wartości osobowości: 100 = neutralna, zakres 0–200; temperatura w tysięcznych.
 [[bots]]
 id = "novice"
-name_pl = "Nowicjusz"
-name_en = "Novice"
+name_pl = "Adept Kręgu"
+name_en = "Circle Adept"
 level = "L0"
 aggression = 100
 spell_bias = 100
@@ -13,8 +13,8 @@ avatar_pool = [1, 2, 3, 4, 5, 6]
 
 [[bots]]
 id = "apprentice"
-name_pl = "Uczeń"
-name_en = "Apprentice"
+name_pl = "Czeladnik Run"
+name_en = "Rune Journeyman"
 level = "L1"
 aggression = 120
 spell_bias = 100
@@ -25,8 +25,8 @@ avatar_pool = [1, 2, 3, 4, 5, 6]
 
 [[bots]]
 id = "tactician"
-name_pl = "Taktyk"
-name_en = "Tactician"
+name_pl = "Mistrz Bitew"
+name_en = "Battlemaster"
 level = "L2"
 aggression = 200
 spell_bias = 80

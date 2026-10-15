@@ -28,9 +28,9 @@
 ## 2. Konta i uwierzytelnianie
 
 - Hasła: minimum 10 znaków, sprawdzenie na liście popularnych haseł, brak wymogów „wielka litera + cyfra”. Hash Argon2id z parametrami OWASP (ADR-010).
-- Logowanie: 5 nieudanych prób na konto w 15 min, potem rosnące opóźnienie; 20 na adres IP. Komunikat błędu nie zdradza, czy konto istnieje.
+- Logowanie F6.2: maks. 5 prób na konto w 15 min (wspólny limit loginu i e-maila, zerowany po udanym logowaniu) i 20 na adres IP. Nieudane próby mają opóźnienie 100–800 ms, przekroczenie limitu zwraca 429 z `Retry-After`. Komunikat błędu nie zdradza, czy konto istnieje.
 - Rejestracja: CAPTCHA przyjazna prywatności (np. Cloudflare Turnstile) i limit kont na adres IP w czasie.
-- Potwierdzenie e-maila zamienia konto gościa w pełne (R-KNT-02). Zmiana e-maila wymaga potwierdzenia na nowy adres i powiadomienia na stary.
+- Potwierdzenie e-maila zamienia konto z niepotwierdzonym adresem w pełne (R-KNT-02). Lokalny gość nie ma konta, sesji ani zapisu danych (ADR-018). Zmiana e-maila wymaga potwierdzenia na nowy adres i powiadomienia na stary.
 - Opcjonalnie później: 2FA dla graczy, passkeys (WebAuthn), logowanie zewnętrzne.
 
 ## 3. Integralność rozgrywki

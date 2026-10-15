@@ -303,7 +303,7 @@ Przykład: Adept na poz. 10 (L_eff = 1100) pokonuje postać bez reinkarnacji na 
 
 Domyślnie `xp.base = 100`, `xp.min = 10`, `xp.max = 300`. Cień liczy się jak Ascent na tym samym poziomie. Parametry kalibrujemy symulacjami (`11-ai-i-symulacje.md`).
 
-**R-PD-03.** Trening nie daje PD `[Ź:S2]`. Konto gościa ma limit PD na postać (R-KNT-02).
+**R-PD-03.** Trening nie daje PD `[Ź:S2]`. Konto z niepotwierdzonym e-mailem ma limit PD na postać (R-KNT-02).
 
 **R-PD-04.** Postać na poziomie 20 z 65 000 PD przestaje zdobywać PD `[Ź:S1,S2]`.
 
@@ -438,13 +438,15 @@ Cieni i postaci z wysypiska nie można wygrać `[Ź:S3]`.
 
 **R-KNT-01.** Rejestracja jest darmowa: login, e-mail, hasło, wybór szkoły startowej. Wybór szkoły daje zestaw startowy kart (`docs/dane/zestawy_startowe.csv`) i postać startową szkoły `[Ź:S2,S6; D: bez opłat]`. Wyboru szkoły nie można zmienić `[Ź:S6]`.
 
-**R-KNT-02. Konto gościa** (niepotwierdzony e-mail) ma ograniczenia `[Ź:S3; D: kryterium = potwierdzenie e-maila zamiast płatności]`:
+**R-KNT-02. Konto z niepotwierdzonym e-mailem** ma ograniczenia `[Ź:S3; D: kryterium = potwierdzenie e-maila zamiast płatności; nazwa uściślona w ADR-018]`:
 - postacie przestają zdobywać PD po 3000 PD;
-- brak rankingu (walki z gościem nie zmieniają rankingu żadnej ze stron);
+- brak rankingu (walki z kontem z niepotwierdzonym e-mailem nie zmieniają rankingu żadnej ze stron);
 - brak turniejów, wymiany i wypraw;
 - czat z ograniczeniem częstotliwości i bez wiadomości prywatnych do nieznajomych `[D]`.
 
 **R-KNT-03.** W oryginale ważność konta była płatna. **Nie odtwarzamy tego** `[D]`.
+
+**R-KNT-04. Gość lokalny** wchodzi bez rejestracji i logowania. Jego dane i postęp istnieją wyłącznie w pamięci frontendu, bez API i zapisu na serwerze lub w pamięci trwałej przeglądarki. Odświeżenie albo zamknięcie strony usuwa stan gościa. Obecnie dostępny jest trening offline, bez nagród online `[D: decyzja właściciela przy F6.2, ADR-018]`.
 
 ### 10.2. Lobby i wyzwania
 

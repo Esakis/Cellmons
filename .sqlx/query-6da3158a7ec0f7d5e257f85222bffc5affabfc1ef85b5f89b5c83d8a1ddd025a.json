@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id_hash FROM sessions WHERE id_hash=$1 AND kind='app' AND expires_at>now() FOR UPDATE",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id_hash",
+        "type_info": "Bytea",
+        "origin": {
+          "Table": {
+            "table": "sessions",
+            "name": "id_hash"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": ["Bytea"]
+    },
+    "nullable": [false]
+  },
+  "hash": "6da3158a7ec0f7d5e257f85222bffc5affabfc1ef85b5f89b5c83d8a1ddd025a"
+}

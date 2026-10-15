@@ -9,10 +9,15 @@
     "lint": "biome check",
     "format": "biome check --write",
     "typecheck": "pnpm --recursive --if-present typecheck",
-    "proto:lint": "buf lint"
+    "proto:lint": "buf lint",
+    "proto:generate": "buf generate",
+    "audit:web": "node scripts/audit-web.mjs"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
-    "@bufbuild/buf": "1.73.0"
+    "@bufbuild/buf": "1.73.0",
+    "@bufbuild/protoc-gen-es": "2.16.0",
+    "lighthouse": "13.5.0",
+    "svgo": "4.1.0"
   }
 }

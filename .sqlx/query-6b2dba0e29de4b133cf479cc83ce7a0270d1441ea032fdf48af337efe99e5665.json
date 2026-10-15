@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO unlocked_templates(user_id,template_id,source) VALUES ($1,$2,'start')",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid", "Int4"]
+    },
+    "nullable": []
+  },
+  "hash": "6b2dba0e29de4b133cf479cc83ce7a0270d1441ea032fdf48af337efe99e5665"
+}

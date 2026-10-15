@@ -2,6 +2,8 @@
 
 PostgreSQL (wersja 17 lub nowsza) przechowuje wszystkie dane trwałe (ADR-005). Treść gry (karty, postacie, zasady) **nie** jest w bazie, bo jest wkompilowana w serwer (`03-tresc-gry.md`, rozdz. 8). Baza przechowuje tylko identyfikatory treści.
 
+**Stan F6.2 (2026-10-15).** Zaimplementowane tabele: `users`, `sessions`, `email_tokens`, `unlocked_templates`, `avatars`, `collection`, `decks`, `deck_presets`, `ratings`. Pozostałe tabele i operacje w tym dokumencie są planem dalszych faz. Cztery migracje F6.1 w `migrations/` przechodzą testy na PostgreSQL 18.6; procedurę opisuje [raport F6.1](22-baza-migracje-testy.md). Rejestrację i logowanie dodano w [F6.2](23-konta-i-gosc-testy.md), a operacje rozwoju i talii powstaną w kolejnych fazach. Gość lokalny nie ma rekordu w bazie.
+
 ## 1. Konwencje
 
 | Temat | Ustalenie |
@@ -52,7 +54,7 @@ erDiagram
 | `login` | citext | UNIQUE, 3–20 znaków `[A-Za-z0-9_-]` |
 | `email` | citext | UNIQUE |
 | `password_hash` | text | Argon2id (PHC string) |
-| `email_verified_at` | timestamptz | NULL = konto gościa (R-KNT-02) |
+| `email_verified_at` | timestamptz | NULL = konto z niepotwierdzonym e-mailem (R-KNT-02); lokalny gość nie ma rekordu w bazie (ADR-018) |
 | `role` | text | `player`, `mentor`, `moderator`, `admin` |
 | `status` | text | `active`, `banned`, `pending_deletion`, `deleted` |
 | `locale` | text | `pl` / `en` |
@@ -95,7 +97,9 @@ erDiagram
 | `is_active` | boolean | — |
 | `created_at`, `deleted_at` | timestamptz | usunięcie miękkie (historia walk zachowuje odwołania) |
 
-Indeksy unikalne częściowe: `(user_id, slot) WHERE deleted_at IS NULL` oraz `(user_id) WHERE is_active AND deleted_at IS NULL` (dokładnie jedna aktywna postać).
+Indeksy unikalne częściowe: `(user_id, slot) WHERE deleted_at IS NULL` oraz `(user_id) WHERE is_active AND deleted_at IS NULL` (najwyżej jedna aktywna postać). Utworzenie i przełączanie postaci w aplikacji zapewni w transakcji, że gracz ma co najmniej jedną aktywną postać. Postać usunięta nie może być aktywna.
+
+Zwykła postać wymaga odblokowania `(user_id, template_id)` (R-PUL-02). Techniczna kolumna `owned_template_id` jest generowana jako `template_id` dla zwykłych postaci i `NULL` dla cieni; klucz obcy do `unlocked_templates` używa tej kolumny. Cień powstaje przez poświęcenie postaci i nie wymaga odblokowania wielokrotnie używanego szablonu (R-CIE-01, R-CIE-05). Identyfikatory treści muszą być dodatnie; ich istnienie we wkompilowanym katalogu sprawdzi aplikacja.
 
 Statystyki efektywne nie są przechowywane: serwer liczy je z treści (szablon, droga, poziom) i wydanych PR. Dzięki temu poprawka balansu w treści działa od razu dla wszystkich postaci.
 
@@ -106,6 +110,8 @@ Statystyki efektywne nie są przechowywane: serwer liczy je z treści (szablon, 
 **`decks`**: `avatar_id` PK (FK `avatars`), `cards smallint[] CHECK (cardinality(cards) <= 20)`, `updated_at`. Limit kopii i posiadanie kart sprawdza aplikacja (R-TAL-02, R-TAL-03).
 
 **`deck_presets`**: `id` PK, `user_id`, `name` (UNIQUE z `user_id`), `cards smallint[]`, `updated_at` (R-TAL-06).
+
+W F6.1 obie tablice kart mają najwyżej 20 elementów, dodatnie identyfikatory, jeden wymiar i indeks początkowy 1; nie mogą zawierać `NULL`. Pusta talia jest dozwolona. Limit kopii, posiadanie kart i najwyżej 10 zapisanych zestawów zostaną sprawdzone przez operacje aplikacji w F8.
 
 ### 3.5. Ekonomia
 
@@ -203,6 +209,10 @@ Kroki opisuje `08-serwer.md`, rozdz. 5.2 i 6. Zasady wspólne:
 - Zmiany niezgodne w dwóch krokach (expand/contract): najpierw dodanie nowej kolumny i podwójny zapis, wdrożenie, potem usunięcie starej w kolejnym wydaniu. Pozwala to na wdrożenia bez przestojów (`15-infrastruktura-i-wdrozenie.md`).
 - CI: migracje na pustej bazie, `sqlx prepare --check` (zgodność zapytań ze schematem), test „migracja w górę” na kopii danych testowych.
 - W produkcji migracje uruchamia osobny krok wdrożenia (rola `migrator`), przed przełączeniem instancji.
+
+Implementacja: `cargo run -p server --locked -- migrate` uruchamia migrator wbudowany w binarkę, po czym kończy proces. Używa `MIGRATION_DATABASE_URL`, a przy braku tej zmiennej — `DATABASE_URL`. Normalny serwer używa wyłącznie `DATABASE_URL` i nie stosuje migracji. `/readyz` wymaga połączenia z bazą i zastosowania najnowszej migracji wbudowanej w daną binarkę; `/healthz` sprawdza sam proces. Metadane `.sqlx/` umożliwiają kompilację bez bazy (`SQLX_OFFLINE=true` w `.cargo/config.toml`). Kontrola `cargo sqlx prepare --check` korzysta z aktualnego schematu i `SQLX_OFFLINE=false`.
+
+Skrypty `deploy/postgres/roles.sql` i `privileges.sql` rozdzielają role `game_migrator`, `game_app` i `game_readonly`. W produkcji trzeba uruchomić je we wskazanej kolejności i ustawić hasła poza repozytorium; procedura jest w `CONTRIBUTING.md`. Lokalny Docker zachowuje prostsze konto deweloperskie.
 
 ## 6. Wydajność i retencja
 

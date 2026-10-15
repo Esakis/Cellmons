@@ -1,5 +1,7 @@
 # 19. Aplikacja Android (APK i Google Play)
 
+**Stan F5.6:** powłoka debug buduje się i rozgrywa trening bez sieci w emulatorze Android 14/WebView 113. Pomiary na fizycznych telefonach pozostają otwarte. Procedura i wyniki: [raport F5](21-trening-offline-testy.md). Funkcje logowania, aktualizacji i publikacji opisane dalej należą do F12A.
+
 Gra ma, oprócz wersji w przeglądarce, aplikację na Androida: w Google Play (format AAB) i jako plik APK do pobrania ze strony. Aplikacja to **ten sam klient** (SolidJS + silnik WebAssembly) w natywnej powłoce Capacitor (ADR-014). Logowanie w aplikacji używa tokenu i biletu WebSocket (ADR-015). Oryginalny Cellmons też miał klienta na telefony (Java ME), więc to naturalna kontynuacja.
 
 ## 1. Założenia
@@ -57,6 +59,8 @@ flowchart TB
 | Powiadomienia push | `@capacitor/push-notifications` (Firebase) | **nie w pierwszym wydaniu** `[D]`: wymaga Firebase i dodatkowych deklaracji prywatności |
 
 ## 4. Logowanie i połączenie (ADR-015)
+
+**Stan F6.2:** backend obsługuje token aplikacji, rotację, listę sesji, CORS, wersję powłoki i jednorazowy bilet WebSocket. Testy integracyjne przechodzą na PostgreSQL. Wspólny klient może użyć `VITE_API_ORIGIN=https://…`; token trzyma obecnie tylko w RAM, bez wznowienia po przeładowaniu. Trwały magazyn oparty na Keystore i pełny cykl życia aplikacji pozostają zadaniami F12A. Lokalny gość nie ma tokenu i niczego nie zapisuje (ADR-018). Szczegóły: [raport F6.2](23-konta-i-gosc-testy.md).
 
 Aplikacja ładuje grę z lokalnego adresu `https://localhost`, a serwer ma inną domenę. Przeglądarka nie wyśle wtedy ciasteczka sesji (SameSite), dlatego aplikacja używa tokenu.
 

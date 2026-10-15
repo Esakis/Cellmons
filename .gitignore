@@ -6,6 +6,16 @@ node_modules/
 dist/
 .vite/
 *.tsbuildinfo
+/web/src/generated/content.json
+/web/src/generated/*.ftl
+/web/src/generated/engine/
+/web/src/assets/
+/mobile/android/.gradle/
+/mobile/android/local.properties
+/mobile/android/**/build/
+/mobile/android/app/src/main/assets/public/
+/mobile/android/app/src/main/assets/capacitor.config.json
+/mobile/android/app/src/main/assets/capacitor.plugins.json
 
 # Playwright
 /e2e/test-results/

@@ -1,6 +1,7 @@
 packages:
   - web
   - e2e
+  - mobile
 
 # Wersje zależności zapisywane dokładnie; aktualizacje przez Renovate (04-architektura.md, rozdz. 8).
 saveExact: true

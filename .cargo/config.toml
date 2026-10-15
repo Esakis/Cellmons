@@ -3,3 +3,7 @@
 # (CONTRIBUTING.md).
 [target.wasm32-unknown-unknown]
 runner = "wasm-bindgen-test-runner"
+
+[env]
+# Builds use committed metadata; only `cargo sqlx prepare` needs a live database.
+SQLX_OFFLINE = "true"

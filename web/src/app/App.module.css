@@ -1,19 +1,117 @@
-.page {
-  min-height: 100dvh;
+.header {
+  display: flex;
+  align-items: center;
+  gap: 44px;
+  padding: 18px 32px;
+  max-width: 1244px;
+  margin: auto;
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, transparent, var(--gold), transparent) 1;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--heading);
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 600;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+}
+.brandIcon {
   display: grid;
-  place-content: center;
-  gap: 0.75rem;
-  padding: 1rem;
-  text-align: center;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  font-size: 1.5rem;
+  color: var(--primary-text);
+  background: var(--primary-bg);
+  border: 1px solid var(--primary-border);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 3px var(--color-bg),
+    0 0 0 4px var(--gold),
+    0 0 18px rgb(217 180 90 / 0.45);
 }
-
-.title {
-  margin: 0;
-  font-size: clamp(2rem, 6vw, 3.5rem);
-  letter-spacing: 0.02em;
-}
-
-.subtitle {
-  margin: 0;
+.brand small {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.5rem;
+  letter-spacing: 0.4em;
+  font-weight: 500;
   color: var(--color-text-muted);
+}
+.header nav {
+  display: flex;
+  gap: 28px;
+  font-size: 0.8rem;
+  align-self: stretch;
+  align-items: center;
+}
+.header nav a {
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+.header nav a {
+  font-family: var(--font-display);
+  letter-spacing: 0.08em;
+}
+.header nav a[aria-current="page"] {
+  color: var(--accent);
+  font-weight: 650;
+  text-decoration: underline;
+  text-decoration-color: var(--gold);
+  text-underline-offset: 10px;
+}
+.header .language {
+  margin-left: auto;
+  width: auto;
+  font-size: 0.75rem;
+  background: transparent;
+}
+.footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 22px 32px;
+  border-top: 1px solid transparent;
+  border-image: linear-gradient(90deg, transparent, var(--color-border), transparent) 1;
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+}
+.update {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--panel-bg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--panel-shadow);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 0.8rem;
+  z-index: 10;
+}
+@media (max-width: 650px) {
+  .header {
+    padding: 16px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .header nav {
+    order: 3;
+    width: 100%;
+    padding-top: 6px;
+  }
+  .brand {
+    font-size: 1.25rem;
+  }
+  .footer {
+    padding: 20px 16px;
+    flex-direction: column;
+    gap: 8px;
+  }
 }

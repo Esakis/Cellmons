@@ -3,21 +3,21 @@
 
 ## Schools
 
-school-combat-name = Combat
-school-divine-name = Divinity
-school-element-name = Elementalism
+school-combat-name = Arms
+school-divine-name = Radiance
+school-element-name = Elements
 school-arcane-name = Arcana
 school-necro-name = Necromancy
-school-tech-name = Technology
+school-tech-name = Runecraft
 
 ## Characters
 
-avatar-dune_wanderer-name = Dune Wanderer
-avatar-dawn_warden-name = Dawn Warden
-avatar-ember_drake-name = Ember Drake
-avatar-star_adept-name = Star Adept
-avatar-ash_widow-name = Ash Widow
-avatar-cogwright-name = Cogwright
+avatar-dune_wanderer-name = Warrior
+avatar-dawn_warden-name = Priest
+avatar-ember_drake-name = Druid
+avatar-star_adept-name = Mage
+avatar-ash_widow-name = Necromancer
+avatar-cogwright-name = Runesmith
 
 ## Combat
 
@@ -168,15 +168,15 @@ card-attack_calibration-name = Attack Calibration
 card-attack_calibration-text = This round all your physical attacks hit.
 card-defense_calibration-name = Defense Calibration
 card-defense_calibration-text = This round +{ $amount } physical and +{ $amount_2 } magic defense.
-card-combat_amplifier-name = Combat Amplifier
-card-combat_amplifier-text = +{ $amount } to your Combat level until the end of the duel.
-card-divine_amplifier-name = Divinity Amplifier
-card-divine_amplifier-text = +{ $amount } to your Divinity level until the end of the duel.
-card-element_amplifier-name = Elementalism Amplifier
-card-element_amplifier-text = +{ $amount } to your Elementalism level until the end of the duel.
+card-combat_amplifier-name = Arms Amplifier
+card-combat_amplifier-text = +{ $amount } to your Arms level until the end of the duel.
+card-divine_amplifier-name = Radiance Amplifier
+card-divine_amplifier-text = +{ $amount } to your Radiance level until the end of the duel.
+card-element_amplifier-name = Elements Amplifier
+card-element_amplifier-text = +{ $amount } to your Elements level until the end of the duel.
 card-arcane_amplifier-name = Arcana Amplifier
 card-arcane_amplifier-text = +{ $amount } to your Arcana level until the end of the duel.
 card-necro_amplifier-name = Necromancy Amplifier
 card-necro_amplifier-text = +{ $amount } to your Necromancy level until the end of the duel.
-card-tech_amplifier-name = Technology Amplifier
-card-tech_amplifier-text = +{ $amount } to your Technology level until the end of the duel.
+card-tech_amplifier-name = Runecraft Amplifier
+card-tech_amplifier-text = +{ $amount } to your Runecraft level until the end of the duel.

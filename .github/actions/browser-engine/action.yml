@@ -1,0 +1,21 @@
+name: Browser engine
+description: Build the browser WASM and content from the locked Rust sources
+runs:
+  using: composite
+  steps:
+    - name: Rust toolchain
+      shell: bash
+      run: rustup toolchain install
+    - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+    - name: wasm-bindgen version
+      id: version
+      shell: bash
+      run: |
+        version=$(grep -A1 '^name = "wasm-bindgen"$' Cargo.lock | sed -n 's/^version = "\(.*\)"$/\1/p')
+        echo "version=$version" >> "$GITHUB_OUTPUT"
+    - uses: taiki-e/install-action@ab6895351a88b908e96a4697860d4ffea5e57dbe # v2.87.27
+      with:
+        tool: wasm-bindgen@${{ steps.version.outputs.version }}
+    - name: Browser assets
+      shell: bash
+      run: pnpm --filter web prepare:assets

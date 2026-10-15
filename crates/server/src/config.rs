@@ -17,6 +17,8 @@ pub enum LogFormat {
 #[derive(Debug, Clone)]
 pub struct Config {
     pub database_url: String,
+    /// Optional DDL credentials. Only the explicit `server migrate` command uses these.
+    pub migration_database_url: Option<String>,
     pub db_pool_size: u32,
     pub listen_addr: SocketAddr,
     pub log_level: String,
@@ -33,6 +35,7 @@ impl Config {
         let var = |key: &str| lookup(key).filter(|value| !value.is_empty());
 
         let database_url = var("DATABASE_URL").context("missing required variable DATABASE_URL")?;
+        let migration_database_url = var("MIGRATION_DATABASE_URL");
 
         let db_pool_size = match var("DB_POOL_SIZE") {
             Some(value) => {
@@ -63,6 +66,7 @@ impl Config {
 
         Ok(Self {
             database_url,
+            migration_database_url,
             db_pool_size,
             listen_addr,
             log_level,
@@ -115,6 +119,7 @@ mod tests {
         assert_eq!(config.log_level, "info");
         assert_eq!(config.log_format, LogFormat::Json);
         assert!(config.db_pool_size >= 2);
+        assert!(config.migration_database_url.is_none());
     }
 
     #[test]
@@ -125,6 +130,10 @@ mod tests {
             ("LISTEN_ADDR", "127.0.0.1:8090"),
             ("LOG_LEVEL", "debug,sqlx=warn"),
             ("LOG_FORMAT", "text"),
+            (
+                "MIGRATION_DATABASE_URL",
+                "postgres://migrator@127.0.0.1:5433/game",
+            ),
         ])
         .expect("valid config");
         assert_eq!(config.database_url, DB.1);
@@ -135,12 +144,22 @@ mod tests {
         );
         assert_eq!(config.log_level, "debug,sqlx=warn");
         assert_eq!(config.log_format, LogFormat::Text);
+        assert_eq!(
+            config.migration_database_url.as_deref(),
+            Some("postgres://migrator@127.0.0.1:5433/game")
+        );
     }
 
     #[test]
     fn database_url_is_required() {
         assert!(config(&[]).is_err());
         assert!(config(&[("DATABASE_URL", "")]).is_err());
+        assert!(
+            config(&[DB, ("MIGRATION_DATABASE_URL", "")])
+                .unwrap()
+                .migration_database_url
+                .is_none()
+        );
     }
 
     #[test]
