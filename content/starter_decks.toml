@@ -1,0 +1,44 @@
+# Zestawy startowe (docs/03-tresc-gry.md, rozdz. 6): karty nowego konta po wyborze szkoły
+# (36–40 kart, około 1/3 „na później”) i talia startowa z kart grywalnych od poziomu 1.
+
+[[starter]]
+school = "combat"
+avatar = "avatar.dune_wanderer"
+# 40 kart
+cards = { "card.bronze_blade" = 4, "card.recruit_pauldron" = 4, "card.herbal_draught" = 4, "card.nimble_step" = 4, "card.tempered_blade" = 4, "card.beginners_luck" = 4, "card.brawl" = 2, "card.curved_blade" = 2, "card.relentlessness" = 2, "card.buckler" = 3, "card.truce" = 2, "card.armor_breaker" = 2, "card.preemptive_strike" = 2, "card.pitfall" = 1 }
+deck = { "card.bronze_blade" = 4, "card.herbal_draught" = 3, "card.nimble_step" = 3, "card.beginners_luck" = 4, "card.brawl" = 2, "card.curved_blade" = 2, "card.preemptive_strike" = 2 }
+
+[[starter]]
+school = "divine"
+avatar = "avatar.dawn_warden"
+# 36 kart
+cards = { "card.hearts_gift" = 4, "card.spirit_shield" = 4, "card.spirit_sword" = 4, "card.shackles_of_truth" = 1, "card.acolyte" = 4, "card.veterans_hymn" = 3, "card.sheltering_grace" = 4, "card.morning_hymn" = 4, "card.gauntlet_of_light" = 4, "card.soothing_touch" = 4 }
+deck = { "card.spirit_shield" = 4, "card.acolyte" = 4, "card.morning_hymn" = 4, "card.gauntlet_of_light" = 4, "card.soothing_touch" = 4 }
+
+[[starter]]
+school = "element"
+avatar = "avatar.ember_drake"
+# 40 kart
+cards = { "card.feral_might" = 2, "card.sandstorm" = 2, "card.healing_mud" = 4, "card.thornhide" = 4, "card.toxic_fumes" = 2, "card.leeching_vine" = 2, "card.stone_spike" = 4, "card.desperate_blaze" = 4, "card.oakbark" = 4, "card.venom" = 4, "card.storm_spark" = 4, "card.surge_of_power" = 4 }
+deck = { "card.healing_mud" = 4, "card.thornhide" = 4, "card.stone_spike" = 4, "card.venom" = 4, "card.storm_spark" = 4 }
+
+[[starter]]
+school = "arcane"
+avatar = "avatar.star_adept"
+# 40 kart
+cards = { "card.unweave" = 3, "card.sages_hood" = 4, "card.mana_elixir" = 4, "card.minor_ward" = 4, "card.wild_weave" = 3, "card.pain_echo" = 3, "card.arcane_flick" = 4, "card.mind_over_steel" = 4, "card.sour_wine" = 4, "card.apprentices_retort" = 4, "card.surge_of_power" = 3 }
+deck = { "card.mana_elixir" = 4, "card.minor_ward" = 4, "card.pain_echo" = 3, "card.arcane_flick" = 4, "card.sour_wine" = 1, "card.apprentices_retort" = 4 }
+
+[[starter]]
+school = "necro"
+avatar = "avatar.ash_widow"
+# 40 kart
+cards = { "card.despair" = 3, "card.blight" = 3, "card.grim_revival" = 1, "card.dark_herald" = 4, "card.cultist" = 4, "card.frailty" = 3, "card.exposure" = 3, "card.doomhelm" = 3, "card.shadow_pact" = 1, "card.dread" = 4, "card.soul_vortex" = 4, "card.stupor" = 3, "card.treacherous_dagger" = 4 }
+deck = { "card.despair" = 2, "card.cultist" = 4, "card.frailty" = 3, "card.dread" = 4, "card.soul_vortex" = 4, "card.stupor" = 3 }
+
+[[starter]]
+school = "tech"
+avatar = "avatar.cogwright"
+# 40 kart
+cards = { "card.short_circuit" = 3, "card.paradox" = 1, "card.attack_lattice" = 4, "card.defense_lattice" = 4, "card.phase_shift" = 2, "card.attack_calibration" = 4, "card.defense_calibration" = 4, "card.combat_amplifier" = 3, "card.divine_amplifier" = 3, "card.element_amplifier" = 3, "card.arcane_amplifier" = 3, "card.necro_amplifier" = 3, "card.tech_amplifier" = 3 }
+deck = { "card.short_circuit" = 3, "card.attack_lattice" = 4, "card.defense_lattice" = 4, "card.phase_shift" = 1, "card.attack_calibration" = 4, "card.defense_calibration" = 4 }

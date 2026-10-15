@@ -1,0 +1,133 @@
+# Karty zestawu startowego szkoły Kapłaństwo (docs/03-tresc-gry.md, rozdz. 5 i 6).
+# `ref` to nazwa karty referencyjnej z docs/dane/karty_klasyczne.csv; nie trafia do gry.
+
+[[card]]
+id = 15
+key = "card.hearts_gift"
+ref = "Altruizm"
+set = "core"
+rarity = "bronze"
+requires = { divine = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "instant"
+effects = [{ family = "heal", target = "both", amount = 8 }]
+
+[[card]]
+id = 16
+key = "card.spirit_shield"
+ref = "Duchowa Tarcza"
+set = "core"
+rarity = "bronze"
+requires = { divine = 1 }
+cost = { focus = 2, stamina = 6 }
+kind = "instant"
+effects = [
+  { family = "stat_mod", target = "self", stat = "mag_def", amount = 2 },
+  { family = "stat_mod", target = "self", stat = "phys_def", amount = 1 },
+]
+
+[[card]]
+id = 17
+key = "card.spirit_sword"
+ref = "Duchowy Miecz"
+set = "core"
+rarity = "bronze"
+requires = { divine = 2 }
+cost = { focus = 2, stamina = 6 }
+kind = "instant"
+effects = [
+  { family = "stat_mod", target = "self", stat = "mag_atk", amount = 2 },
+  { family = "stat_mod", target = "self", stat = "phys_atk", amount = 1 },
+]
+
+[[card]]
+id = 18
+key = "card.shackles_of_truth"
+ref = "Imadło Prawdy"
+set = "core"
+rarity = "bronze"
+requires = { divine = 2 }
+cost = { focus = 2, stamina = 8 }
+kind = "instant"
+effects = [{ family = "focus", target = "opponent", amount = -2 }]
+
+[[card]]
+id = 19
+key = "card.acolyte"
+ref = "Kleryk"
+set = "core"
+rarity = "bronze"
+requires = { divine = 1 }
+cost = { focus = 2, stamina = 8 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [
+  { family = "heal", target = "self", amount = 1 },
+  { family = "stamina", target = "self", amount = 2 },
+]
+
+[[card]]
+id = 20
+key = "card.veterans_hymn"
+ref = "Modlitwa Weterana"
+set = "core"
+rarity = "bronze"
+requires = { divine = 2 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+effects = [
+  { family = "heal", target = "self", amount = 6 },
+  { family = "stamina", target = "self", amount = 6 },
+]
+
+[[card]]
+id = 21
+key = "card.sheltering_grace"
+ref = "Ocalenie"
+set = "core"
+rarity = "bronze"
+requires = { divine = 2 }
+cost = { focus = 2, stamina = 5 }
+kind = "instant"
+effects = [{ family = "damage_taken_mult", target = "self", percent = 50, duration = "round" }]
+
+[[card]]
+id = 22
+key = "card.morning_hymn"
+ref = "Psalm"
+set = "core"
+rarity = "bronze"
+requires = { divine = 1 }
+cost = { focus = 1, stamina = 6 }
+kind = "instant"
+effects = [
+  { family = "heal", target = "self", amount = 2 },
+  { family = "stamina", target = "self", amount = 2 },
+  { family = "stat_mod", target = "self", stat = "phys_def", amount = 1 },
+  { family = "stat_mod", target = "self", stat = "mag_def", amount = 1 },
+]
+
+[[card]]
+id = 23
+key = "card.gauntlet_of_light"
+ref = "Rękawica Prawdy"
+set = "core"
+rarity = "bronze"
+requires = { divine = 1 }
+cost = { focus = 2, stamina = 6 }
+kind = "instant"
+effects = [
+  { family = "stat_mod", target = "self", stat = "phys_atk", amount = 1 },
+  { family = "stat_mod", target = "self", stat = "mag_atk", amount = 1 },
+]
+
+[[card]]
+id = 24
+key = "card.soothing_touch"
+ref = "Uleczenie"
+set = "core"
+rarity = "bronze"
+requires = { divine = 1 }
+cost = { focus = 2, stamina = 10 }
+kind = "instant"
+effects = [{ family = "heal", target = "self", amount = 8 }]

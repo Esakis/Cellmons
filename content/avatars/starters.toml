@@ -1,0 +1,199 @@
+# Postacie startowe szkół (docs/03-tresc-gry.md, rozdz. 3). Statystyki bazowe z szablonów
+# referencyjnych (docs/dane/postacie.csv), nazwy własne. Tabele rozwoju: z danych referencyjnych
+# albo z generatora `cargo run -p content-compiler -- curves` z parametrami podanymi przy postaci.
+
+[[avatar]]
+id = 1
+key = "avatar.dune_wanderer"
+ref = "Nomad"
+rarity = "common"
+starter_for = "combat"
+base = { phys_atk = 4, phys_def = 3, mag_atk = 3, mag_def = 0, hp = 30, stamina = 30 }
+schools = { combat = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+# curves --weights 35,30,20,15 --combat 17 --stamina 70 --hp 80 --school 5:combat=2 --school 8:element=1 --school 12:combat=3 --school 16:element=2
+growth = [
+  # przyrosty: [AF, OF, AM, OM, W, Ż]; content-compiler curves (Z-GRW)
+  { level = 2, d = [0, 0, 0, 0, 3, 4] },
+  { level = 3, d = [1, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 1, 0, 0, 4, 4] },
+  { level = 5, d = [0, 0, 1, 0, 3, 4], schools = { combat = 2 } },
+  { level = 6, d = [0, 0, 0, 1, 4, 5] },
+  { level = 7, d = [1, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 1, 0, 0, 3, 4], schools = { element = 1 } },
+  { level = 9, d = [1, 0, 0, 0, 4, 4] },
+  { level = 10, d = [0, 0, 1, 0, 4, 4] },
+  { level = 11, d = [0, 0, 0, 0, 3, 5] },
+  { level = 12, d = [0, 1, 0, 0, 4, 4], schools = { combat = 3 } },
+  { level = 13, d = [1, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 1, 3, 4] },
+  { level = 15, d = [0, 1, 0, 0, 4, 4] },
+  { level = 16, d = [0, 0, 1, 0, 4, 5], schools = { element = 2 } },
+  { level = 17, d = [1, 0, 0, 0, 3, 4] },
+  { level = 18, d = [0, 1, 0, 0, 4, 4] },
+  { level = 19, d = [1, 0, 0, 0, 4, 4] },
+  { level = 20, d = [0, 0, 0, 1, 4, 5] },
+]
+
+[[avatar]]
+id = 2
+key = "avatar.dawn_warden"
+ref = "Mnich"
+rarity = "common"
+starter_for = "divine"
+base = { phys_atk = 3, phys_def = 2, mag_atk = 3, mag_def = 2, hp = 30, stamina = 40 }
+schools = { divine = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  # przyrosty: [AF, OF, AM, OM, W, Ż]; tabela z docs/dane/rozwoj_postaci.csv
+  { level = 2, d = [0, 0, 1, 0, 2, 3] },
+  { level = 3, d = [1, 0, 0, 0, 3, 3] },
+  { level = 4, d = [0, 0, 0, 1, 3, 3], schools = { divine = 1, combat = 1 } },
+  { level = 5, d = [0, 0, 1, 0, 2, 1] },
+  { level = 6, d = [0, 0, 0, 0, 5, 1], schools = { divine = 2, combat = 1 } },
+  { level = 7, d = [0, 1, 0, 0, 4, 4] },
+  { level = 8, d = [0, 0, 1, 0, 3, 2] },
+  { level = 9, d = [0, 0, 0, 1, 3, 4] },
+  { level = 10, d = [1, 0, 0, 0, 3, 4] },
+  { level = 11, d = [0, 0, 0, 0, 4, 3], schools = { divine = 2, combat = 2 } },
+  { level = 12, d = [0, 0, 1, 0, 7, 2] },
+  { level = 13, d = [1, 0, 0, 0, 3, 5] },
+  { level = 14, d = [1, 0, 0, 0, 5, 1] },
+  { level = 15, d = [0, 0, 0, 0, 3, 3], schools = { divine = 3, combat = 2 } },
+  { level = 16, d = [0, 1, 0, 0, 3, 2] },
+  { level = 17, d = [0, 0, 1, 0, 3, 4] },
+  { level = 18, d = [1, 0, 0, 0, 2, 4] },
+  { level = 19, d = [0, 0, 1, 0, 8, 8] },
+  { level = 20, d = [0, 1, 0, 0, 3, 2] },
+]
+
+[[avatar]]
+id = 3
+key = "avatar.ember_drake"
+ref = "Draco"
+rarity = "common"
+starter_for = "element"
+base = { phys_atk = 3, phys_def = 0, mag_atk = 4, mag_def = 2, hp = 35, stamina = 30 }
+schools = { element = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+# curves --weights 25,15,40,20 --combat 17 --stamina 65 --hp 75 --school 5:element=2 --school 9:combat=1 --school 13:element=3 --school 17:combat=2
+growth = [
+  # przyrosty: [AF, OF, AM, OM, W, Ż]; content-compiler curves (Z-GRW)
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [0, 0, 1, 0, 3, 4] },
+  { level = 4, d = [1, 0, 0, 0, 4, 4] },
+  { level = 5, d = [0, 0, 0, 1, 3, 4], schools = { element = 2 } },
+  { level = 6, d = [0, 1, 0, 0, 4, 4] },
+  { level = 7, d = [0, 0, 1, 0, 3, 4] },
+  { level = 8, d = [1, 0, 0, 0, 3, 4] },
+  { level = 9, d = [0, 0, 1, 0, 4, 4], schools = { combat = 1 } },
+  { level = 10, d = [0, 0, 0, 1, 3, 4] },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [0, 0, 1, 0, 3, 4] },
+  { level = 13, d = [1, 0, 0, 0, 4, 4], schools = { element = 3 } },
+  { level = 14, d = [0, 1, 0, 0, 3, 4] },
+  { level = 15, d = [0, 0, 1, 0, 3, 4] },
+  { level = 16, d = [0, 0, 0, 1, 4, 4] },
+  { level = 17, d = [0, 0, 1, 0, 3, 4], schools = { combat = 2 } },
+  { level = 18, d = [1, 0, 0, 0, 4, 4] },
+  { level = 19, d = [0, 1, 0, 0, 3, 4] },
+  { level = 20, d = [0, 0, 1, 0, 4, 4] },
+]
+
+[[avatar]]
+id = 4
+key = "avatar.star_adept"
+ref = "Czarodziej"
+rarity = "common"
+starter_for = "arcane"
+base = { phys_atk = 2, phys_def = 0, mag_atk = 3, mag_def = 3, hp = 30, stamina = 45 }
+schools = { arcane = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+# curves --weights 10,15,45,30 --combat 16 --stamina 80 --hp 60 --school 5:arcane=2 --school 9:tech=1 --school 13:arcane=3 --school 17:tech=2
+growth = [
+  # przyrosty: [AF, OF, AM, OM, W, Ż]; content-compiler curves (Z-GRW)
+  { level = 2, d = [0, 0, 0, 0, 4, 3] },
+  { level = 3, d = [0, 0, 1, 0, 4, 3] },
+  { level = 4, d = [0, 0, 0, 1, 4, 3] },
+  { level = 5, d = [0, 1, 0, 0, 4, 3], schools = { arcane = 2 } },
+  { level = 6, d = [0, 0, 1, 0, 5, 3] },
+  { level = 7, d = [1, 0, 0, 0, 4, 3] },
+  { level = 8, d = [0, 0, 0, 0, 4, 4] },
+  { level = 9, d = [0, 0, 0, 1, 4, 3], schools = { tech = 1 } },
+  { level = 10, d = [0, 0, 1, 0, 4, 3] },
+  { level = 11, d = [0, 0, 1, 0, 5, 3] },
+  { level = 12, d = [0, 0, 0, 1, 4, 3] },
+  { level = 13, d = [0, 1, 0, 0, 4, 3], schools = { arcane = 3 } },
+  { level = 14, d = [0, 0, 0, 0, 4, 4] },
+  { level = 15, d = [0, 0, 1, 0, 4, 3] },
+  { level = 16, d = [0, 0, 0, 1, 5, 3] },
+  { level = 17, d = [0, 0, 1, 0, 4, 3], schools = { tech = 2 } },
+  { level = 18, d = [1, 0, 0, 0, 4, 3] },
+  { level = 19, d = [0, 0, 1, 0, 4, 3] },
+  { level = 20, d = [0, 0, 0, 1, 5, 4] },
+]
+
+[[avatar]]
+id = 5
+key = "avatar.ash_widow"
+ref = "Lady Kruk"
+rarity = "common"
+starter_for = "necro"
+base = { phys_atk = 3, phys_def = 0, mag_atk = 4, mag_def = 2, hp = 30, stamina = 40 }
+schools = { necro = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  # przyrosty: [AF, OF, AM, OM, W, Ż]; tabela z docs/dane/rozwoj_postaci.csv
+  { level = 2, d = [0, 1, 0, 0, 4, 3] },
+  { level = 3, d = [0, 0, 0, 0, 4, 3], schools = { necro = 2 } },
+  { level = 4, d = [0, 0, 1, 0, 4, 3] },
+  { level = 5, d = [0, 0, 0, 0, 4, 3], schools = { arcane = 1, necro = 2 } },
+  { level = 6, d = [1, 0, 0, 0, 4, 3] },
+  { level = 7, d = [0, 0, 1, 1, 4, 3] },
+  { level = 8, d = [0, 1, 0, 0, 4, 3] },
+  { level = 9, d = [0, 0, 0, 0, 4, 2], schools = { arcane = 2, necro = 2 } },
+  { level = 10, d = [0, 0, 1, 0, 4, 3] },
+  { level = 11, d = [1, 0, 0, 0, 6, 3] },
+  { level = 12, d = [0, 0, 0, 1, 4, 3] },
+  { level = 13, d = [0, 0, 1, 0, 4, 3] },
+  { level = 14, d = [0, 0, 0, 0, 4, 3], schools = { arcane = 2, necro = 3 } },
+  { level = 15, d = [0, 1, 0, 0, 4, 3] },
+  { level = 16, d = [0, 0, 1, 0, 4, 4] },
+  { level = 17, d = [0, 0, 0, 1, 4, 4] },
+  { level = 18, d = [0, 0, 1, 0, 4, 4] },
+  { level = 19, d = [1, 0, 0, 0, 5, 4] },
+  { level = 20, d = [0, 0, 1, 0, 5, 3] },
+]
+
+[[avatar]]
+id = 6
+key = "avatar.cogwright"
+ref = "Doc"
+rarity = "common"
+starter_for = "tech"
+base = { phys_atk = 3, phys_def = 1, mag_atk = 3, mag_def = 2, hp = 30, stamina = 40 }
+schools = { tech = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+# curves --weights 30,20,30,20 --combat 17 --stamina 75 --hp 70 --school 5:tech=2 --school 9:arcane=1 --school 13:tech=3 --school 17:arcane=2
+growth = [
+  # przyrosty: [AF, OF, AM, OM, W, Ż]; content-compiler curves (Z-GRW)
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [1, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 0, 1, 0, 4, 4] },
+  { level = 5, d = [0, 1, 0, 0, 4, 3], schools = { tech = 2 } },
+  { level = 6, d = [0, 0, 0, 1, 4, 4] },
+  { level = 7, d = [1, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 0, 1, 0, 4, 3] },
+  { level = 9, d = [0, 1, 0, 0, 4, 4], schools = { arcane = 1 } },
+  { level = 10, d = [0, 0, 0, 1, 4, 4] },
+  { level = 11, d = [0, 0, 0, 0, 4, 3] },
+  { level = 12, d = [1, 0, 0, 0, 4, 4] },
+  { level = 13, d = [0, 0, 1, 0, 4, 4], schools = { tech = 3 } },
+  { level = 14, d = [1, 0, 0, 0, 4, 3] },
+  { level = 15, d = [0, 0, 1, 0, 4, 4] },
+  { level = 16, d = [0, 1, 0, 0, 4, 4] },
+  { level = 17, d = [0, 0, 0, 1, 4, 3], schools = { arcane = 2 } },
+  { level = 18, d = [1, 0, 0, 0, 4, 4] },
+  { level = 19, d = [0, 0, 1, 0, 4, 4] },
+  { level = 20, d = [0, 1, 0, 0, 4, 4] },
+]

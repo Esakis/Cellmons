@@ -169,6 +169,9 @@ pub struct Scenario {
     initiative: Side,
     seed: [u8; 32],
     gifts: Vec<(Side, CardDef)>,
+    /// Ż i W na start zamiast pełnych pul.
+    hp: [Option<i32>; 2],
+    stamina: [Option<i32>; 2],
 }
 
 impl Scenario {
@@ -188,7 +191,23 @@ impl Scenario {
             initiative: Side::A,
             seed: [0; 32],
             gifts: Vec::new(),
+            hp: [None; 2],
+            stamina: [None; 2],
         }
+    }
+
+    /// Ż strony na start (np. żeby sprawdzić leczenie).
+    #[must_use]
+    pub fn hp(mut self, side: Side, hp: i32) -> Self {
+        self.hp[side.index()] = Some(hp);
+        self
+    }
+
+    /// W strony na start.
+    #[must_use]
+    pub fn stamina(mut self, side: Side, stamina: i32) -> Self {
+        self.stamina[side.index()] = Some(stamina);
+        self
     }
 
     /// Specjalizacja strony (R-CZA-09).
@@ -262,6 +281,12 @@ impl Scenario {
             let player = state.player_mut(side);
             player.hand = self.hands[side.index()].iter().copied().collect();
             player.deck = self.decks[side.index()].iter().copied().collect();
+            if let Some(hp) = self.hp[side.index()] {
+                player.hp = hp;
+            }
+            if let Some(stamina) = self.stamina[side.index()] {
+                player.stamina = stamina;
+            }
         }
         for (side, gift) in &self.gifts {
             enchant::register(&mut state, &mut EventBuf::new(), *side, gift, 1);

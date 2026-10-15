@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 350" font-family="Inter, system-ui, sans-serif" role="img" aria-label="Układ karty">
+<title>Układ karty</title>
+<rect x="1" y="1" width="248" height="348" rx="16" fill="#e2a86a" stroke="#6f4420" stroke-width="2"/>
+<rect x="9" y="9" width="232" height="332" rx="10" fill="#f8f3e8" stroke="#6f4420" stroke-width="1.5"/>
+<rect x="58" y="16" width="176" height="30" rx="6" fill="#ffffff" stroke="#6f4420"/>
+<text x="146" y="36" font-size="13" font-weight="700" text-anchor="middle" fill="#2b2118">Nazwa karty</text>
+<circle cx="34" cy="31" r="17" fill="#2f4f8f" stroke="#6f4420" stroke-width="2"/>
+<text x="34" y="36" font-size="15" font-weight="700" text-anchor="middle" fill="#ffffff">2</text>
+<circle cx="34" cy="66" r="13" fill="#2e7d4f" stroke="#6f4420" stroke-width="2"/>
+<text x="34" y="70.5" font-size="12" font-weight="700" text-anchor="middle" fill="#ffffff">4</text>
+<text x="56" y="62" font-size="9" fill="#5a4a3a">← K (koncentracja)</text>
+<text x="52" y="72" font-size="9" fill="#5a4a3a">← W (wytrzymałość)</text>
+<rect x="20" y="84" width="210" height="122" rx="6" fill="#e9e1cf" stroke="#6f4420" stroke-width="1.5" stroke-dasharray="4 3"/>
+<text x="125" y="149" font-size="12" text-anchor="middle" fill="#5a4a3a">Ilustracja</text>
+<rect x="20" y="212" width="210" height="24" rx="5" fill="#ffffff" stroke="#6f4420"/>
+<text x="28" y="228" font-size="10" fill="#2b2118">Wymagania: ikony szkół z poziomem</text>
+<rect x="20" y="242" width="210" height="84" rx="6" fill="#fffdf8" stroke="#6f4420"/>
+<text x="28" y="262" font-size="11" fill="#2b2118">Tekst efektu: +2 do ataku</text>
+<text x="28" y="277" font-size="11" fill="#2b2118">fizycznego do końca pojedynku.</text>
+<text x="28" y="312" font-size="9" fill="#7a6a5a">Słowa kluczowe pogrubione</text>
+<path d="M125 324l9 9-9 9-9-9z" fill="#b8773d" stroke="#6f4420" stroke-width="1.5"/>
+<text x="140" y="337" font-size="9" fill="#5a4a3a">rzadkość</text>
+</svg>

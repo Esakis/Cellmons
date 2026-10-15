@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Galeria grafik</title>
+<!-- Strona do przeglądu grafik przez właściciela (docs/03-tresc-gry.md, rozdz. 9). Otwórz plik
+     w przeglądarce; ikony pokazane są w kolorach szkół i w motywie jasnym oraz ciemnym. -->
+<style>
+  :root { --bg: #f8f3e8; --ink: #2b2118; --muted: #6b5d4f; --panel: #fffdf8; --line: #e2d8c6; }
+  body { margin: 0; padding: 24px; background: var(--bg); color: var(--ink); font-family: Inter, system-ui, sans-serif; }
+  h1 { margin: 0 0 4px; font-size: 22px; }
+  h2 { margin: 28px 0 10px; font-size: 16px; }
+  p { margin: 0 0 8px; color: var(--muted); font-size: 13px; }
+  .row { display: flex; flex-wrap: wrap; gap: 12px; }
+  .tile { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px; text-align: center; font-size: 11px; color: var(--muted); }
+  .tile.dark { background: #1d1a22; border-color: #3a3442; color: #b8b0c4; }
+  .icon { width: 40px; height: 40px; display: block; margin: 0 auto 6px; }
+  .frame { width: 180px; display: block; margin: 0 auto 6px; }
+  .portrait { width: 140px; display: block; margin: 0 auto 6px; }
+  .swatch { width: 120px; }
+  .swatch div { height: 34px; border-radius: 6px; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<h1>Spellgambit: Arcane Class — galeria grafik (F3.6)</h1>
+<p>Propozycje do zatwierdzenia: ikony, ramki kart, układ karty i portrety postaci startowych.</p>
+
+<h2>Paleta szkół (motyw jasny / ciemny)</h2>
+<div class="row" id="palette"></div>
+
+<h2>Ikony szkół</h2>
+<div class="row" id="schools"></div>
+
+<h2>Typy ataku i statystyki</h2>
+<div class="row" id="stats"></div>
+
+<h2>Ramki kart i układ karty</h2>
+<div class="row">
+  <div class="tile"><img class="frame" src="frames/frame-bronze.svg" alt="">brązowa</div>
+  <div class="tile"><img class="frame" src="frames/frame-silver.svg" alt="">srebrna</div>
+  <div class="tile"><img class="frame" src="frames/frame-gold.svg" alt="">złota</div>
+  <div class="tile"><img class="frame" src="frames/card-layout.svg" alt="">układ karty</div>
+</div>
+
+<h2>Postacie startowe</h2>
+<div class="row" id="avatars"></div>
+
+<script>
+  const schools = [
+    ['combat', 'Walka', '#b23a2e', '#e5735f'],
+    ['divine', 'Kapłaństwo', '#b8860b', '#e6c25a'],
+    ['element', 'Elementalizm', '#2e7d32', '#6fbf73'],
+    ['arcane', 'Magia', '#3949ab', '#8c9eff'],
+    ['necro', 'Nekromancja', '#6a1b9a', '#b77fd1'],
+    ['tech', 'Technologia', '#00838f', '#4dd0e1'],
+  ];
+  const stats = [
+    ['attack-phys', 'atak F'], ['attack-mag', 'atak M'], ['stat-phys-atk', 'AF'], ['stat-phys-def', 'OF'],
+    ['stat-mag-atk', 'AM'], ['stat-mag-def', 'OM'], ['stat-hp', 'Ż'], ['stat-stamina', 'W'], ['stat-focus', 'K'],
+  ];
+  const avatars = [
+    ['dune_wanderer', 'Wędrowiec Wydm'], ['dawn_warden', 'Strażnik Świtu'], ['ember_drake', 'Żarosmok'],
+    ['star_adept', 'Adeptka Gwiazd'], ['ash_widow', 'Wdowa Popiołu'], ['cogwright', 'Mistrz Trybów'],
+  ];
+  // Ikony mają stroke="currentColor"; żeby pokazać je w kolorze, wstawiamy SVG do dokumentu.
+  async function inline(src, color) {
+    const text = await (await fetch(src)).text();
+    const span = document.createElement('span');
+    span.innerHTML = text;
+    const svg = span.querySelector('svg');
+    svg.classList.add('icon');
+    svg.style.color = color;
+    return svg;
+  }
+  function tile(dark, label, child) {
+    const div = document.createElement('div');
+    div.className = dark ? 'tile dark' : 'tile';
+    if (child) div.append(child);
+    div.append(label);
+    return div;
+  }
+  const palette = document.getElementById('palette');
+  for (const [, name, light, dark] of schools) {
+    const div = document.createElement('div');
+    div.className = 'tile swatch';
+    div.innerHTML = `<div style="background:${light}"></div><div style="background:${dark}"></div>${name}<br>${light} / ${dark}`;
+    palette.append(div);
+  }
+  (async () => {
+    for (const dark of [false, true]) {
+      for (const [key, name, light, darkColor] of schools) {
+        const svg = await inline(`icons/school-${key}.svg`, dark ? darkColor : light);
+        document.getElementById('schools').append(tile(dark, name, svg));
+      }
+      for (const [key, name] of stats) {
+        const svg = await inline(`icons/${key}.svg`, dark ? '#e8e2f0' : '#2b2118');
+        document.getElementById('stats').append(tile(dark, name, svg));
+      }
+    }
+    for (const [key, name] of avatars) {
+      const img = document.createElement('img');
+      img.className = 'portrait';
+      img.src = `avatars/${key}.svg`;
+      img.alt = '';
+      document.getElementById('avatars').append(tile(false, name, img));
+    }
+  })();
+</script>
+</body>
+</html>

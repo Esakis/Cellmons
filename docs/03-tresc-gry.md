@@ -66,6 +66,8 @@ Analiza 16 pełnych tabel rozwoju (`docs/dane/rozwoj_postaci.csv`):
 4. Szkoły rosną trzy razy, domyślnie na poz. 5, 10 i 15.
 5. Wynik zapisuje się w danych jako zwykła tabela (generator to narzędzie projektanta, nie mechanizm runtime).
 
+Implementacja (F3.4): `cargo run -p content-compiler -- curves --weights 35,30,20,15 --combat 17 --stamina 70 --hp 80 --school 5:combat=2 …` wypisuje tabelę `growth` do wklejenia w plik postaci. Punkty walki rozkłada równomiernie (co 1–2 poziomy) i przemiennie według wag, a W i Ż po +3…+5 na poziom. Parametry użyte dla postaci są w komentarzu nad jej tabelą w `content/avatars/starters.toml`. Postacie startowe Kapłaństwa i Nekromancji mają tabele z danych referencyjnych, pozostałe cztery z generatora.
+
 ### 3.3. Drogi, specjalizacje, dary
 
 Pełna tabela: `docs/dane/drogi_rozwoju.csv` (62 wiersze). Wzorce:
@@ -195,9 +197,13 @@ Proces dla każdej karty (wymagany w fazach F2 i F10):
 
 Dodatki (edycje) w oryginale: „Core”, „Zemsta Technologa”, „Czas Oczekiwania”, „Trzeci Sztorm”, „Magia Utopców”. U nas edycje mają własne nazwy, a pole `set` w danych pozwala wydawać treść porcjami.
 
+**Treść MVP (F3.3, 2026-10-15):** 72 karty brązowe z 6 zestawów startowych (`content/cards/core/<szkoła>.toml`) i 6 postaci startowych (`content/avatars/starters.toml`), wszystkie z własnymi nazwami po polsku i angielsku. Efekty zaprojektowano od nowa z rodzin efektów, korzystając z zachowanych opisów (rozdz. 5.2) i nazw kart referencyjnych jako wskazówki. Karta „Przypływ Mocy” należy do zestawów Elementalizmu i Magii.
+
 ## 6. Zestawy startowe
 
 `docs/dane/zestawy_startowe.csv`: każda szkoła daje 36–40 kart, z czego 10–14 różnych. Część kart wymaga poziomu 2 lub drugiej szkoły, więc nowicjusz nie zagra wszystkimi od razu (to zamierzone, `[Ź:S6]`). Nasze zestawy startowe budujemy według tej samej proporcji: około 2/3 kart grywalnych od poz. 1, 1/3 „na później”.
+
+Implementacja (F3.3): `content/starter_decks.toml`. Każdy zestaw ma 36–40 kart (`cards`) i talię startową z 20 kart (`deck`), złożoną tylko z kart grywalnych od poziomu 1 postaci startowej (sprawdza to test). Balans postaci startowych z ich taliami mierzy `sim matrix` (`11-ai-i-symulacje.md`, rozdz. 6).
 
 ## 7. Zestawy kart, wysypisko, wyprawy
 
@@ -212,7 +218,8 @@ Dodatki (edycje) w oryginale: „Core”, „Zemsta Technologa”, „Czas Oczek
 ```
 content/
   rules.toml            # parametry zasad (02-zasady-gry.md, rozdz. 13)
-  schools.toml
+  schools.toml          # szkoły i ich kolory (motyw jasny i ciemny)
+  starter_decks.toml    # zestawy startowe: karty nowego konta i talia startowa
   avatars/*.toml        # szablony postaci, drogi
   cards/<set>/*.toml    # karty, jeden plik na dodatek lub szkołę
   boosters.toml
@@ -300,6 +307,13 @@ slots = [
 ]
 ```
 
+**Format w implementacji (F3.1).** Względem przykładów wyżej:
+- karta ma listę `effects = [...]` (do 4 efektów wykonywanych po kolei) zamiast jednego `effect`; umagicznienie ma osobne pole `trigger` (`on_round`, `on_hit`, `on_blocked`, `on_damage_taken`, `on_round_end`);
+- `keywords` to `intervention`, `counter` i `random`; sprzężenie ma osobne pole `coupling = { school = "arcane", level = 2 }`, a warunek pole `condition = { type = "round_at_least", round = 3 }` (także `hp_percent_ahead`, `opponent_exhausted`);
+- parametry rodzin są nazwane jak w silniku (`06-silnik-gry.md`, rozdz. 6.4a), np. `{ family = "force_miss", target = "opponent", kind = "phys", first_only = true }`; sloty liczy się od 1; cel `self`, `opponent` albo `both`; czas `duel` (domyślny), `round` albo `while_active` (tylko w umagicznieniach);
+- efekty `custom`, drogi postaci (`paths`), `boosters.toml` i pozostałe pliki z rozdz. 8.1 dojdą w fazach, które ich potrzebują; na razie nieznany klucz jest błędem;
+- teksty mają identyfikatory `card-<nazwa>-name`, `card-<nazwa>-text`, `avatar-<nazwa>-name` i `school-<klucz>-name`, gdzie `<nazwa>` to klucz bez prefiksu. W tekście karty wolno używać `$focus`, `$stamina` oraz liczbowych parametrów efektów: pierwszego bez przyrostka (`$amount`, `$percent`, `$count`, `$slot`, `$round`), kolejnych z przyrostkiem `_2`, `_3`.
+
 ### 8.3. Walidacja (kompilator treści)
 
 Narzędzie `content-compiler` (Rust, część monorepo) odrzuca build, jeśli:
@@ -310,6 +324,8 @@ Narzędzie `content-compiler` (Rust, część monorepo) odrzuca build, jeśli:
 - efekt `custom` nie ma implementacji w rejestrze silnika (sprawdzane przez wygenerowany kod);
 - karta nie ma ani jednego testu scenariuszowego (sprawdza osobny krok CI);
 - zestaw kart losuje z rzadkości, która ma mniej niż 5 kart w sprzedaży.
+
+Implementacja (F3.2): `cargo run -p content-compiler -- check` sprawdza treść i to, czy wygenerowany kod jest aktualny (krok `check.bat` i CI), a `-- build` generuje `crates/engine-content/src/generated.rs` oraz pliki klienta w `target/content/`. Kompilator zbiera wszystkie błędy naraz i podaje plik, klucz elementu i przyczynę, np. `cards/core/combat.toml [card.edge]: efekt 1: czas „while_active” działa tylko w umagicznieniach`. Celowo zepsute pliki sprawdza `crates/content-compiler/tests/validation.rs`. Sprawdzane są też: kolory szkół, harmonogram punktów rozwoju według rzadkości postaci, niemalejące poziomy szkół, wielkość talii startowej (`deck.size`) i limit kopii, a także teksty nienależące do żadnego elementu. Test scenariuszowy każdej karty jest w `crates/engine-content/tests/cards.rs`; karta bez przypadku w tym teście powoduje błąd testu.
 
 ### 8.4. Artefakty kompilacji i wersjonowanie
 
@@ -322,9 +338,11 @@ flowchart LR
   B --> F["raport walidacji + content_version"]
 ```
 
-- `content_version` to skrót BLAKE3 znormalizowanej treści. Serwer podaje go w powitaniu protokołu (`07-protokol-sieciowy.md`), a klient pobiera plik `content.<hash>.json` cache'owany na stałe.
+- `content_version` to skrót BLAKE3 (tryb wyprowadzania klucza) treści dla klienta w JSON i plików tekstów wszystkich języków, więc zmienia go także poprawka samego tekstu. Serwer podaje go w powitaniu protokołu (`07-protokol-sieciowy.md`), a klient pobiera plik `content.<hash>.json` cache'owany na stałe.
 - Każdy zapis walki przechowuje `content_version` i `engine_version`, co umożliwia odtworzenie powtórek.
 - Treść w produkcji zmienia się tylko przez wdrożenie (bez edycji „na żywo”). Upraszcza to determinizm i testy.
+- Pliki klienta (F3.2): `content.json` (te same pola co w TOML, bez `ref`, z polem `version`) i `i18n.pl.ftl`, `i18n.en.ftl` w `target/content/`. Nazwy z hashem i włączenie do pakietu klienta dojdą w fazie F5.
+- `engine-content` udostępnia `content()`, `rules()`, `AVATARS` (z `at_level` i `snapshot`), `STARTERS` i `CARD_KEYS`. Karty są budowane raz, przy pierwszym użyciu.
 
 ## 9. Grafika i dźwięk
 

@@ -71,7 +71,9 @@ function Invoke-ServerSmokeTest {
 $steps = @(
     @{ Name = 'Rust: formatowanie (cargo fmt)'; Run = { cargo fmt --all --check } }
     @{ Name = 'Rust: lint (clippy)'; Run = { cargo clippy --workspace --all-targets --locked -- -D warnings } }
+    @{ Name = 'Treść: walidacja (content-compiler)'; Run = { cargo run -q -p content-compiler --locked -- check } }
     @{ Name = 'Rust: testy'; Run = { cargo test --workspace --locked } }
+    @{ Name = 'Balans: postacie startowe (sim matrix)'; Run = { cargo run -q -p sim --locked -- matrix --n 500 } }
     @{ Name = 'Rust: silnik do WebAssembly'; Run = { cargo build -p engine-wasm --target wasm32-unknown-unknown --locked } }
     @{
         Name = 'Silnik: natywne = WASM (Node)'

@@ -1,0 +1,121 @@
+# Karty zestawu startowego szkoły Magia (docs/03-tresc-gry.md, rozdz. 5 i 6).
+# `ref` to nazwa karty referencyjnej z docs/dane/karty_klasyczne.csv; nie trafia do gry.
+
+[[card]]
+id = 37
+key = "card.unweave"
+ref = "Antyczar"
+set = "core"
+rarity = "bronze"
+requires = { arcane = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "instant"
+keywords = ["counter"]
+effects = []
+
+[[card]]
+id = 38
+key = "card.sages_hood"
+ref = "Kapelusz Maga"
+set = "core"
+rarity = "bronze"
+requires = { arcane = 2 }
+cost = { focus = 2, stamina = 6 }
+kind = "instant"
+effects = [
+  { family = "stat_mod", target = "self", stat = "mag_atk", amount = 2 },
+  { family = "stat_mod", target = "self", stat = "mag_def", amount = 1 },
+]
+
+[[card]]
+id = 39
+key = "card.mana_elixir"
+ref = "Magiczny Napój"
+set = "core"
+rarity = "bronze"
+requires = { arcane = 1 }
+cost = { focus = 1, stamina = 4 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "mag_atk", amount = 2 }]
+
+[[card]]
+id = 40
+key = "card.minor_ward"
+ref = "Mniejsze Pole Siłowe"
+set = "core"
+rarity = "bronze"
+requires = { arcane = 1 }
+cost = { focus = 1, stamina = 4 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "mag_def", amount = 2 }]
+
+[[card]]
+id = 41
+key = "card.wild_weave"
+ref = "Niebezpieczny Czar"
+set = "core"
+rarity = "bronze"
+requires = { arcane = 2 }
+cost = { focus = 2, stamina = 8 }
+kind = "instant"
+keywords = ["random"]
+effects = []
+
+[[card]]
+id = 42
+key = "card.pain_echo"
+ref = "Projekcja Bólu"
+set = "core"
+rarity = "bronze"
+requires = { arcane = 1 }
+cost = { focus = 1, stamina = 6 }
+kind = "instant"
+effects = [{ family = "damage", target = "opponent", amount = 3 }]
+
+[[card]]
+id = 43
+key = "card.arcane_flick"
+ref = "Prztyczek"
+set = "core"
+rarity = "bronze"
+requires = { arcane = 1 }
+cost = { focus = 1, stamina = 6 }
+kind = "instant"
+effects = [
+  { family = "damage", target = "opponent", amount = 2 },
+  { family = "focus", target = "opponent", amount = -1 },
+]
+
+[[card]]
+id = 44
+key = "card.mind_over_steel"
+ref = "Umysł nad Miecz"
+set = "core"
+rarity = "bronze"
+requires = { arcane = 1 }
+cost = { focus = 2, stamina = 5 }
+kind = "instant"
+effects = [{ family = "swap_stats", target = "self", pair = "attacks" }]
+
+[[card]]
+id = 45
+key = "card.sour_wine"
+ref = "Zatrute Wino"
+set = "core"
+rarity = "bronze"
+requires = { arcane = 1 }
+cost = { focus = 2, stamina = 6 }
+kind = "instant"
+effects = [{ family = "hand", target = "opponent", action = "discard_random", count = 1 }]
+
+[[card]]
+id = 46
+key = "card.apprentices_retort"
+ref = "Zemsta Ucznia"
+set = "core"
+rarity = "bronze"
+requires = { arcane = 1 }
+cost = { focus = 2, stamina = 8 }
+kind = "enchantment"
+trigger = "on_damage_taken"
+effects = [{ family = "damage", target = "opponent", amount = 2 }]

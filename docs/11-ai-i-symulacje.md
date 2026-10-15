@@ -36,6 +36,8 @@ Losuje jeden z dozwolonych ruchów z rozkładu równomiernego. Służy do fuzzin
 
 **Implementacja (F2.6, `crates/engine-ai`).** `Bot::new(poziom, ziarno)` i `Bot::choose(&PlayerView, &Content) -> Move`; to samo ziarno i ten sam widok dają ten sam ruch. L0 wylicza wszystkie 64 ustawienia razem z akcjami kart i losuje spośród dozwolonych. L1 przewiduje, że przeciwnik zostawi ustawienia z poprzedniej rundy: atakuje typem, którego przeciwnik nie blokuje, a broni się przed jego ostatnimi atakami. Slot zmienia, gdy zysk w Ż przekracza dwukrotność kosztu zmiany. Czar wybiera według wartości efektu na koszt, z rezerwą W ≥ ¼ W_max, a kartę, której nie może rzucić, odrzuca.
 
+Poprawki z kroku F3.5: obrony L1 ustawia przeciw typowi, który zada więcej obrażeń (zgodnie z punktem 1 wyżej), a nie tylko przeciw atakom z poprzedniej rundy; bez tego bot nie bronił się w 1. rundzie przed oczywistym atakiem w słabszą obronę. Punkt ataku lub obrony z karty jest wart ok. 1 Ż na każdą pozostałą rundę (wcześniej 3), bo większość ataków jest blokowana; zawyżona wartość sprawiała, że bot wybierał wzmocnienia zamiast obrażeń.
+
 ### L2: adaptacyjny (model przeciwnika)
 
 - Model: dla każdego slotu rozkład wyborów przeciwnika warunkowany numerem rundy i jego ustawieniem z poprzedniej rundy, z rozkładem a priori Dirichleta. Model aktualizuje się w trakcie pojedynku, a dla graczy z historią (sala treningowa) także między pojedynkami.
@@ -99,6 +101,8 @@ Kolor nazwy przeciwnika (R-WYP-02): zielony, gdy jest niżej od gracza, żółty
 |---|---|---|
 | `sim duel` | pojedyncza walka z pełnym zapisem zdarzeń | log tekstowy, powtórka |
 | `sim run --n 100000 --a L1 --b L0` | seria pojedynków botów (od F2.6, na kartach testowych) | wygrane, remisy, powody końca, średnia liczba rund, przewaga inicjatywy, czas |
+| `sim matrix --n 2000 --level 1 --bot L1` | od F3.5: postacie startowe z taliami startowymi z `content/`, każda przeciw każdej, ze zmianą stron co pojedynek | macierz odsetków wygranych (remis = ½), wynik każdej postaci z 95% przedziałem ufności; kod wyjścia 1, gdy któraś postać przekracza 60% |
+| `sim duel 3 --starters dune_wanderer,ember_drake` | od F3.5: jeden pojedynek postaci startowych opisany runda po rundzie | log tekstowy |
 | `sim matrix --level 10 --bot L2 --n 2000` | każda postać przeciw każdej na tym samym poziomie | macierz współczynników wygranych z przedziałami ufności |
 | `sim card <klucz>` | test A/B: talia z kartą i bez niej | zmiana współczynnika wygranych, częstość użycia, wygrane po rzuceniu |
 | `sim initiative` | przewaga inicjatywy | odsetek wygranych gracza z inicjatywą |

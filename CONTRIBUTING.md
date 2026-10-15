@@ -27,6 +27,11 @@ Na Windowsie Rust potrzebuje narzędzi C++ z Visual Studio (Build Tools, składn
 | `check.bat -Quick` | szybsze sprawdzenie, bez testów e2e i testu serwera z bazą |
 | `cargo run -p sim -- duel [ziarno] [--a L0\|L1] [--b L0\|L1]` | pojedynek botów (domyślnie L1 przeciw L1) na losowych postaciach i kartach testowych, opisany runda po rundzie |
 | `cargo run --release -p sim -- run [--n 1000] [--seed 0] [--a L1] [--b L1]` | seria pojedynków botów: wygrane, remisy, powody końca, średnia liczba rund, przewaga inicjatywy i czas |
+| `cargo run -p content-compiler -- check` | sprawdza treść w `content/` i to, czy wygenerowany kod w `engine-content` jest aktualny |
+| `cargo run -p content-compiler -- build` | po zmianie treści: generuje `crates/engine-content/src/generated.rs` i pliki klienta w `target/content/` |
+| `cargo run -p content-compiler -- curves --weights 35,30,20,15 --school 5:combat=2` | wypisuje tabelę rozwoju postaci (poziomy 2–20) do wklejenia w `content/avatars/*.toml` |
+| `cargo run --release -p sim -- matrix [--n 2000] [--level 1] [--bot L1]` | macierz wygranych postaci startowych z taliami startowymi; kod wyjścia 1, gdy któraś ma ponad 60% |
+| `cargo run -p sim -- duel [ziarno] --starters dune_wanderer,ember_drake` | pojedynek postaci startowych opisany runda po rundzie |
 | `cargo bench -p engine` | pomiar rozstrzygania rundy i całego pojedynku (`docs/06-silnik-gry.md`, rozdz. 10) |
 
 - Serwer i klient działają w osobnych oknach; zamknięcie okna zatrzymuje usługę.

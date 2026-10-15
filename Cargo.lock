@@ -344,6 +344,14 @@ checksum = "3d52eff69cd5e647efe296129160853a42795992097e8af39800e1060caeea9b"
 [[package]]
 name = "content-compiler"
 version = "0.1.0"
+dependencies = [
+ "blake3",
+ "engine",
+ "fluent-syntax",
+ "serde",
+ "serde_json",
+ "toml",
+]
 
 [[package]]
 name = "core_detect"
@@ -608,6 +616,16 @@ name = "find-msvc-tools"
 version = "0.1.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "aedcfb3409746eddb02b9e19ebda1c3394f759a152e48ee875a0844d1b955484"
+
+[[package]]
+name = "fluent-syntax"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "54f0d287c53ffd184d04d8677f590f4ac5379785529e5e08b1c8083acdd5c198"
+dependencies = [
+ "memchr",
+ "thiserror",
+]
 
 [[package]]
 name = "fnv"
@@ -1548,6 +1566,7 @@ version = "0.1.0"
 dependencies = [
  "engine",
  "engine-ai",
+ "engine-content",
 ]
 
 [[package]]

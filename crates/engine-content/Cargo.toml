@@ -9,5 +9,8 @@ publish.workspace = true
 [dependencies]
 engine.workspace = true
 
+[dev-dependencies]
+engine = { workspace = true, features = ["testkit"] }
+
 [lints]
 workspace = true

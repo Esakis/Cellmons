@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Mistrz Trybów">
+<title>Mistrz Trybów</title>
+<defs><clipPath id="round"><circle cx="100" cy="100" r="96"/></clipPath></defs>
+<circle cx="100" cy="100" r="98" fill="#00838f"/>
+<g clip-path="url(#round)">
+<circle cx="100" cy="100" r="96" fill="#dff4f6"/>
+<!-- Koło zębate w tle -->
+<g fill="#4dd0e1" fill-opacity="0.5">
+<circle cx="150" cy="60" r="22"/>
+<path d="M146 30h8v8h-8zM146 82h8v8h-8zM120 56h8v8h-8zM172 56h8v8h-8z"/>
+</g>
+<circle cx="150" cy="60" r="9" fill="#dff4f6"/>
+<!-- Konstruktor w goglach -->
+<circle cx="96" cy="88" r="24" fill="#d7a77a"/>
+<path d="M70 70c6-18 46-18 52 0-10-6-42-6-52 0z" fill="#5d4037"/>
+<path d="M72 84h48" stroke="#37474f" stroke-width="5"/>
+<circle cx="86" cy="84" r="8" fill="#80deea" stroke="#37474f" stroke-width="4"/>
+<circle cx="106" cy="84" r="8" fill="#80deea" stroke="#37474f" stroke-width="4"/>
+<path d="M64 116c8-6 56-6 64 0l14 68H50z" fill="#00838f"/>
+<path d="M84 120h24v26H84z" fill="#006064"/>
+<!-- Klucz -->
+<path d="M132 150l30-30" stroke="#90a4ae" stroke-width="6" stroke-linecap="round"/>
+<circle cx="166" cy="116" r="8" fill="none" stroke="#90a4ae" stroke-width="5"/>
+</g>
+<circle cx="100" cy="100" r="96" fill="none" stroke="#00838f" stroke-width="5"/>
+</svg>

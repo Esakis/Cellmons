@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Adeptka Gwiazd">
+<title>Adeptka Gwiazd</title>
+<defs><clipPath id="round"><circle cx="100" cy="100" r="96"/></clipPath></defs>
+<circle cx="100" cy="100" r="98" fill="#3949ab"/>
+<g clip-path="url(#round)">
+<circle cx="100" cy="100" r="96" fill="#e5e8fb"/>
+<!-- Gwiazdy -->
+<g fill="#8c9eff">
+<path d="M40 40l3 8 8 3-8 3-3 8-3-8-8-3 8-3z"/>
+<path d="M160 56l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/>
+<path d="M150 150l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/>
+</g>
+<!-- Spiczasty kapelusz i szata -->
+<path d="M100 18l26 62H74z" fill="#283593"/>
+<path d="M62 80h76l-8 10H70z" fill="#1a237e"/>
+<path d="M112 46l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#ffd166"/>
+<circle cx="100" cy="104" r="16" fill="#e0b48a"/>
+<path d="M70 124c8-6 52-6 60 0l14 60H56z" fill="#3949ab"/>
+<!-- Różdżka -->
+<path d="M140 132l26-34" stroke="#8d6e63" stroke-width="5" stroke-linecap="round"/>
+<circle cx="168" cy="95" r="6" fill="#ffd166"/>
+</g>
+<circle cx="100" cy="100" r="96" fill="none" stroke="#3949ab" stroke-width="5"/>
+</svg>

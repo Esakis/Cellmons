@@ -10,6 +10,7 @@ publish.workspace = true
 # Losowe postacie i talie z narzędzi testowych silnika; prawdziwa zawartość dojdzie w F3.
 engine = { workspace = true, features = ["testkit"] }
 engine-ai.workspace = true
+engine-content.workspace = true
 
 [lints.rust]
 unsafe_code = "forbid"

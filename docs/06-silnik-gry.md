@@ -179,7 +179,7 @@ attack(state, a, slot, combo):
 - **Z-ENG-3:** leczenie nie podnosi Ż ponad `hp_max` (zgodne z walką #26519), chyba że efekt jawnie zwiększa `hp_max`.
 - **Z-ENG-4:** limit K (`duel.focus_cap`, w zasadach klasycznych brak limitu) ogranicza tylko przyrost z R-RUN-01. K zdobyta ponad limitem, np. z efektu karty, zostaje.
 
-**Decyzje silnika z fazy F2** (do zatwierdzenia):
+**Decyzje silnika z fazy F2** (zatwierdzone przez właściciela 2026-10-15):
 - **Z-ENG-5:** efekt przywracający W (rodzina `stamina`, `drain` z puli W) nie podnosi W ponad W_max, tak jak leczenie przy Z-ENG-3. W nie spada poniżej 0.
 - **Z-ENG-6:** efekty wykonane przez umagicznienie nie wyzwalają kolejnych umagicznień (np. obrażenia z umagicznienia nie uruchamiają `OnDamageTaken`). Wyklucza to nieskończone łańcuchy i uzależnienie wyniku od kolejności rejestracji.
 - Dar (R-POJ-07, Z-GFT) jest zwykłym umagicznieniem zarejestrowanym przed 1. rundą, więc można go rozproszyć.

@@ -1,8 +1,10 @@
 //! Symulator balansu: pojedynki botów i raporty (`docs/11-ai-i-symulacje.md`).
 //!
 //! `sim duel` opisuje jeden pojedynek botów runda po rundzie, a `sim run` rozgrywa serię pojedynków
-//! i podsumowuje wyniki. Postacie i talie są losowane z kart testowych silnika; raporty balansu
-//! prawdziwej zawartości dojdą w kroku F3.5 planu.
+//! i podsumowuje wyniki; oba losują postacie i talie z kart testowych silnika. `sim matrix` gra
+//! prawdziwą treścią z `content/`: postaciami startowymi i ich taliami.
+
+mod matrix;
 
 use std::collections::BTreeMap;
 use std::io::{self, Write};
@@ -17,21 +19,32 @@ use engine::{
 use engine_ai::{Bot, Level};
 
 const USAGE: &str = "Użycie:
-  sim duel [ziarno] [--a L0|L1] [--b L0|L1]
-      pojedynek botów opisany runda po rundzie (domyślnie ziarno 1, boty L1)
+  sim duel [ziarno] [--a L0|L1] [--b L0|L1] [--starters postać,postać]
+      pojedynek botów opisany runda po rundzie (domyślnie ziarno 1, boty L1); z --starters
+      grają postacie startowe z content/ (np. dune_wanderer,ember_drake) na poziomie 1
   sim run [--n liczba] [--seed ziarno] [--a L0|L1] [--b L0|L1]
-      seria pojedynków z podsumowaniem (domyślnie 1000 pojedynków od ziarna 0, boty L1)";
+      seria pojedynków z podsumowaniem (domyślnie 1000 pojedynków od ziarna 0, boty L1)
+  sim matrix [--n liczba] [--level poziom] [--bot L0|L1]
+      macierz wygranych postaci startowych z taliami startowymi (domyślnie 2000 pojedynków
+      na parę, poziom 1, boty L1); kod wyjścia 1, gdy któraś postać ma ponad 60% wygranych";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Command {
     Duel {
         seed: u64,
         levels: [Level; 2],
+        /// Indeksy postaci startowych zamiast losowego wejścia z kart testowych.
+        starters: Option<[usize; 2]>,
     },
     Run {
         count: u64,
         seed: u64,
         levels: [Level; 2],
+    },
+    Matrix {
+        games: u64,
+        level: u8,
+        bot: Level,
     },
 }
 
@@ -48,6 +61,9 @@ fn parse(args: &[String]) -> Option<Command> {
     let mut levels = [Level::L1; 2];
     let mut seed = None;
     let mut count = None;
+    let mut level = None;
+    let mut bot = None;
+    let mut starters = None;
     while let Some((flag, tail)) = rest.split_first() {
         if command == "duel" && seed.is_none() && !flag.starts_with("--") {
             seed = Some(flag.parse().ok()?);
@@ -59,7 +75,20 @@ fn parse(args: &[String]) -> Option<Command> {
             "--a" => levels[0] = parse_level(value)?,
             "--b" => levels[1] = parse_level(value)?,
             "--seed" => seed = Some(value.parse().ok()?),
-            "--n" if command == "run" => count = Some(value.parse().ok()?),
+            "--n" if command == "run" || command == "matrix" => count = Some(value.parse().ok()?),
+            "--level" if command == "matrix" => {
+                level = Some(
+                    value
+                        .parse()
+                        .ok()
+                        .filter(|level| (1..=20).contains(level))?,
+                );
+            }
+            "--bot" if command == "matrix" => bot = Some(parse_level(value)?),
+            "--starters" if command == "duel" => {
+                let (a, b) = value.split_once(',')?;
+                starters = Some([matrix::starter_index(a)?, matrix::starter_index(b)?]);
+            }
             _ => return None,
         }
         rest = &tail[1..];
@@ -68,11 +97,17 @@ fn parse(args: &[String]) -> Option<Command> {
         "duel" => Some(Command::Duel {
             seed: seed.unwrap_or(1),
             levels,
+            starters,
         }),
         "run" => Some(Command::Run {
             count: count.unwrap_or(1_000),
             seed: seed.unwrap_or(0),
             levels,
+        }),
+        "matrix" if seed.is_none() && levels == [Level::L1; 2] => Some(Command::Matrix {
+            games: count.unwrap_or(2_000),
+            level: level.unwrap_or(1),
+            bot: bot.unwrap_or(Level::L1),
         }),
         _ => None,
     }
@@ -86,12 +121,30 @@ fn main() -> ExitCode {
     };
     let out = &mut io::stdout().lock();
     let result = match command {
-        Command::Duel { seed, levels } => duel_report(seed, levels, out),
+        Command::Duel {
+            seed,
+            levels,
+            starters,
+        } => duel_report(seed, levels, starters, out),
         Command::Run {
             count,
             seed,
             levels,
         } => run_report(count, seed, levels, out),
+        Command::Matrix { games, level, bot } => {
+            let started = Instant::now();
+            let matrix = matrix::play_matrix(games, level, bot);
+            match matrix::report(&matrix, games, level, bot, out) {
+                Ok(ok) => {
+                    let _ = writeln!(out, "Czas: {:.1} s", started.elapsed().as_secs_f64());
+                    if !ok {
+                        return ExitCode::FAILURE;
+                    }
+                    Ok(())
+                }
+                Err(error) => Err(error),
+            }
+        }
     };
     match result {
         Ok(()) => ExitCode::SUCCESS,
@@ -112,6 +165,11 @@ impl Duel {
     fn new(seed: u64, levels: [Level; 2], content: &Content<'_>) -> Self {
         let setup = random_setup(&mut seeded_rng(seed), content);
         let state = new_duel(&setup, content).expect("losowe wejście jest poprawne");
+        Self::from_state(state, levels, seed)
+    }
+
+    /// Pojedynek od stanu `state` z botami o ziarnach wyprowadzonych z `seed`.
+    fn from_state(state: DuelState, levels: [Level; 2], seed: u64) -> Self {
         // Każdy bot losuje z własnego strumienia.
         let bots = [0, 1].map(|index| Bot::new(levels[index], seed.wrapping_mul(2) + index as u64));
         Self { state, bots }
@@ -135,22 +193,40 @@ const fn level_name(level: Level) -> &'static str {
 }
 
 /// Rozgrywa pojedynek botów i opisuje jego przebieg runda po rundzie.
-fn duel_report(seed: u64, levels: [Level; 2], out: &mut impl Write) -> io::Result<()> {
+fn duel_report(
+    seed: u64,
+    levels: [Level; 2],
+    starters: Option<[usize; 2]>,
+    out: &mut impl Write,
+) -> io::Result<()> {
     let cards = sample_cards();
-    let content = content(&cards);
-    let mut duel = Duel::new(seed, levels, &content);
+    let (content, mut duel, setup) = match starters {
+        None => {
+            let content = content(&cards);
+            let duel = Duel::new(seed, levels, &content);
+            let setup = "Losowe postacie i talie z kart testowych z efektami podstawowych rodzin                          i umagicznieniami.";
+            (content, duel, setup.to_owned())
+        }
+        Some([a, b]) => {
+            let content = engine_content::content();
+            let state = matrix::starter_duel([a, b], 1, matrix::seed(a, b, seed), &content);
+            let names = [a, b].map(matrix::starter_name);
+            let setup = format!(
+                "Postacie startowe na poziomie 1 z taliami startowymi: A {}, B {}.",
+                names[0], names[1]
+            );
+            (content, Duel::from_state(state, levels, seed), setup)
+        }
+    };
     let mut events = EventBuf::new();
 
     writeln!(
         out,
-        "Pojedynek testowy (ziarno {seed}): bot {} (A) przeciw botowi {} (B).",
+        "Pojedynek (ziarno {seed}): bot {} (A) przeciw botowi {} (B).",
         level_name(levels[0]),
         level_name(levels[1])
     )?;
-    writeln!(
-        out,
-        "Losowe postacie i talie z kart testowych z efektami podstawowych rodzin i umagicznieniami."
-    )?;
+    writeln!(out, "{setup}")?;
     writeln!(out)?;
     for side in Side::BOTH {
         writeln!(
@@ -649,7 +725,8 @@ mod tests {
         for seed in 0..50 {
             let first = [Level::L0, Level::L1][seed as usize % 2];
             let mut out = Vec::new();
-            duel_report(seed, [first, Level::L1], &mut out).expect("zapis do pamięci");
+            let starters = (seed % 3 == 0).then_some([seed as usize % 6, 2]);
+            duel_report(seed, [first, Level::L1], starters, &mut out).expect("zapis do pamięci");
             let text = String::from_utf8(out).expect("UTF-8");
             assert!(text.contains("Inicjatywa: "), "ziarno {seed}");
             assert!(
@@ -677,14 +754,24 @@ mod tests {
             parse(&args("duel")),
             Some(Command::Duel {
                 seed: 1,
-                levels: l1
+                levels: l1,
+                starters: None
             })
         );
         assert_eq!(
             parse(&args("duel 5 --b L0")),
             Some(Command::Duel {
                 seed: 5,
-                levels: [Level::L1, Level::L0]
+                levels: [Level::L1, Level::L0],
+                starters: None
+            })
+        );
+        assert_eq!(
+            parse(&args("duel 2 --starters ash_widow,cogwright")),
+            Some(Command::Duel {
+                seed: 2,
+                levels: l1,
+                starters: Some([4, 5])
             })
         );
         assert_eq!(
@@ -695,6 +782,16 @@ mod tests {
                 levels: [Level::L0, Level::L1]
             })
         );
+        assert_eq!(
+            parse(&args("matrix --n 50 --level 3 --bot L0")),
+            Some(Command::Matrix {
+                games: 50,
+                level: 3,
+                bot: Level::L0
+            })
+        );
+        assert_eq!(parse(&args("matrix --level 21")), None);
+        assert_eq!(parse(&args("matrix --a L0")), None);
         assert_eq!(parse(&args("run 5")), None);
         assert_eq!(parse(&args("duel --a L2")), None);
         assert_eq!(parse(&args("run --n")), None);

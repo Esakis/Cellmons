@@ -1,0 +1,163 @@
+# Karty zestawu startowego szkoły Nekromancja (docs/03-tresc-gry.md, rozdz. 5 i 6).
+# `ref` to nazwa karty referencyjnej z docs/dane/karty_klasyczne.csv; nie trafia do gry.
+
+[[card]]
+id = 47
+key = "card.despair"
+ref = "Beznadzieja"
+set = "core"
+rarity = "bronze"
+requires = { necro = 1 }
+cost = { focus = 2, stamina = 6 }
+kind = "instant"
+effects = [
+  { family = "focus", target = "opponent", amount = -1 },
+  { family = "stamina", target = "opponent", amount = -4 },
+]
+
+[[card]]
+id = 48
+key = "card.blight"
+ref = "Choroba"
+set = "core"
+rarity = "bronze"
+requires = { necro = 1 }
+cost = { focus = 2, stamina = 6 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [
+  { family = "damage", target = "opponent", amount = 1 },
+  { family = "stamina", target = "opponent", amount = -2 },
+]
+
+[[card]]
+id = 49
+key = "card.grim_revival"
+ref = "Mroczne Ożywienie"
+set = "core"
+rarity = "bronze"
+requires = { necro = 1 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+keywords = ["intervention"]
+effects = [{ family = "heal", target = "self", amount = 12 }]
+
+[[card]]
+id = 50
+key = "card.dark_herald"
+ref = "Mroczny Posłaniec"
+set = "core"
+rarity = "bronze"
+requires = { necro = 1 }
+cost = { focus = 2, stamina = 6 }
+kind = "instant"
+effects = [{ family = "hand", target = "opponent", action = "discard_random", count = 1 }]
+
+[[card]]
+id = 51
+key = "card.cultist"
+ref = "Nekromanta"
+set = "core"
+rarity = "bronze"
+requires = { necro = 1 }
+cost = { focus = 2, stamina = 8 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "drain", pool = "hp", amount = 1 }]
+
+[[card]]
+id = 52
+key = "card.frailty"
+ref = "Osłabienie"
+set = "core"
+rarity = "bronze"
+requires = { necro = 1 }
+cost = { focus = 1, stamina = 6 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "opponent", stat = "phys_atk", amount = -2 }]
+
+[[card]]
+id = 53
+key = "card.exposure"
+ref = "Podatność"
+set = "core"
+rarity = "bronze"
+requires = { necro = 1 }
+cost = { focus = 1, stamina = 6 }
+kind = "instant"
+effects = [{ family = "damage_taken_mult", target = "opponent", percent = 150, duration = "round" }]
+
+[[card]]
+id = 54
+key = "card.doomhelm"
+ref = "Przeklęty Hełm"
+set = "core"
+rarity = "bronze"
+requires = { necro = 1 }
+cost = { focus = 2, stamina = 6 }
+kind = "instant"
+effects = [
+  { family = "stat_mod", target = "self", stat = "phys_def", amount = 3 },
+  { family = "stat_mod", target = "self", stat = "mag_atk", amount = -1 },
+]
+
+[[card]]
+id = 55
+key = "card.shadow_pact"
+ref = "Przeklęty Pakt"
+set = "core"
+rarity = "bronze"
+requires = { necro = 1 }
+cost = { focus = 1, stamina = 0 }
+kind = "instant"
+effects = [
+  { family = "stamina", target = "self", amount = 10 },
+  { family = "damage", target = "self", amount = 4 },
+]
+
+[[card]]
+id = 56
+key = "card.dread"
+ref = "Strach"
+set = "core"
+rarity = "bronze"
+requires = { necro = 1 }
+cost = { focus = 2, stamina = 6 }
+kind = "instant"
+effects = [{ family = "force_miss", target = "opponent", slot = 1 }]
+
+[[card]]
+id = 57
+key = "card.soul_vortex"
+ref = "Wir Esencji"
+set = "core"
+rarity = "bronze"
+requires = { necro = 1 }
+cost = { focus = 2, stamina = 8 }
+kind = "instant"
+effects = [{ family = "drain", pool = "stamina", amount = 6 }]
+
+[[card]]
+id = 58
+key = "card.stupor"
+ref = "Zamroczenie"
+set = "core"
+rarity = "bronze"
+requires = { necro = 1 }
+cost = { focus = 1, stamina = 6 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "opponent", stat = "mag_atk", amount = -2 }]
+
+[[card]]
+id = 59
+key = "card.treacherous_dagger"
+ref = "Zdradliwe Ostrze"
+set = "core"
+rarity = "bronze"
+requires = { necro = 1 }
+cost = { focus = 2, stamina = 6 }
+kind = "instant"
+effects = [
+  { family = "stat_mod", target = "self", stat = "phys_atk", amount = 3 },
+  { family = "stat_mod", target = "self", stat = "phys_def", amount = -1 },
+]

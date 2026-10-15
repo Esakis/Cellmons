@@ -80,6 +80,13 @@ flowchart LR
 | F3.5 Raport balansu | `sim`: macierz wygranych postaci startowych (boty L1) | żadna postać startowa > 60% wygranych |
 | F3.6 Przewodnik stylu i pierwsze grafiki | asystent AI przygotowuje w SVG: przewodnik stylu (paleta, typografia, układ karty), ikony 6 szkół, typów ataku i statystyk, ramki kart według rzadkości, 6 postaci startowych (`03-tresc-gry.md`, rozdz. 9) | właściciel zatwierdza przewodnik i grafiki; pliki w `art/`; wpisy w rejestrze pochodzenia |
 
+**Stan (2026-10-15).** Kroki F3.1–F3.6 zrobione; grafiki z F3.6 zatwierdził właściciel.
+- F3.1–F3.2: `content-compiler` (`check`, `build`, `curves`), `engine-content` z wygenerowanym kodem, `content.json` i teksty dla klienta, krok „Treść: walidacja” w `check.bat` i CI.
+- F3.3: 72 karty, 6 postaci startowych i 6 zestawów startowych z tekstami PL i EN; każda karta ma test scenariuszowy.
+- F3.4: generator krzywych; krzywe 6 postaci mieszczą się w zakresach z `03-tresc-gry.md`, rozdz. 3.2.
+- F3.5: `sim matrix` (2000 i 10 000 pojedynków na parę, boty L1): postacie startowe mają 43,8–56,2% wygranych, więc żadna nie przekracza 60%. Pojedyncze pary są nadal jednostronne (np. Strażnik Świtu przeciw Mistrzowi Trybów ok. 94%), co trzeba obserwować przy kolejnych zmianach treści i botów. Krok „Balans” w `check.bat` i CI (500 pojedynków na parę).
+- F3.6: przewodnik stylu `art/README.md`, ikony, ramki kart, układ karty i portrety w `art/`, galeria `art/gallery.html`, rejestr `art/PROVENANCE.md`.
+
 ## F4. AI (≈ 2 tydz.)
 
 | Krok | Zadania | Kryteria akceptacji |

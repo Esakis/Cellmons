@@ -1,0 +1,169 @@
+# Karty zestawu startowego szkoły Walka (docs/03-tresc-gry.md, rozdz. 5 i 6).
+# `ref` to nazwa karty referencyjnej z docs/dane/karty_klasyczne.csv; nie trafia do gry.
+
+[[card]]
+id = 1
+key = "card.bronze_blade"
+ref = "Miecz z Brązu"
+set = "core"
+rarity = "bronze"
+requires = { combat = 1 }
+cost = { focus = 2, stamina = 4 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_atk", amount = 2 }]
+
+[[card]]
+id = 2
+key = "card.recruit_pauldron"
+ref = "Naramiennik"
+set = "core"
+rarity = "bronze"
+requires = { combat = 1 }
+cost = { focus = 2, stamina = 4 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_def", amount = 2 }]
+
+[[card]]
+id = 3
+key = "card.herbal_draught"
+ref = "Napój Leczący"
+set = "core"
+rarity = "bronze"
+requires = { combat = 1 }
+cost = { focus = 2, stamina = 8 }
+kind = "instant"
+effects = [{ family = "heal", target = "self", amount = 6 }]
+
+[[card]]
+id = 4
+key = "card.nimble_step"
+ref = "Unik"
+set = "core"
+rarity = "bronze"
+requires = { combat = 1 }
+cost = { focus = 2, stamina = 4 }
+kind = "instant"
+effects = [{ family = "force_miss", target = "opponent", kind = "phys", first_only = true }]
+
+[[card]]
+id = 5
+key = "card.tempered_blade"
+ref = "Stalowy Miecz"
+set = "core"
+rarity = "bronze"
+requires = { combat = 2 }
+cost = { focus = 2, stamina = 8 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_atk", amount = 3 }]
+
+[[card]]
+id = 6
+key = "card.beginners_luck"
+ref = "Szczęście Nowicjusza"
+set = "core"
+rarity = "bronze"
+requires = { combat = 1 }
+cost = { focus = 1, stamina = 4 }
+kind = "instant"
+effects = [{ family = "force_hit", target = "self", first_only = true }]
+
+[[card]]
+id = 7
+key = "card.brawl"
+ref = "Bójka"
+set = "core"
+rarity = "bronze"
+requires = { combat = 1 }
+cost = { focus = 3, stamina = 8 }
+kind = "instant"
+effects = [
+  { family = "damage", target = "opponent", amount = 6 },
+  { family = "damage", target = "self", amount = 2 },
+]
+
+[[card]]
+id = 8
+key = "card.curved_blade"
+ref = "Katana"
+set = "core"
+rarity = "bronze"
+requires = { combat = 1 }
+cost = { focus = 3, stamina = 8 }
+kind = "instant"
+effects = [
+  { family = "stat_mod", target = "self", stat = "phys_atk", amount = 2 },
+  { family = "stat_mod", target = "self", stat = "phys_def", amount = 1 },
+]
+
+[[card]]
+id = 9
+key = "card.relentlessness"
+ref = "Nierozerwany Bój"
+set = "core"
+rarity = "bronze"
+requires = { combat = 1 }
+cost = { focus = 2, stamina = 8 }
+kind = "enchantment"
+trigger = "on_hit"
+effects = [{ family = "stamina", target = "self", amount = 2 }]
+
+[[card]]
+id = 10
+key = "card.buckler"
+ref = "Okrągła Tarcza"
+set = "core"
+rarity = "bronze"
+requires = { combat = 1 }
+cost = { focus = 2, stamina = 4 }
+kind = "instant"
+effects = [
+  { family = "stat_mod", target = "self", stat = "phys_def", amount = 1 },
+  { family = "stat_mod", target = "self", stat = "mag_def", amount = 1 },
+]
+
+[[card]]
+id = 11
+key = "card.truce"
+ref = "Pacyfizm"
+set = "core"
+rarity = "bronze"
+requires = { combat = 1 }
+cost = { focus = 2, stamina = 1 }
+kind = "instant"
+effects = [{ family = "force_miss", target = "both" }]
+
+[[card]]
+id = 12
+key = "card.armor_breaker"
+ref = "Pancerzownica"
+set = "core"
+rarity = "bronze"
+requires = { combat = 1 }
+cost = { focus = 2, stamina = 4 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "opponent", stat = "phys_def", amount = -2 }]
+
+[[card]]
+id = 13
+key = "card.preemptive_strike"
+ref = "Wyprzedzający Atak"
+set = "core"
+rarity = "bronze"
+requires = { combat = 1 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+effects = [{ family = "unblockable", target = "self", kind = "phys" }]
+
+[[card]]
+id = 14
+key = "card.pitfall"
+ref = "Zapadnia"
+set = "core"
+rarity = "bronze"
+requires = { combat = 2 }
+cost = { focus = 2, stamina = 8 }
+kind = "instant"
+effects = [
+  { family = "force_miss", target = "opponent", slot = 2 },
+  { family = "stamina", target = "opponent", amount = -4 },
+]

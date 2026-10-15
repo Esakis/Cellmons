@@ -171,8 +171,15 @@ fn setting_gains(view: &PlayerView) -> Vec<(usize, bool, i32)> {
         if gain > 0 {
             gains.push((slot, true, gain));
         }
-        // Obrony: blok ma sens tylko z W (R-ATK-03) i przeciw przewidywanemu atakowi.
-        let threat = foe.attacks[slot];
+        // Obrony: blok ma sens tylko z W (R-ATK-03) i przeciw przewidywanemu atakowi, czyli
+        // typowi, który zada więcej obrażeń; przy remisie temu z poprzedniej rundy przeciwnika.
+        let hurt = |kind: Kind| (foe.stats.attack(kind) - me.stats.defense(kind)).max(0);
+        let previous = foe.attacks[slot];
+        let threat = if hurt(other(previous)) > hurt(previous) {
+            other(previous)
+        } else {
+            previous
+        };
         if me.stamina >= block_min && me.defenses[slot] != threat {
             let gain = (foe.stats.attack(threat) - me.stats.defense(threat)).max(0);
             gains.push((slot, false, gain));
@@ -250,15 +257,13 @@ fn effect_value(view: &PlayerView, effect: &Effect, remaining: i32) -> i32 {
             amount,
             duration,
         } => {
-            let weight = match stat {
-                Stat::HpMax | Stat::StaminaMax => 1,
-                Stat::PhysAtk | Stat::PhysDef | Stat::MagAtk | Stat::MagDef => 3,
+            // Punkt ataku albo obrony to w przybliżeniu 1 Ż na rundę (większość ataków jest
+            // blokowana), a punkt Ż_max albo W_max działa jak jednorazowy przyrost.
+            let lasting = match (stat, duration) {
+                (Stat::HpMax | Stat::StaminaMax, _) | (_, Duration::Round) => 1,
+                (_, Duration::Duel | Duration::WhileActive) => remaining,
             };
-            let lasting = match duration {
-                Duration::Round => 1,
-                Duration::Duel | Duration::WhileActive => remaining,
-            };
-            sign(target) * i32::from(amount) * weight * lasting
+            sign(target) * i32::from(amount) * lasting
         }
         Effect::Heal { target, amount } => {
             let missing = (me.stats.hp_max - me.hp).max(0);

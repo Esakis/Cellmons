@@ -1,0 +1,158 @@
+# Karty zestawu startowego szkoły Technologia (docs/03-tresc-gry.md, rozdz. 5 i 6).
+# `ref` to nazwa karty referencyjnej z docs/dane/karty_klasyczne.csv; nie trafia do gry.
+
+[[card]]
+id = 60
+key = "card.short_circuit"
+ref = "Krótkie Spięcie"
+set = "core"
+rarity = "bronze"
+requires = { tech = 1 }
+cost = { focus = 2, stamina = 6 }
+kind = "instant"
+effects = [{ family = "dispel", target = "opponent" }]
+
+[[card]]
+id = 61
+key = "card.paradox"
+ref = "Matematyczny Dylemat"
+set = "core"
+rarity = "bronze"
+requires = { tech = 2 }
+cost = { focus = 4, stamina = 12 }
+kind = "instant"
+keywords = ["intervention"]
+condition = { type = "round_at_least", round = 4 }
+effects = [{ family = "conditional_win", condition = { type = "opponent_exhausted" } }]
+
+[[card]]
+id = 62
+key = "card.attack_lattice"
+ref = "Matryca Ataku I"
+set = "core"
+rarity = "bronze"
+requires = { tech = 1 }
+cost = { focus = 2, stamina = 6 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [
+  { family = "stat_mod", target = "self", stat = "phys_atk", amount = 1, duration = "while_active" },
+  { family = "stat_mod", target = "self", stat = "mag_atk", amount = 1, duration = "while_active" },
+]
+
+[[card]]
+id = 63
+key = "card.defense_lattice"
+ref = "Matryca Obrony I"
+set = "core"
+rarity = "bronze"
+requires = { tech = 1 }
+cost = { focus = 2, stamina = 6 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [
+  { family = "stat_mod", target = "self", stat = "phys_def", amount = 1, duration = "while_active" },
+  { family = "stat_mod", target = "self", stat = "mag_def", amount = 1, duration = "while_active" },
+]
+
+[[card]]
+id = 64
+key = "card.phase_shift"
+ref = "Temporalna Zmiana"
+set = "core"
+rarity = "bronze"
+requires = { tech = 1 }
+cost = { focus = 2, stamina = 10 }
+kind = "instant"
+effects = [{ family = "swap_choices", target = "opponent" }]
+
+[[card]]
+id = 65
+key = "card.attack_calibration"
+ref = "Usprawnienie Ataku"
+set = "core"
+rarity = "bronze"
+requires = { tech = 1 }
+cost = { focus = 2, stamina = 8 }
+kind = "instant"
+effects = [{ family = "force_hit", target = "self", kind = "phys" }]
+
+[[card]]
+id = 66
+key = "card.defense_calibration"
+ref = "Usprawnienie Obrony"
+set = "core"
+rarity = "bronze"
+requires = { tech = 1 }
+cost = { focus = 1, stamina = 4 }
+kind = "instant"
+effects = [
+  { family = "stat_mod", target = "self", stat = "phys_def", amount = 2, duration = "round" },
+  { family = "stat_mod", target = "self", stat = "mag_def", amount = 2, duration = "round" },
+]
+
+[[card]]
+id = 67
+key = "card.combat_amplifier"
+ref = "Wzmocnienie Walki"
+set = "core"
+rarity = "bronze"
+requires = { tech = 1 }
+cost = { focus = 1, stamina = 4 }
+kind = "instant"
+effects = [{ family = "school_mod", target = "self", school = "combat", amount = 1 }]
+
+[[card]]
+id = 68
+key = "card.divine_amplifier"
+ref = "Wzmocnienie Kapłaństwa"
+set = "core"
+rarity = "bronze"
+requires = { tech = 1 }
+cost = { focus = 1, stamina = 4 }
+kind = "instant"
+effects = [{ family = "school_mod", target = "self", school = "divine", amount = 1 }]
+
+[[card]]
+id = 69
+key = "card.element_amplifier"
+ref = "Wzmocnienie Elementalizmu"
+set = "core"
+rarity = "bronze"
+requires = { tech = 1 }
+cost = { focus = 1, stamina = 4 }
+kind = "instant"
+effects = [{ family = "school_mod", target = "self", school = "element", amount = 1 }]
+
+[[card]]
+id = 70
+key = "card.arcane_amplifier"
+ref = "Wzmocnienie Magii"
+set = "core"
+rarity = "bronze"
+requires = { tech = 1 }
+cost = { focus = 1, stamina = 4 }
+kind = "instant"
+effects = [{ family = "school_mod", target = "self", school = "arcane", amount = 1 }]
+
+[[card]]
+id = 71
+key = "card.necro_amplifier"
+ref = "Wzmocnienie Nekromancji"
+set = "core"
+rarity = "bronze"
+requires = { tech = 1 }
+cost = { focus = 1, stamina = 4 }
+kind = "instant"
+effects = [{ family = "school_mod", target = "self", school = "necro", amount = 1 }]
+
+[[card]]
+id = 72
+key = "card.tech_amplifier"
+ref = "Wzmocnienie Technologii"
+set = "core"
+rarity = "bronze"
+requires = { tech = 1 }
+cost = { focus = 1, stamina = 4 }
+kind = "instant"
+effects = [{ family = "school_mod", target = "self", school = "tech", amount = 1 }]

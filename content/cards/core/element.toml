@@ -1,0 +1,151 @@
+# Karty zestawu startowego szkoły Elementalizm (docs/03-tresc-gry.md, rozdz. 5 i 6).
+# `ref` to nazwa karty referencyjnej z docs/dane/karty_klasyczne.csv; nie trafia do gry.
+
+[[card]]
+id = 25
+key = "card.feral_might"
+ref = "Brutal"
+set = "core"
+rarity = "bronze"
+requires = { element = 1, combat = 1 }
+cost = { focus = 2, stamina = 6 }
+kind = "instant"
+effects = [
+  { family = "stat_mod", target = "self", stat = "phys_atk", amount = 3 },
+  { family = "stat_mod", target = "self", stat = "phys_def", amount = -1 },
+]
+
+[[card]]
+id = 26
+key = "card.sandstorm"
+ref = "Burza Piaskowa"
+set = "core"
+rarity = "bronze"
+requires = { element = 1 }
+cost = { focus = 2, stamina = 6 }
+kind = "instant"
+effects = [
+  { family = "stat_mod", target = "opponent", stat = "phys_atk", amount = -2, duration = "round" },
+  { family = "stat_mod", target = "opponent", stat = "mag_atk", amount = -2, duration = "round" },
+]
+
+[[card]]
+id = 27
+key = "card.healing_mud"
+ref = "Błotna Kąpiel"
+set = "core"
+rarity = "bronze"
+requires = { element = 1 }
+cost = { focus = 2, stamina = 6 }
+kind = "instant"
+effects = [{ family = "heal", target = "self", amount = 5 }]
+
+[[card]]
+id = 28
+key = "card.thornhide"
+ref = "Ciernie"
+set = "core"
+rarity = "bronze"
+requires = { element = 1 }
+cost = { focus = 2, stamina = 6 }
+kind = "enchantment"
+trigger = "on_damage_taken"
+effects = [{ family = "damage", target = "opponent", amount = 1 }]
+
+[[card]]
+id = 29
+key = "card.toxic_fumes"
+ref = "Duszący Gaz"
+set = "core"
+rarity = "bronze"
+requires = { element = 1 }
+cost = { focus = 2, stamina = 10 }
+kind = "instant"
+effects = [{ family = "stamina", target = "opponent", amount = -12 }]
+
+[[card]]
+id = 30
+key = "card.leeching_vine"
+ref = "Głód Krwi"
+set = "core"
+rarity = "bronze"
+requires = { element = 1 }
+cost = { focus = 1, stamina = 6 }
+kind = "instant"
+effects = [{ family = "drain", pool = "hp", amount = 4 }]
+
+[[card]]
+id = 31
+key = "card.stone_spike"
+ref = "Kolec"
+set = "core"
+rarity = "bronze"
+requires = { element = 1 }
+cost = { focus = 2, stamina = 6 }
+kind = "instant"
+effects = [{ family = "damage", target = "opponent", amount = 4 }]
+
+[[card]]
+id = 32
+key = "card.desperate_blaze"
+ref = "Rozpaczliwy Atak"
+set = "core"
+rarity = "bronze"
+requires = { element = 1 }
+cost = { focus = 3, stamina = 8 }
+kind = "instant"
+effects = [
+  { family = "stat_mod", target = "self", stat = "mag_atk", amount = 4 },
+  { family = "stat_mod", target = "self", stat = "mag_def", amount = -2 },
+]
+
+[[card]]
+id = 33
+key = "card.oakbark"
+ref = "Tarcza Natury"
+set = "core"
+rarity = "bronze"
+requires = { element = 1 }
+cost = { focus = 2, stamina = 8 }
+kind = "instant"
+effects = [
+  { family = "stat_mod", target = "self", stat = "phys_def", amount = 2 },
+  { family = "stat_mod", target = "self", stat = "mag_def", amount = 1 },
+]
+
+[[card]]
+id = 34
+key = "card.venom"
+ref = "Trucizna"
+set = "core"
+rarity = "bronze"
+requires = { element = 1 }
+cost = { focus = 2, stamina = 8 }
+kind = "enchantment"
+trigger = "on_round_end"
+effects = [{ family = "damage", target = "opponent", amount = 1 }]
+
+[[card]]
+id = 35
+key = "card.storm_spark"
+ref = "Uderzenie Pioruna"
+set = "core"
+rarity = "bronze"
+requires = { element = 1 }
+cost = { focus = 1, stamina = 4 }
+kind = "instant"
+effects = [{ family = "damage", target = "opponent", amount = 2 }]
+
+[[card]]
+id = 36
+key = "card.surge_of_power"
+ref = "Wzmocnienie"
+set = "core"
+rarity = "bronze"
+requires = { element = 1, arcane = 2 }
+cost = { focus = 2, stamina = 8 }
+kind = "instant"
+effects = [
+  { family = "stat_mod", target = "self", stat = "mag_atk", amount = 2 },
+  { family = "stat_mod", target = "self", stat = "mag_def", amount = 2 },
+]

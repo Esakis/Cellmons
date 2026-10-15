@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Żarosmok">
+<title>Żarosmok</title>
+<defs><clipPath id="round"><circle cx="100" cy="100" r="96"/></clipPath></defs>
+<circle cx="100" cy="100" r="98" fill="#2e7d32"/>
+<g clip-path="url(#round)">
+<circle cx="100" cy="100" r="96" fill="#e3f2e1"/>
+<!-- Płomień -->
+<path d="M136 120c14-6 30 2 40-10-2 16-14 26-30 26 10 6 24 4 32 0-8 14-30 18-44 8z" fill="#f08a24"/>
+<path d="M140 122c8-2 18 2 24-4-2 8-10 12-20 12z" fill="#ffd166"/>
+<!-- Głowa smoka z trójkątów -->
+<path d="M44 150l30-70 40-8 26 34-12 24-36 6z" fill="#2e7d32"/>
+<path d="M74 80l-6-34 22 30z" fill="#1b5e20"/>
+<path d="M96 74l8-32 6 34z" fill="#1b5e20"/>
+<path d="M114 106l26 10-14 14z" fill="#4caf50"/>
+<path d="M58 140l32-6 2 16-30 8z" fill="#a5d6a7"/>
+<circle cx="104" cy="96" r="5" fill="#ffd166"/><circle cx="105" cy="96" r="2" fill="#1b1b1b"/>
+</g>
+<circle cx="100" cy="100" r="96" fill="none" stroke="#2e7d32" stroke-width="5"/>
+</svg>

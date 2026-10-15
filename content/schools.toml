@@ -1,0 +1,31 @@
+# Szkoły Esencji (docs/03-tresc-gry.md, rozdz. 2): kolor przewodni w motywie jasnym i ciemnym.
+
+[[school]]
+key = "combat"
+color = "#b23a2e"
+color_dark = "#e5735f"
+
+[[school]]
+key = "divine"
+color = "#b8860b"
+color_dark = "#e6c25a"
+
+[[school]]
+key = "element"
+color = "#2e7d32"
+color_dark = "#6fbf73"
+
+[[school]]
+key = "arcane"
+color = "#3949ab"
+color_dark = "#8c9eff"
+
+[[school]]
+key = "necro"
+color = "#6a1b9a"
+color_dark = "#b77fd1"
+
+[[school]]
+key = "tech"
+color = "#00838f"
+color_dark = "#4dd0e1"

@@ -2,7 +2,7 @@
 
 Projekt gry karcianej z elementami RPG (przeglądarka i Android), odtwarzającej zasady polskiej gry sieciowej **Cellmons** (Pogram, 2004–2009). Mechanika pochodzi z oryginału, a nazwy, teksty, fabuła i grafiki są własne. „Cellmons” zostaje tylko nazwą repozytorium. Nazwę produktu, znak towarowy i domeny opisuje `docs/20-nazwa-i-znak-towarowy.md`.
 
-**Status:** faza F2 z `docs/16-plan-wdrozenia.md`: system kart. Silnik rozgrywa pełne pojedynki z efektami kart, umagicznieniami i słowami kluczowymi, deterministycznie natywnie i w WebAssembly. Boty L0 (losowy) i L1 (heurystyczny) grają przez widok gracza, a `sim` rozgrywa nimi pojedynki. Następna faza to F3: treść, narzędzia i pierwsze grafiki.
+**Status:** faza F3 z `docs/16-plan-wdrozenia.md`: treść, narzędzia i pierwsze grafiki. Treść gry jest w `content/` (72 karty, 6 postaci startowych, zestawy startowe, teksty PL i EN), a `content-compiler` sprawdza ją i generuje z niej kod silnika. Silnik z F1–F2 rozgrywa pojedynki deterministycznie natywnie i w WebAssembly, a boty L0 i L1 grają nimi w symulatorze `sim`, który mierzy też balans postaci startowych. Zatwierdzone grafiki (przewodnik stylu, ikony, ramki, portrety) są w `art/`.
 
 ## Uruchomienie lokalne
 
@@ -12,6 +12,8 @@ Potrzebne są: Rust (rustup), Node.js 24 LTS z pnpm (`corepack enable pnpm`) i D
 - `check.bat` wykonuje wszystkie kontrole z CI i kończy się podsumowaniem.
 - `cargo run -p sim -- duel [ziarno]` rozgrywa pojedynek botów i opisuje go runda po rundzie.
 - `cargo run --release -p sim -- run --n 100000` rozgrywa serię pojedynków botów i podsumowuje wyniki.
+- `cargo run --release -p sim -- matrix` pokazuje macierz wygranych postaci startowych.
+- `cargo run -p content-compiler -- build` sprawdza treść z `content/` i generuje z niej kod silnika.
 
 ## Najważniejsze decyzje
 
