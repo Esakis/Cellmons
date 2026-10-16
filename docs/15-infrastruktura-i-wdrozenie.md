@@ -76,44 +76,14 @@ Konfiguracja jako kod: `deploy/ansible/` (albo cloud-init) zawiera powtarzalne p
 | Usługa | Obraz | Uwagi |
 |---|---|---|
 | `caddy` | oficjalny Caddy | konfiguracja w `deploy/Caddyfile`; pliki klienta w `/srv/web/<wersja>` z dowiązaniem `current` |
-| `game-blue`, `game-green` | `ghcr.io/<repo>/server:<wersja>` (distroless, statyczna binarka) | użytkownik bez roota, system plików tylko do odczytu, `cap_drop: ALL` |
+| `game-blue`, `game-green` | `ghcr.io/<repo>/server:<wersja>` (distroless/static, statyczne musl) | użytkownik bez roota, system plików tylko do odczytu, `cap_drop: ALL` |
 | `postgres` | oficjalny PostgreSQL | wolumin danych, konfiguracja w `deploy/postgres/` |
 | `backup` | WAL-G lub pgBackRest | archiwizacja WAL i kopie pełne (rozdz. 7) |
 | `node-exporter`, `postgres-exporter`, `alloy` | eksportery metryk i logów | wysyłają dane do VPS monitoringu |
 
-Szkic konfiguracji Caddy:
+Konfiguracja wykonawcza to `deploy/Caddyfile`; nie utrzymujemy drugiego szkicu. Ruch gry trafia do **jednego** aktywnego slotu wskazanego przez prywatny snippet. `/metrics`, `/readyz`, pliki wewnętrzne i dawne ścieżki administracyjne zwracają publicznie 404. TLS, nadpisywanie XFF i redakcję logów sprawdza `e2e/proxy.mjs`.
 
-```
-<domena> {
-    tls /etc/caddy/origin.pem /etc/caddy/origin-key.pem
-    encode zstd gzip
-
-    @immutable path /assets/* /content/* /i18n/*
-    header @immutable Cache-Control "public, max-age=31536000, immutable"
-
-    handle /api/* {
-        reverse_proxy game-blue:8080 game-green:8080 {
-            lb_policy first
-            health_uri /readyz
-            health_interval 2s
-        }
-    }
-    handle /ws {
-        reverse_proxy game-blue:8080 game-green:8080 {
-            lb_policy first
-            health_uri /readyz
-            health_interval 2s
-        }
-    }
-    handle {
-        root * /srv/web/current
-        try_files {path} /index.html
-        file_server
-    }
-}
-```
-
-`lb_policy first` z aktywnym sprawdzaniem `/readyz` kieruje ruch do pierwszego zdrowego slotu. Gdy slot zaczyna wygaszanie (rozdz. 6), jego `/readyz` zwraca 503, więc nowe połączenia trafiają do drugiego slotu, a istniejące WebSockety zostają na starym aż do zamknięcia.
+Gotowa instrukcja bootstrapu, uprawnień bazy i sekretów jest w [deploy/README.md](../deploy/README.md). Obraz aplikacji używa distroless/static z binarką statycznie linkowaną z musl; skan obejmuje również obraz wykonawczy.
 
 ## 6. CI/CD i wdrożenie bez przerywania walk
 
@@ -132,20 +102,20 @@ flowchart LR
 ```
 
 - Akcje GitHub przypięte do konkretnych SHA. Tokeny z minimalnymi uprawnieniami. Sekrety produkcyjne dostępne tylko w środowisku `production` z wymaganym zatwierdzeniem właściciela.
-- Wdrożenie łączy się z serwerem przez SSH kluczem przeznaczonym tylko do wdrożeń, z ograniczonym zestawem dozwolonych poleceń.
+- Wdrożenie łączy się przez zweryfikowany klucz hosta SSH. Operator ma zaufany dostęp administracyjny przez Docker; ten klucz CI trzeba chronić jak dostęp do hosta.
 
 ### 6.2. Procedura wdrożenia produkcyjnego
 
-1. **Sprawdzenie kopii:** ostatnia udana kopia pełna młodsza niż 26 h i archiwizacja WAL bez błędów. W przeciwnym razie wdrożenie się zatrzymuje.
-2. **Migracje** (tylko zgodne wstecz, tryb expand; `09-baza-danych.md`, rozdz. 5) w jednorazowym kontenerze z rolą `migrator`.
-3. **Start nieaktywnego slotu** (np. green) z nowym obrazem. Czekanie, aż `/readyz` zwróci 200.
-4. **Pliki klienta:** rozpakowanie do `/srv/web/<nowa-wersja>` i przełączenie dowiązania `current`. Stare wersje zostają 7 dni, żeby otwarte karty mogły doładować swoje fragmenty kodu.
-5. **Wygaszanie starego slotu** (blue): `POST /admin/drain` (`08-serwer.md`, rozdz. 9). Nowe połączenia idą do green; blue kończy trwające walki i wymiany (maks. 8 min).
-6. **Przekazanie pojedynków:** pojedynki, które nie skończyły się w czasie wygaszania, blue oznacza w `duel_journal` do przejęcia i powiadamia green przez `LISTEN/NOTIFY` w PostgreSQL. Green odtwarza je z dziennika (`08-serwer.md`, rozdz. 5.3), a gracze wznawiają sesje.
-7. **Testy dymne na produkcji:** `/healthz`, logowanie konta testowego, `Hello`/`Welcome` przez WebSocket, krótka walka konta testowego z botem.
-8. **Zakończenie:** blue zatrzymany; kolejne wdrożenie użyje slotu blue.
+Procedura wykonawcza: `deploy/release.sh`. Wdrożenie zatrzymuje się, jeżeli operator już włączył barierę albo brakuje działającej kopii.
 
-**Wycofanie wersji:** ta sama procedura z poprzednim obrazem. Działa, bo migracje są zgodne wstecz (usuwanie kolumn dopiero w kolejnym wydaniu, tryb contract).
+1. Sprawdź pełną kopię młodszą niż 26 h i archiwizację WAL.
+2. Dotychczasowy serwer wykonuje `server drain start`: blokuje transakcyjnie nowe aktywności, zachowując obsługę trwających walk.
+3. Wykonaj migracje expand osobną rolą i `check-config` kandydata bez uruchamiania jego aktorów.
+4. Zaczekaj na zakończenie wszystkich pojedynków, wymian, turniejów i wypraw. Limit ośmiu minut oznacza odłożenie wydania, a nie przejęcie lub poddanie niedokończonej walki.
+5. Uruchom kandydata, porównaj SHA, silnik i treść z metadanymi klienta, atomowo przełącz zasoby i pojedynczy upstream Caddy.
+6. Zatrzymaj stary slot przy nadal aktywnej barierze, odblokuj nowe aktywności i wykonaj testy dymne. Stare fragmenty klienta są zachowywane minimum siedem dni.
+
+Wycofanie po rozpoczęciu nowych aktywności wymaga tej samej bariery. Aktorzy różnych wersji nie przejmują niezgodnych dzienników; nie wdrożono przekazywania między silnikami przez LISTEN/NOTIFY. Pierwszy bootstrap binarki sprzed F14 wymaga ręcznej konserwacji. Szczegóły i lokalne dowody: [raport F14](38-wdrozenie-i-odtwarzanie.md).
 
 ### 6.3. Aplikacja Android
 
@@ -175,9 +145,9 @@ Sekrety Androida: keystore z kluczem podpisu (zakodowany, z hasłem), klucz prze
 
 ## 8. Monitoring i alerty
 
-**Narzędzia:** Prometheus (metryki), Loki (logi), Grafana (pulpity i alerty), GlitchTip (błędy serwera i klienta), zewnętrzny sprawdzacz dostępności (np. darmowy plan Better Stack lub UptimeRobot). Alerty przez e-mail i komunikator (np. Telegram lub Discord).
+**Narzędzia:** Prometheus (metryki), Loki (logi), Grafana (pulpity i alerty), opcjonalna zewnętrzna usługa śledzenia błędów (jeszcze nieskonfigurowana), zewnętrzny sprawdzacz dostępności (np. darmowy plan Better Stack lub UptimeRobot). Alerty przez e-mail i komunikator (np. Telegram lub Discord).
 
-**Metryki serwera** (wybór): `ws_connections`, `room_members`, `duels_active`, `duel_round_latency_seconds` (histogram), `engine_resolve_seconds`, `messages_total{type,direction}`, `rate_limited_total`, `db_query_seconds`, `db_pool_in_use`, `economy_ducats_total{flow=faucet|sink}`, `matches_total{kind,reason}`, `ai_decision_seconds{level}`, `actor_mailbox_depth`, `registrations_total`, `logins_total{result}`.
+**Projektowany szerszy katalog metryk** (nie wszystkie wdrożone): `ws_connections`, `room_members`, `duels_active`, `duel_round_latency_seconds` (histogram), `engine_resolve_seconds`, `messages_total{type,direction}`, `rate_limited_total`, `db_query_seconds`, `db_pool_in_use`, `economy_ducats_total{flow=faucet|sink}`, `matches_total{kind,reason}`, `ai_decision_seconds{level}`, `actor_mailbox_depth`, `registrations_total`, `logins_total{result}`.
 
 **Pulpity:** przegląd (połączenia, pojedynki, opóźnienia, błędy), baza danych, ekonomia (źródła i ujścia Dukatów), biznesowy (rejestracje, aktywni gracze dziennie, walki dziennie).
 
@@ -215,7 +185,7 @@ Sekrety Androida: keystore z kluczem podpisu (zakodowany, z hasłem), klucz prze
 | R9 | Wniosek RODO | eksport i usunięcie przez endpointy (`07-protokol-sieciowy.md`, rozdz. 8); ręczna weryfikacja tożsamości przy wnioskach mailowych |
 | R10 | Rotacja sekretów | nowe hasło bazy i klucze → aktualizacja sekretów → wdrożenie → unieważnienie starych |
 | R11 | Incydent bezpieczeństwa | `12-bezpieczenstwo-i-prawo.md`, rozdz. 10 |
-| R12 | Wadliwa paczka web w aplikacji | przywrócenie poprzedniej wersji w `manifest.json` → aplikacje wracają do poprzedniej paczki przy starcie → poprawka i nowa paczka |
+| R12 | Wadliwa paczka web w aplikacji | zatrzymanie publikacji → lokalny rollback nieudanej próby → poprawka z wyższym numerem manifestu (trwały próg zabrania obniżania numeru) |
 | R13 | Wyciek lub utrata klucza Android | wyciek klucza przesyłania: zgłoszenie w Play Console i nowy klucz. Wyciek klucza podpisu: procedura zmiany klucza w Play App Signing i komunikat dla graczy z APK. Utrata klucza podpisu: dalsze wydania tylko przez Google Play, APK spoza sklepu trzeba zainstalować od nowa |
 
 ## 10. Zarządzanie wydaniami

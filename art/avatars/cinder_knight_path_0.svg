@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Rycerz Woli"><title>Rycerz Woli</title><defs><radialGradient id="bg" cx="50%" cy="35%" r="80%"><stop stop-color="#a74e39"/><stop offset="1" stop-color="#281b26"/></radialGradient><linearGradient id="metal" x2="1" y2="1"><stop stop-color="#efe3bd"/><stop offset=".5" stop-color="#ac9568"/><stop offset="1" stop-color="#4f493f"/></linearGradient></defs><rect width="200" height="200" rx="12" fill="url(#bg)"/><circle cx="102" cy="70" r="58" fill="none" stroke="#ddcf9f" stroke-width="1" opacity=".35"/>
+<path d="M0 130L29 100 43 126 72 94 101 129 141 92 171 122 200 101V200H0Z" fill="#34252c"/>
+<path d="M25 115L31 80 40 115M155 112L166 72 174 112" stroke="#8f6a56" fill="#281c22"/>
+<path d="M36 194Q32 136 61 119L82 112H119L144 126Q172 145 174 200Z" fill="#823c31" stroke="#e5bd85" stroke-width="2"/>
+<path d="M61 119L92 151 76 192 42 171ZM135 119L108 151 124 194 159 172Z" fill="url(#metal)" stroke="#d7bf94"/>
+<path d="M72 66Q74 38 101 34 130 38 133 65L124 107 104 124 79 103Z" fill="#473136" stroke="#d9b98a" stroke-width="2"/>
+<path d="M71 67L81 43 99 34 120 43 133 66 105 76Z" fill="url(#metal)"/>
+<path d="M100 36L104 75V112" stroke="#ffe2a6" stroke-width="3"/>
+<path d="M76 76L98 82 95 89 79 85M109 82L129 76 126 85 111 89" fill="#ffb169"/>
+<path d="M80 93L96 96M108 96L123 91M83 101L96 104M109 103L119 99" stroke="#ad805b" stroke-width="2"/>
+<path d="M93 153L103 142 113 153 109 169 97 169Z" fill="#d1a45b"/><circle cx="103" cy="157" r="4" fill="#ffce7a"/>
+<path d="M24 181L39 127 47 115 50 130 35 186Z" fill="url(#metal)" stroke="#ffe2a6"/>
+<path d="M26 178L41 184" stroke="#ce9f5d" stroke-width="5"/>
+<rect x="4" y="4" width="192" height="192" rx="9" fill="none" stroke="#d5bd88" opacity=".7"/><path d="M12 30V12H30M170 12H188V30M12 170V188H30M170 188H188V170" stroke="#e1c894" fill="none"/><g fill="#753b33" stroke="#d4b18a" stroke-width="3"><circle cx="160" cy="160" r="30"/><g transform="translate(160 159) scale(.7)" fill="#d4b18a" stroke-width="2" style="--shade-detail:#753b33"><path d="M-4 17V-10L0-23 4-10V17M-13 11H13M0 12V25"/></g></g><path d="M61 25L75 12 91 27 108 10 127 26 140 14" fill="none" stroke="#d4b18a" stroke-width="1.5"/><path d="M11 25V11H28M172 11H189V25M11 172V189H28" fill="none" stroke="#d4b18a" stroke-width="3"/></svg>

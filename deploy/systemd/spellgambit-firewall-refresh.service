@@ -1,0 +1,8 @@
+[Unit]
+Description=Refresh official Cloudflare networks and reload proxy trust
+After=network-online.target docker.service
+Wants=network-online.target
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /srv/spellgambit/deploy/update-firewall.py
+TimeoutStartSec=2min

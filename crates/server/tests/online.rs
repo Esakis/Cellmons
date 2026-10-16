@@ -17,6 +17,12 @@ use tokio_tungstenite::{
     tungstenite::{Message, client::IntoClientRequest as _},
 };
 use uuid::Uuid;
+#[path = "online/clans.rs"]
+mod clans;
+#[path = "online/expeditions.rs"]
+mod expeditions;
+#[path = "online/tournaments.rs"]
+mod tournaments;
 
 struct Player {
     id: Uuid,
@@ -87,7 +93,7 @@ impl Server {
         let online = state.online.clone();
         let task = tokio::spawn(async move {
             axum::serve(
-                listener,
+                gateway::realtime_listener(listener),
                 app.into_make_service_with_connect_info::<SocketAddr>(),
             )
             .with_graceful_shutdown(async move {

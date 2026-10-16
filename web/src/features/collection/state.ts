@@ -5,6 +5,11 @@ export type AvatarState = {
   id: string;
   slot: number;
   template_id: number;
+  path_id?: number | null;
+  specialization?: string | null;
+  gift_id?: number | null;
+  is_shade?: boolean;
+  shade_school?: string | null;
   level: number;
   xp: number;
   tier: number;
@@ -25,6 +30,17 @@ export type Snapshot = {
   presets: { id: string; name: string; cards: number[]; revision: number }[];
 };
 export type Mutation =
+  | {
+      action: 'reincarnate';
+      id: string;
+      revision: number;
+      choice:
+        | { kind: 'path'; id: number }
+        | { kind: 'specialization'; name: string }
+        | { kind: 'gift'; card_id: number };
+      sacrifice?: string;
+    }
+  | { action: 'shade'; id: string; revision: number; new_id: string; school: string }
   | { action: 'create'; id: string; template_id: number }
   | { action: 'delete'; id: string; revision: number }
   | { action: 'activate'; id: string }
@@ -69,7 +85,7 @@ export function guestState(): Snapshot {
     epoch = accountEpoch();
     guest = {
       content_version: content.version,
-      templates: content.avatars.map((a) => a.id),
+      templates: content.avatars.filter((a) => a.rarity !== 'shade').map((a) => a.id),
       avatars: [freshAvatar(crypto.randomUUID(), content.avatars[0]?.id ?? 1, 0)],
       collection: content.cards.map((c) => ({ card_id: c.id, qty: 4 })),
       presets: [],
@@ -104,6 +120,10 @@ export function guestMutation(mutation: Mutation): Snapshot {
     return [...ids];
   };
   switch (mutation.action) {
+    case 'reincarnate':
+    case 'shade':
+      // Training grants no XP; the local guest collection never reaches the threshold.
+      throw new Error('NOT_READY');
     case 'create': {
       if (!next.templates.includes(mutation.template_id)) throw new Error('NOT_FOUND');
       const existing = next.avatars.find((a) => a.id === mutation.id);
@@ -193,3 +213,5 @@ export function guestMutation(mutation: Mutation): Snapshot {
   guest = next;
   return structuredClone(next);
 }
+
+import '../../app/cardCatalog';

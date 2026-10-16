@@ -1,0 +1,17 @@
+/* Shared only by registered online screens. A single sheet avoids four compression headers. */
+@import "./lobby/lobby.css";
+@import "./account/account.css";
+@import "./clans/clans.css";
+@import "./store/store.css";
+
+.account-form .account-agreement {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.account-agreement input {
+  width: 24px;
+  min-height: 24px;
+  margin: 0;
+  flex-shrink: 0;
+}

@@ -53,6 +53,7 @@ message ClientMessage {
     TradeConfirm trade_confirm = 36;
     TradeTarget trade_cancel = 37;
     TradeTarget trade_snapshot = 38;
+    TournamentReady tournament_ready = 39;
   }
 }
 

@@ -17,12 +17,18 @@ import {
   startRequest,
   type Wallet,
 } from './state';
-import './store.css';
+import '../online.css';
 
 addTranslations({ pl, en });
 const cardName = (id: number) => {
   const card = cards.get(id);
   return card ? t(fluentKey(card.key)) : `#${id}`;
+};
+const junkyard = content.rules.junkyard;
+const rarityPoints = {
+  bronze: junkyard.rarity_points[0] ?? 0,
+  silver: junkyard.rarity_points[1] ?? 0,
+  gold: junkyard.rarity_points[2] ?? 0,
 };
 export function Store() {
   const [inventory, setInventory] = createSignal<Inventory>();
@@ -44,17 +50,12 @@ export function Store() {
       .map(([id, qty]) => ({ card_id: Number(id), qty })),
   );
   const points = createMemo(() =>
-    selected().reduce(
-      (sum, row) =>
-        sum +
-        row.qty *
-          (cards.get(row.card_id)?.rarity === 'gold'
-            ? 100
-            : cards.get(row.card_id)?.rarity === 'silver'
-              ? 25
-              : 5),
-      0,
-    ),
+    selected().reduce((sum, row) => {
+      const rarity = cards.get(row.card_id)?.rarity;
+      const value =
+        rarity === 'bronze' || rarity === 'silver' || rarity === 'gold' ? rarityPoints[rarity] : 0;
+      return sum + row.qty * value;
+    }, 0),
   );
   function fail(reason: unknown) {
     const code = reason instanceof ApiError ? reason.code : 'SERVER_UNAVAILABLE';
@@ -274,7 +275,16 @@ export function Store() {
           )}
         </For>
         <h2>{t('store-junkyard')}</h2>
-        <p>{t('store-junkyard-rules')}</p>
+        <p>
+          {t('store-junkyard-rules', {
+            bronze: rarityPoints.bronze,
+            silver: rarityPoints.silver,
+            gold: rarityPoints.gold,
+            threshold: junkyard.reward_threshold,
+            fallback: junkyard.fallback_ducats,
+            characters: content.avatars.filter((a) => a.rarity === 'junkyard').length,
+          })}
+        </p>
         <p>{t('store-total-points', { value: inventory()?.junkyard_points ?? '0' })}</p>
         <form
           onSubmit={(event) => {
@@ -401,3 +411,5 @@ export function Store() {
     </section>
   );
 }
+
+import '../../app/cardCatalog';

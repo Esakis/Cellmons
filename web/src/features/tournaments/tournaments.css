@@ -1,0 +1,67 @@
+.tournaments {
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-block: 1rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.tourney-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.tourney-create fieldset {
+  min-width: 0;
+  margin-block: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.tourney-create label {
+  display: block;
+  margin-block: 0.75rem;
+}
+.tourney-create input:not([type="checkbox"]) {
+  display: block;
+  min-height: 48px;
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: inherit;
+  font: inherit;
+}
+.tourney-create input[type="checkbox"] {
+  min-height: 24px;
+  min-width: 24px;
+  vertical-align: middle;
+  margin-inline-end: 0.6rem;
+}
+.tourney-clans {
+  max-height: 18rem;
+  overflow-y: auto;
+}
+.tourney-catalog {
+  padding-inline-start: 1.2rem;
+}
+.tourney-catalog li {
+  margin-block: 0.6rem;
+}
+.tourney-profile {
+  border-top: 1px solid var(--border);
+  margin-block-start: 1rem;
+  padding-block-start: 0.5rem;
+}
+.tourney-profile details {
+  margin-block: 1rem;
+}
+.tourney-profile li {
+  margin-block: 0.5rem;
+}
+.tourney-profile summary {
+  cursor: pointer;
+  min-height: 44px;
+  padding-block: 0.75rem;
+}

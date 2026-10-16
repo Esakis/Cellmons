@@ -6,7 +6,15 @@ packages:
 # Wersje zależności zapisywane dokładnie; aktualizacje przez Renovate (04-architektura.md, rozdz. 8).
 saveExact: true
 
+# Capacitor CLI's xcode dependency only uses v4; keep the maintained CommonJS release.
+# https://github.com/uuidjs/uuid/security/advisories/GHSA-w5hq-g745-h8pq
+overrides:
+  'xcode>uuid': 11.1.1
+
 # Skrypty instalacyjne zależności są domyślnie blokowane; tu tylko sprawdzone wyjątki.
 allowBuilds:
   # podpina plik binarny buf dla bieżącej platformy
   '@bufbuild/buf': true
+
+minimumReleaseAgeExclude:
+  - '@axe-core/playwright@4.14.0'

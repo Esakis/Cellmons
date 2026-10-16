@@ -1,0 +1,75 @@
+name: spellgambit-monitoring
+x-private: &private
+  network_mode: host
+  restart: unless-stopped
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  tmpfs: ['/tmp:rw,noexec,nosuid,size=16m']
+  logging: { driver: json-file, options: { max-size: 10m, max-file: '3' } }
+services:
+  prometheus:
+    <<: *private
+    image: prom/prometheus:v3.15.0
+    command: ['--config.file=/etc/prometheus/prometheus.yml', '--web.listen-address=127.0.0.1:9090', '--storage.tsdb.retention.time=30d', '--storage.tsdb.retention.size=4GB']
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus:/prometheus
+  alertmanager:
+    <<: *private
+    image: prom/alertmanager:v0.34.1
+    command: ['--config.file=/etc/alertmanager/alertmanager.yml', '--web.listen-address=127.0.0.1:9093', '--cluster.listen-address=']
+    volumes:
+      - ./private/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - ./private/owner-webhook-url:/etc/alertmanager/owner-webhook-url:ro
+      - alertmanager:/alertmanager
+  host:
+    <<: *private
+    image: prom/node-exporter:v1.12.1
+    pid: host
+    command: ['--web.listen-address=127.0.0.1:9100', '--path.rootfs=/host', '--collector.textfile.directory=/textfile']
+    volumes:
+      - /:/host:ro,rslave
+      - ./private/textfile:/textfile:ro
+  loki:
+    <<: *private
+    image: grafana/loki:3.7.8
+    command: ['-config.file=/etc/loki/config.yml']
+    volumes:
+      - ./monitoring/loki.yml:/etc/loki/config.yml:ro
+      - loki:/loki
+  alloy:
+    <<: *private
+    image: grafana/alloy:v1.20.1
+    user: '0:0'
+    command: ['run', '--server.http.listen-addr=127.0.0.1:12345', '--disable-reporting', '--storage.path=/var/lib/alloy', '/etc/alloy/config.alloy']
+    volumes:
+      - ./monitoring/config.alloy:/etc/alloy/config.alloy:ro
+      - /var/log/journal:/var/log/journal:ro
+      - /run/log/journal:/run/log/journal:ro
+      - /etc/machine-id:/etc/machine-id:ro
+      - alloy:/var/lib/alloy
+  grafana:
+    <<: *private
+    image: grafana/grafana:13.2.4
+    environment:
+      GF_SERVER_HTTP_ADDR: 127.0.0.1
+      GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/grafana-password
+      GF_AUTH_ANONYMOUS_ENABLED: 'false'
+      GF_USERS_ALLOW_SIGN_UP: 'false'
+      GF_ANALYTICS_REPORTING_ENABLED: 'false'
+      GF_ANALYTICS_CHECK_FOR_UPDATES: 'false'
+      GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES: 'false'
+    volumes:
+      - ./private/grafana-password:/run/secrets/grafana-password:ro
+      - ./monitoring/datasources.yml:/etc/grafana/provisioning/datasources/game.yml:ro
+      - ./monitoring/dashboards.yml:/etc/grafana/provisioning/dashboards/game.yml:ro
+      - ./monitoring/dashboard.json:/etc/grafana/dashboards/game.json:ro
+      - grafana:/var/lib/grafana
+volumes:
+  prometheus:
+  alertmanager:
+  loki:
+  alloy:
+  grafana:

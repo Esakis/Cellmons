@@ -11,6 +11,7 @@ use uuid::Uuid;
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Account {
     Player(Uuid),
+    Tournament(Uuid),
     Faucet,
     Sink,
 }
@@ -18,6 +19,7 @@ impl Account {
     fn key(self) -> String {
         match self {
             Self::Player(user) => format!("user:{user}"),
+            Self::Tournament(id) => format!("tournament:{id}"),
             Self::Faucet => "system:faucet".into(),
             Self::Sink => "system:sink".into(),
         }
@@ -47,6 +49,29 @@ pub async fn transfer(
     }
     if let Account::Player(user) = to {
         let changed=sqlx::query!("UPDATE wallets SET balance=balance+$2,updated_at=now() WHERE user_id=$1 AND balance<=$3",user,amount,i64::MAX-amount).execute(&mut *connection).await?;
+        if changed.rows_affected() != 1 {
+            return Err(Error("BALANCE_LIMIT"));
+        }
+    }
+    if let Account::Tournament(id) = from {
+        let changed =
+            sqlx::query("UPDATE tournaments SET balance=balance-$2 WHERE id=$1 AND balance>=$2")
+                .bind(id)
+                .bind(amount)
+                .execute(&mut *connection)
+                .await?;
+        if changed.rows_affected() != 1 {
+            return Err(Error("INSUFFICIENT_FUNDS"));
+        }
+    }
+    if let Account::Tournament(id) = to {
+        let changed =
+            sqlx::query("UPDATE tournaments SET balance=balance+$2 WHERE id=$1 AND balance<=$3")
+                .bind(id)
+                .bind(amount)
+                .bind(i64::MAX - amount)
+                .execute(&mut *connection)
+                .await?;
         if changed.rows_affected() != 1 {
             return Err(Error("BALANCE_LIMIT"));
         }
@@ -125,10 +150,13 @@ pub async fn award_arena(connection: &mut PgConnection, user: Uuid, duel: Uuid) 
 pub struct Reconciliation {
     pub unbalanced_transactions: i64,
     pub incorrect_wallets: i64,
+    pub incorrect_escrows: i64,
 }
 impl Reconciliation {
     pub fn is_ok(&self) -> bool {
-        self.unbalanced_transactions == 0 && self.incorrect_wallets == 0
+        self.unbalanced_transactions == 0
+            && self.incorrect_wallets == 0
+            && self.incorrect_escrows == 0
     }
 }
 pub async fn reconcile(db: &PgPool) -> Result<Reconciliation> {
@@ -137,6 +165,7 @@ pub async fn reconcile(db: &PgPool) -> Result<Reconciliation> {
     Ok(Reconciliation {
         unbalanced_transactions,
         incorrect_wallets,
+        incorrect_escrows: sqlx::query_scalar("SELECT count(*) FROM (SELECT coalesce(t.balance,0) AS actual,coalesce(l.recorded,0) AS recorded FROM tournaments t FULL JOIN (SELECT account,sum(delta) AS recorded FROM ledger_entries WHERE account LIKE 'tournament:%' GROUP BY account) l ON l.account='tournament:'||t.id::text) balances WHERE actual<>recorded").fetch_one(db).await?,
     })
 }
 

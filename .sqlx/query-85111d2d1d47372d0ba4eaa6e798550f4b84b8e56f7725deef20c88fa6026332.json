@@ -1,0 +1,109 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT (EXISTS(SELECT 1 FROM duel_locks l WHERE l.user_id=u.id) OR EXISTS(SELECT 1 FROM activity_locks l WHERE l.user_id=u.id)) AS \"busy!\",u.id,u.login::text AS \"login!\",u.description,u.challenge_filter,u.role,u.email_verified_at IS NOT NULL AS \"verified!\",COALESCE(r.rating,1000) AS \"rating!\",c.id AS clan_id,c.name::text AS clan_name,m.title FROM users u LEFT JOIN ratings r ON r.user_id=u.id LEFT JOIN clan_members m ON m.user_id=u.id LEFT JOIN clans c ON c.id=m.clan_id AND c.status='active' WHERE u.id=$1 AND u.status='active'",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "busy!",
+        "type_info": "Bool",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 1,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "login!",
+        "type_info": "Text",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 3,
+        "name": "description",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "description"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "challenge_filter",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "challenge_filter"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "role",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "users",
+            "name": "role"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "verified!",
+        "type_info": "Bool",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 7,
+        "name": "rating!",
+        "type_info": "Int4",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 8,
+        "name": "clan_id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "clans",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 9,
+        "name": "clan_name",
+        "type_info": "Text",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 10,
+        "name": "title",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "clan_members",
+            "name": "title"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid"]
+    },
+    "nullable": [null, false, null, false, false, false, null, null, true, null, true]
+  },
+  "hash": "85111d2d1d47372d0ba4eaa6e798550f4b84b8e56f7725deef20c88fa6026332"
+}

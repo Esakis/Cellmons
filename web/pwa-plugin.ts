@@ -37,8 +37,24 @@ export function offlinePlugin(): Plugin {
       }
       const onlineKeys = [
         'src/features/lobby/Lobby.tsx',
+        'src/features/lobby/OnlineDuel.tsx',
+        'src/features/lobby/OnlineRecords.tsx',
+        'src/features/lobby/Trade.tsx',
         'src/features/account/Account.tsx',
+        'src/features/privacy/Privacy.tsx',
+        'src/features/legal/Legal.tsx',
+        'src/features/legal/software.ts',
         'src/features/store/Store.tsx',
+        'src/features/clans/Clans.tsx',
+        'src/features/tournaments/Tournaments.tsx',
+        'src/features/expeditions/Expeditions.tsx',
+        'src/features/admin/Admin.tsx',
+        'src/features/moderation/Report.tsx',
+        'src/features/moderation/Notices.tsx',
+        'src/app/CardCatalogView.tsx',
+        'src/app/pathArt.ts',
+        'src/app/pathCatalog.ts',
+        'src/features/collection/Progression.tsx',
       ];
       const offline = new Set<string>();
       for (const [key, entry] of Object.entries(manifest)) {
@@ -48,8 +64,40 @@ export function offlinePlugin(): Plugin {
       const excluded = [...new Set(onlineKeys.flatMap((key) => [...graph(key)]))].filter(
         (file) => !offline.has(file),
       );
-      await writeFile(join(output, 'online-assets.json'), JSON.stringify({ excluded }));
-      if (android) return;
+      excluded.push(...JSON.parse(await readFile(join(output, 'legal-assets.json'), 'utf8')));
+      const content = JSON.parse(
+        await readFile(new URL('./src/generated/content.json', import.meta.url), 'utf8'),
+      ) as { version: string };
+      const workspace = await readFile(new URL('../Cargo.toml', import.meta.url), 'utf8');
+      const engine = workspace.match(/^version\s*=\s*"([^"]+)"/m)?.[1];
+      if (!engine) throw new Error('Missing engine version');
+      await writeFile(
+        join(output, '.vite/release.json'),
+        JSON.stringify({
+          release: process.env.GAME_RELEASE ?? 'development',
+          engine,
+          content: content.version,
+        }),
+      );
+      await writeFile(
+        join(output, 'online-assets.json'),
+        JSON.stringify({ excluded, platform: android ? 'android' : 'web' }),
+      );
+      if (android) {
+        // Capacitor's asset copier excludes hidden directories such as .vite.
+        await writeFile(
+          join(output, 'native-release.json'),
+          JSON.stringify({
+            release: process.env.GAME_RELEASE ?? 'development',
+            engine,
+            content: content.version,
+            application_id: process.env.ANDROID_APPLICATION_ID ?? 'dev.game.training',
+            version: process.env.ANDROID_VERSION ?? '1.0.0',
+            web_bundle_version: Number(process.env.WEB_BUNDLE_VERSION ?? 0),
+          }),
+        );
+        return;
+      }
       async function walk(directory: string): Promise<string[]> {
         const entries = await readdir(directory, { withFileTypes: true });
         const paths = await Promise.all(

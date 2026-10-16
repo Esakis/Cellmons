@@ -10,6 +10,9 @@ use crate::duel::{
     manager::Manager,
     record::{Record, Seat},
 };
+use axum::body::Bytes;
+use futures_util::StreamExt as _;
+use protocol::Message as _;
 use protocol::game::v1::{self as pb, client_message::Body as Client, server_message::Body};
 use sqlx::PgPool;
 use std::{
@@ -31,13 +34,35 @@ pub enum Close {
     Shutdown,
 }
 #[derive(Clone)]
+pub enum Outbound {
+    Body(Body),
+    Encoded(Bytes),
+}
+#[derive(Clone)]
 pub struct Output {
-    pub data: mpsc::Sender<(Body, u32)>,
+    pub data: mpsc::Sender<(Outbound, u32)>,
     pub close: watch::Sender<Option<Close>>,
 }
 impl Output {
     pub fn send(&self, body: Body, reply: u32) {
-        if self.data.try_send((body, reply)).is_err() {
+        if self.data.try_send((Outbound::Body(body), reply)).is_err() {
+            let _ = self.close.send(Some(Close::Slow));
+        }
+    }
+    pub fn encode(body: Body) -> Bytes {
+        pb::ServerMessage {
+            body: Some(body),
+            ..Default::default()
+        }
+        .encode_to_vec()
+        .into()
+    }
+    pub fn shared(&self, body: &Bytes) {
+        if self
+            .data
+            .try_send((Outbound::Encoded(body.clone()), 0))
+            .is_err()
+        {
             let _ = self.close.send(Some(Close::Slow));
         }
     }
@@ -111,25 +136,37 @@ enum Command {
         crate::game::Mutation,
         oneshot::Sender<Result<crate::game::Snapshot>>,
     ),
-    Stop,
+    RefreshClans(Vec<Uuid>, oneshot::Sender<()>),
+    ActivityChanged(Vec<Uuid>, oneshot::Sender<()>),
+    StartActivity(Box<Record>),
+    Stop(oneshot::Sender<()>),
 }
 #[derive(Clone)]
 pub struct Hub {
     tx: mpsc::Sender<Command>,
     settings: Arc<Settings>,
+    duel_instance: Uuid,
 }
 impl Hub {
     pub fn new(db: PgPool, settings: Settings) -> Self {
-        let (tx, rx) = mpsc::channel(1024);
+        let (tx, rx) = mpsc::channel(settings.max_connections.clamp(1024, 10000));
         let settings = Arc::new(settings);
         let (notices, events) = mpsc::channel(4096);
         let trades = crate::trade::Manager::new(db.clone(), notices.clone());
         let duels = Manager::new(
             db.clone(),
             settings.duels.clone(),
+            notices.clone(),
+            settings.run_duels,
+        );
+        let tournaments = crate::tournaments::Manager::new(
+            db.clone(),
+            duels.clone(),
+            settings.duels.clone(),
             notices,
             settings.run_duels,
         );
+        let duel_instance = duels.instance();
         tokio::spawn(
             State {
                 db,
@@ -140,13 +177,25 @@ impl Hub {
                 reservations: HashMap::new(),
                 duels,
                 trades,
+                tournaments,
             }
             .run(rx, events),
         );
-        Self { tx, settings }
+        Self {
+            tx,
+            settings,
+            duel_instance,
+        }
     }
     pub fn settings(&self) -> &Settings {
         &self.settings
+    }
+    pub(crate) fn duel_instance(&self) -> Uuid {
+        self.duel_instance
+    }
+    pub(crate) fn start_durable(&self, record: Record) {
+        // A full lobby queue cannot undo the committed journal; lease recovery starts it later.
+        let _ = self.tx.try_send(Command::StartActivity(Box::new(record)));
     }
     pub(crate) async fn attach(
         &self,
@@ -222,12 +271,36 @@ impl Hub {
             .map_err(|_| Error("UNAVAILABLE"))?
     }
     pub async fn shutdown(&self) {
-        let _ = self.tx.send(Command::Stop).await;
+        let (reply, receiver) = oneshot::channel();
+        if self.tx.send(Command::Stop(reply)).await.is_ok() {
+            let _ = receiver.await;
+        }
+    }
+    pub async fn activity_changed(&self, users: Vec<Uuid>) {
+        let (tx, rx) = oneshot::channel();
+        if self
+            .tx
+            .try_send(Command::ActivityChanged(users, tx))
+            .is_ok()
+        {
+            let _ = tokio::time::timeout(Duration::from_secs(3), rx).await;
+        }
+    }
+    pub async fn refresh_clans(&self, users: Vec<Uuid>) {
+        let (reply, receiver) = oneshot::channel();
+        if self
+            .tx
+            .try_send(Command::RefreshClans(users, reply))
+            .is_ok()
+        {
+            let _ = tokio::time::timeout(Duration::from_secs(3), receiver).await;
+        }
     }
 }
 struct State {
     duels: Manager,
     trades: crate::trade::Manager,
+    tournaments: crate::tournaments::Manager,
     db: PgPool,
     settings: Arc<Settings>,
     players: HashMap<Uuid, Player>,
@@ -241,8 +314,11 @@ impl State {
         tick.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
         let mut retention = tokio::time::interval(Duration::from_secs(3600));
         retention.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+        let mut shutdown_reply = None;
+        let mut requests = tokio::task::JoinSet::new();
         loop {
             tokio::select! {
+                _=requests.join_next(), if !requests.is_empty()=>{},
                 command = rx.recv() => match command {
                     Some(Command::Attach(attach)) => {
                         let Attach { session, id, loaded, output, resume, reply } = *attach;
@@ -255,6 +331,49 @@ impl State {
                     Some(Command::Detach(user, id)) => self.detach(user, id).await,
                     Some(Command::Apply(user, id, body, reply)) => {
                         if reply.is_closed() { continue; }
+                        if let Client::ChatSend(value)=&body
+                            && value.channel=="room"
+                            && self.players.get(&user).is_some_and(|p|public_room(&p.room)) {
+                            match self.prepare_public_chat(user,id,value) {
+                                Ok((room,message,session))=>{
+                                    let db=self.db.clone();
+                                    requests.spawn(async move {
+                                        if reply.is_closed(){return;}
+                                        let result=tokio::time::timeout(Duration::from_secs(5),public_chat(db,user,session,room,message)).await.unwrap_or(Err(Error("TIMEOUT")));
+                                        let _=reply.send(result);
+                                    });
+                                },
+                                Err(error)=>{let _=reply.send(Err(error));}
+                            }
+                            continue;
+                        }
+                        if matches!(&body, Client::TradeRespond(_) | Client::TradeUpdate(_) | Client::TradeConfirm(_) | Client::TradeCancel(_) | Client::TradeSnapshot(_)) {
+                            if self.players.get(&user).and_then(|p|p.connection.as_ref()).is_none_or(|c|c.id!=id) {
+                                let _=reply.send(Err(Error("UNAUTHENTICATED"))); continue;
+                            }
+                            let manager=self.trades.clone();
+                            requests.spawn(async move {
+                                if reply.is_closed(){return;}
+                                let result=tokio::time::timeout(Duration::from_secs(5),trade_request(manager,user,body)).await.unwrap_or(Err(Error("TIMEOUT")));
+                                let _=reply.send(result);
+                            });
+                            continue;
+                        }
+                        if matches!(&body, Client::DuelSnapshot(_) | Client::DuelSubmitMove(_) | Client::DuelPreviewMove(_) | Client::DuelForfeit(_)) {
+                            if self.players.get(&user).and_then(|p|p.connection.as_ref()).is_none_or(|c|c.id!=id) {
+                                let _=reply.send(Err(Error("UNAUTHENTICATED"))); continue;
+                            }
+                            let db=self.db.clone();let manager=self.duels.clone();
+                            // A journal write for one match must not stall the global presence actor.
+                            // Transport admits only one outstanding request per connection; match
+                            // actors still serialize and authorize every move by their own seats.
+                            requests.spawn(async move {
+                                if reply.is_closed(){return;}
+                                let result=tokio::time::timeout(Duration::from_secs(5),duel_request(db,manager,user,body)).await.unwrap_or(Err(Error("TIMEOUT")));
+                                let _=reply.send(result);
+                            });
+                            continue;
+                        }
                         let result = tokio::time::timeout(
                             Duration::from_secs(5), self.apply(user, id, body),
                         ).await.unwrap_or(Err(Error("TIMEOUT")));
@@ -291,13 +410,28 @@ impl State {
                         }
                         let _=reply.send(result);
                     },
-                    Some(Command::Stop) | None => break,
+                    Some(Command::RefreshClans(users,reply))=>{
+                        self.refresh_clan_profiles(users).await;
+                        let _=reply.send(());
+                    },
+                    Some(Command::ActivityChanged(users,reply))=>{
+                        for user in &users {self.cancel_for(*user,"cancelled");}
+                        self.refresh_clan_profiles(users).await;
+                        let _=reply.send(());
+                    },
+                    Some(Command::StartActivity(record))=>{
+                        let id=record.id;let users=record.seats.iter().filter_map(|s|s.user).collect();
+                        self.duels.start(*record);
+                        self.duel_notice(Notice::Recovered(id,users)).await;
+                    },
+                    Some(Command::Stop(reply))=>{shutdown_reply=Some(reply);break;},
+                    None=>break,
                 },
                 _ = tick.tick() => self.expire().await,
                 notice = notices.recv() => if let Some(notice) = notice { self.duel_notice(notice).await; },
                 _ = retention.tick() => {
                     let db = self.db.clone();
-                    tokio::spawn(async move {
+                    requests.spawn(async move {
                         let _ = repo::retention(&db).await;
                         match crate::economy::reconcile(&db).await {
                             Ok(report) if !report.is_ok()=>tracing::error!(transactions=report.unbalanced_transactions,wallets=report.incorrect_wallets,"currency reconciliation failed"),
@@ -307,6 +441,18 @@ impl State {
                 }
             }
         }
+        drop(rx);
+        if tokio::time::timeout(Duration::from_secs(6), async {
+            while requests.join_next().await.is_some() {}
+        })
+        .await
+        .is_err()
+        {
+            requests.abort_all();
+            while requests.join_next().await.is_some() {}
+        }
+        drop(notices);
+        self.tournaments.shutdown();
         self.trades.shutdown().await;
         self.duels.shutdown().await;
         for player in self.players.values() {
@@ -314,22 +460,15 @@ impl State {
                 let _ = connection.output.close.send(Some(Close::Shutdown));
             }
         }
+        if let Some(reply) = shutdown_reply {
+            let _ = reply.send(());
+        }
     }
     async fn duel_notice(&mut self, notice: Notice) {
         match notice {
             Notice::Send(user, body) => self.notify(user, body),
             Notice::ProfilesChanged(users) => {
-                for user in users {
-                    if let Ok(Ok(mut info)) =
-                        tokio::time::timeout(Duration::from_secs(1), repo::player(&self.db, user))
-                            .await
-                        && let Some(player) = self.players.get_mut(&user)
-                    {
-                        info.afk = player.info.afk;
-                        player.info = info;
-                    }
-                    self.update(user).await;
-                }
+                self.refresh_clan_profiles(users).await;
             }
             Notice::Recovered(id, users) => {
                 if !self.duels.contains(id) {
@@ -364,17 +503,7 @@ impl State {
                 if !active {
                     self.release(id, "finished").await;
                 }
-                for user in users {
-                    if let Ok(Ok(mut info)) =
-                        tokio::time::timeout(Duration::from_secs(3), repo::player(&self.db, user))
-                            .await
-                        && let Some(player) = self.players.get_mut(&user)
-                    {
-                        info.afk = player.info.afk;
-                        player.info = info;
-                    }
-                    self.update(user).await;
-                }
+                self.refresh_clan_profiles(users).await;
             }
         }
     }
@@ -521,6 +650,9 @@ impl State {
         }
     }
     async fn leave_room(&self, user: Uuid, room: &str) {
+        if room == "castle" {
+            let _ = crate::tournaments::ready(&self.db, user, false).await;
+        }
         if let Some(room) = self.rooms.get(room) {
             let _ = room.leave(user.to_string()).await;
         }
@@ -557,7 +689,7 @@ impl State {
     async fn expire(&mut self) {
         let now = Instant::now();
         self.rooms.retain(|name, _| {
-            !name.starts_with("clan:")
+            !(name.starts_with("clan:") || name == "expedition")
                 || self
                     .players
                     .values()
@@ -640,7 +772,79 @@ impl State {
             let _ = room.update(member).await;
         }
     }
+    async fn refresh_clan_profiles(&mut self, users: Vec<Uuid>) {
+        let connected: Vec<_> = users
+            .into_iter()
+            .filter(|user| self.online(*user))
+            .collect();
+        let db = &self.db;
+        let fetch = futures_util::stream::iter(
+            connected
+                .into_iter()
+                .map(|user| async move { (user, repo::player(db, user).await) }),
+        )
+        .buffer_unordered(8)
+        .collect::<Vec<_>>();
+        let Ok(rows) = tokio::time::timeout(Duration::from_secs(2), fetch).await else {
+            tracing::warn!("clan presence refresh deferred");
+            return;
+        };
+        for (user, result) in rows {
+            let Ok(mut info) = result else {
+                continue;
+            };
+            info.busy |= self.is_busy(user);
+            let Some(player) = self.players.get_mut(&user) else {
+                continue;
+            };
+            info.afk = player.info.afk;
+            let previous = player.room.clone();
+            let private =
+                previous.starts_with("clan:") && previous != format!("clan:{}", info.clan_id);
+            player.info = info.clone();
+            let expedition_private =
+                previous == "expedition" && self.room_access(user, "expedition").await.is_err();
+            if private || expedition_private {
+                self.leave_room(user, &previous).await;
+                self.players
+                    .get_mut(&user)
+                    .expect("connected clan member")
+                    .room
+                    .clear();
+                let snapshot = self
+                    .join(
+                        user,
+                        if expedition_private {
+                            "portal"
+                        } else {
+                            "arena"
+                        },
+                    )
+                    .await
+                    .unwrap_or_default();
+                self.notify(user, Body::RoomSnapshot(snapshot));
+            }
+            if let Some(player) = self.players.get(&user) {
+                self.notify(
+                    user,
+                    Body::RoomDelta(pb::RoomDelta {
+                        room: player.room.clone(),
+                        updated: vec![info],
+                        ..Default::default()
+                    }),
+                );
+            }
+            self.update(user).await;
+        }
+    }
     async fn room_access(&self, user: Uuid, name: &str) -> Result<Option<HashSet<String>>> {
+        if name == "expedition" {
+            let users:Vec<Uuid>=sqlx::query_scalar("SELECT l.user_id FROM activity_locks l JOIN expeditions e ON e.id=l.owner_id AND e.user_id=l.user_id JOIN users u ON u.id=l.user_id WHERE l.kind='expedition' AND e.status='active' AND u.status='active' AND u.email_verified_at IS NOT NULL").fetch_all(&self.db).await?;
+            if !users.contains(&user) {
+                return Err(Error("FORBIDDEN"));
+            }
+            return Ok(Some(users.into_iter().map(|id| id.to_string()).collect()));
+        }
         if [
             "arena", "training", "castle", "portal", "bazaar", "shop", "tower",
         ]
@@ -659,12 +863,21 @@ impl State {
     }
     async fn join(&mut self, user: Uuid, name: &str) -> Result<pb::RoomSnapshot> {
         let allowed = self.room_access(user, name).await?;
+        let motd = if let Some(clan) = name
+            .strip_prefix("clan:")
+            .and_then(|id| Uuid::parse_str(id).ok())
+        {
+            sqlx::query_scalar::<_,String>("SELECT c.motd FROM clans c JOIN clan_members m ON m.clan_id=c.id WHERE c.id=$1 AND m.user_id=$2 AND c.status='active'")
+                .bind(clan).bind(user).fetch_optional(&self.db).await?.ok_or(Error("FORBIDDEN"))?
+        } else {
+            String::new()
+        };
         if self
             .players
             .iter()
             .filter(|(id, p)| **id != user && p.connection.is_some() && p.room == name)
             .count()
-            >= 100
+            >= self.settings.room_capacity
         {
             return Err(Error("ROOM_FULL"));
         }
@@ -676,7 +889,8 @@ impl State {
             .entry(name.into())
             .or_insert_with(|| Room::new(name.into()))
             .clone();
-        let snapshot = room.join(member, allowed).await?;
+        let mut snapshot = room.join(member, allowed).await?;
+        snapshot.motd = motd;
         if previous != name {
             self.trades.cancel_for(user).await;
             self.cancel_for(user, "cancelled");
@@ -699,6 +913,13 @@ impl State {
                 server_time_ms: now_ms(),
             })),
             Client::RoomJoin(value) => Ok(Body::RoomSnapshot(self.join(user, &value.room).await?)),
+            Client::TournamentReady(value) => {
+                if value.ready && self.players[&user].room != "castle" {
+                    return Err(Error("FORBIDDEN"));
+                }
+                crate::tournaments::ready(&self.db, user, value.ready).await?;
+                Ok(ok())
+            }
             Client::RoomLeave(_) => {
                 self.trades.cancel_for(user).await;
                 self.cancel_for(user, "cancelled");
@@ -754,6 +975,7 @@ impl State {
                 let player = self.players.get_mut(&user).unwrap();
                 limit(&mut player.mail, 5, Duration::from_secs(60))?;
                 let text = super::text(&value.text, 1000)?;
+                crate::admin::moderation::can_speak(&self.db, user, &text).await?;
                 let other = repo::target(&self.db, &value.to).await?;
                 if other == user {
                     return Err(Error("INVALID_MESSAGE"));
@@ -791,43 +1013,11 @@ impl State {
                 Ok(ok())
             }
             Client::Hello(_) | Client::Resume(_) => Err(Error("CONFLICT")),
-            Client::DuelSnapshot(value) => {
-                let id = duel_id(&value.duel_id)?;
-                match self.duels.request(user, id, Action::Snapshot).await {
-                    Err(Error("NOT_FOUND" | "UNAVAILABLE")) => {
-                        duels::finished_snapshot(&self.db, user, id).await
-                    }
-                    response => response,
-                }
-            }
-            Client::DuelSubmitMove(value) => {
-                self.duels
-                    .request(
-                        user,
-                        duel_id(&value.duel_id)?,
-                        Action::Submit {
-                            round: value.round,
-                            mv: value.r#move.ok_or(Error("INVALID_MESSAGE"))?,
-                        },
-                    )
-                    .await
-            }
-            Client::DuelPreviewMove(value) => {
-                self.duels
-                    .request(
-                        user,
-                        duel_id(&value.duel_id)?,
-                        Action::Preview {
-                            round: value.round,
-                            mv: value.r#move.ok_or(Error("INVALID_MESSAGE"))?,
-                        },
-                    )
-                    .await
-            }
-            Client::DuelForfeit(value) => {
-                self.duels
-                    .request(user, duel_id(&value.duel_id)?, Action::Forfeit)
-                    .await
+            body @ (Client::DuelSnapshot(_)
+            | Client::DuelSubmitMove(_)
+            | Client::DuelPreviewMove(_)
+            | Client::DuelForfeit(_)) => {
+                duel_request(self.db.clone(), self.duels.clone(), user, body).await
             }
             Client::TrainingChallengeBot(value) => self.train(user, &value.bot_id).await,
             Client::TrainingBots(_) => Ok(Body::TrainingBots(pb::TrainingBots {
@@ -836,54 +1026,11 @@ impl State {
             Client::RankingGet(value) => duels::ranking(&self.db, value).await,
             Client::MatchHistoryGet(value) => duels::history(&self.db, user, value).await,
             Client::TradeInvite(value) => self.trade_invite(user, &value.target).await,
-            Client::TradeRespond(value) => {
-                self.trades
-                    .request(
-                        user,
-                        duel_id(&value.trade_id)?,
-                        crate::trade::Action::Respond(value.accept),
-                    )
-                    .await
-            }
-            Client::TradeUpdate(value) => {
-                self.trades
-                    .request(
-                        user,
-                        duel_id(&value.trade_id)?,
-                        crate::trade::Action::Update(
-                            value.version,
-                            value.offer.ok_or(Error("INVALID_MESSAGE"))?,
-                        ),
-                    )
-                    .await
-            }
-            Client::TradeConfirm(value) => {
-                self.trades
-                    .request(
-                        user,
-                        duel_id(&value.trade_id)?,
-                        crate::trade::Action::Confirm(value.version),
-                    )
-                    .await
-            }
-            Client::TradeCancel(value) => {
-                self.trades
-                    .request(
-                        user,
-                        duel_id(&value.trade_id)?,
-                        crate::trade::Action::Cancel,
-                    )
-                    .await
-            }
-            Client::TradeSnapshot(value) => {
-                self.trades
-                    .request(
-                        user,
-                        duel_id(&value.trade_id)?,
-                        crate::trade::Action::Snapshot,
-                    )
-                    .await
-            }
+            body @ (Client::TradeRespond(_)
+            | Client::TradeUpdate(_)
+            | Client::TradeConfirm(_)
+            | Client::TradeCancel(_)
+            | Client::TradeSnapshot(_)) => trade_request(self.trades.clone(), user, body).await,
             Client::MatchReplay(value) => duels::replay(&self.db, duel_id(&value.match_id)?).await,
         }
     }
@@ -1004,8 +1151,52 @@ impl State {
         }
         Ok(self.social_body(user))
     }
+    fn prepare_public_chat(
+        &mut self,
+        user: Uuid,
+        id: Uuid,
+        value: &pb::ChatSend,
+    ) -> Result<(Room, pb::ChatMessage, Vec<u8>)> {
+        let p = self
+            .players
+            .get_mut(&user)
+            .ok_or(Error("UNAUTHENTICATED"))?;
+        if p.connection.as_ref().is_none_or(|c| c.id != id) {
+            return Err(Error("UNAUTHENTICATED"));
+        }
+        let text = super::text(&value.text, 300)?;
+        let now = Instant::now();
+        limit(
+            &mut p.chat,
+            if p.info.verified { 5 } else { 2 },
+            Duration::from_secs(10),
+        )?;
+        let signature = format!("room::{}", text.to_lowercase());
+        if p.last_chat.as_ref().is_some_and(|(last, at)| {
+            *last == signature && now.duration_since(*at) < Duration::from_secs(10)
+        }) {
+            return Err(Error("RATE_LIMITED"));
+        }
+        p.last_chat = Some((signature, now));
+        let message = pb::ChatMessage {
+            id: Uuid::now_v7().to_string(),
+            channel: "room".into(),
+            room: p.room.clone(),
+            from_id: user.to_string(),
+            from_login: p.info.login.clone(),
+            text,
+            at_ms: now_ms(),
+            ..Default::default()
+        };
+        Ok((
+            self.rooms.get(&p.room).cloned().ok_or(Error("CONFLICT"))?,
+            message,
+            p.session.clone(),
+        ))
+    }
     async fn chat(&mut self, user: Uuid, value: pb::ChatSend) -> Result<Body> {
         let text = super::text(&value.text, 300)?;
+        crate::admin::moderation::can_speak(&self.db, user, &text).await?;
         let now = Instant::now();
         let p = self.players.get_mut(&user).unwrap();
         limit(
@@ -1330,6 +1521,132 @@ fn duel_id(value: &str) -> Result<Uuid> {
     Uuid::parse_str(value).map_err(|_| Error("INVALID_MESSAGE"))
 }
 
+async fn duel_request(db: PgPool, manager: Manager, user: Uuid, body: Client) -> Result<Body> {
+    match body {
+        Client::DuelSnapshot(value) => {
+            let id = duel_id(&value.duel_id)?;
+            match manager.request(user, id, Action::Snapshot).await {
+                Err(Error("NOT_FOUND" | "UNAVAILABLE")) => {
+                    duels::finished_snapshot(&db, user, id).await
+                }
+                response => response,
+            }
+        }
+        Client::DuelSubmitMove(value) => {
+            manager
+                .request(
+                    user,
+                    duel_id(&value.duel_id)?,
+                    Action::Submit {
+                        round: value.round,
+                        mv: value.r#move.ok_or(Error("INVALID_MESSAGE"))?,
+                    },
+                )
+                .await
+        }
+        Client::DuelPreviewMove(value) => {
+            manager
+                .request(
+                    user,
+                    duel_id(&value.duel_id)?,
+                    Action::Preview {
+                        round: value.round,
+                        mv: value.r#move.ok_or(Error("INVALID_MESSAGE"))?,
+                    },
+                )
+                .await
+        }
+        Client::DuelForfeit(value) => {
+            manager
+                .request(user, duel_id(&value.duel_id)?, Action::Forfeit)
+                .await
+        }
+        _ => Err(Error("INVALID_MESSAGE")),
+    }
+}
+
+fn public_room(name: &str) -> bool {
+    [
+        "arena", "training", "castle", "portal", "bazaar", "shop", "tower",
+    ]
+    .contains(&name)
+}
+async fn public_chat(
+    db: PgPool,
+    user: Uuid,
+    session: Vec<u8>,
+    room: Room,
+    message: pb::ChatMessage,
+) -> Result<Body> {
+    let mut tx = db.begin().await?;
+    // Serialize acceptance with password resets, bans and account deletion.
+    let live:Option<Uuid>=sqlx::query_scalar("SELECT id FROM users WHERE id=$1 AND status='active' AND EXISTS(SELECT 1 FROM sessions WHERE user_id=$1 AND id_hash=$2 AND purpose='game' AND expires_at>now()) FOR SHARE")
+        .bind(user).bind(session).fetch_optional(&mut *tx).await?;
+    if live.is_none() {
+        return Err(Error("UNAUTHENTICATED"));
+    }
+    crate::admin::moderation::can_speak_on(&mut tx, user, &message.text).await?;
+    repo::log_chat_on(&mut tx, &message, None).await?;
+    tx.commit().await?;
+    room.chat(message, None)
+        .inspect_err(|_| tracing::warn!("public chat fanout queue saturated"))?;
+    Ok(ok())
+}
+
+async fn trade_request(manager: crate::trade::Manager, user: Uuid, body: Client) -> Result<Body> {
+    match body {
+        Client::TradeRespond(value) => {
+            manager
+                .request(
+                    user,
+                    duel_id(&value.trade_id)?,
+                    crate::trade::Action::Respond(value.accept),
+                )
+                .await
+        }
+        Client::TradeUpdate(value) => {
+            manager
+                .request(
+                    user,
+                    duel_id(&value.trade_id)?,
+                    crate::trade::Action::Update(
+                        value.version,
+                        value.offer.ok_or(Error("INVALID_MESSAGE"))?,
+                    ),
+                )
+                .await
+        }
+        Client::TradeConfirm(value) => {
+            manager
+                .request(
+                    user,
+                    duel_id(&value.trade_id)?,
+                    crate::trade::Action::Confirm(value.version),
+                )
+                .await
+        }
+        Client::TradeCancel(value) => {
+            manager
+                .request(
+                    user,
+                    duel_id(&value.trade_id)?,
+                    crate::trade::Action::Cancel,
+                )
+                .await
+        }
+        Client::TradeSnapshot(value) => {
+            manager
+                .request(
+                    user,
+                    duel_id(&value.trade_id)?,
+                    crate::trade::Action::Snapshot,
+                )
+                .await
+        }
+        _ => Err(Error("INVALID_MESSAGE")),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1374,6 +1691,7 @@ mod tests {
         let mut state = State {
             trades,
             duels,
+            tournaments: crate::tournaments::Manager::disabled(),
             db: sqlx::postgres::PgPoolOptions::new()
                 .connect_lazy("postgres://unused:unused@127.0.0.1/unused")
                 .unwrap(),

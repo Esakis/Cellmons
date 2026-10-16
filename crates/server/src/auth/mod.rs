@@ -3,6 +3,7 @@ pub(crate) mod crypto;
 mod handlers;
 mod limits;
 pub mod mail;
+pub mod privacy;
 pub(crate) mod security;
 mod tickets;
 
@@ -14,15 +15,13 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use std::{
-    collections::HashMap,
-    sync::{Arc, Mutex},
-};
+use std::sync::Arc;
 use tokio::sync::Semaphore;
 use uuid::Uuid;
 
 use crate::gateway::AppState;
 pub use config::AuthConfig;
+pub const LEGAL_VERSION: &str = "2026-10-16";
 
 #[derive(Clone)]
 pub struct Auth(pub(crate) Arc<Inner>);
@@ -33,7 +32,7 @@ pub(crate) struct Inner {
     limits: limits::Limits,
     hashing: Arc<Semaphore>,
     mailing: Arc<Semaphore>,
-    tickets: Mutex<HashMap<String, u64>>,
+    exports: Arc<Semaphore>,
     http: reqwest::Client,
 }
 
@@ -85,12 +84,16 @@ pub struct Profile {
     pub email_verified: bool,
     pub start_school: String,
     pub role: String,
+    #[serde(default)]
+    pub busy: bool,
     pub avatar: Option<Avatar>,
 }
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Avatar {
     pub id: Uuid,
     pub template_id: i32,
+    pub path_id: Option<i32>,
+    pub tier: i16,
     pub level: i16,
     pub xp: i32,
 }
@@ -113,7 +116,7 @@ impl Auth {
             limits: Default::default(),
             hashing: Arc::new(Semaphore::new(4)),
             mailing: Arc::new(Semaphore::new(4)),
-            tickets: Default::default(),
+            exports: Arc::new(Semaphore::new(2)),
             http: reqwest::Client::builder()
                 .timeout(std::time::Duration::from_secs(8))
                 .build()
@@ -144,7 +147,11 @@ impl Auth {
         .map_err(|_| Error::busy())
     }
 
-    async fn check_password(&self, password: String, stored: Option<String>) -> Result<bool> {
+    pub(crate) async fn check_password(
+        &self,
+        password: String,
+        stored: Option<String>,
+    ) -> Result<bool> {
         let permit = self
             .0
             .hashing
@@ -203,9 +210,43 @@ pub(crate) fn routes() -> Router<AppState> {
         .route("/api/auth/ws-ticket", post(tickets::issue))
         .route("/api/auth/sessions", get(handlers::sessions))
         .route("/api/auth/sessions/{id}", delete(handlers::revoke))
-        .route("/api/me", get(handlers::me))
+        .route(
+            "/api/me",
+            get(handlers::me).delete(privacy::request_deletion),
+        )
+        .route("/api/me/privacy", get(privacy::summary))
+        .route("/api/me/export", get(privacy::export))
+        .route("/api/auth/cancel-deletion", post(privacy::restore))
+        .route("/api/auth/deletion-status", post(privacy::deletion_status))
+        .route("/api/auth/privacy-login", post(privacy::login))
+        .route(
+            "/api/admin",
+            get(crate::admin::views::get).post(crate::admin::views::post),
+        )
+        .route("/api/reports", post(crate::admin::moderation::post))
+        .route("/api/notices", get(crate::admin::moderation::notices))
+        .route(
+            "/api/bulletin",
+            get(crate::admin::moderation::public_notices),
+        )
+        .route(
+            "/api/admin/session",
+            get(crate::admin::access::get).post(crate::admin::access::post),
+        )
         .route("/api/game", get(crate::game::get).post(crate::game::post))
+        .route(
+            "/api/clans",
+            get(crate::clans::get).post(crate::clans::post),
+        )
         .route("/api/economy", get(crate::economy::get))
+        .route(
+            "/api/expeditions",
+            get(crate::expeditions::get).post(crate::expeditions::post),
+        )
+        .route(
+            "/api/tournaments",
+            get(crate::tournaments::get).post(crate::tournaments::post),
+        )
         .route(
             "/api/store",
             get(crate::store::get).post(crate::store::post),
@@ -214,7 +255,7 @@ pub(crate) fn routes() -> Router<AppState> {
 
 async fn profile(pool: &PgPool, user: Uuid) -> Result<Profile> {
     let row = sqlx::query!("SELECT id, login::text AS \"login!\", email::text AS \"email!\", email_verified_at IS NOT NULL AS \"verified!\", start_school, role FROM users WHERE id=$1 AND status='active'", user).fetch_optional(pool).await?.ok_or_else(Error::unauthorized)?;
-    let avatar = sqlx::query_as!(Avatar, "SELECT id, template_id, level, xp FROM avatars WHERE user_id=$1 AND is_active AND deleted_at IS NULL", user).fetch_optional(pool).await?;
+    let avatar = sqlx::query_as!(Avatar, "SELECT id, template_id, path_id, tier, level, xp FROM avatars WHERE user_id=$1 AND is_active AND deleted_at IS NULL", user).fetch_optional(pool).await?;
     Ok(Profile {
         id: row.id,
         login: row.login,
@@ -222,6 +263,7 @@ async fn profile(pool: &PgPool, user: Uuid) -> Result<Profile> {
         email_verified: row.verified,
         start_school: row.start_school,
         role: row.role,
+        busy: sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM duel_locks WHERE user_id=$1) OR EXISTS(SELECT 1 FROM activity_locks WHERE user_id=$1)").bind(user).fetch_one(pool).await?,
         avatar,
     })
 }

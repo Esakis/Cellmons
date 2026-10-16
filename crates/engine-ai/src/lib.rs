@@ -9,7 +9,7 @@ use engine::{
 };
 use rand_chacha::ChaCha8Rng;
 use rand_chacha::rand_core::{Rng, SeedableRng};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 mod adaptive;
 mod profiles;
@@ -19,7 +19,7 @@ pub use adaptive::OpponentModel;
 pub use profiles::{Archetype, BotProfile, Profiles, training_profiles};
 
 /// Poziom bota.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
 pub enum Level {
     /// Losuje jeden z dozwolonych ruchów z rozkładu równomiernego.
     L0,

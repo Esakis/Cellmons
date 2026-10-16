@@ -2,7 +2,7 @@
 
 Projekt gry karcianej z elementami RPG (przeglądarka i Android), odtwarzającej zasady polskiej gry sieciowej **Cellmons** (Pogram, 2004–2009). Mechanika pochodzi z oryginału, a nazwy, teksty, fabuła i grafiki są własne. „Cellmons” zostaje tylko nazwą repozytorium. Nazwę produktu, znak towarowy i domeny opisuje `docs/20-nazwa-i-znak-towarowy.md`.
 
-**Status:** zaimplementowane F9.1–F9.4 — Dukaty i bilansowana księga, sklep z jawnymi szansami i idempotencją, wysypisko oraz atomowa wymiana kart i waluty. [Raport F9](docs/27-ekonomia-sklep-wymiana-testy.md). Działają też postacie i kolekcja ([F8](docs/26-postacie-kolekcja-testy.md)) oraz trwałe walki online ([F7](docs/25-pojedynki-online-testy.md)). Gość korzysta tylko z RAM i treningu offline. Kolejny zakres: **F10, rozwój i pełna treść**; przygotowano też treść F9.5 ([audyt balansu](docs/28-tresc-beta-balans.md)). Obecnie 132 karty i 19 postaci; nowe ilustracje oczekują na odbiór właściciela. Publiczna beta i testy fizycznych telefonów wymagają docelowego środowiska i urządzeń.
+**Status:** działają konta, gość wyłącznie w RAM, trwałe pojedynki, kolekcja, ekonomia, sklep, wymiana, [klany](docs/32-klany-testy.md), [turnieje](docs/33-turnieje-testy.md) i [wyprawy](docs/34-wyprawy-testy.md). Dodano reinkarnacje, cienie oraz komplet 31 szablonów i 62 dróg ([raport F10](docs/29-reinkarnacje-cienie-testy.md)). Katalog ma [330 kart w pięciu edycjach](docs/31-pelny-katalog-330-i-protokol.md); trwa kalibracja i realizacja dalszych faz planu. Nowe grafiki oczekują na odbiór właściciela. Publiczna beta, testy fizycznych telefonów i wdrożenie wymagają docelowego środowiska i urządzeń.
 
 ## Uruchomienie lokalne
 
@@ -70,3 +70,10 @@ Zalecana kolejność czytania: 01 → 02 → 03 → 04 → 16, potem pozostałe 
 | [24. Lobby, WebSocket i wyzwania — testy](docs/24-lobby-websocket-wyzwania-testy.md) | F6.3–F7.1, obciążenie, testy dwóch klientów i poprawki przeglądu |
 | [25. Pojedynki online — testy](docs/25-pojedynki-online-testy.md) | F7.2–F7.5, restart procesu, wynik, boty i klient |
 | [26. Postacie i kolekcja — testy](docs/26-postacie-kolekcja-testy.md) | F8, transakcje, PR, talie, nagrody i gość offline |
+| [35. Administracja i moderacja](docs/35-administracja-i-moderacja.md) | F12, drugi składnik, uprawnienia, zgłoszenia, sygnały nadużyć, mentorzy i nagrody systemowe |
+| [36. Android i wydania](docs/36-android-aktualizacje-i-wydania.md) | F12A, Keystore, cykl życia, aktualizacje Ed25519, APK/AAB, testy i otwarte odbiory |
+| [37. Utwardzenie i prywatność](docs/37-utwardzenie-i-prywatnosc.md) | F13, obciążenie, eksport/usuwanie, licencje, dostępność i otwarte budżety |
+| [38. Wdrożenie i odtwarzanie](docs/38-wdrozenie-i-odtwarzanie.md) | F14, bariera aktywności, obrazy, PITR, monitoring i bramki publikacji |
+| [39. Eksploatacja i odbiór](docs/39-eksploatacja-i-odbior.md) | F15, zadania okresowe, telemetria i proces kolejnych wydań |
+
+Prace lokalne obejmują plan do F15. Publiczny start pozostaje zależny od odbiorów wskazanych w raportach 37–39; nie zadeklarowano wykonania bety ludzi ani publikacji Google Play. Instrukcja dla operatora: [deploy/README.md](deploy/README.md).

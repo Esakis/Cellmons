@@ -1,0 +1,29 @@
+FROM node:24.19.0-bookworm-slim AS node
+FROM rust:1.99.0-bookworm AS build
+RUN apt-get update && apt-get install -y --no-install-recommends cmake musl-tools && rm -rf /var/lib/apt/lists/*
+RUN rustup target add x86_64-unknown-linux-musl
+COPY --from=node /usr/local/bin/node /usr/local/bin/node
+WORKDIR /source
+COPY Cargo.toml Cargo.lock rust-toolchain.toml clippy.toml ./
+COPY .cargo .cargo
+COPY .sqlx .sqlx
+COPY content content
+COPY migrations migrations
+COPY proto proto
+COPY crates crates
+ARG GAME_RELEASE=development
+ENV GAME_RELEASE=${GAME_RELEASE}
+RUN cargo fetch --locked
+RUN cargo build --release --locked -p server --target x86_64-unknown-linux-musl
+COPY legal/vendor legal/vendor
+COPY scripts/collect-notices.mjs scripts/collect-notices.mjs
+RUN node scripts/collect-notices.mjs --server
+
+FROM gcr.io/distroless/static-debian13:nonroot@sha256:e2e927ec666bae08560abb3c55d0659eceabb657f56b6782ab500a9fc7f555e3
+ARG GAME_RELEASE=development
+LABEL org.opencontainers.image.revision=${GAME_RELEASE}
+COPY --from=build /source/target/x86_64-unknown-linux-musl/release/server /server
+COPY --from=build /source/target/server-notices.txt /licenses/software.txt
+USER 65532:65532
+EXPOSE 8080 9090
+ENTRYPOINT ["/server"]

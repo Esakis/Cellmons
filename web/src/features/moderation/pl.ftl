@@ -1,0 +1,16 @@
+report-title = Zgłoszenie do moderacji
+report-help = Serwer dołączy właściwy kontekst. Opisz problem. Zgłoszenie nie nakłada automatycznej kary.
+report-reason = Powód zgłoszenia
+report-send = Wyślij zgłoszenie
+report-error = Nie udało się potwierdzić zgłoszenia. Możesz ponowić wysyłkę.
+report-limit = Limit zgłoszeń został wyczerpany. Spróbuj później.
+report-maintenance = Trwa konserwacja. Nowe aktywności są czasowo niedostępne.
+report-announcements = Ogłoszenia
+report-decisions = Decyzje moderacji
+report-kind-warning = Ostrzeżenie
+report-kind-ban = Blokada
+report-kind-unban = Cofnięcie blokady
+report-kind-mute = Wyciszenie
+report-kind-unmute = Cofnięcie wyciszenia
+report-kind-report = Rozpatrzenie zgłoszenia
+report-kind-role = Zmiana roli

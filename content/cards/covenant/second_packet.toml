@@ -1,0 +1,331 @@
+# Original Covenant packet 2
+
+[[card]]
+id = 265
+key = "card.oath_tether"
+set = "covenant"
+rarity = "silver"
+requires = { combat = 2, divine = 2 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_atk", amount = 2, duration = "duel" }, { family = "heal", target = "self", amount = 3 }]
+
+[[card]]
+id = 266
+key = "card.tidal_guard"
+set = "covenant"
+rarity = "silver"
+requires = { combat = 2, element = 2 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_def", amount = 2, duration = "duel" }, { family = "stamina", target = "self", amount = 5 }]
+
+[[card]]
+id = 267
+key = "card.scripted_lunge"
+set = "covenant"
+rarity = "silver"
+requires = { combat = 2, arcane = 2 }
+cost = { focus = 3, stamina = 11 }
+kind = "instant"
+effects = [{ family = "force_hit", target = "self", kind = "phys", slot = 2 }, { family = "focus", target = "self", amount = 1 }]
+
+[[card]]
+id = 268
+key = "card.bone_measure"
+set = "covenant"
+rarity = "silver"
+requires = { combat = 2, necro = 2 }
+cost = { focus = 3, stamina = 11 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "opponent", stat = "phys_def", amount = -2, duration = "duel" }, { family = "drain", pool = "hp", amount = 2 }]
+
+[[card]]
+id = 269
+key = "card.ratchet_stance"
+set = "covenant"
+rarity = "silver"
+requires = { combat = 2, tech = 2 }
+cost = { focus = 3, stamina = 11 }
+kind = "instant"
+effects = [{ family = "unblockable", target = "self", kind = "phys", slot = 3 }, { family = "stamina", target = "self", amount = 4 }]
+
+[[card]]
+id = 270
+key = "card.verdant_litany"
+set = "covenant"
+rarity = "silver"
+requires = { divine = 2, element = 2 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+effects = [{ family = "heal", target = "self", amount = 5 }, { family = "stamina", target = "self", amount = 8 }]
+
+[[card]]
+id = 271
+key = "card.radiant_clause"
+set = "covenant"
+rarity = "silver"
+requires = { divine = 2, arcane = 2 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "mag_def", amount = 2, duration = "round" }, { family = "focus", target = "self", amount = 2 }]
+
+[[card]]
+id = 272
+key = "card.twilight_balance"
+set = "covenant"
+rarity = "silver"
+requires = { divine = 2, necro = 2 }
+cost = { focus = 4, stamina = 13 }
+kind = "instant"
+effects = [{ family = "heal", target = "self", amount = 4 }, { family = "damage", target = "opponent", amount = 7 }]
+
+[[card]]
+id = 273
+key = "card.sanctified_piston"
+set = "covenant"
+rarity = "silver"
+requires = { divine = 2, tech = 2 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "hp_max", amount = 8, duration = "duel" }, { family = "heal", target = "self", amount = 8 }, { family = "stamina", target = "self", amount = 2 }]
+
+[[card]]
+id = 274
+key = "card.cloud_annotation"
+set = "covenant"
+rarity = "silver"
+requires = { element = 2, arcane = 2 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+effects = [{ family = "force_miss", target = "opponent", kind = "mag", first_only = true }, { family = "stat_mod", target = "self", stat = "mag_atk", amount = 1, duration = "round" }]
+
+[[card]]
+id = 275
+key = "card.peat_memory"
+set = "covenant"
+rarity = "silver"
+requires = { element = 2, necro = 2 }
+cost = { focus = 3, stamina = 11 }
+kind = "instant"
+effects = [{ family = "drain", pool = "stamina", amount = 5 }, { family = "heal", target = "self", amount = 2 }]
+
+[[card]]
+id = 276
+key = "card.storm_servo"
+set = "covenant"
+rarity = "silver"
+requires = { element = 2, tech = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "instant"
+effects = [{ family = "damage", target = "opponent", amount = 5 }, { family = "stat_mod", target = "self", stat = "phys_def", amount = 1, duration = "duel" }]
+
+[[card]]
+id = 277
+key = "card.sepulchral_formula"
+set = "covenant"
+rarity = "silver"
+requires = { arcane = 2, necro = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "instant"
+effects = [{ family = "drain", pool = "focus", amount = 2 }, { family = "stat_mod", target = "opponent", stat = "mag_atk", amount = -1, duration = "round" }]
+
+[[card]]
+id = 278
+key = "card.indexed_gear"
+set = "covenant"
+rarity = "silver"
+requires = { arcane = 2, tech = 2 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+effects = [{ family = "focus", target = "self", amount = 2 }, { family = "stamina", target = "self", amount = 5 }]
+
+[[card]]
+id = 279
+key = "card.blackened_motor"
+set = "covenant"
+rarity = "silver"
+requires = { necro = 2, tech = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "instant"
+effects = [{ family = "drain", pool = "stamina", amount = 4 }, { family = "stat_mod", target = "self", stat = "mag_atk", amount = 1, duration = "duel" }]
+
+[[card]]
+id = 280
+key = "card.masters_muster"
+set = "covenant"
+rarity = "gold"
+requires = { combat = 3 }
+cost = { focus = 4, stamina = 14 }
+kind = "instant"
+effects = [{ family = "school_mod", target = "self", school = "combat", amount = 1, duration = "duel" }, { family = "stat_mod", target = "self", stat = "phys_def", amount = 1, duration = "duel" }]
+
+[[card]]
+id = 281
+key = "card.sacred_aperture"
+set = "covenant"
+rarity = "gold"
+requires = { divine = 3 }
+cost = { focus = 4, stamina = 14 }
+kind = "instant"
+effects = [{ family = "school_mod", target = "self", school = "divine", amount = 1, duration = "duel" }, { family = "heal", target = "self", amount = 4 }]
+
+[[card]]
+id = 282
+key = "card.primal_conduit"
+set = "covenant"
+rarity = "gold"
+requires = { element = 3 }
+cost = { focus = 4, stamina = 14 }
+kind = "instant"
+effects = [{ family = "school_mod", target = "self", school = "element", amount = 1, duration = "duel" }, { family = "stamina", target = "self", amount = 5 }]
+
+[[card]]
+id = 283
+key = "card.fourth_theorem"
+set = "covenant"
+rarity = "gold"
+requires = { arcane = 3 }
+cost = { focus = 4, stamina = 15 }
+kind = "instant"
+effects = [{ family = "school_mod", target = "self", school = "arcane", amount = 1, duration = "duel" }, { family = "focus", target = "self", amount = 1 }]
+
+[[card]]
+id = 284
+key = "card.ossuary_gate"
+set = "covenant"
+rarity = "gold"
+requires = { necro = 3 }
+cost = { focus = 4, stamina = 15 }
+kind = "instant"
+effects = [{ family = "school_mod", target = "self", school = "necro", amount = 1, duration = "duel" }, { family = "drain", pool = "hp", amount = 2 }]
+
+[[card]]
+id = 285
+key = "card.precision_foundry"
+set = "covenant"
+rarity = "gold"
+requires = { tech = 3 }
+cost = { focus = 4, stamina = 14 }
+kind = "instant"
+effects = [{ family = "school_mod", target = "self", school = "tech", amount = 1, duration = "duel" }, { family = "stat_mod", target = "self", stat = "mag_def", amount = 1, duration = "duel" }]
+
+[[card]]
+id = 286
+key = "card.fervent_exchange"
+set = "covenant"
+rarity = "silver"
+requires = { combat = 2 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_atk", amount = 4, duration = "duel" }, { family = "stat_mod", target = "self", stat = "phys_def", amount = -2, duration = "duel" }]
+
+[[card]]
+id = 287
+key = "card.entrenched_will"
+set = "covenant"
+rarity = "silver"
+requires = { combat = 2 }
+cost = { focus = 3, stamina = 9 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_def", amount = 3, duration = "duel" }, { family = "stat_mod", target = "self", stat = "mag_atk", amount = -2, duration = "duel" }]
+
+[[card]]
+id = 288
+key = "card.martyrs_measure"
+set = "covenant"
+rarity = "silver"
+requires = { divine = 2 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "hp_max", amount = 14, duration = "duel" }, { family = "heal", target = "self", amount = 14 }, { family = "stat_mod", target = "self", stat = "phys_atk", amount = -2, duration = "duel" }]
+
+[[card]]
+id = 289
+key = "card.luminous_burden"
+set = "covenant"
+rarity = "silver"
+requires = { divine = 2 }
+cost = { focus = 3, stamina = 9 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "mag_def", amount = 3, duration = "duel" }, { family = "stamina", target = "self", amount = -5 }]
+
+[[card]]
+id = 290
+key = "card.undertow_bargain"
+set = "covenant"
+rarity = "silver"
+requires = { element = 2 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "mag_atk", amount = 3, duration = "duel" }, { family = "stat_mod", target = "self", stat = "phys_def", amount = -1, duration = "duel" }, { family = "stamina", target = "self", amount = -3 }]
+
+[[card]]
+id = 291
+key = "card.stone_breath"
+set = "covenant"
+rarity = "silver"
+requires = { element = 2 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_def", amount = 3, duration = "duel" }, { family = "stat_mod", target = "self", stat = "mag_def", amount = 1, duration = "duel" }, { family = "stat_mod", target = "self", stat = "stamina_max", amount = -8, duration = "duel" }]
+
+[[card]]
+id = 292
+key = "card.lucid_wager"
+set = "covenant"
+rarity = "silver"
+requires = { arcane = 2 }
+cost = { focus = 2, stamina = 10 }
+kind = "instant"
+effects = [{ family = "focus", target = "self", amount = 5 }, { family = "damage", target = "self", amount = 5 }]
+
+[[card]]
+id = 293
+key = "card.mirror_debt"
+set = "covenant"
+rarity = "silver"
+requires = { arcane = 2 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "mag_atk", amount = 4, duration = "duel" }, { family = "stat_mod", target = "self", stat = "mag_def", amount = -2, duration = "duel" }]
+
+[[card]]
+id = 294
+key = "card.blood_inventory"
+set = "covenant"
+rarity = "silver"
+requires = { necro = 2 }
+cost = { focus = 3, stamina = 8 }
+kind = "instant"
+effects = [{ family = "drain", pool = "hp", amount = 7 }, { family = "stat_mod", target = "self", stat = "mag_def", amount = -2, duration = "duel" }]
+
+[[card]]
+id = 295
+key = "card.hollow_armour"
+set = "covenant"
+rarity = "silver"
+requires = { necro = 2 }
+cost = { focus = 3, stamina = 8 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_def", amount = 4, duration = "duel" }, { family = "damage", target = "self", amount = 6 }]
+
+[[card]]
+id = 296
+key = "card.overclocked_array"
+set = "covenant"
+rarity = "silver"
+requires = { tech = 2 }
+cost = { focus = 3, stamina = 8 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "mag_atk", amount = 3, duration = "duel" }, { family = "stat_mod", target = "self", stat = "phys_atk", amount = 2, duration = "duel" }, { family = "damage", target = "self", amount = 6 }]
+
+[[card]]
+id = 297
+key = "card.armoured_accumulator"
+set = "covenant"
+rarity = "silver"
+requires = { tech = 2 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_def", amount = 3, duration = "duel" }, { family = "stat_mod", target = "self", stat = "stamina_max", amount = 12, duration = "duel" }, { family = "focus", target = "self", amount = -2 }]

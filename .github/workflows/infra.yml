@@ -1,0 +1,54 @@
+name: Infrastructure
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  safety:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with: { persist-credentials: false }
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with: { node-version-file: .nvmrc }
+      - run: rustup toolchain install
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6
+      - name: Build fixture and production images
+        run: |
+          cargo build -p server --locked
+          docker build -t spellgambit-postgres:local -f deploy/postgres/Dockerfile deploy/postgres
+          docker build -t spellgambit-server:local -f deploy/Dockerfile.server .
+          docker run --rm spellgambit-server:local --help
+      - name: Encrypted PITR and ledger proof
+        env: { PITR_SERVER_IMAGE: 'spellgambit-server:local' }
+        run: node scripts/restore-drill.mjs
+      - name: Public proxy and monitoring configuration
+        run: |
+          mkdir -p target/infra/caddy
+          openssl req -x509 -newkey rsa:2048 -nodes -days 1 -subj /CN=fixture.invalid -keyout target/infra/caddy/origin-key.pem -out target/infra/caddy/origin.pem
+          cp deploy/active.example.caddy target/infra/caddy/active.caddy
+          echo 'trusted_proxies static 127.0.0.1/32' >target/infra/caddy/trusted-proxies.caddy
+          docker run --rm --network none -e GAME_DOMAIN=fixture.invalid -v "$PWD/deploy/Caddyfile:/etc/caddy/Caddyfile:ro" -v "$PWD/target/infra/caddy:/etc/caddy/private:ro" caddy:2.11.7-alpine@sha256:d8542f48d34a9cf4e4c11a478865229840e87e4c96ea3f439101f31a5d35f75f caddy validate --config /etc/caddy/Caddyfile
+          docker run --rm --network none -v "$PWD/deploy/monitoring:/etc/prometheus:ro" --entrypoint promtool prom/prometheus:v3.15.0 check config /etc/prometheus/prometheus.yml
+          docker run --rm --network none -v "$PWD/deploy/monitoring/alertmanager.example.yml:/etc/alertmanager/alertmanager.yml:ro" --entrypoint amtool prom/alertmanager:v0.34.1 check-config /etc/alertmanager/alertmanager.yml
+          docker run --rm --network none --read-only -v "$PWD/deploy/monitoring/loki.yml:/etc/loki/config.yml:ro" grafana/loki:3.7.8 -config.file=/etc/loki/config.yml -verify-config=true
+          docker run --rm --network none --read-only -v "$PWD/deploy/monitoring/config.alloy:/etc/alloy/config.alloy:ro" grafana/alloy:v1.20.1 validate /etc/alloy/config.alloy
+          bash -n deploy/release.sh deploy/job.sh deploy/scan-images.sh deploy/restore-s3.sh
+          node e2e/proxy.mjs
+          docker build --target backup-build -t spellgambit-backup-builder:fixture -f deploy/postgres/Dockerfile deploy/postgres
+          docker run --rm --network none --read-only --tmpfs /srv:rw,noexec,nosuid,size=16m -v "$PWD/deploy:/deploy:ro" -v "$PWD/e2e/deploy-files.py:/fixture.py:ro" spellgambit-backup-builder:fixture python3 /fixture.py
+      - name: Runtime vulnerability scan
+        run: bash deploy/scan-images.sh docker:spellgambit-server:local docker:spellgambit-postgres:local
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        if: always()
+        with:
+          name: infrastructure-proof
+          path: |
+            target/f14-restore-drill.json
+            target/f14-proxy-proof.json
+            target/grype/image-*.json
+          retention-days: 14

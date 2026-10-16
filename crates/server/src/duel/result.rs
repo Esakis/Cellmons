@@ -32,7 +32,26 @@ pub fn xp_award(
     won: bool,
     draw: bool,
 ) -> u32 {
-    let rules = &crate::rules::RULES.xp;
+    xp_award_using(
+        &crate::rules::RULES.xp,
+        level,
+        tier,
+        other_level,
+        other_tier,
+        won,
+        draw,
+    )
+}
+/// The same policy calculation is used by settlement and the pacing audit's what-if scenarios.
+pub fn xp_award_using(
+    rules: &crate::rules::Experience,
+    level: u32,
+    tier: i16,
+    other_level: u32,
+    other_tier: i16,
+    won: bool,
+    draw: bool,
+) -> u32 {
     let effective = |level: u32, tier: i16| {
         let index = usize::try_from(tier).unwrap_or(0).min(3);
         level.clamp(1, 20) * rules.tier_mult_pct[index] + rules.tier_add[index] * 100
@@ -40,23 +59,27 @@ pub fn xp_award(
     if !won && !draw {
         return 0;
     }
-    let base = (rules.base * effective(other_level, other_tier) / effective(level, tier))
-        .clamp(rules.min, rules.max);
+    let base = (u64::from(rules.base) * u64::from(effective(other_level, other_tier))
+        / u64::from(effective(level, tier)))
+    .clamp(u64::from(rules.min), u64::from(rules.max)) as u32;
     if draw { base / 2 } else { base }
 }
+/// Shades are valued as Ascent at every reincarnation stage (R-PD-02).
+pub fn xp_tier(template: u16, tier: i16) -> i16 {
+    if engine_content::avatar(template)
+        .is_some_and(|a| a.rarity == engine_content::AvatarRarity::Shade)
+    {
+        3
+    } else {
+        tier
+    }
+}
 pub fn level_for_xp(xp: i32) -> i16 {
-    include_str!("../../../../docs/dane/progi_doswiadczenia.csv")
-        .lines()
-        .skip(1)
-        .take(20)
-        .filter_map(|line| line.split_once(','))
-        .filter_map(|(level, required)| {
-            Some((level.parse::<i16>().ok()?, required.parse::<i32>().ok()?))
-        })
-        .filter(|(_, required)| xp >= *required)
-        .map(|(level, _)| level)
-        .max()
-        .unwrap_or(1)
+    crate::rules::RULES
+        .progression
+        .level_xp
+        .partition_point(|threshold| *threshold <= xp)
+        .clamp(1, 20) as i16
 }
 pub async fn settle(
     db: &PgPool,
@@ -98,14 +121,21 @@ pub async fn settle(
             .await?;
     }
     let mut reward = Rewards::default();
-    let mut tiers = [0i16; 2];
+    let profiles = [record.seats[0].public()?, record.seats[1].public()?];
+    let mut tiers = profiles
+        .each_ref()
+        .map(|p| xp_tier(p.template_id as u16, p.tier as i16));
     let mut verified = [false; 2];
+    let mut mentors = profiles.each_ref().map(|p| p.mentor);
     let mut avatars = [None, None];
     let mut before = [1000; 2];
     for (i, seat) in record.seats.iter().enumerate() {
         if let (Some(user), Some(avatar)) = (seat.user, seat.avatar) {
             let row=sqlx::query!("SELECT a.tier,a.xp,a.level,a.path_id,a.template_id,u.email_verified_at IS NOT NULL AS \"verified!\" FROM avatars a JOIN users u ON u.id=a.user_id WHERE a.id=$1 AND a.user_id=$2 FOR UPDATE OF a",avatar,user).fetch_one(&mut *tx).await?;
-            tiers[i] = row.tier;
+            tiers[i] = xp_tier(
+                u16::try_from(row.template_id).map_err(|_| Error("CONTENT_MISMATCH"))?,
+                row.tier,
+            );
             verified[i] = row.verified;
             avatars[i] = Some((
                 avatar,
@@ -121,13 +151,23 @@ pub async fn settle(
             .await?;
         }
     }
-    let profiles = [record.seats[0].public()?, record.seats[1].public()?];
     let winner = match outcome {
         Outcome::Draw { .. } => 0,
         Outcome::Win { winner, .. } => winner.index() as i16 + 1,
     };
+    for (index, seat) in record.seats.iter().enumerate() {
+        if let Some(user) = seat.user {
+            mentors[index] |=
+                sqlx::query_scalar::<_, bool>("SELECT role='mentor' FROM users WHERE id=$1")
+                    .bind(user)
+                    .fetch_one(&mut *tx)
+                    .await?;
+        }
+    }
+    let mentor_won = winner != 0 && mentors[(winner - 1) as usize];
     let reason = protocol::duel::outcome(outcome, Side::A).reason;
     let rated = ["arena", "tournament"].contains(&record.kind.as_str())
+        && !mentor_won
         && verified.iter().all(|v| *v)
         && record.seats.iter().all(|s| s.user.is_some());
     if rated && winner != 0 {
@@ -165,7 +205,10 @@ pub async fn settle(
                 }
             }
             if normal {
-                if let Some((avatar, xp, level, template)) = avatars[i] {
+                if record.kind != "expedition"
+                    && !mentor_won
+                    && let Some((avatar, xp, level, template)) = avatars[i]
+                {
                     let gained = xp_award(
                         profiles[i].level,
                         tiers[i],
@@ -198,10 +241,18 @@ pub async fn settle(
                 let draws = i32::from(draw);
                 let losses = i32::from(lost);
                 let dc = i32::from(disconnect);
-                sqlx::query!("UPDATE ratings SET rating=$2,games=games+1,wins=wins+$3,draws=draws+$4,losses=losses+$5,disconnects=disconnects+$6,updated_at=now() WHERE user_id=$1",user,reward.rating[i],wins,draws,losses,dc).execute(&mut *tx).await?;
+                if record.kind != "expedition" {
+                    sqlx::query!("UPDATE ratings SET rating=$2,games=games+1,wins=wins+$3,draws=draws+$4,losses=losses+$5,disconnects=disconnects+$6,updated_at=now() WHERE user_id=$1",user,reward.rating[i],wins,draws,losses,dc).execute(&mut *tx).await?;
+                }
                 sqlx::query!("INSERT INTO player_stats(user_id,games,wins,draws,losses,disconnects) VALUES ($1,1,$2,$3,$4,$5) ON CONFLICT(user_id) DO UPDATE SET games=player_stats.games+1,wins=player_stats.wins+$2,draws=player_stats.draws+$3,losses=player_stats.losses+$4,disconnects=player_stats.disconnects+$5",user,wins,draws,losses,dc).execute(&mut *tx).await?;
             }
         }
+    }
+    if record.kind == "expedition" {
+        let award = crate::expeditions::settle_fight(&mut tx, record, winner).await?;
+        reward.xp[0] = award.xp;
+        reward.ducats[0] = award.ducats;
+        reward.unlock[0] = award.template;
     }
     let first = record.seats[0].user.ok_or(Error("INVALID_JOURNAL"))?;
     let first_avatar = record.seats[0].avatar.ok_or(Error("INVALID_JOURNAL"))?;
@@ -271,6 +322,14 @@ mod tests {
     }
     #[test]
     fn experience_rewards_strength_draws_caps_and_level_thresholds() {
+        let mut large = crate::rules::RULES.xp.clone();
+        large.base = u32::MAX;
+        assert_eq!(xp_award_using(&large, 1, 0, 20, 3, true, false), large.max);
+        assert_eq!(xp_tier(1, 0), 0);
+        for tier in 0..=3 {
+            assert_eq!(xp_tier(29, tier), 3);
+            assert_eq!(xp_tier(1058, tier), 3);
+        }
         assert_eq!(xp_award(1, 0, 20, 0, true, false), 300);
         assert_eq!(xp_award(20, 0, 1, 0, true, false), 10);
         assert_eq!(xp_award(10, 0, 10, 3, true, false), 190);

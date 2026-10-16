@@ -16,6 +16,8 @@ pub struct Seat {
     pub gift: Option<u16>,
     pub deck: Vec<u16>,
     pub bot: Option<String>,
+    #[serde(default)]
+    pub bot_profile: Option<engine_ai::BotProfile>,
 }
 impl Seat {
     pub fn player(
@@ -54,6 +56,7 @@ impl Seat {
             gift: setup.avatar.gift,
             deck: setup.deck.to_vec(),
             bot,
+            bot_profile: None,
         }
     }
     pub fn setup(&self) -> Result<PlayerSetup> {

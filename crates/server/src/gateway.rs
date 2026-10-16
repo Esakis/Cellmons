@@ -43,5 +43,19 @@ pub fn router(state: AppState) -> Router {
         .route("/healthz", get(health::healthz))
         .route("/readyz", get(health::readyz))
         .route("/ws", get(crate::online::ws::upgrade))
+        .layer(middleware::from_fn(crate::telemetry::metrics::track))
         .with_state(state)
+}
+
+/// Small protobuf turns must not wait for TCP delayed-ACK/Nagle coalescing.
+pub fn realtime_listener(
+    listener: tokio::net::TcpListener,
+) -> axum::serve::TapIo<tokio::net::TcpListener, fn(&mut tokio::net::TcpStream)> {
+    use axum::serve::ListenerExt as _;
+    fn configure(socket: &mut tokio::net::TcpStream) {
+        if socket.set_nodelay(true).is_err() {
+            tracing::warn!("TCP_NODELAY unavailable");
+        }
+    }
+    listener.tap_io(configure as fn(&mut tokio::net::TcpStream))
 }

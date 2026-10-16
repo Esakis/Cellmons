@@ -1,0 +1,6 @@
+scenario = "lobby"
+connections = 5000
+duels = 0
+room_members = 1000
+chat_per_second = 500
+seconds = 60

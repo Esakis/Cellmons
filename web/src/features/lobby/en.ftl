@@ -21,6 +21,7 @@ lobby-room-arena = Arena
 lobby-room-training = Training
 lobby-room-castle = Castle
 lobby-room-portal = Portal
+lobby-room-expedition = Expedition chat
 lobby-room-bazaar = Bazaar
 lobby-room-shop = Shop
 lobby-room-tower = Tower
@@ -166,3 +167,10 @@ trade-load-error = Could not load your collection and wallet. Reconnect to refre
 trade-operation-error = The operation was not confirmed. Review the current offers and try again.
 
 lobby-error-EMAIL_UNVERIFIED = Verify your email before trading.
+
+lobby-report = Report
+lobby-report-message = Report message from { $login }
+lobby-mentor = Mentor
+lobby-error-MUTED = Your account is muted. See moderation decisions on the account page.
+lobby-error-FILTERED = The message contains a phrase blocked by moderators.
+lobby-error-MAINTENANCE = Maintenance is in progress. New activities are temporarily unavailable.

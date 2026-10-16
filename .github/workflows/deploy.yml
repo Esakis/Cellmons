@@ -1,0 +1,142 @@
+name: Deploy
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      production:
+        description: Deploy to the protected production environment
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: deploy-${{ inputs.production && 'production' || 'staging' }}
+  cancel-in-progress: false
+jobs:
+  gate:
+    if: >-
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_repository.full_name == github.repository) ||
+      (github.event_name == 'workflow_dispatch' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    permissions: { contents: read, actions: read }
+    outputs:
+      sha: ${{ steps.evidence.outputs.sha }}
+    steps:
+      - id: evidence
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+        run: |
+          [[ $SHA =~ ^[0-9a-f]{40}$ ]]
+          for workflow in ci.yml security.yml android.yml infra.yml; do
+            passed=0
+            for ((i=0;i<180;i++)); do
+              status=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/$workflow/runs?head_sha=$SHA&event=push&per_page=5" --jq '.workflow_runs[0].conclusion // "pending"')
+              if [[ $status == success ]]; then passed=1; break; fi
+              if [[ $status != pending ]]; then echo "Required workflow failed: $workflow" >&2; exit 1; fi
+              sleep 10
+            done
+            (( passed == 1 )) || exit 1
+          done
+          echo "sha=$SHA" >>"$GITHUB_OUTPUT"
+  build:
+    needs: gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions: { contents: read, packages: write }
+    outputs:
+      server: ${{ steps.images.outputs.server }}
+      postgres: ${{ steps.images.outputs.postgres }}
+    env:
+      GAME_RELEASE: ${{ needs.gate.outputs.sha }}
+      PUBLIC_RELEASE: '1'
+      LEGAL_CONFIG: target/legal-release.json
+      LEGAL_CONFIG_JSON: ${{ vars.LEGAL_CONFIG_JSON }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with: { ref: '${{ needs.gate.outputs.sha }}', persist-credentials: false }
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with: { node-version-file: .nvmrc }
+      - run: |
+          test -n "$LEGAL_CONFIG_JSON"
+          mkdir -p target
+          printf '%s' "$LEGAL_CONFIG_JSON" >"$LEGAL_CONFIG"
+          pnpm install --frozen-lockfile
+      - uses: ./.github/actions/browser-engine
+      - run: pnpm --filter web build
+      - id: images
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          base="ghcr.io/${GITHUB_REPOSITORY,,}"
+          docker build --build-arg "GAME_RELEASE=$GAME_RELEASE" -t "$base/server:$GAME_RELEASE" -f deploy/Dockerfile.server .
+          docker build -t "$base/postgres:$GAME_RELEASE" -f deploy/postgres/Dockerfile deploy/postgres
+          bash deploy/scan-images.sh "docker:$base/server:$GAME_RELEASE" "docker:$base/postgres:$GAME_RELEASE"
+          printf '%s' "$GH_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          docker push "$base/server:$GAME_RELEASE"
+          docker push "$base/postgres:$GAME_RELEASE"
+          server=$(docker image inspect "$base/server:$GAME_RELEASE" --format '{{index .RepoDigests 0}}')
+          postgres=$(docker image inspect "$base/postgres:$GAME_RELEASE" --format '{{index .RepoDigests 0}}')
+          echo "server=$server" >>"$GITHUB_OUTPUT"
+          echo "postgres=$postgres" >>"$GITHUB_OUTPUT"
+          jq -n --arg commit "$GAME_RELEASE" --arg server "$server" --arg postgres "$postgres" '{commit:$commit,server:$server,postgres:$postgres}' >target/images.json
+          tar -czf target/web.tgz -C web/dist .
+          sha256sum target/web.tgz >target/web.sha256
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: deployment
+          path: |
+            target/web.tgz
+            target/web.sha256
+            target/images.json
+            target/grype/image-*.json
+          retention-days: 14
+      - if: always()
+        run: |
+          docker logout ghcr.io || true
+          rm -f -- "$LEGAL_CONFIG"
+  deploy:
+    needs: [gate, build]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: ${{ inputs.production && 'production' || 'staging' }}
+    permissions: { contents: read, actions: read }
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with: { ref: '${{ needs.gate.outputs.sha }}', persist-credentials: false }
+      - name: Install reviewed release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GAME_SSH_KEY: ${{ runner.temp }}/game-deploy-key
+          GAME_KNOWN_HOSTS: ${{ runner.temp }}/game-known-hosts
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ vars.DEPLOY_KNOWN_HOSTS }}
+          HOST: ${{ vars.DEPLOY_HOST }}
+          SSH_USER: ${{ vars.DEPLOY_USER }}
+          SHA: ${{ needs.gate.outputs.sha }}
+          IMAGE: ${{ needs.build.outputs.server }}
+        run: |
+          [[ $HOST =~ ^[a-zA-Z0-9.-]+$ && $SSH_USER =~ ^[a-z_][a-z0-9_-]*$ && $SHA =~ ^[0-9a-f]{40}$ ]]
+          [[ $IMAGE =~ ^ghcr\.io/[a-z0-9._/-]+@sha256:[0-9a-f]{64}$ ]]
+          test -n "$SSH_KEY" && test -n "$KNOWN_HOSTS"
+          umask 077
+          printf '%s\n' "$SSH_KEY" >"$GAME_SSH_KEY"
+          printf '%s\n' "$KNOWN_HOSTS" >"$GAME_KNOWN_HOSTS"
+          unset SSH_KEY
+          gh run download "$GITHUB_RUN_ID" --repo "$GITHUB_REPOSITORY" --name deployment --dir target
+          sha256sum --check target/web.sha256
+          cat >"$RUNNER_TEMP/game-ssh" <<'SH'
+          #!/bin/sh
+          exec ssh -i "$GAME_SSH_KEY" -o BatchMode=yes -o StrictHostKeyChecking=yes -o "UserKnownHostsFile=$GAME_KNOWN_HOSTS" "$@"
+          SH
+          chmod 700 "$RUNNER_TEMP/game-ssh"
+          rsync -a --exclude private/ --exclude __pycache__/ -e "$RUNNER_TEMP/game-ssh" deploy/ "$SSH_USER@$HOST:/srv/spellgambit/deploy/"
+          "$RUNNER_TEMP/game-ssh" "$SSH_USER@$HOST" "python3 /srv/spellgambit/deploy/install-web.py $SHA" <target/web.tgz
+          "$RUNNER_TEMP/game-ssh" "$SSH_USER@$HOST" "bash /srv/spellgambit/deploy/release.sh $SHA $IMAGE"
+      - if: always()
+        run: rm -f -- "$RUNNER_TEMP/game-deploy-key" "$RUNNER_TEMP/game-known-hosts" "$RUNNER_TEMP/game-ssh"

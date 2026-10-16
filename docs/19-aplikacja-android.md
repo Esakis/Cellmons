@@ -138,7 +138,7 @@ Aplikacja ma dwie warstwy z osobnym cyklem wydań:
   - ikona 512 × 512, grafika promocyjna 1024 × 500, zrzuty ekranu telefonu;
   - deklaracja „bez reklam”;
   - konto testowe dla recenzenta;
-  - możliwość usunięcia konta w aplikacji i przez stronę WWW (mamy `DELETE /api/me` i stronę ustawień konta).
+  - możliwość usunięcia konta w aplikacji i przez stronę WWW (bramka F13: endpoint i interfejs muszą przejść testy przed publikacją; pierwotna dokumentacja błędnie opisywała je jako już istniejące).
 - **Zakupy w aplikacji:** brak (ADR-011). Gdyby kiedyś się pojawiły, wersja z Google Play musi rozliczać treści cyfrowe przez Google Play Billing.
 - **Ryzyko odrzucenia:** zasady Google Play źle oceniają aplikacje, które są tylko opakowaniem strony WWW. Nasza aplikacja zawiera pełną grę offline i funkcje natywne, ale opis w sklepie i recenzja muszą to pokazać (RY-16).
 
@@ -216,3 +216,5 @@ Kroki są w planie (`16-plan-wdrozenia.md`):
 - **F6.2:** dwa sposoby logowania (przeglądarka i aplikacja);
 - **F12A:** pełna aplikacja i test zamknięty;
 - **F14.6:** publikacja w Google Play i APK na stronie.
+
+Aktualizacja implementacji F12A (2026-10-16): [raport 36](36-android-aktualizacje-i-wydania.md). Powłoka i lokalne testy są przygotowane; odbiory na telefonach oraz Play pozostają otwarte.

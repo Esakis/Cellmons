@@ -279,6 +279,32 @@ fn presentation_payload_is_compact_but_version_still_covers_hidden_engine_semant
 }
 
 #[test]
+fn coupled_cards_export_the_threshold_used_by_their_fluent_text() {
+    let fixture = Fixture::new();
+    fixture.replace(
+        "cards/core/combat.toml",
+        "cost = { focus = 2, stamina = 4 }\nkind = \"instant\"",
+        "cost = { focus = 2, stamina = 4 }\ncoupling = { school = \"combat\", level = 2 }\nkind = \"instant\"",
+    );
+    let compiled = build(fixture.path()).unwrap();
+    let payload: serde_json::Value = serde_json::from_str(&content_json(&compiled)).unwrap();
+    assert_eq!(payload["cards"][0]["params"]["level"], 2);
+    for (source, card) in compiled
+        .cards
+        .iter()
+        .zip(payload["cards"].as_array().unwrap())
+    {
+        for variable in content_compiler::compile::card_vars(&source.src) {
+            assert!(
+                card["params"][&variable].is_number(),
+                "{}: {variable}",
+                source.src.key
+            );
+        }
+    }
+}
+
+#[test]
 fn paths_are_complete_validated_profiles_separate_from_collectible_templates() {
     let fixture = Fixture::new();
     let file = fixture.path().join("avatars/basic.toml");

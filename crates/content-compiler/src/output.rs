@@ -97,6 +97,9 @@ pub fn content_json(compiled: &Compiled) -> String {
         if let Some(round) = fields.get("condition").and_then(|c| c.get("round")) {
             params.insert("round".into(), round.clone());
         }
+        if let Some(level) = fields.get("coupling").and_then(|c| c.get("level")) {
+            params.insert("level".into(), level.clone());
+        }
         for (index, effect) in fields["effects"]
             .as_array()
             .expect("effects")

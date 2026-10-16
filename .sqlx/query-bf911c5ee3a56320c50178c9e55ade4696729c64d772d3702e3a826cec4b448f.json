@@ -1,0 +1,268 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT a.id,a.slot,a.template_id,a.path_id,a.specialization,a.gift_id,a.is_shade,a.shade_school,a.level,a.xp,a.tier,a.is_active,a.revision,a.dev_points_unspent,a.dp_phys_atk,a.dp_phys_def,a.dp_mag_atk,a.dp_mag_def,a.dp_hp,a.dp_stamina,COALESCE(d.cards,'{}'::smallint[]) AS \"cards!\",COALESCE(d.revision,0) AS \"deck_revision!\" FROM avatars a LEFT JOIN decks d ON d.avatar_id=a.id WHERE a.user_id=$1 AND a.deleted_at IS NULL ORDER BY a.slot",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "slot",
+        "type_info": "Int2",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "slot"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "template_id",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "template_id"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "path_id",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "path_id"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "specialization",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "specialization"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "gift_id",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "gift_id"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "is_shade",
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "is_shade"
+          }
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "shade_school",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "shade_school"
+          }
+        }
+      },
+      {
+        "ordinal": 8,
+        "name": "level",
+        "type_info": "Int2",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "level"
+          }
+        }
+      },
+      {
+        "ordinal": 9,
+        "name": "xp",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "xp"
+          }
+        }
+      },
+      {
+        "ordinal": 10,
+        "name": "tier",
+        "type_info": "Int2",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "tier"
+          }
+        }
+      },
+      {
+        "ordinal": 11,
+        "name": "is_active",
+        "type_info": "Bool",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "is_active"
+          }
+        }
+      },
+      {
+        "ordinal": 12,
+        "name": "revision",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "revision"
+          }
+        }
+      },
+      {
+        "ordinal": 13,
+        "name": "dev_points_unspent",
+        "type_info": "Int2",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "dev_points_unspent"
+          }
+        }
+      },
+      {
+        "ordinal": 14,
+        "name": "dp_phys_atk",
+        "type_info": "Int2",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "dp_phys_atk"
+          }
+        }
+      },
+      {
+        "ordinal": 15,
+        "name": "dp_phys_def",
+        "type_info": "Int2",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "dp_phys_def"
+          }
+        }
+      },
+      {
+        "ordinal": 16,
+        "name": "dp_mag_atk",
+        "type_info": "Int2",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "dp_mag_atk"
+          }
+        }
+      },
+      {
+        "ordinal": 17,
+        "name": "dp_mag_def",
+        "type_info": "Int2",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "dp_mag_def"
+          }
+        }
+      },
+      {
+        "ordinal": 18,
+        "name": "dp_hp",
+        "type_info": "Int2",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "dp_hp"
+          }
+        }
+      },
+      {
+        "ordinal": 19,
+        "name": "dp_stamina",
+        "type_info": "Int2",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "dp_stamina"
+          }
+        }
+      },
+      {
+        "ordinal": 20,
+        "name": "cards!",
+        "type_info": "Int2Array",
+        "origin": "Expression"
+      },
+      {
+        "ordinal": 21,
+        "name": "deck_revision!",
+        "type_info": "Int4",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid"]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      null,
+      null
+    ]
+  },
+  "hash": "bf911c5ee3a56320c50178c9e55ade4696729c64d772d3702e3a826cec4b448f"
+}

@@ -1,0 +1,19 @@
+android-title = App settings
+android-haptics = Vibrations during duels
+android-awake = Keep the screen on during duels
+android-reminders = Reminder when leaving an ongoing duel
+android-notifications-denied = Notifications are disabled in Android. Enable them in the app’s Android settings if you want reminders.
+android-permission-error = System settings could not be read. Try again.
+android-background-warning = Minimize the game? In an online duel you have 60 seconds to return before losing by disconnection.
+android-background-training = Minimize the game? You can resume local training while the app stays running.
+android-reminder-title = Return to your duel
+android-reminder-body = Your online duel is running. You have up to 60 seconds to return after disconnection.
+android-webview-old = Update Android System WebView before playing.
+android-webview-update = Open Android System WebView page
+android-native-version = App version
+android-worker-error = The game engine could not start. Restart the app.
+android-update-required = This game release requires a newer Android app version.
+android-update-app = Update the app in Google Play
+
+auth-error-VERSION_MISMATCH = Update the app to sign in.
+auth-error-SECURE_STORAGE = The session could not be saved securely on this device. Try signing in again.

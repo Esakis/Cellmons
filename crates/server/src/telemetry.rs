@@ -4,6 +4,7 @@ use anyhow::Context as _;
 use tracing_subscriber::EnvFilter;
 
 use crate::config::{Config, LogFormat};
+pub mod metrics;
 
 pub fn init(config: &Config) -> anyhow::Result<()> {
     let filter = EnvFilter::try_new(&config.log_level)

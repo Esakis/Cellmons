@@ -1,0 +1,397 @@
+# Ordinary enchantments also used as free Ascent gifts. See Z-GFT-2.
+
+[[card]]
+id = 133
+key = "card.chronicle_veil"
+ref = "Aura Czasu"
+set = "relic"
+rarity = "silver"
+requires = { arcane = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "focus", target = "self", amount = 2 }]
+
+[[card]]
+id = 134
+key = "card.grave_halo"
+ref = "Aura Śmierci"
+set = "relic"
+rarity = "silver"
+requires = { necro = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round_end"
+effects = [{ family = "damage", target = "opponent", amount = 2 }]
+
+[[card]]
+id = 135
+key = "card.dawn_embodiment"
+ref = "Awatar"
+set = "relic"
+rarity = "silver"
+requires = { divine = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_def", amount = 1, duration = "while_active" }, { family = "stat_mod", target = "self", stat = "mag_def", amount = 1, duration = "while_active" }, { family = "heal", target = "self", amount = 1 }]
+
+[[card]]
+id = 136
+key = "card.steadfast_blessing"
+ref = "Błogosławieństwo"
+set = "relic"
+rarity = "silver"
+requires = { divine = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "heal", target = "self", amount = 2 }, { family = "stamina", target = "self", amount = 2 }]
+
+[[card]]
+id = 137
+key = "card.essence_road"
+ref = "Droga Esencji"
+set = "relic"
+rarity = "silver"
+requires = { arcane = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "school_mod", target = "self", school = "arcane", amount = 1, duration = "while_active" }, { family = "stamina", target = "self", amount = 1 }]
+
+[[card]]
+id = 138
+key = "card.sword_oath"
+ref = "Droga Miecza"
+set = "relic"
+rarity = "silver"
+requires = { combat = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_atk", amount = 2, duration = "while_active" }, { family = "stamina", target = "self", amount = 1 }]
+
+[[card]]
+id = 139
+key = "card.living_elixir"
+ref = "Elixir Życia"
+set = "relic"
+rarity = "silver"
+requires = { divine = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "heal", target = "self", amount = 3 }]
+
+[[card]]
+id = 140
+key = "card.wild_current"
+ref = "Energia Natury"
+set = "relic"
+rarity = "silver"
+requires = { element = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "stamina", target = "self", amount = 3 }]
+
+[[card]]
+id = 141
+key = "card.calming_regulator"
+ref = "Inhibitor Agresji"
+set = "relic"
+rarity = "silver"
+requires = { tech = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "stat_mod", target = "opponent", stat = "phys_atk", amount = -1, duration = "while_active" }, { family = "stat_mod", target = "opponent", stat = "mag_atk", amount = -1, duration = "while_active" }]
+
+[[card]]
+id = 142
+key = "card.sage_stone"
+ref = "Kamień Filozoficzny"
+set = "relic"
+rarity = "silver"
+requires = { arcane = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "heal", target = "self", amount = 1 }, { family = "focus", target = "self", amount = 1 }]
+
+[[card]]
+id = 143
+key = "card.fury_catalyst"
+ref = "Katalizator Agresji"
+set = "relic"
+rarity = "silver"
+requires = { tech = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_atk", amount = 2, duration = "while_active" }, { family = "stat_mod", target = "self", stat = "mag_atk", amount = 2, duration = "while_active" }, { family = "stamina", target = "self", amount = -1 }]
+
+[[card]]
+id = 144
+key = "card.runic_workshop"
+ref = "Laboratorium"
+set = "relic"
+rarity = "silver"
+requires = { tech = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "focus", target = "self", amount = 1 }, { family = "stamina", target = "self", amount = 2 }]
+
+[[card]]
+id = 145
+key = "card.radiant_scepter"
+ref = "Laska Arcykapłana"
+set = "relic"
+rarity = "silver"
+requires = { divine = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "school_mod", target = "self", school = "divine", amount = 1, duration = "while_active" }, { family = "heal", target = "self", amount = 1 }]
+
+[[card]]
+id = 146
+key = "card.astral_scepter"
+ref = "Laska Arcymaga"
+set = "relic"
+rarity = "silver"
+requires = { arcane = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "school_mod", target = "self", school = "arcane", amount = 1, duration = "while_active" }, { family = "focus", target = "self", amount = 1 }]
+
+[[card]]
+id = 147
+key = "card.verdant_staff"
+ref = "Laska Druida"
+set = "relic"
+rarity = "silver"
+requires = { element = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "school_mod", target = "self", school = "element", amount = 1, duration = "while_active" }, { family = "stamina", target = "self", amount = 2 }]
+
+[[card]]
+id = 148
+key = "card.martial_staff"
+ref = "Laska Mnicha"
+set = "relic"
+rarity = "silver"
+requires = { combat = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "school_mod", target = "self", school = "combat", amount = 1, duration = "while_active" }, { family = "stamina", target = "self", amount = 1 }]
+
+[[card]]
+id = 149
+key = "card.mending_halo"
+ref = "Lecznicza Aura"
+set = "relic"
+rarity = "silver"
+requires = { divine = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round_end"
+effects = [{ family = "heal", target = "self", amount = 2 }, { family = "stamina", target = "self", amount = 1 }]
+
+[[card]]
+id = 150
+key = "card.night_rite"
+ref = "Mroczny Rytuał"
+set = "relic"
+rarity = "silver"
+requires = { necro = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "stat_mod", target = "self", stat = "mag_atk", amount = 2, duration = "while_active" }, { family = "damage", target = "self", amount = 1 }]
+
+[[card]]
+id = 151
+key = "card.ember_rain"
+ref = "Ognisty Deszcz"
+set = "relic"
+rarity = "silver"
+requires = { element = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round_end"
+effects = [{ family = "damage", target = "opponent", amount = 3 }]
+
+[[card]]
+id = 152
+key = "card.lumen_optimizer"
+ref = "Optymalizacja Kapłaństwa"
+set = "relic"
+rarity = "silver"
+requires = { tech = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "school_mod", target = "self", school = "divine", amount = 1, duration = "while_active" }, { family = "stamina", target = "self", amount = 1 }]
+
+[[card]]
+id = 153
+key = "card.patient_commander"
+ref = "Ostrożny Taktyk"
+set = "relic"
+rarity = "silver"
+requires = { combat = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_blocked"
+effects = [{ family = "stamina", target = "self", amount = 2 }]
+
+[[card]]
+id = 154
+key = "card.sable_exchange"
+ref = "Plugawa Wymiana"
+set = "relic"
+rarity = "silver"
+requires = { necro = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "drain", pool = "stamina", amount = 2 }]
+
+[[card]]
+id = 155
+key = "card.aether_field"
+ref = "Pole Esencji"
+set = "relic"
+rarity = "silver"
+requires = { arcane = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "stat_mod", target = "self", stat = "mag_def", amount = 2, duration = "while_active" }, { family = "stamina", target = "self", amount = 1 }]
+
+[[card]]
+id = 156
+key = "card.sable_curse"
+ref = "Przekleństwo"
+set = "relic"
+rarity = "silver"
+requires = { necro = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "stat_mod", target = "opponent", stat = "phys_def", amount = -1, duration = "while_active" }, { family = "stat_mod", target = "opponent", stat = "mag_def", amount = -1, duration = "while_active" }]
+
+[[card]]
+id = 157
+key = "card.dune_mantle"
+ref = "Pustynia"
+set = "relic"
+rarity = "silver"
+requires = { element = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "stamina", target = "opponent", amount = -3 }]
+
+[[card]]
+id = 158
+key = "card.sword_dancer"
+ref = "Tancerz Miecza"
+set = "relic"
+rarity = "silver"
+requires = { combat = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_hit"
+effects = [{ family = "stamina", target = "self", amount = 1 }, { family = "focus", target = "self", amount = 1 }]
+
+[[card]]
+id = 159
+key = "card.temporal_hollow"
+ref = "Temporalna Nicość"
+set = "relic"
+rarity = "silver"
+requires = { arcane = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "focus", target = "opponent", amount = -1 }, { family = "stamina", target = "opponent", amount = -1 }]
+
+[[card]]
+id = 160
+key = "card.blood_chalice"
+ref = "Wampiryzm"
+set = "relic"
+rarity = "silver"
+requires = { necro = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_hit"
+effects = [{ family = "drain", pool = "hp", amount = 1 }]
+
+[[card]]
+id = 161
+key = "card.moonbound_skin"
+ref = "Wilkołactwo"
+set = "relic"
+rarity = "silver"
+requires = { necro = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_atk", amount = 1, duration = "while_active" }, { family = "stat_mod", target = "self", stat = "mag_def", amount = 1, duration = "while_active" }]
+
+[[card]]
+id = 162
+key = "card.aether_amplifier"
+ref = "Wzmacniacz Esencji III"
+set = "relic"
+rarity = "silver"
+requires = { arcane = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "stat_mod", target = "self", stat = "mag_atk", amount = 2, duration = "while_active" }, { family = "stamina", target = "self", amount = 1 }]
+
+[[card]]
+id = 163
+key = "card.foundry_wisdom"
+ref = "Wzmocnienie Technologii"
+set = "relic"
+rarity = "silver"
+requires = { tech = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "school_mod", target = "self", school = "tech", amount = 1, duration = "while_active" }, { family = "stamina", target = "self", amount = 1 }]
+
+[[card]]
+id = 164
+key = "card.dread_idol"
+ref = "Zaklęty Strach"
+set = "relic"
+rarity = "silver"
+requires = { necro = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "stat_mod", target = "opponent", stat = "phys_atk", amount = -2, duration = "while_active" }, { family = "stamina", target = "opponent", amount = -1 }]
+
+[[card]]
+id = 165
+key = "card.primal_heart"
+ref = "Żywioł"
+set = "relic"
+rarity = "silver"
+requires = { element = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_round"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_def", amount = 1, duration = "while_active" }, { family = "stat_mod", target = "self", stat = "mag_atk", amount = 1, duration = "while_active" }]

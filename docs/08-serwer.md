@@ -158,15 +158,11 @@ Aktor wyprawy (jeden na gracza, R-WYP-01…06):
 
 **Docelowy start:** wczytanie konfiguracji → przygotowanie puli bazy i sprawdzenie schematu → odtworzenie pojedynków, turniejów i wypraw → start menedżera botów → otwarcie portu → `/readyz` zwraca 200. W obecnym F6.1 serwer otwiera port także przy niedostępnej bazie, a stan połączenia i schematu pokazuje `/readyz`.
 
-**Wygaszanie** (sygnał `SIGTERM` albo `POST /admin/drain`), używane przy każdym wdrożeniu:
-1. `/readyz` zwraca 503, więc Caddy kieruje nowe połączenia do nowej instancji.
-2. Ogłoszenie w pokojach: „konserwacja za X min” (`ServerNotice`).
-3. Blokada nowych wyzwań, turniejów, wypraw i wymian (`MAINTENANCE`).
-4. Czekanie, aż trwające pojedynki i wymiany się zakończą, maksymalnie `DRAIN_TIMEOUT` (domyślnie 8 min; pojedynek trwa najwyżej ok. 5 × 90 s).
-5. Po upływie limitu: zapis dziennika pozostałych pojedynków (przejmie je nowa instancja), zamknięcie połączeń z kodem „wznów sesję”.
-6. Zamknięcie puli bazy i wyjście.
+**Implementacja F14:** `server drain start|status|idle|cancel` jest poleceniem operatora, nie publicznym endpointem. Wspólna bariera DB blokuje nowe aktywności, ale pozwala kończyć trwające. Gotowość procesu nadal pozwala korzystać z lobby; proxy nie przełącza slotu wyłącznie na podstawie drain.
 
-Szczegóły przełączania instancji: `15-infrastruktura-i-wdrozenie.md`, rozdz. 6.
+`deploy/release.sh` wykonuje migracje expand i sprawdza kandydata, czeka na brak wszystkich aktywności, dopiero wtedy uruchamia nowy slot i przełącza pojedynczy upstream. Po ośmiu minutach odkłada aktualizację. Nie ma wymuszonego przekazywania walk między różnymi silnikami. SIGTERM służy zakończeniu procesu po tej procedurze; awarię procesu obsługuje odtwarzanie zgodnego dziennika z dzierżawą.
+
+Szczegóły i lokalne testy: [raport F14](38-wdrozenie-i-odtwarzanie.md), [instrukcja operatora](../deploy/README.md). Historyczne pomysły na szerszą orkiestrację nie są deklaracją wdrożonych endpointów.
 
 ## 10. Boty sali treningowej
 
@@ -220,7 +216,7 @@ Każda operacja administracyjna trafia do `audit_log` (kto, co, kiedy, przed i p
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM` | F6.2: serwer SMTP z obowiązkowym STARTTLS, konto, hasło i nadawca | port 587; pozostałe wymagane dla SMTP |
 | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET` | F6.2: publiczny/prywatny klucz antyspamu; wymagane poza loopback | wyłączone na loopback |
 | `TRUSTED_PROXY_IPS` | F6.2: adresy IP pośredników, od których można przyjąć `X-Forwarded-For`, rozdzielone przecinkami | puste; nagłówek jest ignorowany |
-| `DRAIN_TIMEOUT_S` | maks. czas wygaszania | 480 |
+| `OPS_LISTEN_ADDR` | oddzielny, prywatny listener metryk | brak (wyłączony) |
 | `FEATURES` | flagi funkcji, np. `trading,tournaments` | wszystkie włączone |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | eksport śladów | puste (wyłączone) |
 | `LOG_LEVEL` | poziom logów (`error`, `warn`, `info`, `debug`, `trace`, `off`), opcjonalnie z poziomami modułów, np. `info,sqlx=warn`; nieznane słowo albo spacja po przecinku zatrzymują start z błędem | `info` |

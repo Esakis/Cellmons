@@ -1,0 +1,4 @@
+scenario = "economy"
+connections = 400
+duels = 0
+seconds = 1

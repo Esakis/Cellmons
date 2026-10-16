@@ -1,0 +1,5 @@
+scenario = "duels"
+connections = 5000
+duels = 2000
+seconds = 300
+think_ms = 2000

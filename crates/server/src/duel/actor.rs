@@ -252,8 +252,13 @@ impl Actor {
                 next.deadline_ms = next
                     .deadline_ms
                     .min(crate::online::now_ms() + self.settings.opponent_ms());
+                let started = Instant::now();
+                let previous_round = state.round();
                 let (new_state, new_events) = self.resolve(&mut next, false).await?;
                 self.persist(next, &new_state).await?;
+                if new_state.round() != previous_round || new_state.is_finished() {
+                    crate::telemetry::metrics::ROUNDS.observe(started.into());
+                }
                 *state = new_state;
                 *events = new_events;
                 Ok(Body::DuelMoveAccepted(pb::DuelMoveAccepted {
@@ -323,7 +328,7 @@ impl Actor {
             let i = side.index();
             if next.pending[i].is_none() {
                 if let Some(bot) = next.seats[i].bot.clone() {
-                    let mv = choose_bot(next, &state, side, bot).await;
+                    let mv = choose_bot(next, &state, side, bot).await?;
                     next.pending[i] = Some(protocol::duel::encode_move(&mv).encode_to_vec());
                     next.deadline_ms = next
                         .deadline_ms
@@ -364,30 +369,74 @@ async fn choose_bot(
     state: &engine::DuelState,
     side: Side,
     id: String,
-) -> engine::Move {
+) -> Result<engine::Move> {
     let fallback = engine::default_move(state, side);
-    let Ok(permit) = AI_SLOTS.try_acquire() else {
-        return fallback;
+    let expedition = record.kind == "expedition";
+    let permit = if expedition {
+        // Rewarded opponents must never become weaker merely because other AI slots are busy.
+        tokio::time::timeout(Duration::from_millis(500), AI_SLOTS.acquire())
+            .await
+            .map_err(|_| Error("AI_BUSY"))?
+            .map_err(|_| Error("AI_BUSY"))?
+    } else {
+        match AI_SLOTS.try_acquire() {
+            Ok(permit) => permit,
+            Err(_) => return Ok(fallback),
+        }
     };
     let view = engine::view(state, side);
     let seed = u64::from_le_bytes(record.seed[..8].try_into().expect("seed"))
         ^ u64::from(state.round())
         ^ side.index() as u64;
+    let history = (record.kind == "expedition").then(|| record.clone());
+    let frozen = record.seats[side.index()].bot_profile.clone();
     let task = tokio::task::spawn_blocking(move || {
         let _permit = permit;
-        let profiles = engine_ai::training_profiles();
-        let Some(profile) = profiles.bots.iter().find(|p| p.id == id) else {
-            return view.default_move();
-        };
+        let profile = frozen.or_else(|| {
+            engine_ai::training_profiles()
+                .bots
+                .into_iter()
+                .find(|p| p.id == id)
+        });
+        let profile = profile?;
         let mut bot = profile.bot(seed);
+        if let Some(history) = history {
+            let content = engine_content::content();
+            if let Ok(setup) = history.setup()
+                && let Ok(mut previous) = engine::new_duel(&setup, &content)
+            {
+                bot.observe(&engine::view(&previous, side));
+                for pair in history.moves {
+                    let [first, second] = pair.each_ref().map(|m| super::record::decode_move(m));
+                    if let (Ok(first), Ok(second)) = (first, second) {
+                        if engine::resolve_round(
+                            &mut previous,
+                            &content,
+                            &[first, second],
+                            &mut engine::EventBuf::new(),
+                        )
+                        .is_err()
+                        {
+                            break;
+                        }
+                        bot.observe(&engine::view(&previous, side));
+                    }
+                }
+            }
+        }
         bot.observe(&view);
-        bot.choose(&view, &engine_content::content())
+        Some(bot.choose(&view, &engine_content::content()))
     });
-    tokio::time::timeout(Duration::from_millis(50), task)
-        .await
-        .ok()
-        .and_then(|r| r.ok())
-        .unwrap_or(fallback)
+    let timeout = if expedition {
+        Duration::from_secs(2)
+    } else {
+        Duration::from_millis(50)
+    };
+    match tokio::time::timeout(timeout, task).await {
+        Ok(Ok(Some(mv))) => Ok(mv),
+        _ if expedition => Err(Error("AI_BUSY")),
+        _ => Ok(fallback),
+    }
 }
 
 pub fn snapshot(
@@ -447,4 +496,61 @@ pub fn replay(record: &Record) -> Result<pb::MatchReplayData> {
         rounds,
         seed: record.seed.to_vec(),
     })
+}
+
+#[cfg(test)]
+mod ai_tests {
+    use super::*;
+    #[tokio::test]
+    async fn rewarded_ai_waits_instead_of_using_a_weaker_default_when_slots_are_full() {
+        let profile = engine_ai::training_profiles().bots[1].clone();
+        let setup = profile.player(1, 0).unwrap();
+        let public = pb::PublicPlayer {
+            template_id: 1,
+            level: 1,
+            ..Default::default()
+        };
+        let seat = super::super::record::Seat::from_setup(
+            None,
+            None,
+            &setup,
+            &public,
+            Some(profile.id.clone()),
+        );
+        let mut record = Record::new(
+            Uuid::now_v7(),
+            "expedition",
+            [seat.clone(), seat],
+            [0; 32],
+            &Settings::default(),
+        )
+        .unwrap();
+        let (state, _) = record.rebuild().unwrap();
+        let _occupied = AI_SLOTS.acquire_many(4).await.unwrap();
+        assert_eq!(
+            choose_bot(&record, &state, Side::B, profile.id.clone())
+                .await
+                .err()
+                .unwrap()
+                .0,
+            "AI_BUSY"
+        );
+        drop(_occupied);
+        let mut archived = profile;
+        archived.id = "retired-profile".into();
+        record.seats[1].bot_profile = Some(archived);
+        let mv = choose_bot(
+            &record,
+            &state,
+            Side::B,
+            "unknown-to-current-content".into(),
+        )
+        .await
+        .unwrap();
+        assert!(
+            engine::view(&state, Side::B)
+                .validate_move(&engine_content::content(), &mv)
+                .is_ok()
+        );
+    }
 }

@@ -1,0 +1,30 @@
+.legal-page {
+  max-width: 80ch;
+  margin: auto;
+  padding: 24px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.legal-page nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.legal-page p,
+.legal-page dd {
+  white-space: pre-wrap;
+}
+.legal-page section {
+  margin-block: 32px;
+}
+.legal-page dd {
+  margin: 0 0 16px;
+}
+.legal-page dt {
+  font-weight: 600;
+}
+.legal-page pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.85rem;
+}

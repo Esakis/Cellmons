@@ -26,6 +26,8 @@ Wydajność jest głównym wymaganiem projektu. Ten dokument określa budżety (
 
 ### 1.2. Sieć
 
+Moduły konta i lobby mają dodatkowy limit implementacyjny 45 KiB Brotli. Turnieje, wyprawy oraz administracja z moderacją mają osobne limity po 20 KiB i nie należą do aplikacji offline. `check-web-budget.mjs` mierzy te zakresy oddzielnie, bez podnoszenia limitu 200 KiB offline. Od F12 kontroluje też **pełny początkowy graf trasy lobby wraz ze wspólnym kodem startowym** (59,3/70 KiB w pełnym przebiegu F12). Katalog 330 kart z tekstami jest ładowany z kolekcją lub walką i nadal w całości należy do pakietu offline (199,4/200 KiB). Sam moduł startowy ma 41,0 KiB, a dodatkowy kod walki wraz z katalogiem 37,6/40 KiB. Historia, wymiana i walka online są ładowane po wejściu w daną funkcję. Te pomiary nie zastępują testów urządzeń, LCP/INP ani obciążenia serwera w F13.
+
 | Miara | Budżet |
 |---|---|
 | `DuelSubmitMove` | ≤ 40 B |
@@ -138,3 +140,9 @@ Test integracyjny `f63_thousand_authenticated_connections_and_binary_pong` utrzy
 Budżet 200 KiB Brotli dotyczy całego pakietu treningu offline bez ilustracji kart. Ekrany konta i lobby wymagają sieci i są osobnymi zasobami na żądanie (limit 45 KiB). Lista `dist/online-assets.json` powstaje z grafu manifestu Vite; współdzielone zależności nadal wliczają się do offline. Service Worker nie zapisuje API, WebSocket ani danych użytkownika. Build kontroluje obie grupy bez podnoszenia limitu 200 KiB.
 
 Wynik po zmianach F6.3–F7.1 i równoległej rozbudowie ekranu treningu: 199,9 / 200 KiB offline, 14,5 / 45 KiB konta/lobby na żądanie. Vite skraca nazwy wynikowe CSS Modules do wspólnego prefiksu pliku i lokalnego indeksu; opisowe nazwy w kodzie pozostają czytelne.
+
+## Weryfikacja F13
+
+Aktualne wyniki i niezaliczone progi znajdują się w [raporcie 37](37-utwardzenie-i-prywatnosc.md). `loadtests/` zawiera konfiguracje wszystkich scenariuszy; narzędzie tworzy i usuwa wyłącznie własną lokalną bazę. Pomiar łączy generator i serwer w jednym procesie, więc nie potwierdza docelowego CPU/RSS ani opóźnienia Internetu.
+
+Workflow `load.yml` przygotowuje codzienny test 500 WS i 100 trwałych walk, ponowne połączenia, kontrolę księgi i bramkę p95 rundy 100 ms. Raport jest zachowywany jako artefakt. To test regresji na współdzielonym runnerze; pełne S1–S6 na wybranym VPS, osobny generator i 24 godziny pomiaru pamięci nadal wymagają wykonania przed odbiorem publicznego startu.

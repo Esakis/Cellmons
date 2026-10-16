@@ -1,6 +1,13 @@
 // Deliberately separate from account APIs and storage; this is only an offline worker input.
 import { accountEpoch } from './account';
-export type LocalPlayer = { avatar: number; level: number; spent: number[]; deck: number[] };
+export type LocalPlayer = {
+  avatar: number;
+  level: number;
+  spent: number[];
+  deck: number[];
+  specialization?: string | null;
+  gift_id?: number | null;
+};
 let player: LocalPlayer | undefined;
 let epoch = -1;
 export function setTrainingPlayer(value: LocalPlayer) {

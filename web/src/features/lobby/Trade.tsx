@@ -295,3 +295,5 @@ export function Trade(props: {
     </section>
   );
 }
+
+import '../../app/cardCatalog';

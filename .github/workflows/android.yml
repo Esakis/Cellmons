@@ -1,0 +1,186 @@
+name: Android
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '17 2 * * *'
+  workflow_dispatch:
+    inputs:
+      release:
+        description: Build protected release artifacts
+        type: boolean
+        default: false
+      version:
+        description: Native version (major.minor.patch)
+        default: '1.0.0'
+      bundle_version:
+        description: Increasing web bundle version
+        default: '1'
+permissions:
+  contents: read
+concurrency:
+  group: android-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+jobs:
+  debug:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    services:
+      postgres:
+        image: postgres:18.6-alpine
+        env:
+          POSTGRES_USER: game
+          POSTGRES_PASSWORD: game
+          POSTGRES_DB: game
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U game -d game"
+          --health-interval 2s --health-timeout 3s --health-retries 30
+    env:
+      E2E_DATABASE_URL: postgres://game:game@127.0.0.1:5432/game
+      VITE_API_ORIGIN: https://10.0.2.2:18443
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with: { persist-credentials: false }
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with: { node-version-file: .nvmrc }
+      - run: pnpm install --frozen-lockfile
+      - uses: ./.github/actions/browser-engine
+      - name: Java 21 and Android SDK
+        run: |
+          echo "JAVA_HOME=$JAVA_HOME_21_X64" >> "$GITHUB_ENV"
+          echo "$JAVA_HOME_21_X64/bin" >> "$GITHUB_PATH"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'platforms;android-36' 'build-tools;36.0.0'
+      - name: Fixture TLS certificate
+        run: |
+          node e2e/android-fixture.mjs
+          echo "WEB_BUNDLE_PUBLIC_KEY=$(cat target/android-fixture/bundle-public.txt)" >> "$GITHUB_ENV"
+          echo 'WEB_BUNDLE_URL=https://10.0.2.2:18443/app-bundles/' >> "$GITHUB_ENV"
+      - name: Build all web assets for Android
+        env:
+          VITE_API_ORIGIN: https://10.0.2.2:18443
+        run: pnpm --filter mobile sync
+      - name: Debug APK, update verification tests and lint
+        env:
+          E2E_TLS_CERT: ${{ github.workspace }}/target/android-fixture/cert.pem
+        run: |
+          chmod +x mobile/android/gradlew
+          mobile/android/gradlew -p mobile/android assembleDebug testDebugUnitTest lintDebug dependencyInventory
+          node scripts/audit-android-deps.mjs
+          node scripts/refresh-android-notices.mjs --check
+          test "$(stat -c%s mobile/android/app/build/outputs/apk/debug/app-debug.apk)" -le 20971520
+      - name: Emulator (nightly or manual)
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        env:
+          E2E_TLS_CERT: ${{ github.workspace }}/target/android-fixture/cert.pem
+          ADB: adb
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'system-images;android-34;google_apis;x86_64'
+          echo no | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd -n spellgambit-ci -k 'system-images;android-34;google_apis;x86_64'
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+          "$ANDROID_HOME/emulator/emulator" -avd spellgambit-ci -no-window -no-audio -no-snapshot -gpu swiftshader -feature -Vulkan >target/emulator.log 2>&1 &
+          adb wait-for-device
+          for i in $(seq 1 90); do test "$(adb shell getprop sys.boot_completed | tr -d '\r')" = 1 && break; sleep 2; done
+          adb shell input keyevent KEYCODE_WAKEUP
+          adb shell wm dismiss-keyguard
+          mobile/android/gradlew -p mobile/android :app:connectedDebugAndroidTest
+          # Instrumentation uninstalls its target on cleanup; install again for WebView tests.
+          mobile/android/gradlew -p mobile/android installDebug
+          node e2e/android-smoke.mjs
+          node e2e/android-online.mjs
+          node e2e/android-privacy.mjs
+          node e2e/android-updates.mjs
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        if: always()
+        with:
+          name: android-debug
+          path: |
+            mobile/android/app/build/outputs/apk/debug/*.apk
+            mobile/android/app/build/reports/
+            target/f12a-android-*.json
+            target/f12a-android-*.png
+          retention-days: 7
+  release:
+    needs: debug
+    if: github.event_name == 'workflow_dispatch' && inputs.release && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: release
+    timeout-minutes: 30
+    env:
+      ANDROID_APPLICATION_ID: ${{ vars.ANDROID_APPLICATION_ID }}
+      ANDROID_VERSION: ${{ inputs.version }}
+      WEB_BUNDLE_VERSION: ${{ inputs.bundle_version }}
+      WEB_BUNDLE_URL: ${{ vars.WEB_BUNDLE_URL }}
+      WEB_BUNDLE_PUBLIC_KEY: ${{ vars.WEB_BUNDLE_PUBLIC_KEY }}
+      VITE_API_ORIGIN: ${{ vars.GAME_API_ORIGIN }}
+      PUBLIC_RELEASE: '1'
+      GAME_RELEASE: ${{ github.sha }}
+      LEGAL_CONFIG_JSON: ${{ vars.LEGAL_CONFIG_JSON }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with: { persist-credentials: false }
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with: { node-version-file: .nvmrc }
+      - run: pnpm install --frozen-lockfile
+      - uses: ./.github/actions/browser-engine
+      - name: Require release configuration
+        run: |
+          test -n "$ANDROID_APPLICATION_ID" && test -n "$WEB_BUNDLE_URL" && test -n "$WEB_BUNDLE_PUBLIC_KEY" && test -n "$VITE_API_ORIGIN"
+          node --input-type=module -e 'import fs from "node:fs";import path from "node:path";if(!process.env.LEGAL_CONFIG_JSON)throw new Error("LEGAL_CONFIG_JSON is required");const file=path.join(process.env.RUNNER_TEMP,"legal.json");fs.writeFileSync(file,JSON.stringify(JSON.parse(process.env.LEGAL_CONFIG_JSON)));fs.appendFileSync(process.env.GITHUB_ENV,`LEGAL_CONFIG=${file}\n`);'
+          echo "JAVA_HOME=$JAVA_HOME_21_X64" >> "$GITHUB_ENV"
+          echo "$JAVA_HOME_21_X64/bin" >> "$GITHUB_PATH"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'platforms;android-36' 'build-tools;36.0.0'
+      - name: Build Android assets
+        run: |
+          chmod +x mobile/android/gradlew
+          pnpm --filter mobile sync
+      - name: Protected signing material
+        env:
+          APP_KEY: ${{ secrets.ANDROID_APP_KEYSTORE_BASE64 }}
+          UPLOAD_KEY: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
+          BUNDLE_KEY: ${{ secrets.WEB_BUNDLE_SIGNING_KEY_PEM }}
+        run: |
+          umask 077
+          printf '%s' "$APP_KEY" | base64 --decode > "$RUNNER_TEMP/app.jks"
+          printf '%s' "$UPLOAD_KEY" | base64 --decode > "$RUNNER_TEMP/upload.jks"
+          printf '%s' "$BUNDLE_KEY" > "$RUNNER_TEMP/bundle.pem"
+      - name: AAB signed by upload key
+        env:
+          ANDROID_KEYSTORE: ${{ runner.temp }}/upload.jks
+          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_STORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
+        run: mobile/android/gradlew -p mobile/android bundleRelease
+      - name: APK signed by app signing key
+        env:
+          ANDROID_KEYSTORE: ${{ runner.temp }}/app.jks
+          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_APP_STORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_APP_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_APP_KEY_PASSWORD }}
+        run: |
+          mobile/android/gradlew -p mobile/android assembleRelease
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose mobile/android/app/build/outputs/apk/release/app-release.apk
+      - name: Signed web bundle and checksums
+        env:
+          WEB_BUNDLE_SIGNING_KEY: ${{ runner.temp }}/bundle.pem
+        run: |
+          export ANDROID_VERSION_CODE=$(node -e 'const [a,b,c]=process.env.ANDROID_VERSION.split(".").map(Number);console.log(a*10000+b*100+c)')
+          node scripts/pack-web-bundle.mjs
+          test "$(cat target/web-bundle/public-key.txt)" = "$WEB_BUNDLE_PUBLIC_KEY"
+          mkdir -p target/android-release
+          cp mobile/android/app/build/outputs/apk/release/*.apk mobile/android/app/build/outputs/bundle/release/*.aab target/android-release/
+          cp -r target/web-bundle target/android-release/
+          node scripts/prepare-download.mjs mobile/android/app/build/outputs/apk/release/app-release.apk
+          cd target/android-release && sha256sum *.apk *.aab web-bundle/*.zip > SHA256SUMS
+      - name: Remove signing files
+        if: always()
+        run: rm -f "$RUNNER_TEMP/app.jks" "$RUNNER_TEMP/upload.jks" "$RUNNER_TEMP/bundle.pem" "$RUNNER_TEMP/legal.json"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: android-release-${{ inputs.version }}
+          path: target/android-release/
+          retention-days: 14

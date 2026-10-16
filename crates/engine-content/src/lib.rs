@@ -75,6 +75,21 @@ pub struct PathDef {
     pub specializations: [engine::Specialization; 2],
     pub gifts: [CardId; 2],
 }
+#[must_use]
+pub fn specialization_key(value: engine::Specialization) -> &'static str {
+    match value {
+        engine::Specialization::Essence => "essence",
+        engine::Specialization::Concentration => "concentration",
+        engine::Specialization::School(s) => match s {
+            School::Combat => "combat",
+            School::Divine => "divine",
+            School::Element => "element",
+            School::Arcane => "arcane",
+            School::Necro => "necro",
+            School::Tech => "tech",
+        },
+    }
+}
 
 impl AvatarDef {
     /// Statystyki i szkoły na poziomie `level` (1–20), bez wydanych punktów rozwoju.
@@ -164,7 +179,7 @@ pub fn card_key(id: CardId) -> Option<&'static str> {
 
 #[cfg(test)]
 mod tests {
-    use super::{AVATARS, AvatarRarity, MAX_LEVEL, STARTERS, avatar, content, rules};
+    use super::{AVATARS, AvatarRarity, MAX_LEVEL, PATHS, STARTERS, avatar, content, rules};
 
     #[test]
     fn generated_content_is_accepted_by_the_engine() {
@@ -187,6 +202,34 @@ mod tests {
             assert_eq!(start, avatar.base);
             let combat = (end.phys_atk + end.phys_def + end.mag_atk + end.mag_def)
                 - (start.phys_atk + start.phys_def + start.mag_atk + start.mag_def);
+            if avatar.rarity == AvatarRarity::Shade {
+                assert_eq!(combat, 0, "{}", avatar.key);
+                assert_eq!(end.hp_max - start.hp_max, 76);
+                assert_eq!(end.stamina_max - start.stamina_max, 76);
+                assert_eq!(
+                    avatar
+                        .dev_points
+                        .iter()
+                        .map(|(_, n)| u16::from(*n))
+                        .sum::<u16>(),
+                    21
+                );
+                let perfection = PATHS
+                    .iter()
+                    .find(|p| p.base_avatar == avatar.id && p.variant == 1)
+                    .unwrap();
+                let (_, final_schools) = perfection.avatar.at_level(MAX_LEVEL);
+                assert_eq!(final_schools.0.iter().filter(|n| **n != 0).count(), 1);
+                assert_eq!(final_schools.0.iter().copied().max(), Some(4));
+                let madness = PATHS
+                    .iter()
+                    .find(|p| p.base_avatar == avatar.id && p.variant == 0)
+                    .unwrap();
+                let (_, mut final_schools) = madness.avatar.at_level(MAX_LEVEL);
+                final_schools.0.sort_unstable();
+                assert_eq!(final_schools.0, [0, 0, 0, 2, 2, 3]);
+                continue;
+            }
             assert!(
                 (14..=20).contains(&combat),
                 "{}: walka +{combat}",
@@ -215,6 +258,66 @@ mod tests {
                 "{}",
                 avatar.key
             );
+        }
+    }
+    #[test]
+    fn each_template_has_two_separate_paths_and_all_gifts_are_active_from_start() {
+        assert_eq!(PATHS.len(), AVATARS.len() * 2);
+        let content = content();
+        for path in PATHS {
+            let base = AVATARS.iter().find(|a| a.id == path.base_avatar).unwrap();
+            for level in [1, MAX_LEVEL] {
+                let (a, _) = base.at_level(level);
+                let (b, _) = path.avatar.at_level(level);
+                assert_eq!(
+                    a.phys_atk + a.phys_def + a.mag_atk + a.mag_def,
+                    b.phys_atk + b.phys_def + b.mag_atk + b.mag_def,
+                    "{}: combat budget",
+                    path.avatar.key
+                );
+                assert_eq!(
+                    a.hp_max + a.stamina_max,
+                    b.hp_max + b.stamina_max,
+                    "{}: resource budget",
+                    path.avatar.key
+                );
+            }
+            assert_eq!(
+                base.dev_points, path.avatar.dev_points,
+                "{}: PR",
+                path.avatar.key
+            );
+            assert!(AVATARS.iter().any(|a| a.id == path.base_avatar));
+            assert!(!AVATARS.iter().any(|a| a.id == path.avatar.id));
+            for gift in path.gifts {
+                let mut own = path.avatar.snapshot(1);
+                own.gift = Some(gift);
+                own.specialization = Some(path.specializations[0]);
+                let opponent = AVATARS[0].snapshot(1);
+                let state = engine::new_duel(
+                    &engine::DuelSetup {
+                        rules: rules(),
+                        seed: [43; 32],
+                        players: [
+                            engine::PlayerSetup {
+                                avatar: own,
+                                deck: Default::default(),
+                            },
+                            engine::PlayerSetup {
+                                avatar: opponent,
+                                deck: Default::default(),
+                            },
+                        ],
+                    },
+                    &content,
+                )
+                .unwrap();
+                assert!(
+                    engine::view(&state, engine::Side::A)
+                        .enchantments
+                        .contains(&(engine::Side::A, gift))
+                );
+            }
         }
     }
 }

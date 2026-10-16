@@ -1,0 +1,15 @@
+.git
+.env
+.env.*
+**/node_modules
+target
+mobile
+**/*.pem
+**/*.jks
+**/*.keystore
+legal/site.json
+deploy/private
+web/src
+web/public
+art
+e2e

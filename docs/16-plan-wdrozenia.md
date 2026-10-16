@@ -4,6 +4,8 @@ Plan prowadzi od pustego repozytorium do publicznego startu. Każdy krok to jede
 
 **Założenia szacunków:** jedna doświadczona osoba na pełen etat. Grafiki tworzy asystent AI w krokach F3.6, F9.5, F10.6 i F12A (ADR-016), a szacunki obejmują czas na przegląd i poprawki z właścicielem. Szacunki są orientacyjne; po fazie F1 trzeba je przeliczyć według rzeczywistego tempa. Przy dwóch osobach fazy klienta (F5, część F8–F11) i aplikacja Android (F12A) mogą iść równolegle z serwerem.
 
+**Stan prac lokalnych (2026-10-16):** implementacja dochodzi do F15, z testami i poprawkami przeglądu. Nie jest to potwierdzenie publicznego startu. Otwarte pozostają testy ludzi, odbiory fizycznego sprzętu, prawne i graficzne, usługi właściciela oraz część budżetów obciążenia. Raporty [F13](37-utwardzenie-i-prywatnosc.md), [F14](38-wdrozenie-i-odtwarzanie.md) i [F15](39-eksploatacja-i-odbior.md) rozdzielają wykonany kod od odbiorów.
+
 ## Kamienie milowe
 
 | Kamień | Co działa | Po fazie | Szacunek (narastająco) |
@@ -179,6 +181,8 @@ flowchart LR
 | F10.5 Kalibracja tempa | parametry Z-XP, Z-REI, Z-EKO | symulowany czas do poz. 20 i reinkarnacji zgodny z celem projektowym |
 | F10.6 Grafiki pełnej treści | ilustracje SVG pozostałych kart, dróg, darów i cieni (`03-tresc-gry.md`, rozdz. 9) | komplet grafik zatwierdzony; wpisy w rejestrze pochodzenia |
 
+**Aktualizacja F10 (2026-10-15).** Przygotowano reinkarnacje, cienie, 31 szablonów, 62 drogi i 330 kart w pięciu edycjach z ilustracjami. Interfejs PL/EN i test dwóch kont obejmuje rozwój oraz trening z darem; raport: [29](29-reinkarnacje-cienie-testy.md), model tempa: [30](30-covenant-i-tempo-rozwoju.md), pełny katalog i przegląd paczek: [31](31-pelny-katalog-330-i-protokol.md). Pełne kontrole kodu przeszły. Audyt L2 i model ekonomii nadal wskazują potrzebę kalibracji F10.5; odbiór grafik F10.6 jest otwarty.
+
 ## F11. Tryby gry (≈ 4–5 tydz.)
 
 | Krok | Zadania | Kryteria akceptacji |
@@ -188,6 +192,8 @@ flowchart LR
 | F11.3 Wyprawy | etapy, wybór przeciwnika, boss, wycofanie, nagrody (R-WYP) | ukończenie każdego poziomu trudności przez bota L3 |
 | F11.4 Klany | zakładanie, role, pokój, ranking (R-KLA) | testy reguł |
 
+**Aktualizacja F11 (2026-10-16).** Zaimplementowano klany ([32](32-klany-testy.md)), turnieje graczy i klanów ([33](33-turnieje-testy.md)) oraz wyprawy ([34](34-wyprawy-testy.md)). Dwa testy 32 botów rozgrywają prawdziwe turnieje i rozliczają całą pulę; L3 ukończył wszystkie trzy trudności wypraw. Klient PL/EN przechodzi test dwóch kont na desktopie i Pixel 5. Pełna kontrola: wszystkie 19 kroków zielone, 86 testów PostgreSQL, 25 Vitest i 24 E2E. Nagrody turniejów systemowych zostają do podłączenia przy F12.1; kolejnym zakresem jest F12.
+
 ## F12. Administracja i fair play (≈ 2 tydz.) → M5
 
 | Krok | Zadania | Kryteria akceptacji |
@@ -196,6 +202,8 @@ flowchart LR
 | F12.2 Moderacja | zgłoszenia, dziennik czatu, filtry słów | test e2e zgłoszenia |
 | F12.3 Wykrywanie nadużyć | „podkładanie się”, wiele kont, anomalie ekonomii (R-FAI-01) | raport na danych z bety |
 | F12.4 Mentorzy | rola i oznaczenie (R-FAI-02) | — |
+
+**Aktualizacja F12 (2026-10-16).** Zaimplementowano panel z IP/rolą/hasłem/TOTP, niezmienny audyt i idempotentne decyzje, blokady/wyciszenia, zgłoszenia i prywatność kontekstu, filtry, ogłoszenia, konserwację, nagrody turniejów systemowych oraz oznaczenie i rozliczenie mentorów. Mechanizm sygnałów nadużyć jest gotowy do ręcznego przeglądu; **raport F12.3 na danych ludzkiej bety pozostaje otwarty**. Pełna kontrola: 19/19 kroków, 419 s, 25 Vitest, 24 Playwright, Lighthouse 100/100/100/100. Nie nadano uprawnień rzeczywistemu kontu ani nie skonfigurowano produkcyjnego klucza/IP. Szczegóły, procedura uruchomienia i granice: [raport 35](35-administracja-i-moderacja.md). Następny zakres implementacji: F12A.
 
 ## F12A. Aplikacja Android (≈ 4 tydz.) → M5A
 
@@ -211,6 +219,8 @@ Szczegóły: `19-aplikacja-android.md`. Logowanie aplikacji powstaje już w F6.2
 | F12A.6 Testy urządzeń | macierz urządzeń, budżety z `19-aplikacja-android.md`, rozdz. 10, raport przedpremierowy Google Play | budżety spełnione, brak błędów krytycznych |
 | F12A.7 Google Play | karta sklepu PL i EN z tytułem „Spellgambit: Arcane Class” i grafikami (ikona, grafika promocyjna, zrzuty ekranu), „Bezpieczeństwo danych”, klasyfikacja IARC, test zamknięty z testerami bety | **M5A:** aplikacja w teście zamkniętym Google Play; testowy APK dostępny dla testerów |
 
+**Aktualizacja F12A (2026-10-16).** Zaimplementowano powłokę, magazyn Keystore, integracje, podpisane paczki Ed25519 z rollbackiem oraz CI debug/release. Testy na emulatorze obejmują gościa offline, prawdziwe logowanie HTTPS/WS i rozłączenia 3/65 s. Lokalne testy podpisanych aktualizacji oraz testowy APK po R8 działają. **M5A pozostaje otwarty:** fizyczne telefony, identyfikator/klucze właściciela, publikacja testu zamkniętego Play i odbiór materiałów nie zostały zastąpione symulacją. Szczegóły: [raport 36](36-android-aktualizacje-i-wydania.md).
+
 ## F13. Utwardzenie (≈ 3 tydz.)
 
 | Krok | Zadania | Kryteria akceptacji |
@@ -220,6 +230,8 @@ Szczegóły: `19-aplikacja-android.md`. Logowanie aplikacji powstaje już w F6.2
 | F13.3 Bezpieczeństwo | przegląd zagrożeń, skan zależności, test penetracyjny podstawowy (ZAP), przegląd uprawnień | brak krytycznych i wysokich problemów |
 | F13.4 Dostępność | WCAG 2.2 AA (axe, klawiatura, czytnik ekranu) | brak błędów krytycznych axe |
 | F13.5 Prawo | regulamin, polityka prywatności, eksport i usuwanie danych, przegląd nazw i grafik, konsultacja prawna | dokumenty opublikowane; zgoda prawnika |
+
+**Aktualizacja F13:** przygotowano rzeczywiste scenariusze obciążenia, poprawki huba/WS, audyty, ZAP, axe, prawo PL/EN, strumieniowy eksport i usuwanie konta z karencją. Wyniki i niezaliczone progi są w [raporcie 37](37-utwardzenie-i-prywatnosc.md). Wznowienia 2500 sesji w pełnych pokojach przekraczają 10 s; 24 h i docelowy VPS pozostają do odbioru. Dokumenty wymagają danych operatora i zatwierdzenia prawnika.
 
 ## F14. Produkcja i start (≈ 2 tydz.) → M6
 
@@ -234,6 +246,8 @@ Szczegóły: `19-aplikacja-android.md`. Logowanie aplikacji powstaje już w F6.2
 
 **Checklista startowa:** kopie zapasowe działają i są przetestowane; alerty skonfigurowane; tryb konserwacji przetestowany; regulamin i polityka prywatności opublikowane; procedury awaryjne spisane (w tym R12 i R13 dla aplikacji); limit rejestracji i ochrona przed botami włączone; klucze podpisu aplikacji mają kopie offline; plan komunikacji z graczami gotowy.
 
+**Aktualizacja F14:** przygotowano i lokalnie sprawdzono obrazy, Caddy, barierę wdrożeń, zgodność wersji, PITR, monitoring i wydania Android. CI przygotowuje stronę APK z SHA-256. Nie uruchomiono prawdziwego VPS/S3 ani publikacji Play; M6 pozostaje otwarty. [Raport 38](38-wdrozenie-i-odtwarzanie.md), [instrukcja](../deploy/README.md).
+
 ## F15. Eksploatacja (ciągle)
 
 - Cotygodniowy przegląd telemetrii: wygrane według postaci i kart, tempo progresji, inflacja Dukatów, czasy ruchów.
@@ -241,6 +255,8 @@ Szczegóły: `19-aplikacja-android.md`. Logowanie aplikacji powstaje już w F6.2
 - Nowe edycje kart co kilka miesięcy (proces z `03-tresc-gry.md`, rozdz. 5.4), z grafikami tworzonymi tak samo jak wcześniej (ADR-016).
 - Aplikacja Android: paczka web z każdym wydaniem, nowa powłoka tylko przy zmianach natywnych, coroczna aktualizacja wymaganego poziomu API Google Play.
 - Opcjonalnie, po decyzji właściciela: płatności bez losowości (ADR-011; w Google Play przez Google Play Billing), logowanie przez zewnętrznych dostawców, wersja iOS (ta sama powłoka Capacitor; wymaga konta Apple Developer i komputera Mac), powiadomienia push.
+
+**Aktualizacja F15:** są polecenia konserwacji i raportu tygodniowego oraz timery, kontrole integralności i procedura kolejnych zmian balansu/treści/Androida. Eksploatacja i opcjonalne produkty wymagają dalszych decyzji po uruchomieniu. [Raport 39](39-eksploatacja-i-odbior.md).
 
 ## Jak pracować z planem
 

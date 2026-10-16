@@ -1,0 +1,56 @@
+auth-login = Logowanie
+auth-register = Rejestracja
+auth-mode-login = Zaloguj się
+auth-mode-register = Utwórz konto
+auth-mode-request = Zresetuj hasło
+auth-mode-verify = Potwierdź e-mail
+auth-mode-reset = Ustaw nowe hasło
+auth-identity = Login lub e-mail
+auth-login-name = Login (3–20 liter, cyfr, _ lub -)
+auth-email = E-mail
+auth-password = Hasło
+auth-password-hint = Od 10 do 128 znaków. Unikaj popularnych haseł.
+auth-school = Szkoła startowa
+auth-school-hint = Otrzymasz postać i zestaw kart tej szkoły. Wybór jest stały.
+auth-token = Kod z linku e-mail
+auth-submit-login = Zaloguj się
+auth-submit-register = Utwórz konto
+auth-submit-request = Wyślij link resetu
+auth-submit-verify = Potwierdź e-mail
+auth-submit-reset = Zapisz nowe hasło
+auth-working = Proszę czekać…
+auth-forgot = Nie pamiętam hasła
+auth-registered = Konto utworzone. Sprawdź e-mail i potwierdź adres. Możesz już się zalogować.
+auth-email-sent = Jeśli adres pasuje do konta wymagającego tej operacji, wysłaliśmy wiadomość. Sprawdź skrzynkę i spam.
+auth-verified = Adres e-mail potwierdzony.
+auth-reset-done = Hasło zmienione. Wszystkie sesje zostały wylogowane. Zaloguj się nowym hasłem.
+auth-confirmed = E-mail potwierdzony
+auth-unconfirmed = E-mail niepotwierdzony
+auth-resend = Ponów link potwierdzenia
+auth-level = Poziom { $level }, PD: { $xp }
+auth-logout = Wyloguj się
+auth-sessions = Aktywne sesje
+auth-current = (ta sesja)
+auth-revoke = Zakończ sesję
+auth-no-account = Bez konta
+auth-guest-description = Graj lokalnie bez rejestracji i logowania. Dane gościa, wybory i postęp są tylko w pamięci przeglądarki. Odświeżenie lub zamknięcie strony je usuwa. Dostępny jest trening offline.
+auth-leave-guest = Przejdź do logowania
+auth-error-UNAUTHENTICATED = Nieprawidłowy login, e-mail lub hasło albo sesja wygasła.
+auth-error-INVALID_INPUT = Sprawdź format pól i wymagania hasła.
+auth-error-IDENTITY_UNAVAILABLE = Ten login lub e-mail jest już zajęty.
+auth-error-INVALID_TOKEN = Link jest nieprawidłowy, wygasł lub został już użyty. Poproś o nowy.
+auth-error-RATE_LIMITED = Za dużo prób. Spróbuj ponownie za { $seconds } s.
+auth-error-SESSION_LIMIT = Osiągnięto limit sesji. Zakończ jedną z aktywnych sesji.
+auth-error-CAPTCHA_REQUIRED = Dokończ sprawdzenie antyspamowe. W razie błędu otwórz rejestrację ponownie.
+auth-error-GUEST_LOCAL = Tryb gościa działa lokalnie. Przejdź do logowania, aby użyć konta.
+auth-error-FORBIDDEN = Żądanie zostało odrzucone. Odśwież stronę i spróbuj ponownie.
+auth-error-TRY_AGAIN = Usługa jest chwilowo zajęta. Spróbuj ponownie.
+auth-error-SERVER_UNAVAILABLE = Nie można połączyć się z serwerem. Tryb gościa i trening offline są nadal dostępne.
+
+
+
+privacy-title = Dane i usunięcie konta
+
+auth-agreement = Akceptuję regulamin. Mam co najmniej 16 lat albo wymaganą zgodę opiekuna.
+auth-error-LEGAL_VERSION = Dokumenty zmieniły się. Odśwież aplikację i przeczytaj regulamin przed rejestracją.
+auth-error-LEGAL_REQUIRED = Potwierdź regulamin i wymaganie dotyczące wieku.

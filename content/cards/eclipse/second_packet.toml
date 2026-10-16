@@ -1,0 +1,346 @@
+# Original Eclipse packet 2
+
+[[card]]
+id = 298
+key = "card.pursuers_mark"
+set = "eclipse"
+rarity = "silver"
+requires = { combat = 2 }
+cost = { focus = 3, stamina = 8 }
+kind = "instant"
+condition = { type = "opponent_exhausted" }
+effects = [{ family = "damage", target = "opponent", amount = 9 }, { family = "stat_mod", target = "self", stat = "phys_atk", amount = 1, duration = "duel" }]
+
+[[card]]
+id = 299
+key = "card.quiet_judgement"
+set = "eclipse"
+rarity = "silver"
+requires = { divine = 2 }
+cost = { focus = 3, stamina = 8 }
+kind = "instant"
+condition = { type = "opponent_exhausted" }
+effects = [{ family = "heal", target = "self", amount = 10 }, { family = "damage", target = "opponent", amount = 3 }]
+
+[[card]]
+id = 300
+key = "card.desiccation_orb"
+set = "eclipse"
+rarity = "silver"
+requires = { element = 2 }
+cost = { focus = 3, stamina = 8 }
+kind = "instant"
+condition = { type = "opponent_exhausted" }
+effects = [{ family = "damage", target = "opponent", amount = 8 }, { family = "stamina", target = "self", amount = 6 }]
+
+[[card]]
+id = 301
+key = "card.empty_page"
+set = "eclipse"
+rarity = "silver"
+requires = { arcane = 2 }
+cost = { focus = 3, stamina = 8 }
+kind = "instant"
+condition = { type = "opponent_exhausted" }
+effects = [{ family = "focus", target = "self", amount = 4 }, { family = "damage", target = "opponent", amount = 4 }]
+
+[[card]]
+id = 302
+key = "card.final_obol"
+set = "eclipse"
+rarity = "silver"
+requires = { necro = 2 }
+cost = { focus = 3, stamina = 8 }
+kind = "instant"
+condition = { type = "opponent_exhausted" }
+effects = [{ family = "drain", pool = "hp", amount = 8 }, { family = "focus", target = "opponent", amount = -1 }]
+
+[[card]]
+id = 303
+key = "card.vacuum_ratchet"
+set = "eclipse"
+rarity = "silver"
+requires = { tech = 2 }
+cost = { focus = 3, stamina = 8 }
+kind = "instant"
+condition = { type = "opponent_exhausted" }
+effects = [{ family = "stamina", target = "self", amount = 14 }, { family = "stat_mod", target = "self", stat = "mag_atk", amount = 2, duration = "round" }]
+
+[[card]]
+id = 304
+key = "card.redacted_order"
+set = "eclipse"
+rarity = "silver"
+requires = { combat = 2 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+effects = [{ family = "hand", target = "opponent", action = "discard_random", count = 1 }, { family = "stat_mod", target = "self", stat = "phys_def", amount = 1, duration = "duel" }]
+
+[[card]]
+id = 305
+key = "card.charitable_leaf"
+set = "eclipse"
+rarity = "silver"
+requires = { divine = 2 }
+cost = { focus = 3, stamina = 9 }
+kind = "instant"
+effects = [{ family = "hand", target = "self", action = "draw", count = 2 }, { family = "heal", target = "self", amount = 2 }]
+
+[[card]]
+id = 306
+key = "card.whirling_folios"
+set = "eclipse"
+rarity = "silver"
+requires = { element = 2 }
+cost = { focus = 3, stamina = 9 }
+kind = "instant"
+effects = [{ family = "hand", target = "self", action = "draw", count = 2 }, { family = "stamina", target = "self", amount = 3 }]
+
+[[card]]
+id = 307
+key = "card.closed_index"
+set = "eclipse"
+rarity = "silver"
+requires = { arcane = 2 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+effects = [{ family = "hand", target = "opponent", action = "discard_random", count = 1 }, { family = "focus", target = "self", amount = 1 }]
+
+[[card]]
+id = 308
+key = "card.testament_ashes"
+set = "eclipse"
+rarity = "silver"
+requires = { necro = 2 }
+cost = { focus = 3, stamina = 11 }
+kind = "instant"
+effects = [{ family = "hand", target = "opponent", action = "discard_random", count = 1 }, { family = "drain", pool = "hp", amount = 2 }]
+
+[[card]]
+id = 309
+key = "card.folding_blueprint"
+set = "eclipse"
+rarity = "silver"
+requires = { tech = 2 }
+cost = { focus = 3, stamina = 8 }
+kind = "instant"
+effects = [{ family = "hand", target = "self", action = "discard_random", count = 2 }, { family = "hand", target = "self", action = "draw", count = 3 }, { family = "stamina", target = "self", amount = 4 }]
+
+[[card]]
+id = 310
+key = "card.iron_twilight"
+set = "eclipse"
+rarity = "silver"
+requires = { combat = 2 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+effects = [{ family = "damage_taken_mult", target = "self", percent = 75, duration = "round" }, { family = "stat_mod", target = "self", stat = "phys_atk", amount = 1, duration = "round" }]
+
+[[card]]
+id = 311
+key = "card.vesper_aegis"
+set = "eclipse"
+rarity = "silver"
+requires = { divine = 2 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+effects = [{ family = "damage_taken_mult", target = "self", percent = 75, duration = "round" }, { family = "heal", target = "self", amount = 3 }]
+
+[[card]]
+id = 312
+key = "card.mist_bastion"
+set = "eclipse"
+rarity = "silver"
+requires = { element = 2 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+effects = [{ family = "damage_taken_mult", target = "self", percent = 75, duration = "round" }, { family = "stamina", target = "self", amount = 4 }]
+
+[[card]]
+id = 313
+key = "card.refracted_hour"
+set = "eclipse"
+rarity = "silver"
+requires = { arcane = 2 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+effects = [{ family = "damage_taken_mult", target = "self", percent = 75, duration = "round" }, { family = "focus", target = "self", amount = 1 }]
+
+[[card]]
+id = 314
+key = "card.grave_screen"
+set = "eclipse"
+rarity = "silver"
+requires = { necro = 2 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+effects = [{ family = "damage_taken_mult", target = "self", percent = 75, duration = "round" }, { family = "damage", target = "opponent", amount = 3 }]
+
+[[card]]
+id = 315
+key = "card.ceramic_shroud"
+set = "eclipse"
+rarity = "silver"
+requires = { tech = 2 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+effects = [{ family = "damage_taken_mult", target = "self", percent = 75, duration = "round" }, { family = "stat_mod", target = "self", stat = "mag_def", amount = 1, duration = "round" }]
+
+[[card]]
+id = 316
+key = "card.commanders_silence"
+set = "eclipse"
+rarity = "gold"
+requires = { combat = 3 }
+cost = { focus = 5, stamina = 16 }
+kind = "instant"
+keywords = ["counter", "intervention"]
+effects = [{ family = "stat_mod", target = "self", stat = "phys_def", amount = 2, duration = "round" }]
+
+[[card]]
+id = 317
+key = "card.sacred_stillness"
+set = "eclipse"
+rarity = "gold"
+requires = { divine = 3 }
+cost = { focus = 5, stamina = 16 }
+kind = "instant"
+keywords = ["counter", "intervention"]
+effects = [{ family = "heal", target = "self", amount = 6 }]
+
+[[card]]
+id = 318
+key = "card.weather_seal"
+set = "eclipse"
+rarity = "gold"
+requires = { element = 3 }
+cost = { focus = 5, stamina = 16 }
+kind = "instant"
+keywords = ["counter", "intervention"]
+effects = [{ family = "stamina", target = "opponent", amount = -7 }]
+
+[[card]]
+id = 319
+key = "card.unwritten_hour"
+set = "eclipse"
+rarity = "gold"
+requires = { arcane = 3 }
+cost = { focus = 5, stamina = 18 }
+kind = "instant"
+keywords = ["counter", "intervention"]
+effects = [{ family = "focus", target = "self", amount = 4 }]
+
+[[card]]
+id = 320
+key = "card.last_requiem"
+set = "eclipse"
+rarity = "gold"
+requires = { necro = 3 }
+cost = { focus = 5, stamina = 16 }
+kind = "instant"
+keywords = ["counter", "intervention"]
+effects = [{ family = "drain", pool = "hp", amount = 4 }]
+
+[[card]]
+id = 321
+key = "card.absolute_interlock"
+set = "eclipse"
+rarity = "gold"
+requires = { tech = 3 }
+cost = { focus = 5, stamina = 18 }
+kind = "instant"
+keywords = ["counter", "intervention"]
+effects = [{ family = "stamina", target = "self", amount = 10 }]
+
+[[card]]
+id = 322
+key = "card.rearguard_signal"
+set = "eclipse"
+rarity = "bronze"
+requires = { combat = 1 }
+cost = { focus = 1, stamina = 5 }
+kind = "instant"
+effects = [{ family = "stat_mod", target = "self", stat = "phys_def", amount = 1, duration = "round" }, { family = "stamina", target = "self", amount = 4 }]
+
+[[card]]
+id = 323
+key = "card.candle_reserve"
+set = "eclipse"
+rarity = "bronze"
+requires = { divine = 1 }
+cost = { focus = 1, stamina = 5 }
+kind = "instant"
+effects = [{ family = "heal", target = "self", amount = 2 }, { family = "stat_mod", target = "self", stat = "mag_def", amount = 1, duration = "round" }]
+
+[[card]]
+id = 324
+key = "card.rain_measure"
+set = "eclipse"
+rarity = "bronze"
+requires = { element = 1 }
+cost = { focus = 1, stamina = 5 }
+kind = "instant"
+effects = [{ family = "stamina", target = "self", amount = 5 }, { family = "stat_mod", target = "self", stat = "mag_atk", amount = 1, duration = "round" }]
+
+[[card]]
+id = 325
+key = "card.fractional_second"
+set = "eclipse"
+rarity = "bronze"
+requires = { arcane = 1 }
+cost = { focus = 1, stamina = 5 }
+kind = "instant"
+effects = [{ family = "focus", target = "self", amount = 1 }, { family = "stat_mod", target = "self", stat = "phys_def", amount = 1, duration = "round" }]
+
+[[card]]
+id = 326
+key = "card.bone_needle"
+set = "eclipse"
+rarity = "bronze"
+requires = { necro = 1 }
+cost = { focus = 1, stamina = 5 }
+kind = "instant"
+effects = [{ family = "damage", target = "opponent", amount = 2 }, { family = "heal", target = "self", amount = 1 }]
+
+[[card]]
+id = 327
+key = "card.spare_spring"
+set = "eclipse"
+rarity = "bronze"
+requires = { tech = 1 }
+cost = { focus = 1, stamina = 5 }
+kind = "instant"
+effects = [{ family = "stamina", target = "self", amount = 4 }, { family = "stat_mod", target = "self", stat = "mag_def", amount = 1, duration = "round" }]
+
+[[card]]
+id = 328
+key = "card.dusk_procession"
+set = "eclipse"
+rarity = "gold"
+requires = { combat = 2, necro = 2 }
+cost = { focus = 4, stamina = 14 }
+kind = "instant"
+condition = { type = "round_at_least", round = 4 }
+effects = [{ family = "drain", pool = "hp", amount = 6 }, { family = "stat_mod", target = "opponent", stat = "phys_def", amount = -2, duration = "duel" }]
+
+[[card]]
+id = 329
+key = "card.last_light"
+set = "eclipse"
+rarity = "gold"
+requires = { divine = 2, element = 2 }
+cost = { focus = 4, stamina = 14 }
+kind = "instant"
+condition = { type = "round_at_least", round = 4 }
+effects = [{ family = "heal", target = "self", amount = 10 }, { family = "stamina", target = "self", amount = 10 }]
+
+[[card]]
+id = 330
+key = "card.terminal_equation"
+set = "eclipse"
+rarity = "gold"
+requires = { arcane = 2, tech = 2 }
+cost = { focus = 4, stamina = 16 }
+kind = "instant"
+condition = { type = "round_at_least", round = 4 }
+effects = [{ family = "damage", target = "opponent", amount = 8 }, { family = "focus", target = "self", amount = 3 }]

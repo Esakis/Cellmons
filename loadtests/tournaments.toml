@@ -1,0 +1,5 @@
+scenario = "tournaments"
+connections = 640
+duels = 0
+tournaments = 10
+seconds = 60

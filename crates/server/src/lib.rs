@@ -1,15 +1,21 @@
 //! Shared server components and database migrations, also used by integration tests.
 pub mod activity;
+pub mod admin;
 pub mod auth;
+pub mod clans;
 pub mod config;
 pub mod db;
 pub mod duel;
 pub mod economy;
+pub mod expeditions;
 pub mod game;
 pub mod gateway;
 pub mod online;
+pub mod operations;
+pub mod progression;
 pub mod rules;
 pub mod store;
 pub mod telemetry;
+pub mod tournaments;
 pub mod trade;
 pub mod unlock;

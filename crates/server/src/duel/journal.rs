@@ -8,8 +8,38 @@ pub async fn create(
     instance: Uuid,
     lease_ms: i64,
 ) -> Result<()> {
+    create_checked(tx, record, instance, lease_ms, None).await
+}
+/// The caller holds the participants' user rows; only this exact activity may start a duel.
+pub async fn create_for_activity(
+    tx: &mut PgConnection,
+    record: &Record,
+    instance: Uuid,
+    lease_ms: i64,
+    kind: &str,
+    activity: Uuid,
+) -> Result<()> {
+    if record.kind != kind || !matches!(kind, "tournament" | "expedition") {
+        return Err(Error("INVALID_MESSAGE"));
+    }
+    create_checked(tx, record, instance, lease_ms, Some((kind, activity))).await
+}
+async fn create_checked(
+    tx: &mut PgConnection,
+    record: &Record,
+    instance: Uuid,
+    lease_ms: i64,
+    activity: Option<(&str, Uuid)>,
+) -> Result<()> {
     for user in record.seats.iter().filter_map(|s| s.user) {
-        crate::activity::ensure_idle(&mut *tx, user).await?;
+        if let Some((kind, owner)) = activity {
+            let allowed: bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM activity_locks WHERE user_id=$1 AND kind=$2 AND owner_id=$3) AND NOT EXISTS(SELECT 1 FROM duel_locks WHERE user_id=$1)").bind(user).bind(kind).bind(owner).fetch_one(&mut *tx).await?;
+            if !allowed {
+                return Err(Error("BUSY"));
+            }
+        } else {
+            crate::activity::ensure_idle(&mut *tx, user).await?;
+        }
     }
     let data = record.bytes()?;
     sqlx::query!("INSERT INTO duel_journal(id,kind,engine_version,content_version,data,owner_instance,lease_until) VALUES ($1,$2,$3,$4,$5,$6,now()+($7::bigint*interval '1 millisecond'))",record.id,record.kind,record.engine_version,&record.content_version[..],data,instance,lease_ms).execute(&mut *tx).await?;
@@ -72,13 +102,15 @@ pub async fn release_lease(db: &PgPool, id: Uuid, instance: Uuid) -> Result<()> 
     Ok(())
 }
 pub async fn recover(db: &PgPool, instance: Uuid, lease_ms: i64) -> Result<Vec<Record>> {
-    let rows=sqlx::query!("UPDATE duel_journal SET owner_instance=$1,lease_until=now()+($2::bigint*interval '1 millisecond') WHERE id IN (SELECT id FROM duel_journal WHERE status='active' AND lease_until<=clock_timestamp() ORDER BY lease_until LIMIT 100 FOR UPDATE SKIP LOCKED) RETURNING id,data",instance,lease_ms).fetch_all(db).await?;
+    // An incompatible worker must never claim a lease belonging to the retained release.
+    let rows=sqlx::query_as::<_, (Uuid, Vec<u8>)>("UPDATE duel_journal SET owner_instance=$1,lease_until=now()+($2::bigint*interval '1 millisecond') WHERE id IN (SELECT id FROM duel_journal WHERE status='active' AND lease_until<=clock_timestamp() AND engine_version=$3 AND content_version=$4 ORDER BY lease_until LIMIT 100 FOR UPDATE SKIP LOCKED) RETURNING id,data")
+        .bind(instance).bind(lease_ms).bind(engine::VERSION).bind(&engine_content::CONTENT_VERSION[..]).fetch_all(db).await?;
     Ok(rows
         .into_iter()
-        .filter_map(|row| match Record::decode(&row.data) {
-            Ok(record) if record.id == row.id => Some(record),
+        .filter_map(|(id, data)| match Record::decode(&data) {
+            Ok(record) if record.id == id => Some(record),
             _ => {
-                tracing::error!(duel=%row.id,"invalid journal requires operator recovery");
+                tracing::error!(duel=%id,"invalid journal requires operator recovery");
                 None
             }
         })

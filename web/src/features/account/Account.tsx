@@ -1,5 +1,5 @@
 import { A, useLocation, useNavigate } from '@solidjs/router';
-import { createEffect, createSignal, For, onCleanup, onMount, Show } from 'solid-js';
+import { createEffect, createSignal, For, lazy, onCleanup, onMount, Show } from 'solid-js';
 import {
   ApiError,
   account,
@@ -12,9 +12,17 @@ import {
   signIn,
   signOut,
 } from '../../app/account';
-import { hasTranslation, t } from '../../i18n';
+import { version as legalVersion } from '../../generated/legal-version.json';
+import { addTranslations, hasTranslation, t } from '../../i18n';
+import en from './en.ftl?raw';
+import pl from './pl.ftl?raw';
+
+addTranslations({ pl, en });
+const Notices = lazy(() => import('../moderation/Notices').then((m) => ({ default: m.Notices })));
+const Privacy = lazy(() => import('../privacy/Privacy').then((m) => ({ default: m.Privacy })));
+
 import { loadCaptcha } from './captcha';
-import './account.css';
+import '../online.css';
 
 type Mode = 'login' | 'register' | 'request' | 'verify' | 'reset';
 type Session = { id: string; kind: string; device: string; current: boolean; last_seen_at: string };
@@ -67,6 +75,9 @@ function Captcha(props: {
 }
 
 export function AccountPage() {
+  const [privacyOpen, setPrivacyOpen] = createSignal(
+    new URLSearchParams(location.hash.split('?')[1] ?? '').get('privacy') === '1',
+  );
   const navigate = useNavigate();
   const route = useLocation();
   const query = new URLSearchParams(location.hash.split('?')[1] ?? '');
@@ -178,6 +189,8 @@ export function AccountPage() {
             school: value('school'),
             client: authClient(),
             captcha_token: captchaToken() || null,
+            terms_version: legalVersion,
+            age_confirmed: data.get('agreement') === 'on',
           });
           setMode('login');
           setNotice(t('auth-registered'));
@@ -212,7 +225,23 @@ export function AccountPage() {
   return (
     <section class="account-page">
       <p class="eyebrow">SPELLGAMBIT</p>
+      <Show when={account()?.kind !== 'guest'}>
+        <Notices />
+      </Show>
       <h1>{t('auth-account')}</h1>
+      <Show when={!isGuest()}>
+        <details
+          open={privacyOpen()}
+          onToggle={(e) => {
+            if (e.currentTarget.open) setPrivacyOpen(true);
+          }}
+        >
+          <summary>{t('privacy-title')}</summary>
+          <Show when={privacyOpen()}>
+            <Privacy />
+          </Show>
+        </details>
+      </Show>
       <Show when={notice()}>
         <p role="status">{notice()}</p>
       </Show>
@@ -238,6 +267,11 @@ export function AccountPage() {
             <A class="button primary" href="/lobby">
               {t('lobby')}
             </A>
+            <Show when={['admin', 'moderator'].includes(user.role)}>
+              <A class="button" href="/admin">
+                {t('administration')}
+              </A>
+            </Show>
             <p>
               {user.email} · {t(user.email_verified ? 'auth-confirmed' : 'auth-unconfirmed')}
             </p>
@@ -360,6 +394,13 @@ export function AccountPage() {
               </select>
             </label>
             <small>{t('auth-school-hint')}</small>
+            <label class="account-agreement">
+              <input type="checkbox" name="agreement" required />
+              {t('auth-agreement')}
+            </label>
+            <p>
+              <A href="/legal">{t('legal')}</A>
+            </p>
             <For each={[captchaEpoch()]}>
               {(_) => (
                 <Captcha

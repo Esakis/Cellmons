@@ -87,6 +87,13 @@ pub struct Offer {
     pub available: bool,
     pub slots: Vec<FrozenSlot>,
 }
+pub(crate) fn reward_slots(kind: &str) -> Result<Vec<FrozenSlot>> {
+    offers()
+        .into_iter()
+        .find(|o| o.id == kind && o.available)
+        .map(|o| o.slots)
+        .ok_or(Error("INVALID_MESSAGE"))
+}
 fn offers() -> Vec<Offer> {
     CONFIG
         .booster

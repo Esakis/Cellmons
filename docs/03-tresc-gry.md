@@ -49,7 +49,7 @@ Pełna tabela: `docs/dane/postacie.csv` (31 szablonów, nazwy oryginalne tylko j
 
 **Nazwy postaci w grze** (od 2026-10-15) to nazwy klas, a nie imiona: Wojownik / Warrior (`dune_wanderer`, Oręż), Kapłan / Priest (`dawn_warden`, Światłość), Druid / Druid (`ember_drake`, Żywioły), Mag / Mage (`star_adept`, Arkana), Nekromantka / Necromancer (`ash_widow`, Nekromancja), Runotechnik / Runesmith (`cogwright`, Runotechnika). Klucze w danych zostają bez zmian.
 
-**Nazwy po reinkarnacji** (do zaprojektowania w F10, decyzja właściciela z 2026-10-15): klasa bazowa łączy się ze szkołą, którą dokłada wybrana droga (3.3), przez przyrostek, np. Wojownik + Nekromancja → „Wojownik Mroku”, Kapłan + Oręż → „Kapłan Bitwy”. Poziom reinkarnacji może dodawać przedrostek (np. „Mistrz”). Pełną listę nazw dróg ustala się razem z danymi dróg.
+**Nazwy po reinkarnacji** (62 własne nazwy PL/EN w `content/avatars/paths.toml`, według decyzji właściciela z 2026-10-15): klasa bazowa łączy się ze szkołą, którą dokłada wybrana droga (3.3), przez przyrostek, np. Wojownik + Nekromancja → „Wojownik Mroku”, Kapłan + Oręż → „Kapłan Bitwy”. Poziom reinkarnacji dodaje osobne oznaczenie (np. „Mistrz”).
 
 Rozrzut statystyk na poz. 1 (bez cieni): AF 2–6, OF 0–4, AM 2–4, OM 0–3, Ż 25–45, W 25–45. Suma czterech statystyk walki: 7–12.
 
@@ -317,7 +317,8 @@ slots = [
 - karta ma listę `effects = [...]` (do 4 efektów wykonywanych po kolei) zamiast jednego `effect`; umagicznienie ma osobne pole `trigger` (`on_round`, `on_hit`, `on_blocked`, `on_damage_taken`, `on_round_end`);
 - `keywords` to `intervention`, `counter` i `random`; sprzężenie ma osobne pole `coupling = { school = "arcane", level = 2 }`, a warunek pole `condition = { type = "round_at_least", round = 3 }` (także `hp_percent_ahead`, `opponent_exhausted`);
 - parametry rodzin są nazwane jak w silniku (`06-silnik-gry.md`, rozdz. 6.4a), np. `{ family = "force_miss", target = "opponent", kind = "phys", first_only = true }`; sloty liczy się od 1; cel `self`, `opponent` albo `both`; czas `duel` (domyślny), `round` albo `while_active` (tylko w umagicznieniach);
-- efekty `custom`, drogi postaci (`paths`), `boosters.toml` i pozostałe pliki z rozdz. 8.1 dojdą w fazach, które ich potrzebują; na razie nieznany klucz jest błędem;
+- drogi są profilami `[[avatar]]` z `path = { base_avatar = 1, variant = 0, specializations = ["element", "combat"], gifts = ["card.acolyte", "card.sword_dancer"] }`; kompilator wymaga obu wariantów każdego szablonu i sprawdza rodzica, specjalizacje oraz dary będące umagicznieniami; klient dostaje osobne `avatars` i `paths`;
+- zestawy w `boosters.toml` są zaimplementowane. Rodzina efektów `custom` nadal nie jest obsługiwana; nieznany klucz jest błędem;
 - teksty mają identyfikatory `card-<nazwa>-name`, `card-<nazwa>-text`, `avatar-<nazwa>-name` i `school-<klucz>-name`, gdzie `<nazwa>` to klucz bez prefiksu. W tekście karty wolno używać `$focus`, `$stamina` oraz liczbowych parametrów efektów: pierwszego bez przyrostka (`$amount`, `$percent`, `$count`, `$slot`, `$round`), kolejnych z przyrostkiem `_2`, `_3`.
 
 ### 8.3. Walidacja (kompilator treści)

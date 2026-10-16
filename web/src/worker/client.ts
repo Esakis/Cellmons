@@ -1,11 +1,6 @@
-import { create, fromBinary, toBinary } from '@bufbuild/protobuf';
 import { trainingPlayer } from '../app/trainingPlayer';
-import {
-  type TrainingReply,
-  TrainingReplySchema,
-  type TrainingRequest,
-  TrainingRequestSchema,
-} from '../generated/proto/game/v1/training_pb';
+import type { TrainingReply, TrainingRequest } from '../generated/proto/game/v1/training_pb';
+import { decodeReply, encodeRequest } from './wire';
 
 export class TrainingClient {
   private worker = new Worker(new URL('./training.worker.ts', import.meta.url), { type: 'module' });
@@ -27,7 +22,7 @@ export class TrainingClient {
         return;
       }
       try {
-        const reply = fromBinary(TrainingReplySchema, new Uint8Array(event.data));
+        const reply = decodeReply(new Uint8Array(event.data));
         const waiting = this.pending.get(reply.seq);
         if (!waiting) return;
         clearTimeout(waiting.timer);
@@ -56,12 +51,14 @@ export class TrainingClient {
               level: player.level,
               spent: player.spent,
               deck: player.deck,
+              specialization: player.specialization ?? '',
+              giftId: player.gift_id ?? 0,
             },
           },
         };
     }
     const seq = ++this.seq;
-    const bytes = toBinary(TrainingRequestSchema, create(TrainingRequestSchema, { seq, body }));
+    const bytes = encodeRequest({ $typeName: 'game.v1.TrainingRequest', seq, body });
     return new Promise<TrainingReply>((resolve, reject) => {
       const timer = setTimeout(() => {
         this.pending.delete(seq);
@@ -69,6 +66,13 @@ export class TrainingClient {
       }, 30_000);
       this.pending.set(seq, { resolve, reject, timer });
       this.worker.postMessage(bytes.buffer, [bytes.buffer]);
+    }).then((reply) => {
+      if (
+        import.meta.env.VITE_PLATFORM === 'android' &&
+        (body.case === 'play' || body.case === 'forfeit')
+      )
+        window.dispatchEvent(new CustomEvent('game-feedback', { detail: reply.events }));
+      return reply;
     });
   }
 

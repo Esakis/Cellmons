@@ -21,7 +21,7 @@ pub enum Client {
     Android,
 }
 impl Client {
-    fn android(&self) -> bool {
+    pub(super) fn android(&self) -> bool {
         matches!(self, Self::Android)
     }
 }
@@ -33,6 +33,8 @@ pub struct Register {
     email: String,
     password: String,
     school: String,
+    terms_version: String,
+    age_confirmed: bool,
     #[serde(default)]
     client: Client,
     captcha_token: Option<String>,
@@ -195,6 +197,12 @@ pub async fn register(
     security::client(&state.auth, &headers, input.client.android())?;
     let ip = security::peer_key(&state.auth, peer.0, &headers);
     state.auth.limit("register", &ip, 5, 3600)?;
+    if input.terms_version != super::LEGAL_VERSION {
+        return Err(Error(StatusCode::BAD_REQUEST, "LEGAL_VERSION", 0));
+    }
+    if !input.age_confirmed {
+        return Err(Error(StatusCode::BAD_REQUEST, "LEGAL_REQUIRED", 0));
+    }
     if !login_allowed(&input.login) || !crypto::password_allowed(&input.password) {
         return Err(Error::bad());
     }
@@ -222,6 +230,11 @@ pub async fn register(
     if inserted.is_none() {
         return Err(Error(StatusCode::CONFLICT, "IDENTITY_UNAVAILABLE", 0));
     }
+    sqlx::query("INSERT INTO account_agreements(user_id,version,age_attested) VALUES($1,$2,true)")
+        .bind(user)
+        .bind(super::LEGAL_VERSION)
+        .execute(&mut *tx)
+        .await?;
     let template = i32::from(starter.avatar);
     sqlx::query!(
         "INSERT INTO unlocked_templates(user_id,template_id,source) VALUES ($1,$2,'start')",
@@ -297,7 +310,7 @@ async fn lock_email_token(
     Ok(row.user_id)
 }
 
-async fn insert_session(
+pub(super) async fn insert_session(
     tx: &mut Transaction<'_, Postgres>,
     state: &AppState,
     user: Uuid,
@@ -362,6 +375,9 @@ pub async fn login(
     let ip = security::peer_key(&state.auth, peer.0, &headers);
     state.auth.limit("login-ip", &ip, 20, 900)?;
     let identity = input.identity.trim().to_lowercase();
+    crate::admin::moderation::expire_ban(&state.db, None, Some(&identity))
+        .await
+        .map_err(|_| Error::busy())?;
     let row = sqlx::query!(
         "SELECT id, password_hash, status FROM users WHERE login=$1::citext OR email=$1::citext",
         identity
@@ -591,7 +607,7 @@ pub async fn rotate(
     }
     state
         .auth
-        .limit("rotate", &crypto::hex(&current.hash), 5, 60)?;
+        .limit("rotate", &current.user.to_string(), 5, 60)?;
     let mut tx = state.db.begin().await?;
     lock_user(&mut tx, current.user).await?;
     let row = sqlx::query!("SELECT id_hash FROM sessions WHERE id_hash=$1 AND kind='app' AND expires_at>now() FOR UPDATE", current.hash).fetch_optional(&mut *tx).await?;
@@ -600,6 +616,15 @@ pub async fn rotate(
     }
     let raw = crypto::token().map_err(|_| Error::busy())?;
     let next = crypto::hash(&raw);
+    // Step-up is bound to the old credential. Revoke it before changing the session primary key.
+    sqlx::query("DELETE FROM admin_sessions WHERE session_hash=$1")
+        .bind(&current.hash)
+        .execute(&mut *tx)
+        .await?;
+    sqlx::query("DELETE FROM ws_tickets WHERE session_hash=$1")
+        .bind(&current.hash)
+        .execute(&mut *tx)
+        .await?;
     sqlx::query!("UPDATE sessions SET id_hash=$2, rotated_at=now(), last_seen_at=now(), expires_at=now()+interval '30 days' WHERE id_hash=$1", current.hash, next).execute(&mut *tx).await?;
     tx.commit().await?;
     state

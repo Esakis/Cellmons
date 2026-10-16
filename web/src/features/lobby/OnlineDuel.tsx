@@ -10,7 +10,7 @@ import {
   Show,
 } from 'solid-js';
 import { avatars, cardArgs, cards, fluentKey, portrait } from '../../app/content';
-import { setDuelActive } from '../../app/session';
+import { setDuelActive, setOnlineDuelActive } from '../../app/session';
 import { Modal } from '../../components/Modal';
 import type {
   DuelEnd,
@@ -106,7 +106,10 @@ export function OnlineDuel(props: {
           ),
         );
     }
-    if (!props.replay) setDuelActive(!finished());
+    if (!props.replay) {
+      setDuelActive(!finished());
+      setOnlineDuelActive(!finished());
+    }
   });
   createEffect(() => {
     const mv = move();
@@ -135,7 +138,10 @@ export function OnlineDuel(props: {
   onCleanup(() => {
     disposed = true;
     generation++;
-    if (!props.replay) setDuelActive(false);
+    if (!props.replay) {
+      setDuelActive(false);
+      setOnlineDuelActive(false);
+    }
   });
   async function submit() {
     setSending(true);
@@ -198,11 +204,15 @@ export function OnlineDuel(props: {
         </Show>
       </div>
       <div class="online-sides">
-        {side(view()?.me, props.snapshot.you?.login ?? '', props.snapshot.you?.templateId ?? 0)}
+        {side(
+          view()?.me,
+          props.snapshot.you?.login ?? '',
+          props.snapshot.you?.pathId || props.snapshot.you?.templateId || 0,
+        )}
         {side(
           view()?.opponent,
           props.snapshot.opponent?.login ?? '',
-          props.snapshot.opponent?.templateId ?? 0,
+          props.snapshot.opponent?.pathId || props.snapshot.opponent?.templateId || 0,
         )}
       </div>
       <Show when={!finished() && !props.replay}>
@@ -385,3 +395,5 @@ export function OnlineDuel(props: {
     </section>
   );
 }
+
+import '../../app/cardCatalog';

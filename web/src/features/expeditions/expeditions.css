@@ -1,0 +1,61 @@
+.expeditions {
+  margin-block: 1rem;
+  padding: 1rem;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow-wrap: anywhere;
+}
+.expeditions fieldset {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-block: 1rem;
+}
+.expeditions button {
+  margin: 0.3rem;
+}
+.exp-difficulty {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 0.6rem;
+  margin-block: 1rem;
+  cursor: pointer;
+}
+.exp-difficulty input {
+  width: 24px;
+  height: 24px;
+  grid-row: span 2;
+}
+.exp-difficulty span {
+  grid-column: 2;
+}
+.exp-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: 0.8rem;
+  margin-block: 1rem;
+}
+.exp-enemy {
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.exp-enemy-lower {
+  border-top: 4px solid #4f9567;
+}
+.exp-enemy-equal {
+  border-top: 4px solid #bdaf44;
+}
+.exp-enemy-higher {
+  border-top: 4px solid #c28143;
+}
+.exp-enemy-danger {
+  border-top: 4px solid #b95455;
+}
+.exp-award {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}

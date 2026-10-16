@@ -17,6 +17,14 @@ test('guest builds a RAM-only collection and tests its deck offline', async ({
   await page.locator('header nav').getByRole('link', { name: 'Collection', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Characters and collection' })).toBeVisible();
   await expect(page.locator('.collection-avatars button')).toHaveCount(1);
+  await expect(page.locator('.collection-cards article')).toHaveCount(24);
+  await page.getByRole('button', { name: 'Show more spells', exact: true }).click();
+  await expect(page.locator('.collection-cards article')).toHaveCount(48);
+  await page.getByRole('searchbox', { name: 'Find spell', exact: true }).fill('Primal Heart');
+  await expect(page.locator('.collection-cards article')).toHaveCount(1);
+  await expect(page.getByRole('heading', { name: 'Primal Heart', exact: true })).toBeVisible();
+  await page.getByRole('searchbox', { name: 'Find spell', exact: true }).fill('');
+  await expect(page.locator('.collection-cards article')).toHaveCount(24);
   await page.getByRole('button', { name: 'Create character', exact: true }).click();
   await expect(page.locator('.collection-avatars button')).toHaveCount(2);
   await page.getByRole('button', { name: 'Activate', exact: true }).click();
@@ -44,6 +52,14 @@ test('guest builds a RAM-only collection and tests its deck offline', async ({
   ).toBeVisible();
   await expect(page.getByRole('link', { name: 'Account', exact: true }).last()).toBeVisible();
   await expect(page.locator('.store-page')).toHaveCount(0);
+  await page.evaluate(() => {
+    location.hash = '#/clans';
+  });
+  await expect(page.getByRole('heading', { name: 'Clans', exact: true })).toBeVisible();
+  await expect(
+    page.getByText('Clans are available to registered accounts while connected to the server.'),
+  ).toBeVisible();
+  await expect(page.locator('.clans-page')).toHaveCount(0);
   await page.locator('header nav').getByRole('link', { name: 'Collection', exact: true }).click();
   await expect(page.getByTestId('offline-status')).toHaveText('Ready to play offline');
   await context.setOffline(true);

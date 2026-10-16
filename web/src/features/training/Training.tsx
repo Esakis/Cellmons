@@ -1,4 +1,3 @@
-import { create } from '@bufbuild/protobuf';
 import { A, useBeforeLeave, useSearchParams } from '@solidjs/router';
 import {
   batch,
@@ -24,19 +23,22 @@ import {
 import { readPreference, writePreference } from '../../app/preferences';
 import { setDuelActive, speed } from '../../app/session';
 import { Modal } from '../../components/Modal';
-import {
-  type DuelEvent,
-  type DuelMove,
-  DuelMoveSchema,
-  type DuelSide,
-  type MovePreview,
-  TrainingForfeitSchema,
-  type TrainingReply,
-  TrainingSetupSchema,
-  type TrainingView,
+import type {
+  DuelEvent,
+  DuelMove,
+  DuelSide,
+  MovePreview,
+  TrainingReply,
+  TrainingView,
 } from '../../generated/proto/game/v1/training_pb';
 import { hasTranslation, t } from '../../i18n';
 import { TrainingClient } from '../../worker/client';
+import {
+  create,
+  DuelMoveSchema,
+  TrainingForfeitSchema,
+  TrainingSetupSchema,
+} from '../../worker/wire';
 import styles from './Training.module.css';
 
 const profiles = ['novice', 'apprentice', 'tactician', 'archmage'];

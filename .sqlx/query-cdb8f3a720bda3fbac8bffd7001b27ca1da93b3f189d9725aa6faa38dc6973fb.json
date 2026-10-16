@@ -1,0 +1,170 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT id,template_id,path_id,tier,specialization,gift_id,level,dp_phys_atk,dp_phys_def,dp_mag_atk,dp_mag_def,dp_hp,dp_stamina FROM avatars WHERE user_id=$1 AND is_active AND deleted_at IS NULL",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Uuid",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "template_id",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "template_id"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "path_id",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "path_id"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "tier",
+        "type_info": "Int2",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "tier"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "specialization",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "specialization"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "gift_id",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "gift_id"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "level",
+        "type_info": "Int2",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "level"
+          }
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "dp_phys_atk",
+        "type_info": "Int2",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "dp_phys_atk"
+          }
+        }
+      },
+      {
+        "ordinal": 8,
+        "name": "dp_phys_def",
+        "type_info": "Int2",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "dp_phys_def"
+          }
+        }
+      },
+      {
+        "ordinal": 9,
+        "name": "dp_mag_atk",
+        "type_info": "Int2",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "dp_mag_atk"
+          }
+        }
+      },
+      {
+        "ordinal": 10,
+        "name": "dp_mag_def",
+        "type_info": "Int2",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "dp_mag_def"
+          }
+        }
+      },
+      {
+        "ordinal": 11,
+        "name": "dp_hp",
+        "type_info": "Int2",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "dp_hp"
+          }
+        }
+      },
+      {
+        "ordinal": 12,
+        "name": "dp_stamina",
+        "type_info": "Int2",
+        "origin": {
+          "Table": {
+            "table": "avatars",
+            "name": "dp_stamina"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid"]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "cdb8f3a720bda3fbac8bffd7001b27ca1da93b3f189d9725aa6faa38dc6973fb"
+}

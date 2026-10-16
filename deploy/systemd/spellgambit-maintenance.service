@@ -1,0 +1,11 @@
+[Unit]
+Description=Spellgambit bounded cleanup and ledger reconciliation
+After=docker.service
+Requires=docker.service
+[Service]
+Type=oneshot
+User=spellgambit
+WorkingDirectory=/srv/spellgambit/deploy
+ExecStart=/srv/spellgambit/deploy/job.sh maintenance
+TimeoutStartSec=12min
+NoNewPrivileges=true

@@ -1,0 +1,23 @@
+discovery.relabel "game_journal" {
+  targets = []
+  rule {
+    source_labels = ["__journal_container_tag"]
+    regex = "spellgambit-game-(blue|green)-[0-9]+"
+    action = "keep"
+  }
+  rule {
+    source_labels = ["__journal_container_tag"]
+    target_label = "slot"
+    regex = "spellgambit-game-(blue|green)-[0-9]+"
+    replacement = "$1"
+  }
+}
+loki.source.journal "game" {
+  max_age = "24h"
+  labels = {job = "game"}
+  relabel_rules = discovery.relabel.game_journal.rules
+  forward_to = [loki.write.local.receiver]
+}
+loki.write "local" {
+  endpoint { url = "http://127.0.0.1:3100/loki/api/v1/push" }
+}

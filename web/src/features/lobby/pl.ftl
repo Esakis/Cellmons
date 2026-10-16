@@ -21,6 +21,7 @@ lobby-room-arena = Arena
 lobby-room-training = Trening
 lobby-room-castle = Zamek
 lobby-room-portal = Portal
+lobby-room-expedition = Czat wypraw
 lobby-room-bazaar = Bazar
 lobby-room-shop = Sklep
 lobby-room-tower = Wieża
@@ -166,3 +167,10 @@ trade-load-error = Nie udało się pobrać kolekcji i portfela. Połącz się po
 trade-operation-error = Operacja nie została potwierdzona. Sprawdź obecne oferty i spróbuj ponownie.
 
 lobby-error-EMAIL_UNVERIFIED = Potwierdź e-mail, aby korzystać z wymiany.
+
+lobby-report = Zgłoś
+lobby-report-message = Zgłoś wiadomość od { $login }
+lobby-mentor = Mentor
+lobby-error-MUTED = Twoje konto jest wyciszone. Powód znajdziesz w decyzjach moderacji na stronie konta.
+lobby-error-FILTERED = Wiadomość zawiera frazę zablokowaną przez moderację.
+lobby-error-MAINTENANCE = Trwa konserwacja. Nowe aktywności są czasowo niedostępne.

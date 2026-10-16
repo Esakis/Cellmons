@@ -54,3 +54,64 @@ arena_win_daily_cap = 10 # Ducats from normal wins, plus the separate first-win 
 rarity_points = [5, 25, 100]
 reward_threshold = 1000
 fallback_ducats = 40
+
+[progression]
+level_xp = [0, 1000, 2000, 3000, 4000, 5000, 6000, 8000, 10000, 12000, 14000, 17000, 20000, 23000, 27000, 31000, 35000, 40000, 45000, 50000]
+reincarnation_xp = 65000
+reincarnation_bonus_dp = [2, 4, 6]
+
+[clan]
+min_members = 5
+max_members = 256
+max_applications = 10
+
+[tournament]
+first_fight_s = 20
+next_fight_s = 15
+ready_grace_s = 90
+registration_hours = 24
+max_players = 256
+max_teams = 64
+max_fee = 1000000
+
+[expedition]
+avatar_chance_bps = 4000
+card_chance_bps = 300
+ducats_chance_bps = 100
+avatar_pool = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]
+
+[[expedition.difficulties]]
+id = "walk"
+stages = 4
+bot = "apprentice"
+boss_bot = "tactician"
+level_min = -3
+level_max = 0
+boss_level = 1
+rarity = "common"
+fixed_ducats = 5
+random_ducats = 10
+
+[[expedition.difficulties]]
+id = "expedition"
+stages = 6
+bot = "tactician"
+boss_bot = "archmage"
+level_min = -1
+level_max = 2
+boss_level = 2
+rarity = "uncommon"
+fixed_ducats = 10
+random_ducats = 25
+
+[[expedition.difficulties]]
+id = "ordeal"
+stages = 8
+bot = "archmage"
+boss_bot = "archmage"
+level_min = 0
+level_max = 3
+boss_level = 3
+rarity = "rare"
+fixed_ducats = 20
+random_ducats = 50

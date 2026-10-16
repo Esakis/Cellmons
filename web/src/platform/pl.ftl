@@ -1,0 +1,19 @@
+android-title = Ustawienia aplikacji
+android-haptics = Wibracje podczas walki
+android-awake = Nie wygaszaj ekranu podczas walki
+android-reminders = Przypomnienie po wyjściu z trwającej walki
+android-notifications-denied = Powiadomienia są wyłączone w systemie. Włącz je w ustawieniach aplikacji Androida, jeśli chcesz otrzymywać przypomnienia.
+android-permission-error = Nie udało się odczytać ustawień systemu. Spróbuj ponownie.
+android-background-warning = Zminimalizować grę? W walce online masz 60 sekund na powrót, zanim przegrasz z powodu rozłączenia.
+android-background-training = Zminimalizować grę? Lokalny trening możesz wznowić, dopóki aplikacja pozostaje uruchomiona.
+android-reminder-title = Wróć do pojedynku
+android-reminder-body = Walka online trwa. Masz do 60 sekund na powrót po rozłączeniu.
+android-webview-old = Zaktualizuj Android System WebView przed grą.
+android-webview-update = Otwórz stronę Android System WebView
+android-native-version = Wersja aplikacji
+android-worker-error = Nie udało się uruchomić silnika gry. Uruchom aplikację ponownie.
+android-update-required = To wydanie gry wymaga nowszej wersji aplikacji Android.
+android-update-app = Zaktualizuj aplikację w Google Play
+
+auth-error-VERSION_MISMATCH = Zaktualizuj aplikację, aby się zalogować.
+auth-error-SECURE_STORAGE = Nie udało się bezpiecznie zapisać sesji w telefonie. Spróbuj zalogować się ponownie.

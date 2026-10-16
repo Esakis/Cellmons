@@ -1,0 +1,63 @@
+groups:
+  - name: spellgambit
+    rules:
+      - alert: GameUnavailable
+        expr: sum(up{job="game"}) == 0
+        for: 2m
+        labels: { severity: critical }
+        annotations: { summary: 'Both game slots unavailable' }
+      - alert: MaintenanceFailed
+        expr: max(operation_success{operation="maintenance"}) == 0
+        for: 5m
+        labels: { severity: critical }
+        annotations: { summary: 'Maintenance or ledger reconciliation failed' }
+      - alert: MaintenanceStale
+        expr: time() - max(operation_last_success_seconds{operation="maintenance"}) > 1800 or absent(operation_last_success_seconds{operation="maintenance"})
+        for: 5m
+        labels: { severity: high }
+        annotations: { summary: 'Maintenance has not succeeded in 30 minutes' }
+      - alert: GameHttpErrors
+        expr: sum(rate(http_responses_total{class="5xx"}[5m])) / clamp_min(sum(rate(http_responses_total[5m])), 0.01) > 0.01
+        for: 5m
+        labels: { severity: high }
+        annotations: { summary: 'HTTP error ratio above one percent' }
+      - alert: SlowRounds
+        expr: histogram_quantile(0.95, sum by(le) (rate(duel_round_latency_seconds_bucket[5m]))) > 0.1
+        for: 15m
+        labels: { severity: high }
+        annotations: { summary: 'Round p95 exceeds 100 ms' }
+      - alert: HostCpu
+        expr: 1 - avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) > 0.6
+        for: 15m
+        labels: { severity: warning }
+        annotations: { summary: 'CPU above 60 percent' }
+      - alert: HostMemory
+        expr: 1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes > 0.8
+        for: 10m
+        labels: { severity: warning }
+        annotations: { summary: 'Memory above 80 percent' }
+      - alert: HostDisk
+        expr: node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs"} / node_filesystem_size_bytes < 0.2
+        for: 10m
+        labels: { severity: high }
+        annotations: { summary: 'Less than 20 percent disk space free' }
+      - alert: DatabasePool
+        expr: db_pool_in_use / clamp_min(db_pool_size,1) > 0.8
+        for: 10m
+        labels: { severity: warning }
+        annotations: { summary: 'Database pool above 80 percent' }
+      - alert: BackupStale
+        expr: time() - game_backup_success_seconds > 93600 or absent(game_backup_success_seconds)
+        for: 5m
+        labels: { severity: high }
+        annotations: { summary: 'No successful daily backup in 26 hours' }
+      - alert: WalArchiveFailed
+        expr: max(wal_archive_failed) == 1
+        for: 5m
+        labels: { severity: high }
+        annotations: { summary: 'WAL archive has failed without a later success' }
+      - alert: DeploymentDrainingTooLong
+        expr: max(deployment_draining) == 1
+        for: 15m
+        labels: { severity: high }
+        annotations: { summary: 'Deployment admission barrier has remained active for 15 minutes' }

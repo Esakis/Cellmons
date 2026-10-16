@@ -1,0 +1,22 @@
+[
+  {
+    "file": "fluent-LICENSE.txt",
+    "source": "https://raw.githubusercontent.com/projectfluent/fluent.js/88582193c29a689241a4f7b2ca7086c802840264/LICENSE",
+    "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "file": "rust-LICENSE-MIT.txt",
+    "source": "https://raw.githubusercontent.com/rust-lang/rust/1.99.0/LICENSE-MIT",
+    "sha256": "b71bd43a069ca0641a9ecfe585ca7b3c53b5cc1608f8b68321168698e28b5ea1"
+  },
+  {
+    "file": "rust-LICENSE-APACHE.txt",
+    "source": "https://raw.githubusercontent.com/rust-lang/rust/1.99.0/LICENSE-APACHE",
+    "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+  },
+  {
+    "file": "musl-COPYRIGHT.txt",
+    "source": "https://git.musl-libc.org/cgit/musl/plain/COPYRIGHT?h=v1.2.5",
+    "sha256": "f9bc4423732350eb0b3f7ed7e91d530298476f8fec0c6c427a1c04ade22655af"
+  }
+]

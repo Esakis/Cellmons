@@ -1,0 +1,90 @@
+---
+# Ubuntu 24.04 LTS. Inventory and public administrator key are supplied by the owner.
+- name: Prepare Spellgambit host
+  hosts: game
+  become: true
+  tasks:
+    - name: Require the chosen host and administrator key
+      ansible.builtin.assert:
+        that:
+          - ansible_distribution == 'Ubuntu'
+          - ansible_distribution_version == '24.04'
+          - owner_ssh_public_key is defined
+          - owner_ssh_public_key is match('ssh-ed25519 .*')
+          - owner_ssh_private_key_file is defined
+    - name: Install host services
+      ansible.builtin.apt:
+        update_cache: true
+        name: [docker.io, docker-compose-v2, nftables, fail2ban, chrony, unattended-upgrades, python3, curl, ca-certificates]
+        state: present
+    - name: Create trusted deployment operator
+      ansible.builtin.user:
+        name: spellgambit
+        groups: docker
+        append: true
+        shell: /bin/bash
+    - name: Create operator SSH directory
+      ansible.builtin.file:
+        path: /home/spellgambit/.ssh
+        state: directory
+        owner: spellgambit
+        group: spellgambit
+        mode: '0700'
+    - name: Install operator public key
+      ansible.builtin.copy:
+        content: "{{ owner_ssh_public_key }}\n"
+        dest: /home/spellgambit/.ssh/authorized_keys
+        owner: spellgambit
+        group: spellgambit
+        mode: '0600'
+    - name: Prepare deployment directory
+      ansible.builtin.file:
+        path: /srv/spellgambit
+        state: directory
+        owner: spellgambit
+        group: spellgambit
+        mode: '0750'
+    - name: Verify new operator access before changing SSH policy
+      ansible.builtin.command:
+        argv: [ssh, -o, BatchMode=yes, -o, StrictHostKeyChecking=yes, -i, '{{ owner_ssh_private_key_file }}', 'spellgambit@{{ ansible_host | default(inventory_hostname) }}', 'true']
+      delegate_to: localhost
+      become: false
+      changed_when: false
+    - name: Disable password SSH and root SSH
+      ansible.builtin.copy:
+        dest: /etc/ssh/sshd_config.d/50-spellgambit.conf
+        content: "PasswordAuthentication no\nKbdInteractiveAuthentication no\nPermitRootLogin no\nX11Forwarding no\nAllowUsers spellgambit\n"
+        mode: '0644'
+        validate: /usr/sbin/sshd -t -f %s
+      notify: Reload SSH
+    - name: Enable security updates
+      ansible.builtin.copy:
+        dest: /etc/apt/apt.conf.d/20auto-upgrades
+        content: "APT::Periodic::Update-Package-Lists \"1\";\nAPT::Periodic::Unattended-Upgrade \"1\";\n"
+        mode: '0644'
+    - name: Prepare persistent journal policy
+      ansible.builtin.file:
+        path: /etc/systemd/journald.conf.d
+        state: directory
+        mode: '0755'
+    - name: Bound persistent game logs
+      ansible.builtin.copy:
+        dest: /etc/systemd/journald.conf.d/50-spellgambit.conf
+        content: "[Journal]\nStorage=persistent\nSystemMaxUse=1G\nMaxRetentionSec=14day\n"
+        mode: '0644'
+      notify: Restart journal
+    - name: Enable services
+      ansible.builtin.service:
+        name: '{{ item }}'
+        enabled: true
+        state: started
+      loop: [docker, fail2ban, chrony]
+  handlers:
+    - name: Restart journal
+      ansible.builtin.service:
+        name: systemd-journald
+        state: restarted
+    - name: Reload SSH
+      ansible.builtin.service:
+        name: ssh
+        state: reloaded

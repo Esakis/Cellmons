@@ -1,6 +1,6 @@
 use super::{
     Settings,
-    hub::{Close, Hub, Output},
+    hub::{Close, Hub, Outbound, Output},
     repo,
 };
 use crate::{
@@ -15,6 +15,7 @@ use axum::{
     http::{HeaderMap, StatusCode, header},
     response::{IntoResponse as _, Response},
 };
+use futures_util::SinkExt as _;
 use protocol::{
     Message as _,
     game::v1::{self as pb, client_message::Body as Client, server_message::Body},
@@ -30,6 +31,10 @@ use tokio::{
     time::{Duration, Instant},
 };
 use uuid::Uuid;
+
+type PendingReply =
+    std::pin::Pin<Box<dyn std::future::Future<Output = (u32, super::Result<Body>)> + Send>>;
+type PendingValidation = std::pin::Pin<Box<dyn std::future::Future<Output = bool> + Send>>;
 
 pub struct Online {
     pub hub: Hub,
@@ -54,6 +59,11 @@ impl Drop for Permit {
     }
 }
 impl Online {
+    pub fn connections(&self) -> usize {
+        self.settings
+            .max_connections
+            .saturating_sub(self.slots.available_permits())
+    }
     pub fn new(db: PgPool, settings: Settings) -> Self {
         Self {
             hub: Hub::new(db, settings.clone()),
@@ -121,6 +131,8 @@ pub async fn upgrade(
         Err(error) => return error.into_response(),
     };
     upgrade
+        .read_buffer_size(16 * 1024)
+        .write_buffer_size(4096)
         .max_message_size(16384)
         .max_frame_size(16384)
         .max_write_buffer_size(512 * 1024)
@@ -129,22 +141,48 @@ pub async fn upgrade(
 }
 
 async fn send(socket: &mut WebSocket, seq: &mut u32, body: Body, reply: u32) -> bool {
+    send_encoded(socket, seq, Output::encode(body), reply).await
+}
+fn envelope(seq: u32, reply: u32, body: &[u8]) -> Vec<u8> {
+    let mut bytes = pb::ServerMessage {
+        seq,
+        reply_to: reply,
+        body: None,
+    }
+    .encode_to_vec();
+    bytes.extend_from_slice(body);
+    bytes
+}
+async fn send_encoded(
+    socket: &mut WebSocket,
+    seq: &mut u32,
+    body: axum::body::Bytes,
+    reply: u32,
+) -> bool {
+    if !queue_encoded(socket, seq, body, reply).await {
+        return false;
+    }
+    tokio::time::timeout(Duration::from_secs(3), socket.flush())
+        .await
+        .is_ok_and(|r| r.is_ok())
+}
+async fn queue_encoded(
+    socket: &mut WebSocket,
+    seq: &mut u32,
+    body: axum::body::Bytes,
+    reply: u32,
+) -> bool {
     let Some(next) = seq.checked_add(1) else {
         return false;
     };
     *seq = next;
-    let bytes = pb::ServerMessage {
-        seq: *seq,
-        reply_to: reply,
-        body: Some(body),
-    }
-    .encode_to_vec();
+    let bytes = envelope(*seq, reply, &body);
     if bytes.len() > 256 * 1024 {
         return false;
     }
     tokio::time::timeout(
         Duration::from_secs(3),
-        socket.send(Message::Binary(bytes.into())),
+        socket.feed(Message::Binary(bytes.into())),
     )
     .await
     .is_ok_and(|result| result.is_ok())
@@ -282,8 +320,34 @@ async fn connection(mut socket: WebSocket, state: AppState, session: Session, _p
     let mut bad = 0;
     let mut tokens = 60000u64;
     let mut refilled = Instant::now();
+    let flush = tokio::time::sleep(Duration::from_secs(3600));
+    tokio::pin!(flush);
+    let mut buffered = false;
+    let mut pending: Option<PendingReply> = None;
+    let mut validation: Option<PendingValidation> = None;
     loop {
         tokio::select! {
+            response = async { pending.as_mut().expect("pending reply").await }, if pending.is_some() => {
+                pending=None;
+                let (reply,result)=response;
+                let body=result.unwrap_or_else(|error|super::error(error.0));
+                if !send(&mut socket,&mut server_seq,body,reply).await {break;}
+                buffered=false;
+            }
+            valid = async { validation.as_mut().expect("pending validation").await }, if validation.is_some() => {
+                validation=None;
+                if !valid {
+                    send(&mut socket,&mut server_seq,super::error("UNAUTHENTICATED"),0).await;
+                    close(&mut socket,1008).await;
+                    break;
+                }
+                if !tokio::time::timeout(Duration::from_secs(3),socket.send(Message::Ping(Vec::new().into()))).await.is_ok_and(|result|result.is_ok()){break;}
+                buffered=false;
+            }
+            _=flush.as_mut(), if buffered=>{
+                if !tokio::time::timeout(Duration::from_secs(3),socket.flush()).await.is_ok_and(|r|r.is_ok()){break;}
+                buffered=false;
+            }
             _ = cancelled.changed() => {
                 let reason = *cancelled.borrow_and_update();
                 match reason {
@@ -295,31 +359,34 @@ async fn connection(mut socket: WebSocket, state: AppState, session: Session, _p
                     }
                     _ => {}
                 }
-                close(&mut socket, if matches!(reason, Some(Close::Replaced)) { 4001 } else { 1008 }).await;
+                close(&mut socket, match reason {Some(Close::Replaced)=>4001,Some(Close::Slow)=>1013,Some(Close::Shutdown)=>1012,_=>1008}).await;
                 break;
             }
             output = rx.recv() => {
                 let Some((body, reply)) = output else { break; };
-                if !send(&mut socket, &mut server_seq, body, reply).await { break; }
+                let sent=match body {
+                    Outbound::Body(body)=>{let sent=send(&mut socket,&mut server_seq,body,reply).await;buffered=false;sent},
+                    Outbound::Encoded(body)=>{
+                        let sent=queue_encoded(&mut socket,&mut server_seq,body,reply).await;
+                        if sent && !buffered {buffered=true;flush.as_mut().reset(Instant::now()+Duration::from_millis(5));}
+                        sent
+                    },
+                };
+                if !sent {break;}
             }
             _ = heartbeat.tick() => {
                 if last_frame.elapsed() >= settings.idle {
                     close(&mut socket, 1001).await;
                     break;
                 }
-                let valid = tokio::time::timeout(
-                    Duration::from_secs(3), repo::session_valid(&state.db, session.user, &session.hash),
-                ).await.is_ok_and(|result| result.unwrap_or(false));
-                if !valid {
-                    send(&mut socket, &mut server_seq, super::error("UNAUTHENTICATED"), 0).await;
-                    close(&mut socket, 1008).await;
-                    break;
+                if validation.is_none() {
+                    let db=state.db.clone();let user=session.user;let hash=session.hash.clone();
+                    validation=Some(Box::pin(async move {
+                        tokio::time::timeout(Duration::from_secs(3),repo::session_valid(&db,user,&hash)).await.is_ok_and(|result|result.unwrap_or(false))
+                    }));
                 }
-                if !tokio::time::timeout(
-                    Duration::from_secs(3), socket.send(Message::Ping(Vec::new().into())),
-                ).await.is_ok_and(|result| result.is_ok()) { break; }
             }
-            message = socket.recv() => {
+            message = socket.recv(), if pending.is_none() => {
                 let Some(Ok(message)) = message else { break; };
                 last_frame = Instant::now();
                 let elapsed = refilled.elapsed().as_millis().min(2000) as u64;
@@ -355,15 +422,35 @@ async fn connection(mut socket: WebSocket, state: AppState, session: Session, _p
                     }
                 };
                 last_seq = request.seq;
-                let body = if let Some(body) = request.body {
-                    match state.online.hub.apply(session.user, id, body).await {
-                        Ok(body) => body,
-                        Err(error) => super::error(error.0),
-                    }
-                } else { super::ok() };
-                if !send(&mut socket, &mut server_seq, body, request.seq).await { break; }
+                let hub=state.online.hub.clone();let user=session.user;
+                pending=Some(Box::pin(async move {
+                    let result=if let Some(body)=request.body { hub.apply(user,id,body).await } else {Ok(super::ok())};
+                    (request.seq,result)
+                }));
             }
         }
     }
     state.online.hub.detach(session.user, id);
+}
+
+#[cfg(test)]
+mod broadcast_tests {
+    use super::*;
+    #[test]
+    fn shared_body_preserves_each_receivers_sequence_and_correlation() {
+        let body = Body::ChatMessage(pb::ChatMessage {
+            text: "Zażółć <script>".into(),
+            ..Default::default()
+        });
+        let encoded = Output::encode(body.clone());
+        for seq in [1, 127, 128, 65536, u32::MAX] {
+            for reply in [0, 31, u32::MAX] {
+                let decoded =
+                    pb::ServerMessage::decode(envelope(seq, reply, &encoded).as_slice()).unwrap();
+                assert_eq!(decoded.seq, seq);
+                assert_eq!(decoded.reply_to, reply);
+                assert_eq!(decoded.body, Some(body.clone()));
+            }
+        }
+    }
 }

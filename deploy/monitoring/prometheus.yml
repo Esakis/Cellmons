@@ -1,0 +1,15 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+rule_files: [/etc/prometheus/alerts.yml]
+alerting:
+  alertmanagers:
+    - static_configs: [{ targets: ['127.0.0.1:9093'] }]
+scrape_configs:
+  - job_name: game
+    static_configs:
+      - targets: ['127.0.0.1:19091', '127.0.0.1:19092']
+    # Only the active slot is expected to be online; alerts aggregate both slots.
+  - job_name: host
+    static_configs:
+      - targets: ['127.0.0.1:9100']

@@ -1,7 +1,18 @@
 import { A } from '@solidjs/router';
-import { createEffect, createMemo, createSignal, For, onCleanup, onMount, Show } from 'solid-js';
+import {
+  createEffect,
+  createMemo,
+  createSignal,
+  For,
+  lazy,
+  onCleanup,
+  onMount,
+  Show,
+} from 'solid-js';
 import { account, restoreAccount } from '../../app/account';
 import { avatars, portrait } from '../../app/content';
+import { setActivityBusy } from '../../app/session';
+import '../../app/pathCatalog';
 import type {
   ChallengeReceived,
   ChatMessage,
@@ -14,21 +25,33 @@ import { type ClientBody, OnlineClient, type ServerBody, type Status } from '../
 import { parseCommand } from '../../net/commands';
 import en from './en.ftl?raw';
 import pl from './pl.ftl?raw';
-import './lobby.css';
+import '../online.css';
 import type { DuelEnd, DuelSnapshot } from '../../generated/proto/game/v1/online_duel_pb';
 import type { TradeSnapshot } from '../../generated/proto/game/v1/trade_pb';
-import { OnlineDuel } from './OnlineDuel';
-import { OnlineRecords } from './OnlineRecords';
-import { Trade } from './Trade';
+
+const OnlineDuel = lazy(() => import('./OnlineDuel').then((m) => ({ default: m.OnlineDuel })));
+const OnlineRecords = lazy(() =>
+  import('./OnlineRecords').then((m) => ({ default: m.OnlineRecords })),
+);
+const Trade = lazy(() => import('./Trade').then((m) => ({ default: m.Trade })));
 
 addTranslations({ pl, en });
 const rooms = ['arena', 'training', 'castle', 'portal', 'bazaar', 'shop', 'tower'];
+const Tournaments = lazy(() =>
+  import('../tournaments/Tournaments').then((module) => ({ default: module.Tournaments })),
+);
+const Expeditions = lazy(() =>
+  import('../expeditions/Expeditions').then((module) => ({ default: module.Expeditions })),
+);
+const Report = lazy(() => import('../moderation/Report').then((m) => ({ default: m.Report })));
+const Notices = lazy(() => import('../moderation/Notices').then((m) => ({ default: m.Notices })));
 
 export function Lobby() {
   const client = new OnlineClient();
   const [status, setStatus] = createSignal<Status>('connecting');
   const [me, setMe] = createSignal<PublicPlayer>();
   const [room, setRoom] = createSignal('');
+  const [roomMotd, setRoomMotd] = createSignal('');
   const [players, setPlayers] = createSignal<PublicPlayer[]>([]);
   const [messages, setMessages] = createSignal<ChatMessage[]>([]);
   const [social, setSocial] = createSignal<SocialSnapshot>();
@@ -38,6 +61,11 @@ export function Lobby() {
   const [error, setError] = createSignal('');
   const [notice, setNotice] = createSignal('');
   const [help, setHelp] = createSignal(false);
+  const [report, setReport] = createSignal<{
+    kind: 'chat' | 'player';
+    target: string;
+    label: string;
+  }>();
   const [tab, setTab] = createSignal<'map' | 'social' | 'mail' | 'ranking' | 'history'>('map');
   const [sort, setSort] = createSignal('login');
   const [mail, setMail] = createSignal<MailEntry[]>([]);
@@ -53,6 +81,10 @@ export function Lobby() {
   let disposed = false;
   let chatLog: HTMLDivElement | undefined;
   const connected = () => status() === 'connected';
+  createEffect(() => {
+    const profile = me();
+    if (profile) setActivityBusy(profile.busy);
+  });
   const sorted = createMemo(() =>
     [...players()].sort((a, b) =>
       sort() === 'login'
@@ -84,6 +116,7 @@ export function Lobby() {
         setMe(body.value.profile);
         offset = Number(body.value.serverTimeMs) - Date.now();
         setRoom('');
+        setRoomMotd('');
         setPlayers([]);
         setMessages([]);
         setOffers([]);
@@ -125,6 +158,7 @@ export function Lobby() {
         break;
       case 'roomSnapshot':
         setRoom(body.value.room);
+        setRoomMotd(body.value.motd);
         setPlayers(body.value.players);
         setMessages(body.value.messages);
         if (body.value.room === 'training')
@@ -348,19 +382,19 @@ export function Lobby() {
           />
         )}
       </Show>
-      <Show when={me()} keyed>
+      <Show when={me()}>
         {(self) => (
           <>
             <div class="lobby-toolbar">
-              <strong>{self.login}</strong>
+              <strong>{self().login}</strong>
               <span>
-                {t('lobby-level', { level: self.level })} · {self.rating} RP
+                {t('lobby-level', { level: self().level })} · {self().rating} RP
               </span>
               <label>
                 {t('lobby-challenges')}
                 <select
                   aria-label={t('lobby-challenges')}
-                  value={self.challengeFilter}
+                  value={self().challengeFilter}
                   disabled={!connected()}
                   onChange={async (e) => {
                     const filter = e.currentTarget.value;
@@ -381,21 +415,21 @@ export function Lobby() {
               <button
                 type="button"
                 disabled={!connected()}
-                aria-pressed={self.afk}
+                aria-pressed={self().afk}
                 onClick={async () => {
                   if (
                     await send({
                       case: 'setAfk',
-                      value: { $typeName: 'game.v1.SetAfk', afk: !self.afk },
+                      value: { $typeName: 'game.v1.SetAfk', afk: !self().afk },
                     })
                   )
                     setMe((p) => (p ? { ...p, afk: !p.afk } : p));
                 }}
               >
-                AFK {self.afk ? '✓' : ''}
+                AFK {self().afk ? '✓' : ''}
               </button>
             </div>
-            <Show when={!self.verified}>
+            <Show when={!self().verified}>
               <p class="lobby-hint">{t('lobby-unverified')}</p>
             </Show>
             <div class="lobby-layout">
@@ -418,7 +452,7 @@ export function Lobby() {
                 </nav>
                 <Show when={tab() === 'map'}>
                   <section class="lobby-map" aria-label={t('lobby-tab-map')}>
-                    <For each={self.clanId ? [...rooms, `clan:${self.clanId}`] : rooms}>
+                    <For each={self().clanId ? [...rooms, `clan:${self().clanId}`] : rooms}>
                       {(name) => (
                         <button
                           type="button"
@@ -448,6 +482,31 @@ export function Lobby() {
                 </Show>
                 <Show when={room() === 'shop'}>
                   <A href="/store">{t('store')}</A>
+                </Show>
+                <Show when={room() === 'castle' && tab() === 'map'}>
+                  <div hidden={Boolean(duel() || trade())}>
+                    <Tournaments
+                      send={send}
+                      connected={connected()}
+                      avatar={self().avatarId}
+                      active={!duel() && !trade()}
+                    />
+                  </div>
+                </Show>
+                <Show when={room() === 'tower' || self().clanId}>
+                  <A href="/clans">{t('clans')}</A>
+                </Show>
+                <Show when={room() === 'portal' || room() === 'expedition'}>
+                  <div hidden={Boolean(duel() || trade())}>
+                    <Expeditions
+                      avatar={self().avatarId}
+                      verified={self().verified}
+                      active={!duel() && !trade()}
+                      connected={connected()}
+                      room={room()}
+                      send={send}
+                    />
+                  </div>
                 </Show>
                 <Show when={room() === 'training' && tab() === 'map'}>
                   <section class="lobby-panel">
@@ -597,6 +656,10 @@ export function Lobby() {
                   </div>
                 </Show>
                 <section class="lobby-chat">
+                  <Notices bulletin />
+                  <Show when={roomMotd()}>
+                    <p class="lobby-notice">{roomMotd()}</p>
+                  </Show>
                   <div class="lobby-chat-heading">
                     <h2>
                       {room()
@@ -650,6 +713,20 @@ export function Lobby() {
                             <small> [{t(`lobby-channel-${m.channel}`)}]</small>
                           </Show>
                           : <span>{m.text}</span>
+                          <button
+                            type="button"
+                            class="quiet"
+                            aria-label={t('lobby-report-message', { login: m.fromLogin })}
+                            onClick={() =>
+                              setReport({
+                                kind: 'chat',
+                                target: m.id,
+                                label: `${m.fromLogin}: ${m.text}`,
+                              })
+                            }
+                          >
+                            {t('lobby-report')}
+                          </button>
                         </p>
                       )}
                     </For>
@@ -693,17 +770,28 @@ export function Lobby() {
                     <For each={sorted()}>
                       {(p) => (
                         <li>
-                          <button type="button" onClick={() => setSelected(p)}>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              void send({
+                                case: 'whoIs',
+                                value: { $typeName: 'game.v1.PlayerTarget', player: p.login },
+                              })
+                            }
+                          >
                             <span>
-                              {p.login} {p.afk ? '☾' : ''} {p.busy ? '⚔' : ''}
+                              {p.login} {p.mentor ? ` · ${t('lobby-mentor')}` : ''}{' '}
+                              {p.afk ? '☾' : ''} {p.busy ? '⚔' : ''}
                             </span>
                             <small>
                               {t('lobby-level', { level: p.level })} · {p.rating} RP
                             </small>
                             <small>
                               {t(`lobby-${p.title}`)} ·{' '}
-                              {avatars.get(p.templateId)
-                                ? t(`${avatars.get(p.templateId)?.key.replace('.', '-')}-name`)
+                              {avatars.get(p.pathId || p.templateId)
+                                ? t(
+                                    `${avatars.get(p.pathId || p.templateId)?.key.replace('.', '-')}-name`,
+                                  )
                                 : '—'}
                             </small>
                           </button>
@@ -723,12 +811,25 @@ export function Lobby() {
                       >
                         ×
                       </button>
-                      <Show when={avatars.get(p.templateId)}>
+                      <Show when={avatars.get(p.pathId || p.templateId)}>
                         {(avatar) => (
                           <img width="80" height="80" alt="" src={portrait(avatar().key)} />
                         )}
                       </Show>
                       <h2>{p.login}</h2>
+                      <Show when={p.mentor}>
+                        <p>{t('lobby-mentor')}</p>
+                      </Show>
+                      <Show when={p.id !== self().id}>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setReport({ kind: 'player', target: p.id, label: p.login })
+                          }
+                        >
+                          {t('lobby-report')}
+                        </button>
+                      </Show>
                       <p>
                         {t('lobby-level', { level: p.level })} · {p.rating} RP · #{p.rank || '—'}
                       </p>
@@ -749,12 +850,12 @@ export function Lobby() {
                           )}
                         </For>
                       </dl>
-                      <Show when={p.id !== self.id}>
+                      <Show when={p.id !== self().id}>
                         <div class="lobby-actions">
                           <button
                             type="button"
                             disabled={
-                              !connected() || room() !== 'arena' || p.busy || self.busy || p.afk
+                              !connected() || room() !== 'arena' || p.busy || self().busy || p.afk
                             }
                             onClick={() =>
                               void send({
@@ -780,9 +881,9 @@ export function Lobby() {
                               !connected() ||
                               room() !== 'bazaar' ||
                               !p.verified ||
-                              !self.verified ||
+                              !self().verified ||
                               p.busy ||
-                              self.busy ||
+                              self().busy ||
                               p.afk
                             }
                             onClick={() =>
@@ -823,7 +924,7 @@ export function Lobby() {
                       <Show when={offer.from} keyed>
                         {(p) => (
                           <>
-                            <Show when={avatars.get(p.templateId)}>
+                            <Show when={avatars.get(p.pathId || p.templateId)}>
                               {(avatar) => (
                                 <img width="64" height="64" alt="" src={portrait(avatar().key)} />
                               )}
@@ -849,7 +950,7 @@ export function Lobby() {
                       </Show>
                       <p>{Math.max(0, Math.ceil((Number(offer.expiresAtMs) - now()) / 1000))} s</p>
                       <Show
-                        when={offer.to?.id === self.id}
+                        when={offer.to?.id === self().id}
                         fallback={
                           <button
                             type="button"
@@ -908,6 +1009,9 @@ export function Lobby() {
             </div>
           </>
         )}
+      </Show>
+      <Show when={report()}>
+        {(value) => <Report {...value()} close={() => setReport(undefined)} />}
       </Show>
     </section>
   );

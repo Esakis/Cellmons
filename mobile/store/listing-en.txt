@@ -1,0 +1,15 @@
+Spellgambit: Arcane Class
+
+Short description:
+Turn-based card duels, offline training and magic in your hands.
+
+Full description:
+Plan three attacks, choose your defenses and decide when to cast a spell. In Spellgambit: Arcane Class, a small change of plan can turn a five-round duel around.
+
+Explore hundreds of cards, schools of magic and character development paths. Train against bots without an internet connection, or create an account for online duels, clans, tournaments, expeditions and card trading.
+
+Try guest mode without registration. Guest data and progress stay in the app’s memory and disappear when the game closes or reloads. An online account keeps your collection and character progress on the server.
+
+There are no advertisements or purchases with real money. Earn Dukats by playing. Check card pack contents and odds before opening a pack.
+
+Configure vibrations, keep the screen on during duels and opt into reminders about an ongoing duel. Notifications are optional. Online play requires internet access; bot training works offline.

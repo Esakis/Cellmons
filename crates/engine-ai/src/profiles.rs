@@ -1,11 +1,11 @@
 //! Profile treningowe są wspólne dla serwera i klienta WASM.
 
 use engine::{CardKind, Effect, PlayerSetup};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{Bot, Level};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Archetype {
     Balanced,
@@ -14,7 +14,7 @@ pub enum Archetype {
     Enchantment,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct BotProfile {
     pub id: String,

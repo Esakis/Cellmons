@@ -1,5 +1,5 @@
 import { A, useBeforeLeave } from '@solidjs/router';
-import { createEffect, createMemo, createSignal, For, onCleanup, Show } from 'solid-js';
+import { createEffect, createMemo, createSignal, For, lazy, onCleanup, Show } from 'solid-js';
 import {
   ApiError,
   account,
@@ -8,16 +8,28 @@ import {
   enterGuest,
   restoreAccount,
 } from '../../app/account';
-import { avatars, cardArgs, cards, content, fluentKey, portrait } from '../../app/content';
+import {
+  avatars,
+  cardArgs,
+  cards,
+  content,
+  fluentKey,
+  loadPaths,
+  portrait,
+} from '../../app/content';
 import { setTrainingPlayer } from '../../app/trainingPlayer';
 import { Modal } from '../../components/Modal';
 import { addTranslations, hasTranslation, t } from '../../i18n';
 import en from './en.ftl?raw';
 import pl from './pl.ftl?raw';
+import { progressionDescription } from './progressionDescription';
 import { guestMutation, guestState, type Mutation, type Snapshot } from './state';
 import './collection.css';
 
 addTranslations({ pl, en });
+const Progression = lazy(() =>
+  import('./Progression').then((module) => ({ default: module.Progression })),
+);
 const statKeys = ['PhysAtk', 'PhysDef', 'MagAtk', 'MagDef', 'HpMax', 'StaminaMax'];
 const schools = ['combat', 'divine', 'element', 'arcane', 'necro', 'tech'];
 
@@ -28,6 +40,7 @@ export function Collection() {
   const [points, setPoints] = createSignal([0, 0, 0, 0, 0, 0]);
   const [template, setTemplate] = createSignal(0);
   const [query, setQuery] = createSignal('');
+  const [visibleCount, setVisibleCount] = createSignal(24);
   const [rarity, setRarity] = createSignal('');
   const [castable, setCastable] = createSignal(false);
   const [ownedOnly, setOwnedOnly] = createSignal(false);
@@ -63,6 +76,10 @@ export function Collection() {
     setLoading(true);
     setError('');
     try {
+      if (!guest()) {
+        await loadPaths();
+        if (disposed || epoch !== accountEpoch()) return;
+      }
       const snapshot = guest() ? guestState() : await api<Snapshot>('/api/game');
       if (snapshot.content_version !== content.version) throw new ApiError('CONTENT_MISMATCH');
       if (!disposed && epoch === accountEpoch()) setData(snapshot);
@@ -113,6 +130,8 @@ export function Collection() {
         setData(snapshot);
         if (mutation.action === 'spend') setPoints([0, 0, 0, 0, 0, 0]);
         if (mutation.action === 'create') setSelected(mutation.id);
+        if (mutation.action === 'shade') setSelected(mutation.new_id);
+        if (mutation.action === 'reincarnate') setPoints([0, 0, 0, 0, 0, 0]);
         setNotice(t('collection-saved'));
       }
     } catch (reason) {
@@ -144,6 +163,13 @@ export function Collection() {
       return true;
     }),
   );
+  createEffect(() => {
+    query();
+    rarity();
+    castable();
+    ownedOnly();
+    setVisibleCount(24);
+  });
   function select(id: string) {
     if (changed() && !window.confirm(t('collection-unsaved'))) return;
     setSelected(id);
@@ -232,13 +258,15 @@ export function Collection() {
                         aria-pressed={selected() === avatar.id}
                         onClick={() => select(avatar.id)}
                       >
-                        <Show when={avatars.get(avatar.template_id)}>
+                        <Show when={avatars.get(avatar.path_id ?? avatar.template_id)}>
                           {(definition) => (
                             <img width="64" height="64" alt="" src={portrait(definition().key)} />
                           )}
                         </Show>
                         <span>
-                          {t(fluentKey(avatars.get(avatar.template_id)?.key ?? ''))}
+                          {t(
+                            fluentKey(avatars.get(avatar.path_id ?? avatar.template_id)?.key ?? ''),
+                          )}
                           <small>
                             {t('collection-level', { level: avatar.level })} · {avatar.xp} PD{' '}
                             {avatar.active ? '★' : ''}
@@ -253,7 +281,13 @@ export function Collection() {
                     {(avatar) => (
                       <>
                         <div class="collection-heading">
-                          <h2>{t(fluentKey(avatars.get(avatar().template_id)?.key ?? ''))}</h2>
+                          <h2>
+                            {t(
+                              fluentKey(
+                                avatars.get(avatar().path_id ?? avatar().template_id)?.key ?? '',
+                              ),
+                            )}
+                          </h2>
                           <button
                             type="button"
                             disabled={loading() || avatar().active}
@@ -322,16 +356,26 @@ export function Collection() {
                             {t('collection-spend')}
                           </button>
                         </fieldset>
+                        <Show when={!guest()}>
+                          <Progression
+                            avatar={avatar()}
+                            avatars={snapshot().avatars}
+                            disabled={loading()}
+                            confirm={setConfirm}
+                          />
+                        </Show>
                         <section aria-label={t('collection-deck')}>
                           <div class="collection-heading">
                             <h2>
                               {t('collection-deck')} ({draft().length}/{content.rules.deck.size})
                             </h2>
                             <A
-                              href={`/duel?avatar=${avatar().template_id}&bot=novice&custom=1`}
+                              href={`/duel?avatar=${avatar().path_id ?? avatar().template_id}&bot=novice&custom=1`}
                               onClick={() =>
                                 setTrainingPlayer({
-                                  avatar: avatar().template_id,
+                                  avatar: avatar().path_id ?? avatar().template_id,
+                                  specialization: avatar().specialization ?? undefined,
+                                  gift_id: avatar().gift_id ?? undefined,
                                   level: avatar().level,
                                   spent: avatar().spent,
                                   deck: draft(),
@@ -482,7 +526,7 @@ export function Collection() {
                       </label>
                     </div>
                     <div class="collection-cards">
-                      <For each={visible()}>
+                      <For each={visible().slice(0, visibleCount())}>
                         {(card) => {
                           const quantity = () =>
                             snapshot().collection.find((s) => s.card_id === card.id)?.qty ?? 0;
@@ -518,6 +562,17 @@ export function Collection() {
                         }}
                       </For>
                     </div>
+                    <p>
+                      {t('collection-showing', {
+                        shown: Math.min(visibleCount(), visible().length),
+                        total: visible().length,
+                      })}
+                    </p>
+                    <Show when={visibleCount() < visible().length}>
+                      <button type="button" onClick={() => setVisibleCount((n) => n + 24)}>
+                        {t('collection-more')}
+                      </button>
+                    </Show>
                   </section>
                 </div>
               </div>
@@ -532,9 +587,14 @@ export function Collection() {
               {t(
                 mutation().action === 'delete'
                   ? 'collection-delete-warning'
-                  : 'collection-spend-warning',
+                  : mutation().action === 'reincarnate'
+                    ? 'collection-reincarnate-warning'
+                    : mutation().action === 'shade'
+                      ? 'collection-shade-warning'
+                      : 'collection-spend-warning',
               )}
             </p>
+            <p>{progressionDescription(mutation(), data()?.avatars)}</p>
             <button
               type="button"
               onClick={() => {

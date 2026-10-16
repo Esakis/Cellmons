@@ -101,7 +101,7 @@ Archetypy talii (z poradnika graczy S9): „zjadanie wytrzymałości”, „gra 
 | Wyprawa | L2 | −1 … +2 | L3, +2 |
 | Męka | L3 | 0 … +3 | L3, +3, talia „bossa” |
 
-Kolor nazwy przeciwnika (R-WYP-02): zielony, gdy jest niżej od gracza, żółty na równym poziomie, pomarańczowy przy +1…+2, czerwony od +3. Parametry są w `content/expeditions.toml`.
+Kolor nazwy przeciwnika (R-WYP-02): zielony, gdy jest niżej od gracza, żółty na równym poziomie, pomarańczowy przy +1…+2, czerwony od +3. Parametry F11 są w sekcji `expedition` pliku `content/rules.toml`, wspólnie wersjonowanej z pozostałą treścią.
 
 ## 6. Symulator balansu (`sim`)
 

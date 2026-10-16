@@ -1,0 +1,56 @@
+{
+	admin 127.0.0.1:2019
+	log default {
+		format filter {
+			wrap json
+			fields {
+				request delete
+			}
+		}
+	}
+	servers {
+		# Generated from Cloudflare's official IP endpoints by update-firewall.py.
+		import /etc/caddy/private/trusted-proxies.caddy
+		client_ip_headers CF-Connecting-IP
+		trusted_proxies_strict
+	}
+}
+{$GAME_DOMAIN} {
+	tls /etc/caddy/private/origin.pem /etc/caddy/private/origin-key.pem
+	encode zstd gzip
+	header {
+		Content-Security-Policy "default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://challenges.cloudflare.com; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Referrer-Policy strict-origin-when-cross-origin
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+		Strict-Transport-Security "max-age=31536000"
+		-Server
+	}
+	route {
+		@private path /metrics /admin/* /readyz /.env /.git/* /.vite/*
+		respond @private 404
+		@backend path /api/* /ws /healthz
+		handle @backend {
+			header Cache-Control "no-store"
+			# One active backend: local hubs are not a distributed presence service.
+			import /etc/caddy/private/active.caddy
+		}
+		handle /assets/* {
+			root * /srv/web
+			header Cache-Control "public, max-age=31536000, immutable"
+			file_server
+		}
+		handle /downloads/* {
+			root * /srv/web
+			header Cache-Control "no-cache"
+			file_server
+		}
+		handle {
+			root * /srv/web/current
+			header Cache-Control "no-cache"
+			try_files {path} /index.html
+			file_server
+		}
+	}
+}

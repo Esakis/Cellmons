@@ -1,0 +1,56 @@
+auth-login = Sign in
+auth-register = Register
+auth-mode-login = Sign in
+auth-mode-register = Create an account
+auth-mode-request = Reset your password
+auth-mode-verify = Verify your email
+auth-mode-reset = Choose a new password
+auth-identity = Login or email
+auth-login-name = Login (3–20 letters, digits, _ or -)
+auth-email = Email
+auth-password = Password
+auth-password-hint = Use 10–128 characters. Avoid common passwords.
+auth-school = Starting school
+auth-school-hint = You receive this school's character and cards. This choice is permanent.
+auth-token = Code from the email link
+auth-submit-login = Sign in
+auth-submit-register = Create account
+auth-submit-request = Send reset link
+auth-submit-verify = Verify email
+auth-submit-reset = Save new password
+auth-working = Please wait…
+auth-forgot = I forgot my password
+auth-registered = Account created. Check your email to verify your address. You can sign in now.
+auth-email-sent = If the address matches an account requiring this action, we sent a message. Check your inbox and spam folder.
+auth-verified = Email address verified.
+auth-reset-done = Password changed. All sessions were signed out. Sign in with your new password.
+auth-confirmed = Email verified
+auth-unconfirmed = Email not verified
+auth-resend = Resend verification link
+auth-level = Level { $level }, XP: { $xp }
+auth-logout = Sign out
+auth-sessions = Active sessions
+auth-current = (this session)
+auth-revoke = End session
+auth-no-account = No account needed
+auth-guest-description = Play locally without registration or signing in. Guest data, choices and progress exist only in browser memory. Reloading or closing the page removes them. Offline training is available.
+auth-leave-guest = Continue to sign in
+auth-error-UNAUTHENTICATED = Incorrect login, email or password, or your session has expired.
+auth-error-INVALID_INPUT = Check the field formats and password requirements.
+auth-error-IDENTITY_UNAVAILABLE = This login or email is already in use.
+auth-error-INVALID_TOKEN = The link is invalid, expired or already used. Request a new one.
+auth-error-RATE_LIMITED = Too many attempts. Try again in { $seconds } s.
+auth-error-SESSION_LIMIT = Session limit reached. End an active session first.
+auth-error-CAPTCHA_REQUIRED = Complete the spam check. If it fails, open registration again.
+auth-error-GUEST_LOCAL = Guest mode is local. Continue to sign in to use an account.
+auth-error-FORBIDDEN = Request rejected. Reload the page and try again.
+auth-error-TRY_AGAIN = The service is temporarily busy. Please try again.
+auth-error-SERVER_UNAVAILABLE = Cannot reach the server. Guest mode and offline training are still available.
+
+
+
+privacy-title = Data and account deletion
+
+auth-agreement = I accept the terms. I am at least 16 or have the required guardian permission.
+auth-error-LEGAL_VERSION = Documents changed. Refresh the app and read the current terms before registering.
+auth-error-LEGAL_REQUIRED = Confirm the terms and age requirement.

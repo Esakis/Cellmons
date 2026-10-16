@@ -1,0 +1,10 @@
+[Unit]
+Description=Monthly isolated S3 restore proof (dedicated restore host)
+After=docker.service network-online.target
+Wants=network-online.target
+[Service]
+Type=oneshot
+WorkingDirectory=/srv/spellgambit-restore
+EnvironmentFile=/srv/spellgambit-restore/private/restore.env
+ExecStart=/bin/bash /srv/spellgambit-restore/deploy/restore-s3.sh
+TimeoutStartSec=65min

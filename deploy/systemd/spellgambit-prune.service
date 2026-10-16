@@ -1,0 +1,9 @@
+[Unit]
+Description=Prune expired web releases while retaining active and previous chunks
+[Service]
+Type=oneshot
+User=spellgambit
+ExecStart=/usr/bin/python3 /srv/spellgambit/deploy/prune-web.py
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/srv/spellgambit/web

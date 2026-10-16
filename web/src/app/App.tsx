@@ -6,18 +6,24 @@ import { account } from './account';
 import { Settings } from './Settings';
 import { Shell } from './Shell';
 
-const Duel = lazy(() =>
-  import('../features/training/Training').then((module) => ({ default: module.Duel })),
-);
+const Duel = lazy(() => import('../features/offline').then((module) => ({ default: module.Duel })));
 const AccountPage = lazy(() =>
   import('../features/account/Account').then((module) => ({ default: module.AccountPage })),
 );
 const Lobby = lazy(() => import('../features/lobby/Lobby').then((m) => ({ default: m.Lobby })));
 const CollectionPage = lazy(() =>
-  import('../features/collection/Collection').then((m) => ({ default: m.Collection })),
+  import('../features/offline').then((m) => ({ default: m.Collection })),
 );
 const Store = lazy(() => import('../features/store/Store').then((m) => ({ default: m.Store })));
-function OnlineRoute(props: { account?: boolean; store?: boolean }) {
+const Clans = lazy(() => import('../features/clans/Clans').then((m) => ({ default: m.Clans })));
+const Admin = lazy(() => import('../features/admin/Admin').then((m) => ({ default: m.Admin })));
+const Legal = lazy(() => import('../features/legal/Legal').then((m) => ({ default: m.Legal })));
+function OnlineRoute(props: {
+  account?: boolean;
+  store?: boolean;
+  clans?: boolean;
+  admin?: boolean;
+}) {
   const [online, setOnline] = createSignal(navigator.onLine);
   const [entered, setEntered] = createSignal(navigator.onLine);
   const update = () => {
@@ -35,8 +41,8 @@ function OnlineRoute(props: { account?: boolean; store?: boolean }) {
       when={(entered() || online()) && (props.account || account()?.kind !== 'guest')}
       fallback={
         <section class="settings-page">
-          <h1>{t(props.store ? 'store' : 'lobby')}</h1>
-          <p>{t(props.store ? 'store-gate' : 'lobby-gate')}</p>
+          <h1>{t(props.clans ? 'clans' : props.store ? 'store' : 'lobby')}</h1>
+          <p>{t(props.clans ? 'clans-gate' : props.store ? 'store-gate' : 'lobby-gate')}</p>
           <A href="/">{t('training')}</A> · <A href="/account">{t('auth-account')}</A>
         </section>
       }
@@ -44,7 +50,21 @@ function OnlineRoute(props: { account?: boolean; store?: boolean }) {
       <Show
         when={props.account}
         fallback={
-          <Show when={props.store} fallback={<Lobby />}>
+          <Show
+            when={props.store}
+            fallback={
+              <Show
+                when={props.clans}
+                fallback={
+                  <Show when={props.admin} fallback={<Lobby />}>
+                    <Admin />
+                  </Show>
+                }
+              >
+                <Clans />
+              </Show>
+            }
+          >
             <Store />
           </Show>
         }
@@ -64,6 +84,9 @@ export function App() {
       <Route path="/account" component={() => <OnlineRoute account />} />
       <Route path="/lobby" component={OnlineRoute} />
       <Route path="/store" component={() => <OnlineRoute store />} />
+      <Route path="/clans" component={() => <OnlineRoute clans />} />
+      <Route path="/admin" component={() => <OnlineRoute admin />} />
+      <Route path="/legal" component={Legal} />
       <Route path="/collection" component={CollectionPage} />
       <Route path="*" component={TrainingSetup} />
     </HashRouter>

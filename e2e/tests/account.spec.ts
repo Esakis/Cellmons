@@ -115,6 +115,7 @@ test('account forms register, sign in and sign out using the API contract', asyn
   await page.getByLabel('Email', { exact: true }).fill('one@example.test');
   await page.getByLabel('Password', { exact: true }).fill('A long test password!');
   await page.screenshot({ path: `../target/f62-${info.project.name}-account.png`, fullPage: true });
+  await page.locator('input[name=agreement]').check();
   await page.getByRole('button', { name: 'Create account', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Account created.' })).toBeVisible();
   expect(registered).toBe(true);

@@ -11,12 +11,13 @@
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json"
   },
   "dependencies": {
-    "@bufbuild/protobuf": "2.16.0",
+    "@capacitor/core": "8.5.3",
     "@fluent/bundle": "0.19.1",
     "@solidjs/router": "1.0.0",
     "solid-js": "1.9.17"
   },
   "devDependencies": {
+    "@bufbuild/protobuf": "2.16.0",
     "@solidjs/testing-library": "0.8.10",
     "@types/node": "24.19.2",
     "happy-dom": "21.0.1",

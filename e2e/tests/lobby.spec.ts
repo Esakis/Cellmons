@@ -1,4 +1,10 @@
 import { expect, type Page, test } from '@playwright/test';
+import { administration } from '../admin';
+import { clans } from '../clans';
+import { expeditions } from '../expeditions';
+import { privacy } from '../privacy';
+import { progression } from '../progression';
+import { tournaments } from '../tournaments';
 
 // Real registrations deliberately keep the production IP limit; retries need a fresh fixture DB.
 test.describe.configure({ retries: 0 });
@@ -10,6 +16,7 @@ async function register(page: Page, login: string, build = false) {
   await page.getByLabel('Login (3–20 letters, digits, _ or -)').fill(login);
   await page.getByLabel('Email', { exact: true }).fill(`${login}@example.test`);
   await page.getByLabel('Password', { exact: true }).fill('Lobby integration password!');
+  await page.locator('input[name=agreement]').check();
   await page.getByRole('button', { name: 'Create account', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Account created.' })).toBeVisible();
   // Read the captured email from the loopback-only disposable backend, then use the real verification UI.
@@ -51,7 +58,7 @@ async function register(page: Page, login: string, build = false) {
 test('real registration, two-client chat, contacts, mail, challenges and reconnect', async ({
   browser,
 }, info) => {
-  test.setTimeout(90000);
+  test.setTimeout(180000);
   const first = await browser.newContext(info.project.use);
   const second = await browser.newContext(info.project.use);
   try {
@@ -238,6 +245,12 @@ test('real registration, two-client chat, contacts, mail, challenges and reconne
         () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
       ),
     ).toBe(false);
+    await progression(a, alice, info.project.name);
+    await clans(a, b, alice, bob, info.project.name);
+    await tournaments(a, b, alice, info.project.name);
+    await expeditions(a, b, info.project.name);
+    await administration(a, b, alice, bob, info.project.name);
+    await privacy(b, bob, info.project.name);
   } finally {
     await first.close();
     await second.close();

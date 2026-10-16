@@ -1,0 +1,1983 @@
+# Reference choices: Droga Oazy; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1002
+key = "avatar.dune_wanderer_path_0"
+ref = "Nomad / Droga Oazy"
+rarity = "common"
+path = { base_avatar = 1, variant = 0, specializations = ["element", "combat"], gifts = ["card.acolyte", "card.sword_dancer"] }
+base = { phys_atk = 3, phys_def = 3, mag_atk = 4, mag_def = 0, hp = 25, stamina = 35 }
+schools = { element = 1, combat = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 4] },
+  { level = 3, d = [1, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 1, 0, 0, 4, 4] },
+  { level = 5, d = [0, 0, 1, 0, 3, 4], schools = { combat = 2 } },
+  { level = 6, d = [0, 0, 0, 1, 4, 5] },
+  { level = 7, d = [1, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 1, 0, 0, 3, 4] },
+  { level = 9, d = [1, 0, 0, 0, 4, 4] },
+  { level = 10, d = [0, 0, 1, 0, 4, 4], schools = { element = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 3, 5] },
+  { level = 12, d = [0, 1, 0, 0, 4, 4] },
+  { level = 13, d = [1, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 1, 3, 4] },
+  { level = 15, d = [0, 1, 0, 0, 4, 4], schools = { combat = 3 } },
+  { level = 16, d = [0, 0, 1, 0, 4, 5] },
+  { level = 17, d = [1, 0, 0, 0, 3, 4] },
+  { level = 18, d = [0, 1, 0, 0, 4, 4] },
+  { level = 19, d = [1, 0, 0, 0, 4, 4], schools = { element = 3 } },
+  { level = 20, d = [0, 0, 0, 1, 4, 5] },
+]
+
+# Reference choices: Droga Pustyni; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1003
+key = "avatar.dune_wanderer_path_1"
+ref = "Nomad / Droga Pustyni"
+rarity = "common"
+path = { base_avatar = 1, variant = 1, specializations = ["element", "combat"], gifts = ["card.dune_mantle", "card.sword_dancer"] }
+base = { phys_atk = 3, phys_def = 4, mag_atk = 3, mag_def = 0, hp = 35, stamina = 25 }
+schools = { element = 1, combat = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 4] },
+  { level = 3, d = [1, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 1, 0, 0, 4, 4] },
+  { level = 5, d = [0, 0, 1, 0, 3, 4], schools = { combat = 2 } },
+  { level = 6, d = [0, 0, 0, 1, 4, 5] },
+  { level = 7, d = [1, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 1, 0, 0, 3, 4] },
+  { level = 9, d = [1, 0, 0, 0, 4, 4] },
+  { level = 10, d = [1, 0, 0, 0, 4, 4], schools = { element = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 3, 5] },
+  { level = 12, d = [0, 1, 0, 0, 4, 4] },
+  { level = 13, d = [1, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 1, 3, 4] },
+  { level = 15, d = [0, 1, 0, 0, 4, 4], schools = { combat = 3 } },
+  { level = 16, d = [1, 0, 0, 0, 4, 5] },
+  { level = 17, d = [1, 0, 0, 0, 3, 4] },
+  { level = 18, d = [0, 1, 0, 0, 4, 4] },
+  { level = 19, d = [1, 0, 0, 0, 4, 4], schools = { element = 3 } },
+  { level = 20, d = [0, 0, 0, 1, 4, 5] },
+]
+
+# Reference choices: Droga Pokuty; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1004
+key = "avatar.dawn_warden_path_0"
+ref = "Mnich / Droga Pokuty"
+rarity = "common"
+path = { base_avatar = 2, variant = 0, specializations = ["combat", "divine"], gifts = ["card.steadfast_blessing", "card.mending_halo"] }
+base = { phys_atk = 2, phys_def = 2, mag_atk = 4, mag_def = 2, hp = 25, stamina = 45 }
+schools = { combat = 1, divine = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 1, 0, 2, 3] },
+  { level = 3, d = [1, 0, 0, 0, 3, 3] },
+  { level = 4, d = [0, 0, 0, 1, 3, 3] },
+  { level = 5, d = [0, 0, 1, 0, 2, 1], schools = { divine = 2 } },
+  { level = 6, d = [0, 0, 0, 0, 5, 1] },
+  { level = 7, d = [0, 1, 0, 0, 4, 4] },
+  { level = 8, d = [0, 0, 1, 0, 3, 2] },
+  { level = 9, d = [0, 0, 0, 1, 3, 4] },
+  { level = 10, d = [0, 0, 1, 0, 3, 4], schools = { combat = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 3] },
+  { level = 12, d = [0, 0, 1, 0, 7, 2] },
+  { level = 13, d = [1, 0, 0, 0, 3, 5] },
+  { level = 14, d = [0, 0, 1, 0, 5, 1] },
+  { level = 15, d = [0, 0, 0, 0, 3, 3], schools = { divine = 3 } },
+  { level = 16, d = [0, 1, 0, 0, 3, 2] },
+  { level = 17, d = [0, 0, 1, 0, 3, 4] },
+  { level = 18, d = [0, 0, 1, 0, 2, 4] },
+  { level = 19, d = [0, 0, 1, 0, 8, 8], schools = { combat = 3 } },
+  { level = 20, d = [0, 1, 0, 0, 3, 2] },
+]
+
+# Reference choices: Droga Broni; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1005
+key = "avatar.dawn_warden_path_1"
+ref = "Mnich / Droga Broni"
+rarity = "common"
+path = { base_avatar = 2, variant = 1, specializations = ["combat", "divine"], gifts = ["card.steadfast_blessing", "card.mending_halo"] }
+base = { phys_atk = 3, phys_def = 3, mag_atk = 3, mag_def = 1, hp = 35, stamina = 35 }
+schools = { combat = 1, divine = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [1, 0, 0, 0, 2, 3] },
+  { level = 3, d = [1, 0, 0, 0, 3, 3] },
+  { level = 4, d = [0, 0, 0, 1, 3, 3] },
+  { level = 5, d = [0, 0, 1, 0, 2, 1], schools = { divine = 2 } },
+  { level = 6, d = [0, 0, 0, 0, 5, 1] },
+  { level = 7, d = [0, 1, 0, 0, 4, 4] },
+  { level = 8, d = [1, 0, 0, 0, 3, 2] },
+  { level = 9, d = [0, 0, 0, 1, 3, 4] },
+  { level = 10, d = [1, 0, 0, 0, 3, 4], schools = { combat = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 3] },
+  { level = 12, d = [1, 0, 0, 0, 7, 2] },
+  { level = 13, d = [1, 0, 0, 0, 3, 5] },
+  { level = 14, d = [1, 0, 0, 0, 5, 1] },
+  { level = 15, d = [0, 0, 0, 0, 3, 3], schools = { divine = 3 } },
+  { level = 16, d = [0, 1, 0, 0, 3, 2] },
+  { level = 17, d = [0, 0, 1, 0, 3, 4] },
+  { level = 18, d = [1, 0, 0, 0, 2, 4] },
+  { level = 19, d = [0, 0, 1, 0, 8, 8], schools = { combat = 3 } },
+  { level = 20, d = [0, 1, 0, 0, 3, 2] },
+]
+
+# Reference choices: Droga Światła; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1006
+key = "avatar.ember_drake_path_0"
+ref = "Draco / Droga Światła"
+rarity = "common"
+path = { base_avatar = 3, variant = 0, specializations = ["divine", "element"], gifts = ["card.steadfast_blessing", "card.acolyte"] }
+base = { phys_atk = 2, phys_def = 0, mag_atk = 5, mag_def = 2, hp = 30, stamina = 35 }
+schools = { divine = 1, element = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [0, 0, 1, 0, 3, 4] },
+  { level = 4, d = [0, 0, 1, 0, 4, 4] },
+  { level = 5, d = [0, 0, 0, 1, 3, 4], schools = { element = 2 } },
+  { level = 6, d = [0, 1, 0, 0, 4, 4] },
+  { level = 7, d = [0, 0, 1, 0, 3, 4] },
+  { level = 8, d = [0, 0, 1, 0, 3, 4] },
+  { level = 9, d = [0, 0, 1, 0, 4, 4] },
+  { level = 10, d = [0, 0, 0, 1, 3, 4], schools = { divine = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [0, 0, 1, 0, 3, 4] },
+  { level = 13, d = [1, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 1, 0, 0, 3, 4] },
+  { level = 15, d = [0, 0, 1, 0, 3, 4], schools = { element = 3 } },
+  { level = 16, d = [0, 0, 0, 1, 4, 4] },
+  { level = 17, d = [0, 0, 1, 0, 3, 4] },
+  { level = 18, d = [0, 0, 1, 0, 4, 4] },
+  { level = 19, d = [0, 1, 0, 0, 3, 4], schools = { divine = 3 } },
+  { level = 20, d = [0, 0, 1, 0, 4, 4] },
+]
+
+# Reference choices: Droga Ciemności; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1007
+key = "avatar.ember_drake_path_1"
+ref = "Draco / Droga Ciemności"
+rarity = "common"
+path = { base_avatar = 3, variant = 1, specializations = ["necro", "element"], gifts = ["card.sable_curse", "card.ember_rain"] }
+base = { phys_atk = 3, phys_def = 1, mag_atk = 4, mag_def = 1, hp = 40, stamina = 25 }
+schools = { necro = 1, element = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [0, 0, 1, 0, 3, 4] },
+  { level = 4, d = [1, 0, 0, 0, 4, 4] },
+  { level = 5, d = [0, 0, 0, 1, 3, 4], schools = { element = 2 } },
+  { level = 6, d = [0, 1, 0, 0, 4, 4] },
+  { level = 7, d = [0, 0, 1, 0, 3, 4] },
+  { level = 8, d = [1, 0, 0, 0, 3, 4] },
+  { level = 9, d = [0, 0, 1, 0, 4, 4] },
+  { level = 10, d = [0, 0, 0, 1, 3, 4], schools = { necro = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [1, 0, 0, 0, 3, 4] },
+  { level = 13, d = [1, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 1, 0, 0, 3, 4] },
+  { level = 15, d = [0, 0, 1, 0, 3, 4], schools = { element = 3 } },
+  { level = 16, d = [0, 0, 0, 1, 4, 4] },
+  { level = 17, d = [0, 0, 1, 0, 3, 4] },
+  { level = 18, d = [1, 0, 0, 0, 4, 4] },
+  { level = 19, d = [0, 1, 0, 0, 3, 4], schools = { necro = 3 } },
+  { level = 20, d = [1, 0, 0, 0, 4, 4] },
+]
+
+# Reference choices: Droga Natury; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1008
+key = "avatar.star_adept_path_0"
+ref = "Czarodziej / Droga Natury"
+rarity = "common"
+path = { base_avatar = 4, variant = 0, specializations = ["element", "arcane"], gifts = ["card.acolyte", "card.runic_workshop"] }
+base = { phys_atk = 1, phys_def = 0, mag_atk = 4, mag_def = 3, hp = 25, stamina = 50 }
+schools = { element = 1, arcane = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 4, 3] },
+  { level = 3, d = [0, 0, 1, 0, 4, 3] },
+  { level = 4, d = [0, 0, 0, 1, 4, 3] },
+  { level = 5, d = [0, 1, 0, 0, 4, 3], schools = { arcane = 2 } },
+  { level = 6, d = [0, 0, 1, 0, 5, 3] },
+  { level = 7, d = [1, 0, 0, 0, 4, 3] },
+  { level = 8, d = [0, 0, 0, 0, 4, 4] },
+  { level = 9, d = [0, 0, 0, 1, 4, 3] },
+  { level = 10, d = [0, 0, 1, 0, 4, 3], schools = { element = 2 } },
+  { level = 11, d = [0, 0, 1, 0, 5, 3] },
+  { level = 12, d = [0, 0, 0, 1, 4, 3] },
+  { level = 13, d = [0, 1, 0, 0, 4, 3] },
+  { level = 14, d = [0, 0, 0, 0, 4, 4] },
+  { level = 15, d = [0, 0, 1, 0, 4, 3], schools = { arcane = 3 } },
+  { level = 16, d = [0, 0, 0, 1, 5, 3] },
+  { level = 17, d = [0, 0, 1, 0, 4, 3] },
+  { level = 18, d = [0, 0, 1, 0, 4, 3] },
+  { level = 19, d = [0, 0, 1, 0, 4, 3], schools = { element = 3 } },
+  { level = 20, d = [0, 0, 0, 1, 5, 4] },
+]
+
+# Reference choices: Droga Wiary; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1009
+key = "avatar.star_adept_path_1"
+ref = "Czarodziej / Droga Wiary"
+rarity = "common"
+path = { base_avatar = 4, variant = 1, specializations = ["divine", "arcane"], gifts = ["card.steadfast_blessing", "card.runic_workshop"] }
+base = { phys_atk = 2, phys_def = 1, mag_atk = 3, mag_def = 2, hp = 35, stamina = 40 }
+schools = { divine = 1, arcane = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 4, 3] },
+  { level = 3, d = [0, 0, 1, 0, 4, 3] },
+  { level = 4, d = [0, 0, 0, 1, 4, 3] },
+  { level = 5, d = [0, 1, 0, 0, 4, 3], schools = { arcane = 2 } },
+  { level = 6, d = [1, 0, 0, 0, 5, 3] },
+  { level = 7, d = [1, 0, 0, 0, 4, 3] },
+  { level = 8, d = [0, 0, 0, 0, 4, 4] },
+  { level = 9, d = [0, 0, 0, 1, 4, 3] },
+  { level = 10, d = [1, 0, 0, 0, 4, 3], schools = { divine = 2 } },
+  { level = 11, d = [0, 0, 1, 0, 5, 3] },
+  { level = 12, d = [0, 0, 0, 1, 4, 3] },
+  { level = 13, d = [0, 1, 0, 0, 4, 3] },
+  { level = 14, d = [0, 0, 0, 0, 4, 4] },
+  { level = 15, d = [0, 0, 1, 0, 4, 3], schools = { arcane = 3 } },
+  { level = 16, d = [0, 0, 0, 1, 5, 3] },
+  { level = 17, d = [0, 0, 1, 0, 4, 3] },
+  { level = 18, d = [1, 0, 0, 0, 4, 3] },
+  { level = 19, d = [0, 0, 1, 0, 4, 3], schools = { divine = 3 } },
+  { level = 20, d = [0, 0, 0, 1, 5, 4] },
+]
+
+# Reference choices: Droga Przemiany; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1010
+key = "avatar.ash_widow_path_0"
+ref = "Lady Kruk / Droga Przemiany"
+rarity = "common"
+path = { base_avatar = 5, variant = 0, specializations = ["element", "necro"], gifts = ["card.moonbound_skin", "card.sable_curse"] }
+base = { phys_atk = 2, phys_def = 0, mag_atk = 5, mag_def = 2, hp = 25, stamina = 45 }
+schools = { element = 1, necro = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 1, 0, 0, 4, 3] },
+  { level = 3, d = [0, 0, 0, 0, 4, 3] },
+  { level = 4, d = [0, 0, 1, 0, 4, 3] },
+  { level = 5, d = [0, 0, 0, 0, 4, 3], schools = { necro = 2 } },
+  { level = 6, d = [0, 0, 1, 0, 4, 3] },
+  { level = 7, d = [0, 0, 1, 1, 4, 3] },
+  { level = 8, d = [0, 1, 0, 0, 4, 3] },
+  { level = 9, d = [0, 0, 0, 0, 4, 2] },
+  { level = 10, d = [0, 0, 1, 0, 4, 3], schools = { element = 2 } },
+  { level = 11, d = [1, 0, 0, 0, 6, 3] },
+  { level = 12, d = [0, 0, 0, 1, 4, 3] },
+  { level = 13, d = [0, 0, 1, 0, 4, 3] },
+  { level = 14, d = [0, 0, 0, 0, 4, 3] },
+  { level = 15, d = [0, 1, 0, 0, 4, 3], schools = { necro = 3 } },
+  { level = 16, d = [0, 0, 1, 0, 4, 4] },
+  { level = 17, d = [0, 0, 0, 1, 4, 4] },
+  { level = 18, d = [0, 0, 1, 0, 4, 4] },
+  { level = 19, d = [1, 0, 0, 0, 5, 4], schools = { element = 3 } },
+  { level = 20, d = [0, 0, 1, 0, 5, 3] },
+]
+
+# Reference choices: Droga Wiedzy; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1011
+key = "avatar.ash_widow_path_1"
+ref = "Lady Kruk / Droga Wiedzy"
+rarity = "common"
+path = { base_avatar = 5, variant = 1, specializations = ["arcane", "necro"], gifts = ["card.runic_workshop", "card.sable_curse"] }
+base = { phys_atk = 3, phys_def = 1, mag_atk = 4, mag_def = 1, hp = 35, stamina = 35 }
+schools = { arcane = 1, necro = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 1, 0, 0, 4, 3] },
+  { level = 3, d = [0, 0, 0, 0, 4, 3] },
+  { level = 4, d = [1, 0, 0, 0, 4, 3] },
+  { level = 5, d = [0, 0, 0, 0, 4, 3], schools = { necro = 2 } },
+  { level = 6, d = [1, 0, 0, 0, 4, 3] },
+  { level = 7, d = [0, 0, 1, 1, 4, 3] },
+  { level = 8, d = [0, 1, 0, 0, 4, 3] },
+  { level = 9, d = [0, 0, 0, 0, 4, 2] },
+  { level = 10, d = [1, 0, 0, 0, 4, 3], schools = { arcane = 2 } },
+  { level = 11, d = [1, 0, 0, 0, 6, 3] },
+  { level = 12, d = [0, 0, 0, 1, 4, 3] },
+  { level = 13, d = [0, 0, 1, 0, 4, 3] },
+  { level = 14, d = [0, 0, 0, 0, 4, 3] },
+  { level = 15, d = [0, 1, 0, 0, 4, 3], schools = { necro = 3 } },
+  { level = 16, d = [1, 0, 0, 0, 4, 4] },
+  { level = 17, d = [0, 0, 0, 1, 4, 4] },
+  { level = 18, d = [1, 0, 0, 0, 4, 4] },
+  { level = 19, d = [1, 0, 0, 0, 5, 4], schools = { arcane = 3 } },
+  { level = 20, d = [1, 0, 0, 0, 5, 3] },
+]
+
+# Reference choices: Droga Teologii; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1012
+key = "avatar.cogwright_path_0"
+ref = "Doc / Droga Teologii"
+rarity = "common"
+path = { base_avatar = 6, variant = 0, specializations = ["divine", "tech"], gifts = ["card.steadfast_blessing", "card.mending_halo"] }
+base = { phys_atk = 2, phys_def = 1, mag_atk = 4, mag_def = 2, hp = 25, stamina = 45 }
+schools = { divine = 1, tech = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [1, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 0, 1, 0, 4, 4] },
+  { level = 5, d = [0, 1, 0, 0, 4, 3], schools = { tech = 2 } },
+  { level = 6, d = [0, 0, 0, 1, 4, 4] },
+  { level = 7, d = [1, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 0, 1, 0, 4, 3] },
+  { level = 9, d = [0, 1, 0, 0, 4, 4] },
+  { level = 10, d = [0, 0, 0, 1, 4, 4], schools = { divine = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 3] },
+  { level = 12, d = [0, 0, 1, 0, 4, 4] },
+  { level = 13, d = [0, 0, 1, 0, 4, 4] },
+  { level = 14, d = [0, 0, 1, 0, 4, 3] },
+  { level = 15, d = [0, 0, 1, 0, 4, 4], schools = { tech = 3 } },
+  { level = 16, d = [0, 1, 0, 0, 4, 4] },
+  { level = 17, d = [0, 0, 0, 1, 4, 3] },
+  { level = 18, d = [0, 0, 1, 0, 4, 4] },
+  { level = 19, d = [0, 0, 1, 0, 4, 4], schools = { divine = 3 } },
+  { level = 20, d = [0, 1, 0, 0, 4, 4] },
+]
+
+# Reference choices: Droga Metafizyki; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1013
+key = "avatar.cogwright_path_1"
+ref = "Doc / Droga Metafizyki"
+rarity = "common"
+path = { base_avatar = 6, variant = 1, specializations = ["arcane", "tech"], gifts = ["card.runic_workshop", "card.temporal_hollow"] }
+base = { phys_atk = 3, phys_def = 2, mag_atk = 3, mag_def = 1, hp = 35, stamina = 35 }
+schools = { arcane = 1, tech = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [1, 0, 0, 0, 4, 4] },
+  { level = 4, d = [1, 0, 0, 0, 4, 4] },
+  { level = 5, d = [0, 1, 0, 0, 4, 3], schools = { tech = 2 } },
+  { level = 6, d = [0, 0, 0, 1, 4, 4] },
+  { level = 7, d = [1, 0, 0, 0, 4, 4] },
+  { level = 8, d = [1, 0, 0, 0, 4, 3] },
+  { level = 9, d = [0, 1, 0, 0, 4, 4] },
+  { level = 10, d = [0, 0, 0, 1, 4, 4], schools = { arcane = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 3] },
+  { level = 12, d = [1, 0, 0, 0, 4, 4] },
+  { level = 13, d = [0, 0, 1, 0, 4, 4] },
+  { level = 14, d = [1, 0, 0, 0, 4, 3] },
+  { level = 15, d = [0, 0, 1, 0, 4, 4], schools = { tech = 3 } },
+  { level = 16, d = [0, 1, 0, 0, 4, 4] },
+  { level = 17, d = [0, 0, 0, 1, 4, 3] },
+  { level = 18, d = [1, 0, 0, 0, 4, 4] },
+  { level = 19, d = [0, 0, 1, 0, 4, 4], schools = { arcane = 3 } },
+  { level = 20, d = [0, 1, 0, 0, 4, 4] },
+]
+
+# Reference choices: Droga Energii; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1014
+key = "avatar.storm_surveyor_path_0"
+ref = "Elektrykus / Droga Energii"
+rarity = "common"
+path = { base_avatar = 7, variant = 0, specializations = ["element", "tech"], gifts = ["card.acolyte", "card.defense_lattice"] }
+base = { phys_atk = 2, phys_def = 0, mag_atk = 4, mag_def = 2, hp = 25, stamina = 45 }
+schools = { element = 1, tech = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [0, 0, 1, 0, 4, 4] },
+  { level = 4, d = [0, 0, 0, 1, 4, 4] },
+  { level = 5, d = [1, 0, 0, 0, 3, 4], schools = { element = 2 } },
+  { level = 6, d = [0, 0, 1, 0, 4, 4] },
+  { level = 7, d = [0, 1, 0, 0, 4, 4] },
+  { level = 8, d = [0, 0, 1, 0, 3, 4] },
+  { level = 9, d = [0, 0, 0, 1, 4, 4] },
+  { level = 10, d = [0, 0, 1, 0, 4, 4], schools = { tech = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 3, 4] },
+  { level = 12, d = [0, 0, 1, 0, 4, 4] },
+  { level = 13, d = [0, 0, 1, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 1, 3, 4] },
+  { level = 15, d = [1, 0, 0, 0, 4, 4], schools = { element = 3 } },
+  { level = 16, d = [0, 0, 1, 0, 4, 4] },
+  { level = 17, d = [0, 0, 0, 1, 3, 4] },
+  { level = 18, d = [0, 0, 1, 0, 4, 4] },
+  { level = 19, d = [0, 1, 0, 0, 4, 4], schools = { tech = 3 } },
+  { level = 20, d = [0, 0, 1, 0, 4, 4] },
+]
+
+# Reference choices: Droga Konstrukcji; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1015
+key = "avatar.storm_surveyor_path_1"
+ref = "Elektrykus / Droga Konstrukcji"
+rarity = "common"
+path = { base_avatar = 7, variant = 1, specializations = ["combat", "tech"], gifts = ["card.sword_oath", "card.attack_lattice"] }
+base = { phys_atk = 3, phys_def = 1, mag_atk = 3, mag_def = 1, hp = 35, stamina = 35 }
+schools = { combat = 1, tech = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [0, 0, 1, 0, 4, 4] },
+  { level = 4, d = [0, 0, 0, 1, 4, 4] },
+  { level = 5, d = [1, 0, 0, 0, 3, 4], schools = { tech = 2 } },
+  { level = 6, d = [1, 0, 0, 0, 4, 4] },
+  { level = 7, d = [0, 1, 0, 0, 4, 4] },
+  { level = 8, d = [1, 0, 0, 0, 3, 4] },
+  { level = 9, d = [0, 0, 0, 1, 4, 4] },
+  { level = 10, d = [1, 0, 0, 0, 4, 4], schools = { combat = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 3, 4] },
+  { level = 12, d = [1, 0, 0, 0, 4, 4] },
+  { level = 13, d = [0, 0, 1, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 1, 3, 4] },
+  { level = 15, d = [1, 0, 0, 0, 4, 4], schools = { tech = 3 } },
+  { level = 16, d = [1, 0, 0, 0, 4, 4] },
+  { level = 17, d = [0, 0, 0, 1, 3, 4] },
+  { level = 18, d = [1, 0, 0, 0, 4, 4] },
+  { level = 19, d = [0, 1, 0, 0, 4, 4], schools = { combat = 3 } },
+  { level = 20, d = [1, 0, 0, 0, 4, 4] },
+]
+
+# Reference choices: Droga Animacji; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1016
+key = "avatar.stoneguard_path_0"
+ref = "Gorylla / Droga Animacji"
+rarity = "common"
+path = { base_avatar = 8, variant = 0, specializations = ["necro", "combat"], gifts = ["card.sable_curse", "card.sword_oath"] }
+base = { phys_atk = 3, phys_def = 1, mag_atk = 4, mag_def = 1, hp = 35, stamina = 30 }
+schools = { necro = 1, combat = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [1, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 1, 0, 0, 4, 4] },
+  { level = 5, d = [0, 0, 1, 0, 4, 3], schools = { combat = 2 } },
+  { level = 6, d = [0, 0, 0, 1, 4, 4] },
+  { level = 7, d = [1, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 1, 0, 0, 4, 3] },
+  { level = 9, d = [0, 0, 1, 0, 4, 4] },
+  { level = 10, d = [0, 0, 1, 0, 4, 4], schools = { necro = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 3] },
+  { level = 12, d = [0, 0, 0, 1, 4, 4] },
+  { level = 13, d = [1, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 1, 0, 0, 4, 3] },
+  { level = 15, d = [0, 0, 1, 0, 4, 4], schools = { combat = 3 } },
+  { level = 16, d = [0, 0, 1, 0, 4, 4] },
+  { level = 17, d = [0, 1, 0, 0, 4, 3] },
+  { level = 18, d = [0, 0, 1, 0, 4, 4] },
+  { level = 19, d = [1, 0, 0, 0, 4, 4], schools = { necro = 3 } },
+  { level = 20, d = [0, 0, 0, 1, 4, 4] },
+]
+
+# Reference choices: Droga Życia; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1017
+key = "avatar.stoneguard_path_1"
+ref = "Gorylla / Droga Życia"
+rarity = "common"
+path = { base_avatar = 8, variant = 1, specializations = ["element", "combat"], gifts = ["card.acolyte", "card.moonbound_skin"] }
+base = { phys_atk = 4, phys_def = 2, mag_atk = 3, mag_def = 0, hp = 45, stamina = 20 }
+schools = { element = 1, combat = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [1, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 1, 0, 0, 4, 4] },
+  { level = 5, d = [0, 0, 1, 0, 4, 3], schools = { combat = 2 } },
+  { level = 6, d = [0, 0, 0, 1, 4, 4] },
+  { level = 7, d = [1, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 1, 0, 0, 4, 3] },
+  { level = 9, d = [0, 0, 1, 0, 4, 4] },
+  { level = 10, d = [1, 0, 0, 0, 4, 4], schools = { element = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 3] },
+  { level = 12, d = [0, 0, 0, 1, 4, 4] },
+  { level = 13, d = [1, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 1, 0, 0, 4, 3] },
+  { level = 15, d = [0, 0, 1, 0, 4, 4], schools = { combat = 3 } },
+  { level = 16, d = [1, 0, 0, 0, 4, 4] },
+  { level = 17, d = [0, 1, 0, 0, 4, 3] },
+  { level = 18, d = [1, 0, 0, 0, 4, 4] },
+  { level = 19, d = [1, 0, 0, 0, 4, 4], schools = { element = 3 } },
+  { level = 20, d = [0, 0, 0, 1, 4, 4] },
+]
+
+# Reference choices: Droga Duszy; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1018
+key = "avatar.tide_oracle_path_0"
+ref = "Pani Jeziora / Droga Duszy"
+rarity = "common"
+path = { base_avatar = 9, variant = 0, specializations = ["divine", "element"], gifts = ["card.radiant_scepter", "card.verdant_staff"] }
+base = { phys_atk = 2, phys_def = 1, mag_atk = 5, mag_def = 1, hp = 25, stamina = 45 }
+schools = { divine = 1, element = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [0, 0, 1, 0, 4, 4] },
+  { level = 4, d = [0, 0, 0, 1, 4, 4] },
+  { level = 5, d = [0, 1, 0, 0, 3, 4], schools = { divine = 2 } },
+  { level = 6, d = [0, 0, 1, 0, 4, 4] },
+  { level = 7, d = [0, 0, 1, 0, 4, 4] },
+  { level = 8, d = [0, 0, 0, 1, 3, 4] },
+  { level = 9, d = [0, 0, 1, 0, 4, 4] },
+  { level = 10, d = [0, 1, 0, 0, 4, 4], schools = { element = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 3, 4] },
+  { level = 12, d = [0, 0, 1, 0, 4, 4] },
+  { level = 13, d = [1, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 1, 3, 4] },
+  { level = 15, d = [0, 0, 1, 0, 4, 4], schools = { divine = 3 } },
+  { level = 16, d = [0, 1, 0, 0, 4, 4] },
+  { level = 17, d = [0, 0, 1, 0, 3, 4] },
+  { level = 18, d = [0, 0, 0, 1, 4, 4] },
+  { level = 19, d = [1, 0, 0, 0, 4, 4], schools = { element = 3 } },
+  { level = 20, d = [0, 0, 1, 0, 4, 4] },
+]
+
+# Reference choices: Droga Czaru; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1019
+key = "avatar.tide_oracle_path_1"
+ref = "Pani Jeziora / Droga Czaru"
+rarity = "common"
+path = { base_avatar = 9, variant = 1, specializations = ["arcane", "element"], gifts = ["card.astral_scepter", "card.verdant_staff"] }
+base = { phys_atk = 3, phys_def = 2, mag_atk = 4, mag_def = 0, hp = 35, stamina = 35 }
+schools = { arcane = 1, element = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [0, 0, 1, 0, 4, 4] },
+  { level = 4, d = [0, 0, 0, 1, 4, 4] },
+  { level = 5, d = [0, 1, 0, 0, 3, 4], schools = { element = 2 } },
+  { level = 6, d = [1, 0, 0, 0, 4, 4] },
+  { level = 7, d = [0, 0, 1, 0, 4, 4] },
+  { level = 8, d = [0, 0, 0, 1, 3, 4] },
+  { level = 9, d = [0, 0, 1, 0, 4, 4] },
+  { level = 10, d = [0, 1, 0, 0, 4, 4], schools = { arcane = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 3, 4] },
+  { level = 12, d = [1, 0, 0, 0, 4, 4] },
+  { level = 13, d = [1, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 1, 3, 4] },
+  { level = 15, d = [0, 0, 1, 0, 4, 4], schools = { element = 3 } },
+  { level = 16, d = [0, 1, 0, 0, 4, 4] },
+  { level = 17, d = [0, 0, 1, 0, 3, 4] },
+  { level = 18, d = [0, 0, 0, 1, 4, 4] },
+  { level = 19, d = [1, 0, 0, 0, 4, 4], schools = { arcane = 3 } },
+  { level = 20, d = [1, 0, 0, 0, 4, 4] },
+]
+
+# Reference choices: Droga Wody; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1020
+key = "avatar.venom_scout_path_0"
+ref = "Skorpia / Droga Wody"
+rarity = "common"
+path = { base_avatar = 10, variant = 0, specializations = ["combat", "necro"], gifts = ["card.sable_curse", "card.dread_idol"] }
+base = { phys_atk = 2, phys_def = 1, mag_atk = 4, mag_def = 2, hp = 25, stamina = 40 }
+schools = { combat = 1, necro = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [1, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 0, 1, 0, 4, 4] },
+  { level = 5, d = [0, 1, 0, 0, 4, 4], schools = { necro = 2 } },
+  { level = 6, d = [0, 0, 0, 1, 4, 4] },
+  { level = 7, d = [1, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 0, 1, 0, 4, 4] },
+  { level = 9, d = [1, 0, 0, 0, 4, 4] },
+  { level = 10, d = [0, 1, 0, 0, 4, 4], schools = { combat = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [0, 0, 1, 0, 4, 4] },
+  { level = 13, d = [1, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 1, 4, 4] },
+  { level = 15, d = [0, 0, 1, 0, 4, 4], schools = { necro = 3 } },
+  { level = 16, d = [0, 1, 0, 0, 4, 4] },
+  { level = 17, d = [1, 0, 0, 0, 4, 4] },
+  { level = 18, d = [0, 0, 1, 0, 4, 4] },
+  { level = 19, d = [1, 0, 0, 0, 4, 4], schools = { combat = 3 } },
+  { level = 20, d = [0, 0, 0, 1, 4, 4] },
+]
+
+# Reference choices: Droga Ognia; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1021
+key = "avatar.venom_scout_path_1"
+ref = "Skorpia / Droga Ognia"
+rarity = "common"
+path = { base_avatar = 10, variant = 1, specializations = ["element", "necro"], gifts = ["card.moonbound_skin", "card.dread_idol"] }
+base = { phys_atk = 3, phys_def = 2, mag_atk = 3, mag_def = 1, hp = 35, stamina = 30 }
+schools = { element = 1, necro = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [1, 0, 0, 0, 4, 4] },
+  { level = 4, d = [1, 0, 0, 0, 4, 4] },
+  { level = 5, d = [0, 1, 0, 0, 4, 4], schools = { necro = 2 } },
+  { level = 6, d = [0, 0, 0, 1, 4, 4] },
+  { level = 7, d = [1, 0, 0, 0, 4, 4] },
+  { level = 8, d = [1, 0, 0, 0, 4, 4] },
+  { level = 9, d = [1, 0, 0, 0, 4, 4] },
+  { level = 10, d = [0, 1, 0, 0, 4, 4], schools = { element = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [1, 0, 0, 0, 4, 4] },
+  { level = 13, d = [1, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 1, 4, 4] },
+  { level = 15, d = [0, 0, 1, 0, 4, 4], schools = { necro = 3 } },
+  { level = 16, d = [0, 1, 0, 0, 4, 4] },
+  { level = 17, d = [1, 0, 0, 0, 4, 4] },
+  { level = 18, d = [1, 0, 0, 0, 4, 4] },
+  { level = 19, d = [1, 0, 0, 0, 4, 4], schools = { element = 3 } },
+  { level = 20, d = [0, 0, 0, 1, 4, 4] },
+]
+
+# Reference choices: Droga Przetwarzania; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1022
+key = "avatar.iron_reaver_path_0"
+ref = "Masakrator / Droga Przetwarzania"
+rarity = "uncommon"
+path = { base_avatar = 11, variant = 0, specializations = ["tech", "combat"], gifts = ["card.attack_lattice", "card.fury_catalyst"] }
+base = { phys_atk = 5, phys_def = 0, mag_atk = 4, mag_def = 0, hp = 40, stamina = 30 }
+schools = { tech = 1, combat = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 1, 0, 0, 4, 5] },
+  { level = 3, d = [1, 0, 0, 0, 2, 5] },
+  { level = 4, d = [0, 1, 0, 0, 3, 5] },
+  { level = 5, d = [1, 0, 0, 0, 3, 5], schools = { combat = 2 } },
+  { level = 6, d = [0, 0, 0, 1, 3, 4] },
+  { level = 7, d = [1, 0, 0, 0, 3, 4] },
+  { level = 8, d = [0, 0, 0, 0, 2, 3] },
+  { level = 9, d = [0, 0, 1, 0, 4, 6] },
+  { level = 10, d = [0, 1, 0, 0, 3, 4], schools = { tech = 2 } },
+  { level = 11, d = [0, 0, 0, 1, 3, 4] },
+  { level = 12, d = [0, 0, 1, 0, 3, 5] },
+  { level = 13, d = [0, 0, 0, 1, 3, 5] },
+  { level = 14, d = [0, 1, 1, 0, 2, 5] },
+  { level = 15, d = [0, 0, 1, 0, 3, 5], schools = { combat = 3 } },
+  { level = 16, d = [0, 0, 1, 0, 3, 5] },
+  { level = 17, d = [1, 0, 0, 0, 3, 5] },
+  { level = 18, d = [0, 0, 1, 0, 3, 5] },
+  { level = 19, d = [0, 1, 0, 0, 3, 5], schools = { tech = 3 } },
+  { level = 20, d = [0, 0, 1, 0, 2, 5] },
+]
+
+# Reference choices: Droga Pojemności; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1023
+key = "avatar.iron_reaver_path_1"
+ref = "Masakrator / Droga Pojemności"
+rarity = "uncommon"
+path = { base_avatar = 11, variant = 1, specializations = ["concentration", "combat"], gifts = ["card.sword_oath", "card.sword_dancer"] }
+base = { phys_atk = 5, phys_def = 1, mag_atk = 3, mag_def = 0, hp = 50, stamina = 20 }
+schools = { combat = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 1, 0, 0, 4, 5] },
+  { level = 3, d = [1, 0, 0, 0, 2, 5] },
+  { level = 4, d = [0, 1, 0, 0, 3, 5] },
+  { level = 5, d = [1, 0, 0, 0, 3, 5], schools = { combat = 2 } },
+  { level = 6, d = [0, 0, 0, 1, 3, 4] },
+  { level = 7, d = [1, 0, 0, 0, 3, 4] },
+  { level = 8, d = [0, 0, 0, 0, 2, 3] },
+  { level = 9, d = [0, 0, 1, 0, 4, 6] },
+  { level = 10, d = [0, 1, 0, 0, 3, 4] },
+  { level = 11, d = [0, 0, 0, 1, 3, 4] },
+  { level = 12, d = [1, 0, 0, 0, 3, 5] },
+  { level = 13, d = [0, 0, 0, 1, 3, 5] },
+  { level = 14, d = [1, 1, 0, 0, 2, 5] },
+  { level = 15, d = [0, 0, 1, 0, 3, 5], schools = { combat = 3 } },
+  { level = 16, d = [1, 0, 0, 0, 3, 5] },
+  { level = 17, d = [1, 0, 0, 0, 3, 5] },
+  { level = 18, d = [1, 0, 0, 0, 3, 5] },
+  { level = 19, d = [0, 1, 0, 0, 3, 5] },
+  { level = 20, d = [1, 0, 0, 0, 2, 5] },
+]
+
+# Reference choices: Droga Ostrza; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1024
+key = "avatar.rift_duelist_path_0"
+ref = "Ripper / Droga Ostrza"
+rarity = "uncommon"
+path = { base_avatar = 12, variant = 0, specializations = ["concentration", "combat"], gifts = ["card.sword_oath", "card.sword_dancer"] }
+base = { phys_atk = 4, phys_def = 0, mag_atk = 5, mag_def = 0, hp = 35, stamina = 35 }
+schools = { combat = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 1, 0, 2, 4] },
+  { level = 3, d = [0, 0, 1, 0, 3, 4] },
+  { level = 4, d = [0, 0, 1, 0, 3, 4] },
+  { level = 5, d = [1, 0, 0, 0, 3, 4], schools = { combat = 2 } },
+  { level = 6, d = [0, 0, 0, 0, 3, 4] },
+  { level = 7, d = [1, 0, 0, 0, 3, 4] },
+  { level = 8, d = [0, 0, 0, 0, 4, 4] },
+  { level = 9, d = [1, 0, 0, 0, 2, 4] },
+  { level = 10, d = [0, 0, 0, 0, 3, 4] },
+  { level = 11, d = [0, 0, 1, 0, 4, 6] },
+  { level = 12, d = [0, 0, 1, 0, 4, 4] },
+  { level = 13, d = [0, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 1, 0, 4, 4] },
+  { level = 15, d = [0, 0, 1, 0, 4, 4], schools = { combat = 3 } },
+  { level = 16, d = [0, 0, 1, 0, 6, 4] },
+  { level = 17, d = [1, 0, 0, 0, 4, 4] },
+  { level = 18, d = [0, 0, 0, 0, 4, 4] },
+  { level = 19, d = [1, 0, 0, 0, 5, 5] },
+  { level = 20, d = [0, 0, 1, 0, 5, 5] },
+]
+
+# Reference choices: Droga Rytuału; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1025
+key = "avatar.rift_duelist_path_1"
+ref = "Ripper / Droga Rytuału"
+rarity = "uncommon"
+path = { base_avatar = 12, variant = 1, specializations = ["necro", "combat"], gifts = ["card.night_rite", "card.sword_dancer"] }
+base = { phys_atk = 4, phys_def = 1, mag_atk = 4, mag_def = 0, hp = 45, stamina = 25 }
+schools = { necro = 1, combat = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [1, 0, 0, 0, 2, 4] },
+  { level = 3, d = [0, 0, 1, 0, 3, 4] },
+  { level = 4, d = [1, 0, 0, 0, 3, 4] },
+  { level = 5, d = [1, 0, 0, 0, 3, 4], schools = { combat = 2 } },
+  { level = 6, d = [0, 0, 0, 0, 3, 4] },
+  { level = 7, d = [1, 0, 0, 0, 3, 4] },
+  { level = 8, d = [0, 0, 0, 0, 4, 4] },
+  { level = 9, d = [1, 0, 0, 0, 2, 4] },
+  { level = 10, d = [0, 0, 0, 0, 3, 4], schools = { necro = 2 } },
+  { level = 11, d = [0, 0, 1, 0, 4, 6] },
+  { level = 12, d = [1, 0, 0, 0, 4, 4] },
+  { level = 13, d = [0, 0, 0, 0, 4, 4] },
+  { level = 14, d = [1, 0, 0, 0, 4, 4] },
+  { level = 15, d = [0, 0, 1, 0, 4, 4], schools = { combat = 3 } },
+  { level = 16, d = [1, 0, 0, 0, 6, 4] },
+  { level = 17, d = [1, 0, 0, 0, 4, 4] },
+  { level = 18, d = [0, 0, 0, 0, 4, 4] },
+  { level = 19, d = [1, 0, 0, 0, 5, 5], schools = { necro = 3 } },
+  { level = 20, d = [1, 0, 0, 0, 5, 5] },
+]
+
+# Reference choices: Droga Zgody; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1026
+key = "avatar.root_sage_path_0"
+ref = "Sokrates / Droga Zgody"
+rarity = "uncommon"
+path = { base_avatar = 13, variant = 0, specializations = ["divine", "element"], gifts = ["card.steadfast_blessing", "card.verdant_staff"] }
+base = { phys_atk = 3, phys_def = 2, mag_atk = 3, mag_def = 1, hp = 35, stamina = 35 }
+schools = { divine = 1, element = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [1, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 1, 0, 0, 4, 4] },
+  { level = 5, d = [0, 0, 1, 0, 3, 3], schools = { element = 2 } },
+  { level = 6, d = [0, 0, 0, 1, 4, 4] },
+  { level = 7, d = [1, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 1, 0, 0, 3, 3] },
+  { level = 9, d = [0, 0, 1, 0, 4, 4] },
+  { level = 10, d = [0, 0, 1, 0, 4, 4], schools = { divine = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 3, 3] },
+  { level = 12, d = [0, 1, 0, 0, 4, 4] },
+  { level = 13, d = [0, 0, 1, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 1, 3, 3] },
+  { level = 15, d = [1, 0, 0, 0, 4, 4], schools = { element = 3 } },
+  { level = 16, d = [0, 1, 0, 0, 4, 4] },
+  { level = 17, d = [0, 0, 1, 0, 3, 3] },
+  { level = 18, d = [0, 0, 1, 0, 4, 4] },
+  { level = 19, d = [0, 1, 0, 0, 4, 4], schools = { divine = 3 } },
+  { level = 20, d = [0, 0, 0, 1, 4, 4] },
+]
+
+# Reference choices: Droga Sporu; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1027
+key = "avatar.root_sage_path_1"
+ref = "Sokrates / Droga Sporu"
+rarity = "uncommon"
+path = { base_avatar = 13, variant = 1, specializations = ["combat", "element"], gifts = ["card.sword_oath", "card.verdant_staff"] }
+base = { phys_atk = 4, phys_def = 3, mag_atk = 2, mag_def = 0, hp = 45, stamina = 25 }
+schools = { combat = 1, element = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [1, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 1, 0, 0, 4, 4] },
+  { level = 5, d = [0, 0, 1, 0, 3, 3], schools = { combat = 2 } },
+  { level = 6, d = [0, 0, 0, 1, 4, 4] },
+  { level = 7, d = [1, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 1, 0, 0, 3, 3] },
+  { level = 9, d = [0, 0, 1, 0, 4, 4] },
+  { level = 10, d = [1, 0, 0, 0, 4, 4], schools = { element = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 3, 3] },
+  { level = 12, d = [0, 1, 0, 0, 4, 4] },
+  { level = 13, d = [0, 0, 1, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 1, 3, 3] },
+  { level = 15, d = [1, 0, 0, 0, 4, 4], schools = { combat = 3 } },
+  { level = 16, d = [0, 1, 0, 0, 4, 4] },
+  { level = 17, d = [0, 0, 1, 0, 3, 3] },
+  { level = 18, d = [1, 0, 0, 0, 4, 4] },
+  { level = 19, d = [0, 1, 0, 0, 4, 4], schools = { element = 3 } },
+  { level = 20, d = [0, 0, 0, 1, 4, 4] },
+]
+
+# Reference choices: Droga Energii; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1028
+key = "avatar.tideform_path_0"
+ref = "Blob / Droga Energii"
+rarity = "uncommon"
+path = { base_avatar = 14, variant = 0, specializations = ["element", "concentration"], gifts = ["card.sword_oath", "card.acolyte"] }
+base = { phys_atk = 1, phys_def = 4, mag_atk = 3, mag_def = 3, hp = 25, stamina = 35 }
+schools = { element = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [0, 1, 0, 0, 4, 4] },
+  { level = 4, d = [0, 0, 0, 1, 4, 4] },
+  { level = 5, d = [1, 0, 0, 0, 4, 4], schools = { element = 2 } },
+  { level = 6, d = [0, 0, 1, 0, 4, 4] },
+  { level = 7, d = [0, 1, 0, 0, 4, 4] },
+  { level = 8, d = [0, 0, 0, 1, 4, 4] },
+  { level = 9, d = [0, 1, 0, 0, 4, 4] },
+  { level = 10, d = [0, 0, 1, 0, 4, 4] },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [0, 0, 1, 0, 4, 4] },
+  { level = 13, d = [0, 1, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 1, 4, 4] },
+  { level = 15, d = [1, 0, 0, 0, 4, 4], schools = { element = 3 } },
+  { level = 16, d = [0, 0, 1, 0, 4, 4] },
+  { level = 17, d = [0, 1, 0, 0, 4, 4] },
+  { level = 18, d = [0, 0, 0, 1, 4, 4] },
+  { level = 19, d = [0, 1, 0, 0, 4, 4] },
+  { level = 20, d = [0, 0, 1, 0, 4, 4] },
+]
+
+# Reference choices: Droga Wzrostu; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1029
+key = "avatar.tideform_path_1"
+ref = "Blob / Droga Wzrostu"
+rarity = "uncommon"
+path = { base_avatar = 14, variant = 1, specializations = ["combat", "concentration"], gifts = ["card.sword_oath", "card.patient_commander"] }
+base = { phys_atk = 2, phys_def = 5, mag_atk = 2, mag_def = 2, hp = 35, stamina = 25 }
+schools = { combat = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [0, 1, 0, 0, 4, 4] },
+  { level = 4, d = [0, 0, 0, 1, 4, 4] },
+  { level = 5, d = [1, 0, 0, 0, 4, 4], schools = { combat = 2 } },
+  { level = 6, d = [1, 0, 0, 0, 4, 4] },
+  { level = 7, d = [0, 1, 0, 0, 4, 4] },
+  { level = 8, d = [0, 0, 0, 1, 4, 4] },
+  { level = 9, d = [0, 1, 0, 0, 4, 4] },
+  { level = 10, d = [1, 0, 0, 0, 4, 4] },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [1, 0, 0, 0, 4, 4] },
+  { level = 13, d = [0, 1, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 1, 4, 4] },
+  { level = 15, d = [1, 0, 0, 0, 4, 4], schools = { combat = 3 } },
+  { level = 16, d = [1, 0, 0, 0, 4, 4] },
+  { level = 17, d = [0, 1, 0, 0, 4, 4] },
+  { level = 18, d = [0, 0, 0, 1, 4, 4] },
+  { level = 19, d = [0, 1, 0, 0, 4, 4] },
+  { level = 20, d = [1, 0, 0, 0, 4, 4] },
+]
+
+# Reference choices: Droga Sieci; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1030
+key = "avatar.silkblade_path_0"
+ref = "Spiddy / Droga Sieci"
+rarity = "uncommon"
+path = { base_avatar = 15, variant = 0, specializations = ["arcane", "combat"], gifts = ["card.sword_oath", "card.sword_dancer"] }
+base = { phys_atk = 2, phys_def = 2, mag_atk = 5, mag_def = 1, hp = 25, stamina = 35 }
+schools = { arcane = 1, combat = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [0, 0, 1, 0, 4, 4] },
+  { level = 4, d = [0, 0, 1, 0, 4, 4] },
+  { level = 5, d = [0, 1, 0, 0, 4, 4], schools = { combat = 2 } },
+  { level = 6, d = [0, 0, 0, 1, 4, 4] },
+  { level = 7, d = [0, 0, 1, 0, 4, 4] },
+  { level = 8, d = [0, 0, 1, 0, 4, 4] },
+  { level = 9, d = [0, 0, 1, 0, 4, 4] },
+  { level = 10, d = [0, 1, 0, 0, 4, 4], schools = { arcane = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [0, 0, 1, 0, 4, 4] },
+  { level = 13, d = [0, 0, 1, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 1, 4, 4] },
+  { level = 15, d = [1, 0, 0, 0, 4, 4], schools = { combat = 3 } },
+  { level = 16, d = [0, 1, 0, 0, 4, 4] },
+  { level = 17, d = [0, 0, 1, 0, 4, 4] },
+  { level = 18, d = [0, 0, 1, 0, 4, 4] },
+  { level = 19, d = [0, 0, 1, 0, 4, 4], schools = { arcane = 3 } },
+  { level = 20, d = [0, 0, 0, 1, 4, 4] },
+]
+
+# Reference choices: Droga Jadu; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1031
+key = "avatar.silkblade_path_1"
+ref = "Spiddy / Droga Jadu"
+rarity = "uncommon"
+path = { base_avatar = 15, variant = 1, specializations = ["element", "combat"], gifts = ["card.moonbound_skin", "card.acolyte"] }
+base = { phys_atk = 3, phys_def = 3, mag_atk = 4, mag_def = 0, hp = 35, stamina = 25 }
+schools = { element = 1, combat = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [0, 0, 1, 0, 4, 4] },
+  { level = 4, d = [1, 0, 0, 0, 4, 4] },
+  { level = 5, d = [0, 1, 0, 0, 4, 4], schools = { combat = 2 } },
+  { level = 6, d = [0, 0, 0, 1, 4, 4] },
+  { level = 7, d = [0, 0, 1, 0, 4, 4] },
+  { level = 8, d = [1, 0, 0, 0, 4, 4] },
+  { level = 9, d = [0, 0, 1, 0, 4, 4] },
+  { level = 10, d = [0, 1, 0, 0, 4, 4], schools = { element = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [1, 0, 0, 0, 4, 4] },
+  { level = 13, d = [0, 0, 1, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 1, 4, 4] },
+  { level = 15, d = [1, 0, 0, 0, 4, 4], schools = { combat = 3 } },
+  { level = 16, d = [0, 1, 0, 0, 4, 4] },
+  { level = 17, d = [0, 0, 1, 0, 4, 4] },
+  { level = 18, d = [1, 0, 0, 0, 4, 4] },
+  { level = 19, d = [0, 0, 1, 0, 4, 4], schools = { element = 3 } },
+  { level = 20, d = [0, 0, 0, 1, 4, 4] },
+]
+
+# Reference choices: Droga Kości; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1032
+key = "avatar.bone_sentinel_path_0"
+ref = "Szkieletor / Droga Kości"
+rarity = "uncommon"
+path = { base_avatar = 16, variant = 0, specializations = ["combat", "necro"], gifts = ["card.sword_oath", "card.dread_idol"] }
+base = { phys_atk = 3, phys_def = 2, mag_atk = 4, mag_def = 1, hp = 35, stamina = 35 }
+schools = { combat = 1, necro = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [1, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 1, 0, 0, 4, 4] },
+  { level = 5, d = [0, 0, 1, 0, 4, 4], schools = { combat = 2 } },
+  { level = 6, d = [0, 0, 0, 1, 4, 4] },
+  { level = 7, d = [1, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 1, 0, 0, 4, 4] },
+  { level = 9, d = [1, 0, 0, 0, 4, 4] },
+  { level = 10, d = [0, 0, 1, 0, 4, 4], schools = { necro = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [0, 1, 0, 0, 4, 4] },
+  { level = 13, d = [1, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 1, 4, 4] },
+  { level = 15, d = [0, 1, 0, 0, 4, 4], schools = { combat = 3 } },
+  { level = 16, d = [0, 0, 1, 0, 4, 4] },
+  { level = 17, d = [1, 0, 0, 0, 4, 4] },
+  { level = 18, d = [0, 1, 0, 0, 4, 4] },
+  { level = 19, d = [1, 0, 0, 0, 4, 4], schools = { necro = 3 } },
+  { level = 20, d = [0, 0, 0, 1, 4, 4] },
+]
+
+# Reference choices: Droga Stali; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1033
+key = "avatar.bone_sentinel_path_1"
+ref = "Szkieletor / Droga Stali"
+rarity = "uncommon"
+path = { base_avatar = 16, variant = 1, specializations = ["combat", "concentration"], gifts = ["card.sword_dancer", "card.sable_curse"] }
+base = { phys_atk = 4, phys_def = 3, mag_atk = 3, mag_def = 0, hp = 45, stamina = 25 }
+schools = { combat = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [1, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 1, 0, 0, 4, 4] },
+  { level = 5, d = [0, 0, 1, 0, 4, 4], schools = { combat = 2 } },
+  { level = 6, d = [0, 0, 0, 1, 4, 4] },
+  { level = 7, d = [1, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 1, 0, 0, 4, 4] },
+  { level = 9, d = [1, 0, 0, 0, 4, 4] },
+  { level = 10, d = [1, 0, 0, 0, 4, 4] },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [0, 1, 0, 0, 4, 4] },
+  { level = 13, d = [1, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 1, 4, 4] },
+  { level = 15, d = [0, 1, 0, 0, 4, 4], schools = { combat = 3 } },
+  { level = 16, d = [1, 0, 0, 0, 4, 4] },
+  { level = 17, d = [1, 0, 0, 0, 4, 4] },
+  { level = 18, d = [0, 1, 0, 0, 4, 4] },
+  { level = 19, d = [1, 0, 0, 0, 4, 4] },
+  { level = 20, d = [0, 0, 0, 1, 4, 4] },
+]
+
+# Reference choices: Droga Płaszcza; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1034
+key = "avatar.veil_agent_path_0"
+ref = "Szpieg / Droga Płaszcza"
+rarity = "uncommon"
+path = { base_avatar = 17, variant = 0, specializations = ["arcane", "combat"], gifts = ["card.runic_workshop", "card.sword_dancer"] }
+base = { phys_atk = 5, phys_def = 0, mag_atk = 4, mag_def = 0, hp = 25, stamina = 35 }
+schools = { arcane = 1, combat = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [1, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 0, 1, 0, 4, 4] },
+  { level = 5, d = [1, 0, 0, 0, 4, 4], schools = { combat = 2 } },
+  { level = 6, d = [0, 1, 0, 0, 4, 4] },
+  { level = 7, d = [0, 0, 1, 0, 4, 4] },
+  { level = 8, d = [0, 0, 1, 0, 4, 4] },
+  { level = 9, d = [0, 0, 0, 1, 4, 4] },
+  { level = 10, d = [0, 0, 1, 0, 4, 4], schools = { arcane = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [0, 0, 1, 0, 4, 4] },
+  { level = 13, d = [1, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 1, 0, 4, 4] },
+  { level = 15, d = [1, 0, 0, 0, 4, 4], schools = { combat = 3 } },
+  { level = 16, d = [0, 0, 1, 0, 4, 4] },
+  { level = 17, d = [0, 1, 0, 0, 4, 4] },
+  { level = 18, d = [0, 0, 1, 0, 4, 4] },
+  { level = 19, d = [0, 0, 1, 0, 4, 4], schools = { arcane = 3 } },
+  { level = 20, d = [0, 0, 0, 1, 4, 4] },
+]
+
+# Reference choices: Droga Szpady; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1035
+key = "avatar.veil_agent_path_1"
+ref = "Szpieg / Droga Szpady"
+rarity = "uncommon"
+path = { base_avatar = 17, variant = 1, specializations = ["concentration", "combat"], gifts = ["card.sword_oath", "card.sword_dancer"] }
+base = { phys_atk = 5, phys_def = 1, mag_atk = 3, mag_def = 0, hp = 35, stamina = 25 }
+schools = { combat = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [1, 0, 0, 0, 4, 4] },
+  { level = 4, d = [1, 0, 0, 0, 4, 4] },
+  { level = 5, d = [1, 0, 0, 0, 4, 4], schools = { combat = 2 } },
+  { level = 6, d = [0, 1, 0, 0, 4, 4] },
+  { level = 7, d = [0, 0, 1, 0, 4, 4] },
+  { level = 8, d = [1, 0, 0, 0, 4, 4] },
+  { level = 9, d = [0, 0, 0, 1, 4, 4] },
+  { level = 10, d = [1, 0, 0, 0, 4, 4] },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [1, 0, 0, 0, 4, 4] },
+  { level = 13, d = [1, 0, 0, 0, 4, 4] },
+  { level = 14, d = [1, 0, 0, 0, 4, 4] },
+  { level = 15, d = [1, 0, 0, 0, 4, 4], schools = { combat = 3 } },
+  { level = 16, d = [1, 0, 0, 0, 4, 4] },
+  { level = 17, d = [0, 1, 0, 0, 4, 4] },
+  { level = 18, d = [1, 0, 0, 0, 4, 4] },
+  { level = 19, d = [0, 0, 1, 0, 4, 4] },
+  { level = 20, d = [0, 0, 0, 1, 4, 4] },
+]
+
+# Reference choices: Droga Światła; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1036
+key = "avatar.glass_alchemist_path_0"
+ref = "Alchemik / Droga Światła"
+rarity = "rare"
+path = { base_avatar = 18, variant = 0, specializations = ["essence", "concentration"], gifts = ["card.aether_amplifier", "card.sage_stone"] }
+base = { phys_atk = 2, phys_def = 0, mag_atk = 4, mag_def = 2, hp = 25, stamina = 50 }
+schools = { arcane = 1, divine = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [0, 0, 1, 0, 3, 4] },
+  { level = 4, d = [0, 0, 0, 1, 4, 4] },
+  { level = 5, d = [1, 0, 0, 0, 3, 4], schools = { arcane = 2 } },
+  { level = 6, d = [0, 0, 1, 0, 4, 4] },
+  { level = 7, d = [0, 1, 0, 0, 3, 4] },
+  { level = 8, d = [0, 0, 1, 0, 3, 4] },
+  { level = 9, d = [0, 0, 0, 1, 4, 4] },
+  { level = 10, d = [0, 0, 1, 0, 3, 4], schools = { divine = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [0, 0, 1, 0, 3, 4] },
+  { level = 13, d = [0, 1, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 1, 0, 3, 4] },
+  { level = 15, d = [0, 0, 0, 1, 3, 4], schools = { arcane = 3 } },
+  { level = 16, d = [0, 0, 1, 0, 4, 4] },
+  { level = 17, d = [0, 0, 0, 1, 3, 4] },
+  { level = 18, d = [0, 0, 1, 0, 4, 4] },
+  { level = 19, d = [1, 0, 0, 0, 3, 4], schools = { divine = 3 } },
+  { level = 20, d = [0, 0, 1, 0, 4, 4] },
+]
+
+# Reference choices: Droga Mroku; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1037
+key = "avatar.glass_alchemist_path_1"
+ref = "Alchemik / Droga Mroku"
+rarity = "rare"
+path = { base_avatar = 18, variant = 1, specializations = ["essence", "concentration"], gifts = ["card.aether_amplifier", "card.sage_stone"] }
+base = { phys_atk = 3, phys_def = 1, mag_atk = 3, mag_def = 1, hp = 35, stamina = 40 }
+schools = { arcane = 1, necro = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [0, 0, 1, 0, 3, 4] },
+  { level = 4, d = [0, 0, 0, 1, 4, 4] },
+  { level = 5, d = [1, 0, 0, 0, 3, 4], schools = { arcane = 2 } },
+  { level = 6, d = [1, 0, 0, 0, 4, 4] },
+  { level = 7, d = [0, 1, 0, 0, 3, 4] },
+  { level = 8, d = [1, 0, 0, 0, 3, 4] },
+  { level = 9, d = [0, 0, 0, 1, 4, 4] },
+  { level = 10, d = [1, 0, 0, 0, 3, 4], schools = { necro = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [1, 0, 0, 0, 3, 4] },
+  { level = 13, d = [0, 1, 0, 0, 4, 4] },
+  { level = 14, d = [1, 0, 0, 0, 3, 4] },
+  { level = 15, d = [0, 0, 0, 1, 3, 4], schools = { arcane = 3 } },
+  { level = 16, d = [1, 0, 0, 0, 4, 4] },
+  { level = 17, d = [0, 0, 0, 1, 3, 4] },
+  { level = 18, d = [1, 0, 0, 0, 4, 4] },
+  { level = 19, d = [1, 0, 0, 0, 3, 4], schools = { necro = 3 } },
+  { level = 20, d = [1, 0, 0, 0, 4, 4] },
+]
+
+# Reference choices: Droga Sztuki; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1038
+key = "avatar.dusk_stalker_path_0"
+ref = "Hiena / Droga Sztuki"
+rarity = "rare"
+path = { base_avatar = 19, variant = 0, specializations = ["essence", "concentration"], gifts = ["card.blood_chalice", "card.astral_scepter"] }
+base = { phys_atk = 2, phys_def = 1, mag_atk = 4, mag_def = 2, hp = 25, stamina = 40 }
+schools = { arcane = 1, necro = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 4] },
+  { level = 3, d = [1, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 0, 1, 0, 4, 4] },
+  { level = 5, d = [0, 1, 0, 0, 4, 4], schools = { arcane = 2 } },
+  { level = 6, d = [0, 0, 0, 1, 4, 5] },
+  { level = 7, d = [1, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 0, 1, 0, 4, 4] },
+  { level = 9, d = [1, 0, 0, 0, 4, 4] },
+  { level = 10, d = [0, 0, 1, 0, 4, 4], schools = { necro = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 5] },
+  { level = 12, d = [0, 1, 0, 0, 4, 4] },
+  { level = 13, d = [1, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 1, 0, 4, 4] },
+  { level = 15, d = [0, 0, 0, 1, 4, 4], schools = { arcane = 3 } },
+  { level = 16, d = [0, 0, 1, 0, 4, 5] },
+  { level = 17, d = [0, 0, 1, 0, 4, 4] },
+  { level = 18, d = [0, 0, 1, 0, 4, 4] },
+  { level = 19, d = [0, 0, 1, 0, 4, 4], schools = { necro = 3 } },
+  { level = 20, d = [0, 1, 0, 0, 4, 5] },
+]
+
+# Reference choices: Droga Szponu; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1039
+key = "avatar.dusk_stalker_path_1"
+ref = "Hiena / Droga Szponu"
+rarity = "rare"
+path = { base_avatar = 19, variant = 1, specializations = ["essence", "concentration"], gifts = ["card.martial_staff", "card.astral_scepter"] }
+base = { phys_atk = 3, phys_def = 2, mag_atk = 3, mag_def = 1, hp = 35, stamina = 30 }
+schools = { combat = 1, arcane = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 4] },
+  { level = 3, d = [1, 0, 0, 0, 4, 4] },
+  { level = 4, d = [1, 0, 0, 0, 4, 4] },
+  { level = 5, d = [0, 1, 0, 0, 4, 4], schools = { arcane = 2 } },
+  { level = 6, d = [0, 0, 0, 1, 4, 5] },
+  { level = 7, d = [1, 0, 0, 0, 4, 4] },
+  { level = 8, d = [1, 0, 0, 0, 4, 4] },
+  { level = 9, d = [1, 0, 0, 0, 4, 4] },
+  { level = 10, d = [1, 0, 0, 0, 4, 4], schools = { combat = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 5] },
+  { level = 12, d = [0, 1, 0, 0, 4, 4] },
+  { level = 13, d = [1, 0, 0, 0, 4, 4] },
+  { level = 14, d = [1, 0, 0, 0, 4, 4] },
+  { level = 15, d = [0, 0, 0, 1, 4, 4], schools = { arcane = 3 } },
+  { level = 16, d = [1, 0, 0, 0, 4, 5] },
+  { level = 17, d = [0, 0, 1, 0, 4, 4] },
+  { level = 18, d = [1, 0, 0, 0, 4, 4] },
+  { level = 19, d = [0, 0, 1, 0, 4, 4], schools = { combat = 3 } },
+  { level = 20, d = [0, 1, 0, 0, 4, 5] },
+]
+
+# Reference choices: Droga Pychy; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1040
+key = "avatar.dawn_lancer_path_0"
+ref = "Lambert / Droga Pychy"
+rarity = "rare"
+path = { base_avatar = 20, variant = 0, specializations = ["necro", "combat"], gifts = ["card.blood_chalice", "card.sword_dancer"] }
+base = { phys_atk = 4, phys_def = 1, mag_atk = 3, mag_def = 2, hp = 30, stamina = 35 }
+schools = { necro = 1, combat = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 1, 0, 3, 6] },
+  { level = 3, d = [1, 0, 0, 0, 3, 3] },
+  { level = 4, d = [0, 1, 0, 0, 3, 3] },
+  { level = 5, d = [0, 0, 0, 0, 3, 4], schools = { combat = 2 } },
+  { level = 6, d = [0, 0, 1, 0, 3, 4] },
+  { level = 7, d = [0, 0, 1, 0, 3, 4] },
+  { level = 8, d = [0, 1, 0, 0, 3, 4] },
+  { level = 9, d = [0, 0, 0, 0, 2, 4] },
+  { level = 10, d = [0, 0, 1, 0, 3, 4], schools = { necro = 2 } },
+  { level = 11, d = [0, 0, 0, 1, 3, 4] },
+  { level = 12, d = [0, 0, 1, 0, 3, 4] },
+  { level = 13, d = [0, 1, 0, 0, 3, 4] },
+  { level = 14, d = [0, 1, 0, 0, 3, 4] },
+  { level = 15, d = [0, 0, 0, 0, 3, 4], schools = { combat = 3 } },
+  { level = 16, d = [0, 0, 1, 0, 4, 4] },
+  { level = 17, d = [1, 0, 0, 1, 4, 6] },
+  { level = 18, d = [0, 0, 1, 0, 4, 4] },
+  { level = 19, d = [1, 0, 0, 0, 4, 5], schools = { necro = 3 } },
+  { level = 20, d = [0, 0, 0, 1, 3, 5] },
+]
+
+# Reference choices: Droga Pokory; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1041
+key = "avatar.dawn_lancer_path_1"
+ref = "Lambert / Droga Pokory"
+rarity = "rare"
+path = { base_avatar = 20, variant = 1, specializations = ["divine", "combat"], gifts = ["card.dawn_embodiment", "card.sword_dancer"] }
+base = { phys_atk = 5, phys_def = 2, mag_atk = 2, mag_def = 1, hp = 40, stamina = 25 }
+schools = { divine = 1, combat = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [1, 0, 0, 0, 3, 6] },
+  { level = 3, d = [1, 0, 0, 0, 3, 3] },
+  { level = 4, d = [0, 1, 0, 0, 3, 3] },
+  { level = 5, d = [0, 0, 0, 0, 3, 4], schools = { combat = 2 } },
+  { level = 6, d = [1, 0, 0, 0, 3, 4] },
+  { level = 7, d = [0, 0, 1, 0, 3, 4] },
+  { level = 8, d = [0, 1, 0, 0, 3, 4] },
+  { level = 9, d = [0, 0, 0, 0, 2, 4] },
+  { level = 10, d = [1, 0, 0, 0, 3, 4], schools = { divine = 2 } },
+  { level = 11, d = [0, 0, 0, 1, 3, 4] },
+  { level = 12, d = [1, 0, 0, 0, 3, 4] },
+  { level = 13, d = [0, 1, 0, 0, 3, 4] },
+  { level = 14, d = [0, 1, 0, 0, 3, 4] },
+  { level = 15, d = [0, 0, 0, 0, 3, 4], schools = { combat = 3 } },
+  { level = 16, d = [1, 0, 0, 0, 4, 4] },
+  { level = 17, d = [1, 0, 0, 1, 4, 6] },
+  { level = 18, d = [1, 0, 0, 0, 4, 4] },
+  { level = 19, d = [1, 0, 0, 0, 4, 5], schools = { divine = 3 } },
+  { level = 20, d = [0, 0, 0, 1, 3, 5] },
+]
+
+# Reference choices: Droga Jasnej Strony; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1042
+key = "avatar.aether_seer_path_0"
+ref = "Magus / Droga Jasnej Strony"
+rarity = "rare"
+path = { base_avatar = 21, variant = 0, specializations = ["essence", "concentration"], gifts = ["card.dawn_embodiment", "card.astral_scepter"] }
+base = { phys_atk = 1, phys_def = 0, mag_atk = 5, mag_def = 1, hp = 20, stamina = 50 }
+schools = { arcane = 1, divine = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [0, 0, 1, 0, 4, 4] },
+  { level = 4, d = [0, 0, 0, 1, 4, 4] },
+  { level = 5, d = [1, 0, 0, 0, 4, 4], schools = { arcane = 2 } },
+  { level = 6, d = [0, 0, 1, 0, 4, 4] },
+  { level = 7, d = [0, 1, 0, 0, 4, 4] },
+  { level = 8, d = [0, 0, 1, 0, 4, 4] },
+  { level = 9, d = [0, 0, 0, 1, 4, 4] },
+  { level = 10, d = [0, 0, 1, 0, 4, 4], schools = { divine = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [0, 0, 1, 0, 4, 4] },
+  { level = 13, d = [0, 1, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 1, 0, 4, 4] },
+  { level = 15, d = [0, 0, 0, 1, 4, 4], schools = { arcane = 3 } },
+  { level = 16, d = [0, 0, 1, 0, 4, 4] },
+  { level = 17, d = [0, 0, 0, 1, 4, 4] },
+  { level = 18, d = [0, 0, 1, 0, 4, 4] },
+  { level = 19, d = [1, 0, 0, 0, 4, 4], schools = { divine = 3 } },
+  { level = 20, d = [0, 0, 1, 0, 4, 4] },
+]
+
+# Reference choices: Droga Ciemnej Strony; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1043
+key = "avatar.aether_seer_path_1"
+ref = "Magus / Droga Ciemnej Strony"
+rarity = "rare"
+path = { base_avatar = 21, variant = 1, specializations = ["essence", "concentration"], gifts = ["card.dread_idol", "card.astral_scepter"] }
+base = { phys_atk = 2, phys_def = 1, mag_atk = 4, mag_def = 0, hp = 30, stamina = 40 }
+schools = { arcane = 1, necro = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [0, 0, 1, 0, 4, 4] },
+  { level = 4, d = [0, 0, 0, 1, 4, 4] },
+  { level = 5, d = [1, 0, 0, 0, 4, 4], schools = { arcane = 2 } },
+  { level = 6, d = [1, 0, 0, 0, 4, 4] },
+  { level = 7, d = [0, 1, 0, 0, 4, 4] },
+  { level = 8, d = [1, 0, 0, 0, 4, 4] },
+  { level = 9, d = [0, 0, 0, 1, 4, 4] },
+  { level = 10, d = [1, 0, 0, 0, 4, 4], schools = { necro = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [1, 0, 0, 0, 4, 4] },
+  { level = 13, d = [0, 1, 0, 0, 4, 4] },
+  { level = 14, d = [1, 0, 0, 0, 4, 4] },
+  { level = 15, d = [0, 0, 0, 1, 4, 4], schools = { arcane = 3 } },
+  { level = 16, d = [1, 0, 0, 0, 4, 4] },
+  { level = 17, d = [0, 0, 0, 1, 4, 4] },
+  { level = 18, d = [1, 0, 0, 0, 4, 4] },
+  { level = 19, d = [1, 0, 0, 0, 4, 4], schools = { necro = 3 } },
+  { level = 20, d = [1, 0, 0, 0, 4, 4] },
+]
+
+# Reference choices: Droga Chi; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1044
+key = "avatar.jade_vanguard_path_0"
+ref = "Mandaryn / Droga Chi"
+rarity = "rare"
+path = { base_avatar = 22, variant = 0, specializations = ["essence", "concentration"], gifts = ["card.dawn_embodiment", "card.essence_road"] }
+base = { phys_atk = 4, phys_def = 0, mag_atk = 4, mag_def = 3, hp = 20, stamina = 30 }
+schools = { arcane = 1, divine = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [1, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 0, 1, 0, 4, 4] },
+  { level = 5, d = [0, 0, 0, 1, 4, 4], schools = { arcane = 2 } },
+  { level = 6, d = [0, 1, 0, 0, 4, 4] },
+  { level = 7, d = [1, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 0, 1, 0, 4, 4] },
+  { level = 9, d = [1, 0, 0, 0, 4, 4] },
+  { level = 10, d = [0, 0, 0, 1, 4, 4], schools = { divine = 2 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [0, 0, 1, 0, 4, 4] },
+  { level = 13, d = [1, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 1, 0, 0, 4, 4] },
+  { level = 15, d = [0, 0, 1, 0, 4, 4], schools = { arcane = 3 } },
+  { level = 16, d = [0, 0, 0, 1, 4, 4] },
+  { level = 17, d = [1, 0, 0, 0, 4, 4] },
+  { level = 18, d = [0, 0, 1, 0, 4, 4] },
+  { level = 19, d = [1, 0, 0, 0, 4, 4], schools = { divine = 3 } },
+  { level = 20, d = [0, 1, 0, 0, 4, 4] },
+]
+
+# Reference choices: Droga Fu; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1045
+key = "avatar.jade_vanguard_path_1"
+ref = "Mandaryn / Droga Fu"
+rarity = "rare"
+path = { base_avatar = 22, variant = 1, specializations = ["combat", "concentration"], gifts = ["card.martial_staff", "card.sword_dancer"] }
+base = { phys_atk = 5, phys_def = 1, mag_atk = 3, mag_def = 2, hp = 30, stamina = 20 }
+schools = { combat = 1 }
+dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [1, 0, 0, 0, 4, 4] },
+  { level = 4, d = [1, 0, 0, 0, 4, 4] },
+  { level = 5, d = [0, 0, 0, 1, 4, 4], schools = { combat = 2 } },
+  { level = 6, d = [0, 1, 0, 0, 4, 4] },
+  { level = 7, d = [1, 0, 0, 0, 4, 4] },
+  { level = 8, d = [1, 0, 0, 0, 4, 4] },
+  { level = 9, d = [1, 0, 0, 0, 4, 4] },
+  { level = 10, d = [0, 0, 0, 1, 4, 4] },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [1, 0, 0, 0, 4, 4] },
+  { level = 13, d = [1, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 1, 0, 0, 4, 4] },
+  { level = 15, d = [0, 0, 1, 0, 4, 4], schools = { combat = 3 } },
+  { level = 16, d = [0, 0, 0, 1, 4, 4] },
+  { level = 17, d = [1, 0, 0, 0, 4, 4] },
+  { level = 18, d = [1, 0, 0, 0, 4, 4] },
+  { level = 19, d = [1, 0, 0, 0, 4, 4] },
+  { level = 20, d = [0, 1, 0, 0, 4, 4] },
+]
+
+# Reference choices: Droga Woli; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1046
+key = "avatar.cinder_knight_path_0"
+ref = "Dżin / Droga Woli"
+rarity = "junkyard"
+path = { base_avatar = 23, variant = 0, specializations = ["essence", "concentration"], gifts = ["card.living_elixir", "card.apprentices_retort"] }
+base = { phys_atk = 4, phys_def = 0, mag_atk = 4, mag_def = 0, hp = 20, stamina = 30 }
+schools = { combat = 1, arcane = 1 }
+dev_points = { 2 = 1, 4 = 1, 6 = 1, 8 = 1, 10 = 1, 12 = 1, 14 = 1, 16 = 1, 18 = 1, 20 = 1 }
+growth = [
+  { level = 2, d = [0, 1, 0, 0, 4, 4] },
+  { level = 3, d = [1, 0, 0, 0, 2, 2] },
+  { level = 4, d = [0, 1, 0, 0, 3, 3] },
+  { level = 5, d = [1, 0, 0, 0, 3, 3], schools = { combat = 2 } },
+  { level = 6, d = [0, 0, 0, 1, 3, 3] },
+  { level = 7, d = [1, 0, 0, 0, 3, 3] },
+  { level = 8, d = [0, 0, 0, 0, 2, 2] },
+  { level = 9, d = [0, 0, 1, 0, 4, 4] },
+  { level = 10, d = [0, 1, 0, 0, 3, 3], schools = { arcane = 2 } },
+  { level = 11, d = [0, 0, 0, 1, 3, 3] },
+  { level = 12, d = [0, 0, 1, 0, 3, 3] },
+  { level = 13, d = [0, 0, 0, 1, 3, 3] },
+  { level = 14, d = [0, 1, 1, 0, 3, 3] },
+  { level = 15, d = [0, 0, 1, 0, 3, 3], schools = { combat = 3 } },
+  { level = 16, d = [0, 0, 1, 0, 2, 2] },
+  { level = 17, d = [1, 0, 0, 0, 3, 3] },
+  { level = 18, d = [0, 0, 1, 0, 3, 3] },
+  { level = 19, d = [0, 1, 0, 0, 3, 3], schools = { arcane = 3 } },
+  { level = 20, d = [0, 0, 1, 0, 2, 2] },
+]
+
+# Reference choices: Droga Ciała; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1047
+key = "avatar.cinder_knight_path_1"
+ref = "Dżin / Droga Ciała"
+rarity = "junkyard"
+path = { base_avatar = 23, variant = 1, specializations = ["essence", "concentration"], gifts = ["card.primal_heart", "card.patient_commander"] }
+base = { phys_atk = 4, phys_def = 1, mag_atk = 3, mag_def = 0, hp = 30, stamina = 20 }
+schools = { combat = 1, element = 1 }
+dev_points = { 2 = 1, 4 = 1, 6 = 1, 8 = 1, 10 = 1, 12 = 1, 14 = 1, 16 = 1, 18 = 1, 20 = 1 }
+growth = [
+  { level = 2, d = [0, 1, 0, 0, 4, 4] },
+  { level = 3, d = [1, 0, 0, 0, 2, 2] },
+  { level = 4, d = [0, 1, 0, 0, 3, 3] },
+  { level = 5, d = [1, 0, 0, 0, 3, 3], schools = { combat = 2 } },
+  { level = 6, d = [0, 0, 0, 1, 3, 3] },
+  { level = 7, d = [1, 0, 0, 0, 3, 3] },
+  { level = 8, d = [0, 0, 0, 0, 2, 2] },
+  { level = 9, d = [0, 0, 1, 0, 4, 4] },
+  { level = 10, d = [0, 1, 0, 0, 3, 3], schools = { element = 2 } },
+  { level = 11, d = [0, 0, 0, 1, 3, 3] },
+  { level = 12, d = [1, 0, 0, 0, 3, 3] },
+  { level = 13, d = [0, 0, 0, 1, 3, 3] },
+  { level = 14, d = [1, 1, 0, 0, 3, 3] },
+  { level = 15, d = [0, 0, 1, 0, 3, 3], schools = { combat = 3 } },
+  { level = 16, d = [1, 0, 0, 0, 2, 2] },
+  { level = 17, d = [1, 0, 0, 0, 3, 3] },
+  { level = 18, d = [1, 0, 0, 0, 3, 3] },
+  { level = 19, d = [0, 1, 0, 0, 3, 3], schools = { element = 3 } },
+  { level = 20, d = [1, 0, 0, 0, 2, 2] },
+]
+
+# Reference choices: Droga Krwi; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1048
+key = "avatar.copper_distiller_path_0"
+ref = "Hum / Droga Krwi"
+rarity = "junkyard"
+path = { base_avatar = 24, variant = 0, specializations = ["essence", "concentration"], gifts = ["card.foundry_wisdom", "card.lumen_optimizer"] }
+base = { phys_atk = 4, phys_def = 1, mag_atk = 5, mag_def = 1, hp = 20, stamina = 30 }
+schools = { tech = 1, necro = 1 }
+dev_points = { 2 = 1, 4 = 1, 6 = 1, 8 = 1, 10 = 1, 12 = 1, 14 = 1, 16 = 1, 18 = 1, 20 = 1 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [1, 0, 0, 0, 3, 3] },
+  { level = 4, d = [0, 0, 1, 0, 3, 3] },
+  { level = 5, d = [0, 0, 0, 0, 3, 3], schools = { tech = 2 } },
+  { level = 6, d = [0, 1, 0, 0, 3, 3] },
+  { level = 7, d = [1, 0, 0, 0, 3, 3] },
+  { level = 8, d = [0, 0, 1, 0, 4, 4] },
+  { level = 9, d = [0, 0, 0, 0, 3, 3] },
+  { level = 10, d = [0, 0, 0, 1, 3, 3], schools = { necro = 2 } },
+  { level = 11, d = [1, 0, 0, 0, 3, 3] },
+  { level = 12, d = [0, 0, 1, 0, 3, 3] },
+  { level = 13, d = [0, 0, 0, 0, 3, 3] },
+  { level = 14, d = [0, 0, 1, 0, 4, 4] },
+  { level = 15, d = [0, 1, 0, 0, 3, 3], schools = { tech = 3 } },
+  { level = 16, d = [0, 0, 1, 0, 3, 3] },
+  { level = 17, d = [0, 0, 0, 0, 3, 3] },
+  { level = 18, d = [0, 0, 1, 0, 3, 3] },
+  { level = 19, d = [0, 0, 1, 0, 3, 3], schools = { necro = 3 } },
+  { level = 20, d = [0, 0, 1, 0, 4, 4] },
+]
+
+# Reference choices: Droga Stali; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1049
+key = "avatar.copper_distiller_path_1"
+ref = "Hum / Droga Stali"
+rarity = "junkyard"
+path = { base_avatar = 24, variant = 1, specializations = ["essence", "concentration"], gifts = ["card.sable_exchange", "card.calming_regulator"] }
+base = { phys_atk = 5, phys_def = 2, mag_atk = 4, mag_def = 0, hp = 30, stamina = 20 }
+schools = { tech = 1, combat = 1 }
+dev_points = { 2 = 1, 4 = 1, 6 = 1, 8 = 1, 10 = 1, 12 = 1, 14 = 1, 16 = 1, 18 = 1, 20 = 1 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 3, 3] },
+  { level = 3, d = [1, 0, 0, 0, 3, 3] },
+  { level = 4, d = [1, 0, 0, 0, 3, 3] },
+  { level = 5, d = [0, 0, 0, 0, 3, 3], schools = { tech = 2 } },
+  { level = 6, d = [0, 1, 0, 0, 3, 3] },
+  { level = 7, d = [1, 0, 0, 0, 3, 3] },
+  { level = 8, d = [1, 0, 0, 0, 4, 4] },
+  { level = 9, d = [0, 0, 0, 0, 3, 3] },
+  { level = 10, d = [0, 0, 0, 1, 3, 3], schools = { combat = 2 } },
+  { level = 11, d = [1, 0, 0, 0, 3, 3] },
+  { level = 12, d = [1, 0, 0, 0, 3, 3] },
+  { level = 13, d = [0, 0, 0, 0, 3, 3] },
+  { level = 14, d = [1, 0, 0, 0, 4, 4] },
+  { level = 15, d = [0, 1, 0, 0, 3, 3], schools = { tech = 3 } },
+  { level = 16, d = [1, 0, 0, 0, 3, 3] },
+  { level = 17, d = [0, 0, 0, 0, 3, 3] },
+  { level = 18, d = [1, 0, 0, 0, 3, 3] },
+  { level = 19, d = [0, 0, 1, 0, 3, 3], schools = { combat = 3 } },
+  { level = 20, d = [1, 0, 0, 0, 4, 4] },
+]
+
+# Reference choices: Droga Puszczy; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1050
+key = "avatar.ruin_keeper_path_0"
+ref = "Pustelnik / Droga Puszczy"
+rarity = "junkyard"
+path = { base_avatar = 25, variant = 0, specializations = ["essence", "concentration"], gifts = ["card.astral_scepter", "card.wild_current"] }
+base = { phys_atk = 2, phys_def = 3, mag_atk = 4, mag_def = 3, hp = 20, stamina = 30 }
+schools = { element = 1, arcane = 1 }
+dev_points = { 2 = 1, 4 = 1, 6 = 1, 8 = 1, 10 = 1, 12 = 1, 14 = 1, 16 = 1, 18 = 1, 20 = 1 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 2, 2] },
+  { level = 3, d = [1, 0, 0, 0, 3, 3] },
+  { level = 4, d = [0, 1, 0, 0, 3, 3] },
+  { level = 5, d = [0, 0, 0, 0, 3, 3], schools = { element = 2 } },
+  { level = 6, d = [0, 0, 1, 0, 3, 3] },
+  { level = 7, d = [0, 0, 0, 1, 3, 3] },
+  { level = 8, d = [0, 0, 1, 0, 3, 3] },
+  { level = 9, d = [0, 0, 0, 0, 3, 3] },
+  { level = 10, d = [0, 1, 0, 0, 3, 3], schools = { arcane = 2 } },
+  { level = 11, d = [0, 0, 1, 0, 2, 2] },
+  { level = 12, d = [0, 0, 0, 1, 3, 3] },
+  { level = 13, d = [0, 0, 0, 0, 3, 3] },
+  { level = 14, d = [0, 0, 1, 0, 3, 3] },
+  { level = 15, d = [0, 1, 0, 0, 3, 3], schools = { element = 3 } },
+  { level = 16, d = [0, 0, 1, 0, 3, 3] },
+  { level = 17, d = [0, 0, 0, 0, 3, 3] },
+  { level = 18, d = [0, 0, 0, 1, 3, 3] },
+  { level = 19, d = [1, 0, 0, 0, 3, 3], schools = { arcane = 3 } },
+  { level = 20, d = [0, 1, 0, 0, 3, 3] },
+]
+
+# Reference choices: Droga Szczytu; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1051
+key = "avatar.ruin_keeper_path_1"
+ref = "Pustelnik / Droga Szczytu"
+rarity = "junkyard"
+path = { base_avatar = 25, variant = 1, specializations = ["essence", "concentration"], gifts = ["card.fury_catalyst", "card.aether_field"] }
+base = { phys_atk = 3, phys_def = 4, mag_atk = 3, mag_def = 2, hp = 30, stamina = 20 }
+schools = { element = 1, combat = 1 }
+dev_points = { 2 = 1, 4 = 1, 6 = 1, 8 = 1, 10 = 1, 12 = 1, 14 = 1, 16 = 1, 18 = 1, 20 = 1 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 2, 2] },
+  { level = 3, d = [1, 0, 0, 0, 3, 3] },
+  { level = 4, d = [0, 1, 0, 0, 3, 3] },
+  { level = 5, d = [0, 0, 0, 0, 3, 3], schools = { element = 2 } },
+  { level = 6, d = [1, 0, 0, 0, 3, 3] },
+  { level = 7, d = [0, 0, 0, 1, 3, 3] },
+  { level = 8, d = [1, 0, 0, 0, 3, 3] },
+  { level = 9, d = [0, 0, 0, 0, 3, 3] },
+  { level = 10, d = [0, 1, 0, 0, 3, 3], schools = { combat = 2 } },
+  { level = 11, d = [0, 0, 1, 0, 2, 2] },
+  { level = 12, d = [0, 0, 0, 1, 3, 3] },
+  { level = 13, d = [0, 0, 0, 0, 3, 3] },
+  { level = 14, d = [1, 0, 0, 0, 3, 3] },
+  { level = 15, d = [0, 1, 0, 0, 3, 3], schools = { element = 3 } },
+  { level = 16, d = [1, 0, 0, 0, 3, 3] },
+  { level = 17, d = [0, 0, 0, 0, 3, 3] },
+  { level = 18, d = [0, 0, 0, 1, 3, 3] },
+  { level = 19, d = [1, 0, 0, 0, 3, 3], schools = { combat = 3 } },
+  { level = 20, d = [0, 1, 0, 0, 3, 3] },
+]
+
+# Reference choices: Droga Obłędu; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1052
+key = "avatar.shade_war_path_0"
+ref = "Cień Wojny / Droga Obłędu"
+rarity = "shade"
+path = { base_avatar = 26, variant = 0, specializations = ["essence", "concentration"], gifts = ["card.patient_commander", "card.sword_oath"] }
+base = { phys_atk = 2, phys_def = 2, mag_atk = 2, mag_def = 2, hp = 35, stamina = 40 }
+schools = { combat = 1 }
+dev_points = { 2 = 1, 3 = 1, 4 = 1, 5 = 1, 6 = 1, 7 = 1, 8 = 1, 9 = 1, 10 = 1, 11 = 1, 12 = 1, 13 = 1, 14 = 1, 15 = 1, 16 = 1, 17 = 1, 18 = 1, 19 = 2, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 4, 4] },
+  { level = 3, d = [0, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 0, 0, 0, 4, 4] },
+  { level = 5, d = [0, 0, 0, 0, 4, 4], schools = { combat = 2, arcane = 1 } },
+  { level = 6, d = [0, 0, 0, 0, 4, 4] },
+  { level = 7, d = [0, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 0, 0, 0, 4, 4] },
+  { level = 9, d = [0, 0, 0, 0, 4, 4] },
+  { level = 10, d = [0, 0, 0, 0, 4, 4], schools = { necro = 1 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [0, 0, 0, 0, 4, 4] },
+  { level = 13, d = [0, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 0, 4, 4] },
+  { level = 15, d = [0, 0, 0, 0, 4, 4], schools = { combat = 3 } },
+  { level = 16, d = [0, 0, 0, 0, 4, 4] },
+  { level = 17, d = [0, 0, 0, 0, 4, 4] },
+  { level = 18, d = [0, 0, 0, 0, 4, 4] },
+  { level = 19, d = [0, 0, 0, 0, 4, 4], schools = { arcane = 2 } },
+  { level = 20, d = [0, 0, 0, 0, 4, 4], schools = { necro = 2 } },
+]
+
+# Reference choices: Droga Perfekcji; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1053
+key = "avatar.shade_war_path_1"
+ref = "Cień Wojny / Droga Perfekcji"
+rarity = "shade"
+path = { base_avatar = 26, variant = 1, specializations = ["essence", "concentration"], gifts = ["card.sword_dancer", "card.martial_staff"] }
+base = { phys_atk = 2, phys_def = 2, mag_atk = 2, mag_def = 2, hp = 35, stamina = 40 }
+schools = { combat = 1 }
+dev_points = { 2 = 1, 3 = 1, 4 = 1, 5 = 1, 6 = 1, 7 = 1, 8 = 1, 9 = 1, 10 = 1, 11 = 1, 12 = 1, 13 = 1, 14 = 1, 15 = 1, 16 = 1, 17 = 1, 18 = 1, 19 = 2, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 4, 4] },
+  { level = 3, d = [0, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 0, 0, 0, 4, 4] },
+  { level = 5, d = [0, 0, 0, 0, 4, 4], schools = { combat = 2 } },
+  { level = 6, d = [0, 0, 0, 0, 4, 4] },
+  { level = 7, d = [0, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 0, 0, 0, 4, 4] },
+  { level = 9, d = [0, 0, 0, 0, 4, 4] },
+  { level = 10, d = [0, 0, 0, 0, 4, 4] },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [0, 0, 0, 0, 4, 4], schools = { combat = 3 } },
+  { level = 13, d = [0, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 0, 4, 4] },
+  { level = 15, d = [0, 0, 0, 0, 4, 4] },
+  { level = 16, d = [0, 0, 0, 0, 4, 4] },
+  { level = 17, d = [0, 0, 0, 0, 4, 4] },
+  { level = 18, d = [0, 0, 0, 0, 4, 4] },
+  { level = 19, d = [0, 0, 0, 0, 4, 4] },
+  { level = 20, d = [0, 0, 0, 0, 4, 4], schools = { combat = 4 } },
+]
+
+# Reference choices: Droga Obłędu; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1054
+key = "avatar.shade_truth_path_0"
+ref = "Cień Prawdy / Droga Obłędu"
+rarity = "shade"
+path = { base_avatar = 27, variant = 0, specializations = ["essence", "concentration"], gifts = ["card.dawn_embodiment", "card.radiant_scepter"] }
+base = { phys_atk = 2, phys_def = 2, mag_atk = 2, mag_def = 2, hp = 35, stamina = 40 }
+schools = { divine = 1 }
+dev_points = { 2 = 1, 3 = 1, 4 = 1, 5 = 1, 6 = 1, 7 = 1, 8 = 1, 9 = 1, 10 = 1, 11 = 1, 12 = 1, 13 = 1, 14 = 1, 15 = 1, 16 = 1, 17 = 1, 18 = 1, 19 = 2, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 4, 4] },
+  { level = 3, d = [0, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 0, 0, 0, 4, 4] },
+  { level = 5, d = [0, 0, 0, 0, 4, 4], schools = { divine = 2, necro = 1 } },
+  { level = 6, d = [0, 0, 0, 0, 4, 4] },
+  { level = 7, d = [0, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 0, 0, 0, 4, 4] },
+  { level = 9, d = [0, 0, 0, 0, 4, 4] },
+  { level = 10, d = [0, 0, 0, 0, 4, 4], schools = { tech = 1 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [0, 0, 0, 0, 4, 4] },
+  { level = 13, d = [0, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 0, 4, 4] },
+  { level = 15, d = [0, 0, 0, 0, 4, 4], schools = { divine = 3 } },
+  { level = 16, d = [0, 0, 0, 0, 4, 4] },
+  { level = 17, d = [0, 0, 0, 0, 4, 4] },
+  { level = 18, d = [0, 0, 0, 0, 4, 4] },
+  { level = 19, d = [0, 0, 0, 0, 4, 4], schools = { necro = 2 } },
+  { level = 20, d = [0, 0, 0, 0, 4, 4], schools = { tech = 2 } },
+]
+
+# Reference choices: Droga Perfekcji; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1055
+key = "avatar.shade_truth_path_1"
+ref = "Cień Prawdy / Droga Perfekcji"
+rarity = "shade"
+path = { base_avatar = 27, variant = 1, specializations = ["essence", "concentration"], gifts = ["card.living_elixir", "card.dawn_embodiment"] }
+base = { phys_atk = 2, phys_def = 2, mag_atk = 2, mag_def = 2, hp = 35, stamina = 40 }
+schools = { divine = 1 }
+dev_points = { 2 = 1, 3 = 1, 4 = 1, 5 = 1, 6 = 1, 7 = 1, 8 = 1, 9 = 1, 10 = 1, 11 = 1, 12 = 1, 13 = 1, 14 = 1, 15 = 1, 16 = 1, 17 = 1, 18 = 1, 19 = 2, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 4, 4] },
+  { level = 3, d = [0, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 0, 0, 0, 4, 4] },
+  { level = 5, d = [0, 0, 0, 0, 4, 4], schools = { divine = 2 } },
+  { level = 6, d = [0, 0, 0, 0, 4, 4] },
+  { level = 7, d = [0, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 0, 0, 0, 4, 4] },
+  { level = 9, d = [0, 0, 0, 0, 4, 4] },
+  { level = 10, d = [0, 0, 0, 0, 4, 4] },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [0, 0, 0, 0, 4, 4], schools = { divine = 3 } },
+  { level = 13, d = [0, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 0, 4, 4] },
+  { level = 15, d = [0, 0, 0, 0, 4, 4] },
+  { level = 16, d = [0, 0, 0, 0, 4, 4] },
+  { level = 17, d = [0, 0, 0, 0, 4, 4] },
+  { level = 18, d = [0, 0, 0, 0, 4, 4] },
+  { level = 19, d = [0, 0, 0, 0, 4, 4] },
+  { level = 20, d = [0, 0, 0, 0, 4, 4], schools = { divine = 4 } },
+]
+
+# Reference choices: Droga Obłędu; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1056
+key = "avatar.shade_elements_path_0"
+ref = "Cień Żywiołu / Droga Obłędu"
+rarity = "shade"
+path = { base_avatar = 28, variant = 0, specializations = ["essence", "concentration"], gifts = ["card.moonbound_skin", "card.verdant_staff"] }
+base = { phys_atk = 2, phys_def = 2, mag_atk = 2, mag_def = 2, hp = 35, stamina = 40 }
+schools = { element = 1 }
+dev_points = { 2 = 1, 3 = 1, 4 = 1, 5 = 1, 6 = 1, 7 = 1, 8 = 1, 9 = 1, 10 = 1, 11 = 1, 12 = 1, 13 = 1, 14 = 1, 15 = 1, 16 = 1, 17 = 1, 18 = 1, 19 = 2, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 4, 4] },
+  { level = 3, d = [0, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 0, 0, 0, 4, 4] },
+  { level = 5, d = [0, 0, 0, 0, 4, 4], schools = { element = 2, tech = 1 } },
+  { level = 6, d = [0, 0, 0, 0, 4, 4] },
+  { level = 7, d = [0, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 0, 0, 0, 4, 4] },
+  { level = 9, d = [0, 0, 0, 0, 4, 4] },
+  { level = 10, d = [0, 0, 0, 0, 4, 4], schools = { combat = 1 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [0, 0, 0, 0, 4, 4] },
+  { level = 13, d = [0, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 0, 4, 4] },
+  { level = 15, d = [0, 0, 0, 0, 4, 4], schools = { element = 3 } },
+  { level = 16, d = [0, 0, 0, 0, 4, 4] },
+  { level = 17, d = [0, 0, 0, 0, 4, 4] },
+  { level = 18, d = [0, 0, 0, 0, 4, 4] },
+  { level = 19, d = [0, 0, 0, 0, 4, 4], schools = { tech = 2 } },
+  { level = 20, d = [0, 0, 0, 0, 4, 4], schools = { combat = 2 } },
+]
+
+# Reference choices: Droga Perfekcji; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1057
+key = "avatar.shade_elements_path_1"
+ref = "Cień Żywiołu / Droga Perfekcji"
+rarity = "shade"
+path = { base_avatar = 28, variant = 1, specializations = ["essence", "concentration"], gifts = ["card.moonbound_skin", "card.verdant_staff"] }
+base = { phys_atk = 2, phys_def = 2, mag_atk = 2, mag_def = 2, hp = 35, stamina = 40 }
+schools = { element = 1 }
+dev_points = { 2 = 1, 3 = 1, 4 = 1, 5 = 1, 6 = 1, 7 = 1, 8 = 1, 9 = 1, 10 = 1, 11 = 1, 12 = 1, 13 = 1, 14 = 1, 15 = 1, 16 = 1, 17 = 1, 18 = 1, 19 = 2, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 4, 4] },
+  { level = 3, d = [0, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 0, 0, 0, 4, 4] },
+  { level = 5, d = [0, 0, 0, 0, 4, 4], schools = { element = 2 } },
+  { level = 6, d = [0, 0, 0, 0, 4, 4] },
+  { level = 7, d = [0, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 0, 0, 0, 4, 4] },
+  { level = 9, d = [0, 0, 0, 0, 4, 4] },
+  { level = 10, d = [0, 0, 0, 0, 4, 4] },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [0, 0, 0, 0, 4, 4], schools = { element = 3 } },
+  { level = 13, d = [0, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 0, 4, 4] },
+  { level = 15, d = [0, 0, 0, 0, 4, 4] },
+  { level = 16, d = [0, 0, 0, 0, 4, 4] },
+  { level = 17, d = [0, 0, 0, 0, 4, 4] },
+  { level = 18, d = [0, 0, 0, 0, 4, 4] },
+  { level = 19, d = [0, 0, 0, 0, 4, 4] },
+  { level = 20, d = [0, 0, 0, 0, 4, 4], schools = { element = 4 } },
+]
+
+# Reference choices: Droga Obłędu; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1058
+key = "avatar.shade_time_path_0"
+ref = "Cień Czasu / Droga Obłędu"
+rarity = "shade"
+path = { base_avatar = 29, variant = 0, specializations = ["essence", "concentration"], gifts = ["card.astral_scepter", "card.chronicle_veil"] }
+base = { phys_atk = 2, phys_def = 2, mag_atk = 2, mag_def = 2, hp = 35, stamina = 40 }
+schools = { arcane = 1 }
+dev_points = { 2 = 1, 3 = 1, 4 = 1, 5 = 1, 6 = 1, 7 = 1, 8 = 1, 9 = 1, 10 = 1, 11 = 1, 12 = 1, 13 = 1, 14 = 1, 15 = 1, 16 = 1, 17 = 1, 18 = 1, 19 = 2, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 4, 4] },
+  { level = 3, d = [0, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 0, 0, 0, 4, 4] },
+  { level = 5, d = [0, 0, 0, 0, 4, 4], schools = { arcane = 2, combat = 1 } },
+  { level = 6, d = [0, 0, 0, 0, 4, 4] },
+  { level = 7, d = [0, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 0, 0, 0, 4, 4] },
+  { level = 9, d = [0, 0, 0, 0, 4, 4] },
+  { level = 10, d = [0, 0, 0, 0, 4, 4], schools = { divine = 1 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [0, 0, 0, 0, 4, 4] },
+  { level = 13, d = [0, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 0, 4, 4] },
+  { level = 15, d = [0, 0, 0, 0, 4, 4], schools = { arcane = 3 } },
+  { level = 16, d = [0, 0, 0, 0, 4, 4] },
+  { level = 17, d = [0, 0, 0, 0, 4, 4] },
+  { level = 18, d = [0, 0, 0, 0, 4, 4] },
+  { level = 19, d = [0, 0, 0, 0, 4, 4], schools = { combat = 2 } },
+  { level = 20, d = [0, 0, 0, 0, 4, 4], schools = { divine = 2 } },
+]
+
+# Reference choices: Droga Perfekcji; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1059
+key = "avatar.shade_time_path_1"
+ref = "Cień Czasu / Droga Perfekcji"
+rarity = "shade"
+path = { base_avatar = 29, variant = 1, specializations = ["essence", "concentration"], gifts = ["card.astral_scepter", "card.chronicle_veil"] }
+base = { phys_atk = 2, phys_def = 2, mag_atk = 2, mag_def = 2, hp = 35, stamina = 40 }
+schools = { arcane = 1 }
+dev_points = { 2 = 1, 3 = 1, 4 = 1, 5 = 1, 6 = 1, 7 = 1, 8 = 1, 9 = 1, 10 = 1, 11 = 1, 12 = 1, 13 = 1, 14 = 1, 15 = 1, 16 = 1, 17 = 1, 18 = 1, 19 = 2, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 4, 4] },
+  { level = 3, d = [0, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 0, 0, 0, 4, 4] },
+  { level = 5, d = [0, 0, 0, 0, 4, 4], schools = { arcane = 2 } },
+  { level = 6, d = [0, 0, 0, 0, 4, 4] },
+  { level = 7, d = [0, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 0, 0, 0, 4, 4] },
+  { level = 9, d = [0, 0, 0, 0, 4, 4] },
+  { level = 10, d = [0, 0, 0, 0, 4, 4] },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [0, 0, 0, 0, 4, 4], schools = { arcane = 3 } },
+  { level = 13, d = [0, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 0, 4, 4] },
+  { level = 15, d = [0, 0, 0, 0, 4, 4] },
+  { level = 16, d = [0, 0, 0, 0, 4, 4] },
+  { level = 17, d = [0, 0, 0, 0, 4, 4] },
+  { level = 18, d = [0, 0, 0, 0, 4, 4] },
+  { level = 19, d = [0, 0, 0, 0, 4, 4] },
+  { level = 20, d = [0, 0, 0, 0, 4, 4], schools = { arcane = 4 } },
+]
+
+# Reference choices: Droga Obłędu; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1060
+key = "avatar.shade_death_path_0"
+ref = "Cień Śmierci / Droga Obłędu"
+rarity = "shade"
+path = { base_avatar = 30, variant = 0, specializations = ["essence", "concentration"], gifts = ["card.grave_halo", "card.blood_chalice"] }
+base = { phys_atk = 2, phys_def = 2, mag_atk = 2, mag_def = 2, hp = 35, stamina = 40 }
+schools = { necro = 1 }
+dev_points = { 2 = 1, 3 = 1, 4 = 1, 5 = 1, 6 = 1, 7 = 1, 8 = 1, 9 = 1, 10 = 1, 11 = 1, 12 = 1, 13 = 1, 14 = 1, 15 = 1, 16 = 1, 17 = 1, 18 = 1, 19 = 2, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 4, 4] },
+  { level = 3, d = [0, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 0, 0, 0, 4, 4] },
+  { level = 5, d = [0, 0, 0, 0, 4, 4], schools = { necro = 2, divine = 1 } },
+  { level = 6, d = [0, 0, 0, 0, 4, 4] },
+  { level = 7, d = [0, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 0, 0, 0, 4, 4] },
+  { level = 9, d = [0, 0, 0, 0, 4, 4] },
+  { level = 10, d = [0, 0, 0, 0, 4, 4], schools = { element = 1 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [0, 0, 0, 0, 4, 4] },
+  { level = 13, d = [0, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 0, 4, 4] },
+  { level = 15, d = [0, 0, 0, 0, 4, 4], schools = { necro = 3 } },
+  { level = 16, d = [0, 0, 0, 0, 4, 4] },
+  { level = 17, d = [0, 0, 0, 0, 4, 4] },
+  { level = 18, d = [0, 0, 0, 0, 4, 4] },
+  { level = 19, d = [0, 0, 0, 0, 4, 4], schools = { divine = 2 } },
+  { level = 20, d = [0, 0, 0, 0, 4, 4], schools = { element = 2 } },
+]
+
+# Reference choices: Droga Perfekcji; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1061
+key = "avatar.shade_death_path_1"
+ref = "Cień Śmierci / Droga Perfekcji"
+rarity = "shade"
+path = { base_avatar = 30, variant = 1, specializations = ["essence", "concentration"], gifts = ["card.grave_halo", "card.blood_chalice"] }
+base = { phys_atk = 2, phys_def = 2, mag_atk = 2, mag_def = 2, hp = 35, stamina = 40 }
+schools = { necro = 1 }
+dev_points = { 2 = 1, 3 = 1, 4 = 1, 5 = 1, 6 = 1, 7 = 1, 8 = 1, 9 = 1, 10 = 1, 11 = 1, 12 = 1, 13 = 1, 14 = 1, 15 = 1, 16 = 1, 17 = 1, 18 = 1, 19 = 2, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 4, 4] },
+  { level = 3, d = [0, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 0, 0, 0, 4, 4] },
+  { level = 5, d = [0, 0, 0, 0, 4, 4], schools = { necro = 2 } },
+  { level = 6, d = [0, 0, 0, 0, 4, 4] },
+  { level = 7, d = [0, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 0, 0, 0, 4, 4] },
+  { level = 9, d = [0, 0, 0, 0, 4, 4] },
+  { level = 10, d = [0, 0, 0, 0, 4, 4] },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [0, 0, 0, 0, 4, 4], schools = { necro = 3 } },
+  { level = 13, d = [0, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 0, 4, 4] },
+  { level = 15, d = [0, 0, 0, 0, 4, 4] },
+  { level = 16, d = [0, 0, 0, 0, 4, 4] },
+  { level = 17, d = [0, 0, 0, 0, 4, 4] },
+  { level = 18, d = [0, 0, 0, 0, 4, 4] },
+  { level = 19, d = [0, 0, 0, 0, 4, 4] },
+  { level = 20, d = [0, 0, 0, 0, 4, 4], schools = { necro = 4 } },
+]
+
+# Reference choices: Droga Obłędu; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1062
+key = "avatar.shade_genius_path_0"
+ref = "Cień Geniuszu / Droga Obłędu"
+rarity = "shade"
+path = { base_avatar = 31, variant = 0, specializations = ["essence", "concentration"], gifts = ["card.calming_regulator", "card.aether_amplifier"] }
+base = { phys_atk = 2, phys_def = 2, mag_atk = 2, mag_def = 2, hp = 35, stamina = 40 }
+schools = { tech = 1 }
+dev_points = { 2 = 1, 3 = 1, 4 = 1, 5 = 1, 6 = 1, 7 = 1, 8 = 1, 9 = 1, 10 = 1, 11 = 1, 12 = 1, 13 = 1, 14 = 1, 15 = 1, 16 = 1, 17 = 1, 18 = 1, 19 = 2, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 4, 4] },
+  { level = 3, d = [0, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 0, 0, 0, 4, 4] },
+  { level = 5, d = [0, 0, 0, 0, 4, 4], schools = { tech = 2, element = 1 } },
+  { level = 6, d = [0, 0, 0, 0, 4, 4] },
+  { level = 7, d = [0, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 0, 0, 0, 4, 4] },
+  { level = 9, d = [0, 0, 0, 0, 4, 4] },
+  { level = 10, d = [0, 0, 0, 0, 4, 4], schools = { arcane = 1 } },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [0, 0, 0, 0, 4, 4] },
+  { level = 13, d = [0, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 0, 4, 4] },
+  { level = 15, d = [0, 0, 0, 0, 4, 4], schools = { tech = 3 } },
+  { level = 16, d = [0, 0, 0, 0, 4, 4] },
+  { level = 17, d = [0, 0, 0, 0, 4, 4] },
+  { level = 18, d = [0, 0, 0, 0, 4, 4] },
+  { level = 19, d = [0, 0, 0, 0, 4, 4], schools = { element = 2 } },
+  { level = 20, d = [0, 0, 0, 0, 4, 4], schools = { arcane = 2 } },
+]
+
+# Reference choices: Droga Perfekcji; growth alterations: Z-PATH-1.
+[[avatar]]
+id = 1063
+key = "avatar.shade_genius_path_1"
+ref = "Cień Geniuszu / Droga Perfekcji"
+rarity = "shade"
+path = { base_avatar = 31, variant = 1, specializations = ["essence", "concentration"], gifts = ["card.calming_regulator", "card.aether_amplifier"] }
+base = { phys_atk = 2, phys_def = 2, mag_atk = 2, mag_def = 2, hp = 35, stamina = 40 }
+schools = { tech = 1 }
+dev_points = { 2 = 1, 3 = 1, 4 = 1, 5 = 1, 6 = 1, 7 = 1, 8 = 1, 9 = 1, 10 = 1, 11 = 1, 12 = 1, 13 = 1, 14 = 1, 15 = 1, 16 = 1, 17 = 1, 18 = 1, 19 = 2, 20 = 2 }
+growth = [
+  { level = 2, d = [0, 0, 0, 0, 4, 4] },
+  { level = 3, d = [0, 0, 0, 0, 4, 4] },
+  { level = 4, d = [0, 0, 0, 0, 4, 4] },
+  { level = 5, d = [0, 0, 0, 0, 4, 4], schools = { tech = 2 } },
+  { level = 6, d = [0, 0, 0, 0, 4, 4] },
+  { level = 7, d = [0, 0, 0, 0, 4, 4] },
+  { level = 8, d = [0, 0, 0, 0, 4, 4] },
+  { level = 9, d = [0, 0, 0, 0, 4, 4] },
+  { level = 10, d = [0, 0, 0, 0, 4, 4] },
+  { level = 11, d = [0, 0, 0, 0, 4, 4] },
+  { level = 12, d = [0, 0, 0, 0, 4, 4], schools = { tech = 3 } },
+  { level = 13, d = [0, 0, 0, 0, 4, 4] },
+  { level = 14, d = [0, 0, 0, 0, 4, 4] },
+  { level = 15, d = [0, 0, 0, 0, 4, 4] },
+  { level = 16, d = [0, 0, 0, 0, 4, 4] },
+  { level = 17, d = [0, 0, 0, 0, 4, 4] },
+  { level = 18, d = [0, 0, 0, 0, 4, 4] },
+  { level = 19, d = [0, 0, 0, 0, 4, 4] },
+  { level = 20, d = [0, 0, 0, 0, 4, 4], schools = { tech = 4 } },
+]

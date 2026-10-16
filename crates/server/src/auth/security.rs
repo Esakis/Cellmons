@@ -160,7 +160,14 @@ pub async fn session(state: &AppState, headers: &HeaderMap) -> Result<Session> {
 }
 
 pub(crate) async fn session_hash(state: &AppState, hash: &[u8], kind: &str) -> Result<Session> {
-    let row = sqlx::query!("UPDATE sessions AS s SET last_seen_at=now(), expires_at=now()+interval '30 days' FROM users AS u WHERE s.id_hash=$1 AND s.kind=$2 AND s.expires_at>now() AND u.id=s.user_id AND u.status='active' RETURNING s.id_hash, s.user_id, s.kind", hash, kind).fetch_optional(&state.db).await?.ok_or_else(Error::unauthorized)?;
+    let owner:Option<uuid::Uuid>=sqlx::query_scalar("SELECT user_id FROM sessions WHERE id_hash=$1 AND kind=$2 AND expires_at>clock_timestamp()")
+        .bind(hash).bind(kind).fetch_optional(&state.db).await?;
+    if let Some(user) = owner {
+        crate::admin::moderation::expire_ban(&state.db, Some(user), None)
+            .await
+            .map_err(|_| Error::busy())?;
+    }
+    let row = sqlx::query!("UPDATE sessions AS s SET last_seen_at=now(), expires_at=now()+interval '30 days' FROM users AS u WHERE s.id_hash=$1 AND s.kind=$2 AND s.purpose='game' AND s.expires_at>now() AND u.id=s.user_id AND u.status='active' RETURNING s.id_hash, s.user_id, s.kind", hash, kind).fetch_optional(&state.db).await?.ok_or_else(Error::unauthorized)?;
     Ok(Session {
         hash: row.id_hash,
         user: row.user_id,

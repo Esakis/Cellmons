@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js';
-import { duelActive } from './app/session';
+import { updatesBlocked } from './app/session';
 
 export const [offlineStatus, setOfflineStatus] = createSignal<
   'loading' | 'ready' | 'failed' | 'local'
@@ -24,7 +24,7 @@ export async function registerOffline() {
     registration = await navigator.serviceWorker.register('./sw.js');
     navigator.serviceWorker.addEventListener('message', (event) => {
       if (event.data === 'offline-ready') setOfflineStatus('ready');
-      if (event.data === 'can-update') event.ports[0]?.postMessage(!duelActive());
+      if (event.data === 'can-update') event.ports[0]?.postMessage(!updatesBlocked());
     });
     registration.active?.postMessage('status');
     if (registration.waiting) setUpdateReady(true);
@@ -46,11 +46,11 @@ export async function registerOffline() {
 }
 
 export function updateApp() {
-  if (duelActive() || !registration?.waiting) return;
+  if (updatesBlocked() || !registration?.waiting) return;
   navigator.serviceWorker.addEventListener(
     'controllerchange',
     () => {
-      if (!duelActive()) location.reload();
+      if (!updatesBlocked()) location.reload();
     },
     {
       once: true,

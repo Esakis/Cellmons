@@ -97,3 +97,27 @@
     height: 40px;
   }
 }
+
+.collection-progression {
+  border-block: 1px solid var(--color-border);
+  margin-block: 24px;
+  padding-block: 12px;
+}
+.collection-paths {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 12px;
+  margin-block: 12px;
+}
+.collection-paths article {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 16px;
+  background: var(--surface);
+}
+.collection-paths h3 {
+  margin-top: 0;
+}
+.collection-progression select {
+  max-width: 100%;
+}

@@ -325,3 +325,19 @@ Konto z niepotwierdzonym e-mailem pozostaje trwałym kontem z ograniczeniami R-K
 **Alternatywy.** Anonimowy użytkownik w bazie lub token aplikacji wymagałyby zapisu na serwerze. Zapis klienta w pamięci trwałej pozwalałby wznowić grę, ale nie spełniałby wymagania właściciela.
 
 **Konsekwencje.** Gość działa bez sieci i rejestracji, ale nie ma odzyskiwania ani automatycznego przenoszenia jego stanu na konto. Limity, ranking i nagrody online dotyczą kont uwierzytelnionych. Testy sprawdzają brak API i zapisu oraz utratę trybu po przeładowaniu strony.
+
+## ADR-019. Wdrożenie po zakończeniu aktywności
+
+**Kontekst.** Lobby jest lokalne dla procesu; dzienniki walk, turnieje i plany wypraw zawierają konkretną wersję silnika i treści. Przejęcie niezgodnej aktywności mogłoby zmienić wynik lub zablokować zasoby gracza.
+
+**Decyzja.** Wspólna transakcyjna bariera blokuje nowe aktywności. Dotychczasowy slot kończy wszystkie aktywności; po ośmiu minutach wydanie zostaje odłożone. Kandydat uruchamia aktorów dopiero po opróżnieniu aktywności. Caddy przełącza jeden upstream. Stary proces jest zatrzymywany przed odblokowaniem bariery, aby stare WebSockety nie rozpoczęły walki tuż przed zamknięciem. Wycofanie po wznowieniu gry używa tej samej procedury. Bilety WS są jednorazowe we wspólnej bazie, a dzierżawy są filtrowane według wersji przed przejęciem.
+
+**Konsekwencje.** Wdrożenie nie przerywa walk, ale może być odłożone przez długi turniej lub wyprawę. Nie ma przekazywania między różnymi silnikami ani równoważenia dwóch lokalnych lobby. Zmienia to wcześniejszy szkic infrastruktury, który zakładał automatyczne przekazanie po limicie czasu.
+
+## ADR-020. Minimalne obrazy wykonawcze
+
+**Kontekst.** Skan rzeczywiście zbudowanych obrazów ujawnił podatności bibliotek systemowych i nieużywanej obsługi SFTP.
+
+**Decyzja.** Serwer Linux x86_64 jest statycznie linkowany z musl i działa jako UID 65532 w `distroless/static-debian13`. PostgreSQL 18 używa oficjalnego Alpine 3.24 z aktualizacją pakietów. pgBackRest 2.59.3 budujemy ze źródła zweryfikowanego SHA-256, bez opcjonalnego libssh2/SFTP; repozytoria używane przez wdrożenie to S3 i lokalne fixture. Budowanie wykonuje również test smoke producenta. Skan Grype nie ma wykluczeń podatności; kody błędów blokują wydanie.
+
+**Konsekwencje.** Obrazy nadal wymagają regularnej przebudowy i skanu. Migracja istniejącej bazy między dystrybucjami wymaga osobnego odbioru danych, rozszerzeń i porządkowania znaków; nie jest zwykłym rolloutem aplikacji. Obraz odtwarzania musi odpowiadać źródłu kopii. Gotowy pipeline buduje x86_64; inna architektura wymaga osobnej kompilacji i testów.

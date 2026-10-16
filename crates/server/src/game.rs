@@ -30,6 +30,11 @@ pub struct Avatar {
     pub level: i16,
     pub xp: i32,
     pub tier: i16,
+    pub path_id: Option<i32>,
+    pub specialization: Option<String>,
+    pub gift_id: Option<i32>,
+    pub is_shade: bool,
+    pub shade_school: Option<String>,
     pub active: bool,
     pub revision: i32,
     pub unspent: i16,
@@ -55,6 +60,18 @@ pub struct Preset {
 #[derive(Deserialize)]
 #[serde(tag = "action", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Mutation {
+    Reincarnate {
+        id: Uuid,
+        revision: i32,
+        choice: crate::progression::Choice,
+        sacrifice: Option<Uuid>,
+    },
+    Shade {
+        id: Uuid,
+        revision: i32,
+        new_id: Uuid,
+        school: String,
+    },
     Create {
         id: Uuid,
         template_id: u16,
@@ -95,11 +112,14 @@ impl IntoResponse for HttpError {
 }
 pub(crate) fn response(error: Error) -> HttpError {
     let status = match error.0 {
-        "UNAUTHENTICATED" => StatusCode::UNAUTHORIZED,
-        "NOT_FOUND" => StatusCode::NOT_FOUND,
-        "BUSY" | "CONFLICT" | "PRICE_CHANGED" | "SLOTS_FULL" | "ACTIVE_AVATAR" | "PRESETS_FULL" => {
-            StatusCode::CONFLICT
+        "UNAUTHENTICATED" | "STEP_UP_REQUIRED" | "INVALID_OTP" | "INVALID_CREDENTIALS" => {
+            StatusCode::UNAUTHORIZED
         }
+        "FORBIDDEN" | "TOTP_SETUP_REQUIRED" => StatusCode::FORBIDDEN,
+        "NOT_FOUND" => StatusCode::NOT_FOUND,
+        "BUSY" | "CONFLICT" | "PRICE_CHANGED" | "SLOTS_FULL" | "ACTIVE_AVATAR" | "PRESETS_FULL"
+        | "ALREADY_MEMBER" | "MASTER_REQUIRED" | "NAME_TAKEN" | "CLAN_FULL"
+        | "APPLICATION_LIMIT" | "INELIGIBLE" | "FULL" | "LIMIT" => StatusCode::CONFLICT,
         "INTERNAL" | "TIMEOUT" | "UNAVAILABLE" => StatusCode::SERVICE_UNAVAILABLE,
         _ => StatusCode::BAD_REQUEST,
     };
@@ -152,7 +172,7 @@ pub async fn load(connection: &mut PgConnection, user: Uuid) -> Result<Snapshot>
     )
     .fetch_all(&mut *connection)
     .await?;
-    let rows=sqlx::query!("SELECT a.id,a.slot,a.template_id,a.path_id,a.level,a.xp,a.tier,a.is_active,a.revision,a.dev_points_unspent,a.dp_phys_atk,a.dp_phys_def,a.dp_mag_atk,a.dp_mag_def,a.dp_hp,a.dp_stamina,COALESCE(d.cards,'{}'::smallint[]) AS \"cards!\",COALESCE(d.revision,0) AS \"deck_revision!\" FROM avatars a LEFT JOIN decks d ON d.avatar_id=a.id WHERE a.user_id=$1 AND a.deleted_at IS NULL ORDER BY a.slot",user).fetch_all(&mut *connection).await?;
+    let rows=sqlx::query!("SELECT a.id,a.slot,a.template_id,a.path_id,a.specialization,a.gift_id,a.is_shade,a.shade_school,a.level,a.xp,a.tier,a.is_active,a.revision,a.dev_points_unspent,a.dp_phys_atk,a.dp_phys_def,a.dp_mag_atk,a.dp_mag_def,a.dp_hp,a.dp_stamina,COALESCE(d.cards,'{}'::smallint[]) AS \"cards!\",COALESCE(d.revision,0) AS \"deck_revision!\" FROM avatars a LEFT JOIN decks d ON d.avatar_id=a.id WHERE a.user_id=$1 AND a.deleted_at IS NULL ORDER BY a.slot",user).fetch_all(&mut *connection).await?;
     let mut avatars = Vec::new();
     for a in rows {
         let def = engine_content::avatar(
@@ -182,6 +202,11 @@ pub async fn load(connection: &mut PgConnection, user: Uuid) -> Result<Snapshot>
             level: a.level,
             xp: a.xp,
             tier: a.tier,
+            path_id: a.path_id,
+            specialization: a.specialization,
+            gift_id: a.gift_id,
+            is_shade: a.is_shade,
+            shade_school: a.shade_school,
             active: a.is_active,
             revision: a.revision,
             unspent: a.dev_points_unspent,
@@ -226,9 +251,25 @@ pub async fn mutate(db: &PgPool, user: Uuid, mutation: Mutation) -> Result<Snaps
     crate::activity::ensure_idle(&mut tx, user).await?;
     let mut snapshot = load(&mut tx, user).await?;
     match mutation {
+        Mutation::Reincarnate {
+            id,
+            revision,
+            choice,
+            sacrifice,
+        } => {
+            crate::progression::reincarnate(&mut tx, user, id, revision, choice, sacrifice).await?
+        }
+        Mutation::Shade {
+            id,
+            revision,
+            new_id,
+            school,
+        } => crate::progression::create_shade(&mut tx, user, id, revision, new_id, &school).await?,
         Mutation::Create { id, template_id } => {
             if !snapshot.templates.contains(&i32::from(template_id))
-                || engine_content::avatar(template_id).is_none()
+                || !engine_content::AVATARS
+                    .iter()
+                    .any(|a| a.id == template_id && a.rarity != engine_content::AvatarRarity::Shade)
             {
                 return Err(Error("NOT_FOUND"));
             }

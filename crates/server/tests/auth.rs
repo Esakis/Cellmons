@@ -23,6 +23,7 @@ use tower::ServiceExt as _;
 const PASSWORD: &str = "A long test password!";
 struct Fixture {
     state: AppState,
+    config: AuthConfig,
     mail: Arc<Mutex<Vec<Mail>>>,
 }
 struct Reply {
@@ -33,9 +34,11 @@ struct Reply {
 impl Fixture {
     fn new(db: PgPool) -> Self {
         let mail = Arc::new(Mutex::new(Vec::new()));
-        let auth = Auth::new(AuthConfig::local(), Mailer::Capture(mail.clone()));
+        let config = AuthConfig::local();
+        let auth = Auth::new(config.clone(), Mailer::Capture(mail.clone()));
         Self {
             state: AppState::new(db, auth, server::online::Settings::default()),
+            config,
             mail,
         }
     }
@@ -77,7 +80,7 @@ impl Fixture {
         }
     }
     async fn register(&self) {
-        let reply = self.call("POST","/api/auth/register",json!({"login":"PlayerOne","email":"one@example.test","password":PASSWORD,"school":"combat"}), &[]).await;
+        let reply = self.call("POST","/api/auth/register",json!({"login":"PlayerOne","email":"one@example.test","password":PASSWORD,"school":"combat","terms_version":"2026-10-16","age_confirmed":true}), &[]).await;
         assert_eq!(reply.status, StatusCode::CREATED, "{}", reply.body);
         assert!(reply.body.get("token").is_none());
     }
@@ -132,9 +135,9 @@ async fn r_knt_01_registration_provisions_the_compiled_starter_atomically(pool: 
     assert!(row.0.starts_with("$argon2id$v=19$m=19456,t=2,p=1$"));
     assert_eq!((row.1, row.2, row.3, row.4), (1, 40, 20, 1000));
     assert_eq!(f.mail.lock().unwrap().len(), 1);
-    let duplicate=f.call("POST","/api/auth/register",json!({"login":"playerone","email":"other@example.test","password":PASSWORD,"school":"tech"}), &[]).await;
+    let duplicate=f.call("POST","/api/auth/register",json!({"login":"playerone","email":"other@example.test","password":PASSWORD,"school":"tech","terms_version":"2026-10-16","age_confirmed":true}), &[]).await;
     assert_eq!(duplicate.status, StatusCode::CONFLICT);
-    let invalid=f.call("POST","/api/auth/register",json!({"login":"Second","email":"two@example.test","password":"password123","school":"tech"}), &[]).await;
+    let invalid=f.call("POST","/api/auth/register",json!({"login":"Second","email":"two@example.test","password":"password123","school":"tech","terms_version":"2026-10-16","age_confirmed":true}), &[]).await;
     assert_eq!(invalid.status, StatusCode::BAD_REQUEST);
     let count: i64 = sqlx::query_scalar("SELECT count(*) FROM users")
         .fetch_one(&pool)
@@ -243,13 +246,12 @@ async fn android_cors_rotation_and_one_time_ws_tickets(pool: PgPool) {
             .await
             .is_err()
     );
+    let replacement = Auth::new(f.config.clone(), Mailer::Capture(f.mail.clone()));
     let (a, b) = tokio::join!(
         f.state
             .auth
             .consume_ws_ticket(&f.state, raw, "https://localhost"),
-        f.state
-            .auth
-            .consume_ws_ticket(&f.state, raw, "https://localhost")
+        replacement.consume_ws_ticket(&f.state, raw, "https://localhost")
     );
     assert_ne!(a.is_ok(), b.is_ok());
     let another = f
@@ -615,7 +617,7 @@ async fn r_knt_01_all_six_schools_receive_their_exact_starter(pool: PgPool) {
     {
         let f = Fixture::new(pool.clone());
         let login = format!("Player{index}");
-        let reply=f.call("POST","/api/auth/register",json!({"login":login,"email":format!("player{index}@example.test"),"password":PASSWORD,"school":school}),&[]).await;
+        let reply=f.call("POST","/api/auth/register",json!({"login":login,"email":format!("player{index}@example.test"),"password":PASSWORD,"school":school,"terms_version":"2026-10-16","age_confirmed":true}),&[]).await;
         assert_eq!(reply.status, StatusCode::CREATED, "{}", reply.body);
         let user: uuid::Uuid = sqlx::query_scalar("SELECT id FROM users WHERE login=$1::citext")
             .bind(&login)
@@ -652,7 +654,7 @@ async fn failed_registration_delivery_rolls_back_the_entire_account(pool: PgPool
     let path = std::env::temp_dir().join(format!("game-mail-failure-{}", uuid::Uuid::now_v7()));
     std::fs::write(&path, b"fixture: not a directory").unwrap();
     f.state.auth = Auth::new(AuthConfig::local(), Mailer::File(path.clone()));
-    let reply=f.call("POST","/api/auth/register",json!({"login":"PlayerOne","email":"one@example.test","password":PASSWORD,"school":"combat"}),&[]).await;
+    let reply=f.call("POST","/api/auth/register",json!({"login":"PlayerOne","email":"one@example.test","password":PASSWORD,"school":"combat","terms_version":"2026-10-16","age_confirmed":true}),&[]).await;
     std::fs::remove_file(path).unwrap();
     assert_eq!(reply.status, StatusCode::SERVICE_UNAVAILABLE);
     let users: i64 = sqlx::query_scalar("SELECT count(*) FROM users")
@@ -782,7 +784,7 @@ async fn production_cookie_is_host_scoped_and_other_accounts_cannot_revoke_sessi
         .await;
     let id = list.body["sessions"][0]["id"].as_str().unwrap();
     let other = Fixture::new(pool.clone());
-    assert_eq!(other.call("POST","/api/auth/register",json!({"login":"PlayerTwo","email":"two@example.test","password":PASSWORD,"school":"tech"}),&[]).await.status,StatusCode::CREATED);
+    assert_eq!(other.call("POST","/api/auth/register",json!({"login":"PlayerTwo","email":"two@example.test","password":PASSWORD,"school":"tech","terms_version":"2026-10-16","age_confirmed":true}),&[]).await.status,StatusCode::CREATED);
     let other_login = other
         .call(
             "POST",
@@ -820,3 +822,34 @@ mod economy;
 
 #[path = "auth/store.rs"]
 mod store;
+
+#[path = "auth/clans.rs"]
+mod clans;
+#[path = "auth/expeditions.rs"]
+mod expeditions;
+#[path = "auth/progression.rs"]
+mod progression;
+#[path = "auth/tournaments.rs"]
+mod tournaments;
+
+#[sqlx::test(migrator = "server::db::MIGRATOR")]
+#[ignore = "requires PostgreSQL"]
+async fn registration_records_only_an_explicit_current_agreement(pool: PgPool) {
+    let f = Fixture::new(pool.clone());
+    for (version, age, code) in [
+        ("obsolete", true, "LEGAL_VERSION"),
+        (server::auth::LEGAL_VERSION, false, "LEGAL_REQUIRED"),
+    ] {
+        let reply=f.call("POST","/api/auth/register",json!({"login":"AgreementUser","email":"agreement@example.test","password":PASSWORD,"school":"combat","terms_version":version,"age_confirmed":age}),&[]).await;
+        assert_eq!(reply.status, StatusCode::BAD_REQUEST);
+        assert_eq!(reply.body["error"], code);
+    }
+    f.register().await;
+    let (version, age): (String, bool) =
+        sqlx::query_as("SELECT version,age_attested FROM account_agreements")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+    assert_eq!(version, server::auth::LEGAL_VERSION);
+    assert!(age);
+}

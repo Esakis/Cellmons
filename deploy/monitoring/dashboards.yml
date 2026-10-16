@@ -1,0 +1,5 @@
+apiVersion: 1
+providers:
+  - name: game
+    type: file
+    options: { path: /etc/grafana/dashboards }

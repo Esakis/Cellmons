@@ -14,6 +14,7 @@ pub struct AuthConfig {
     pub native_version: (u32, u32, u32),
     pub mail: MailConfig,
     pub captcha: Option<(String, String)>,
+    pub admin: Option<crate::admin::Config>,
 }
 
 impl std::fmt::Debug for AuthConfig {
@@ -73,6 +74,10 @@ impl AuthConfig {
         let var = |name| lookup(name).filter(|value| !value.is_empty());
         let public_origin = var("PUBLIC_ORIGIN").context("PUBLIC_ORIGIN is required")?;
         let local = origin(&public_origin)?;
+        ensure!(
+            local || var("LEGAL_APPROVED_VERSION").as_deref() == Some(super::LEGAL_VERSION),
+            "LEGAL_APPROVED_VERSION must match the reviewed document version outside loopback"
+        );
         let secure_cookie = public_origin.starts_with("https://");
         let app_origins: Vec<String> = var("APP_ORIGINS")
             .unwrap_or_else(|| "https://localhost".into())
@@ -143,6 +148,7 @@ impl AuthConfig {
             native_version,
             mail,
             captcha,
+            admin: crate::admin::Config::from_lookup(lookup)?,
         })
     }
 
@@ -189,6 +195,7 @@ mod tests {
                 "SMTP_FROM" => "game@example.test".into(),
                 "TURNSTILE_SITE_KEY" => "site".into(),
                 "TURNSTILE_SECRET" => "secret".into(),
+                "LEGAL_APPROVED_VERSION" => super::super::LEGAL_VERSION.into(),
                 _ => return None,
             })
         })
@@ -203,5 +210,15 @@ mod tests {
             })
             .is_err()
         );
+    }
+}
+
+#[cfg(test)]
+mod legal_version_test {
+    #[test]
+    fn served_documents_and_account_agreements_share_a_version() {
+        let documents: serde_json::Value =
+            serde_json::from_str(include_str!("../../../../legal/documents.json")).unwrap();
+        assert_eq!(documents["version"], crate::auth::LEGAL_VERSION);
     }
 }

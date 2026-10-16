@@ -1,7 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Spellgambit</string>
-    <string name="title_activity_main">Spellgambit</string>
-    <string name="package_name">dev.game.training</string>
-    <string name="custom_url_scheme">dev.game.training</string>
+    <string name="app_name" translatable="false">Spellgambit</string>
+    <string name="webview_update_required">Update Android System WebView before playing Spellgambit.</string>
+    <string name="webview_update">Update WebView</string>
+    <string name="title_activity_main" translatable="false">Spellgambit</string>
+    <string name="package_name" translatable="false">dev.game.training</string>
+    <string name="custom_url_scheme" translatable="false">dev.game.training</string>
 </resources>

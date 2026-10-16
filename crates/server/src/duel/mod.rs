@@ -25,11 +25,11 @@ impl Default for Settings {
     fn default() -> Self {
         let rules = engine_content::rules().duel;
         Self {
-            max_active: 1024,
+            max_active: 2048,
             round: Duration::from_secs(u64::from(rules.round_timeout_s)),
             after_opponent: Duration::from_secs(u64::from(rules.move_timeout_after_opponent_s)),
             reconnect: Duration::from_secs(u64::from(rules.reconnect_grace_s)),
-            lease: Duration::from_secs(5),
+            lease: Duration::from_secs(15),
             tick: Duration::from_millis(100),
         }
     }

@@ -13,6 +13,12 @@ use engine_content::{CARD_KEYS, STARTERS, content};
 /// Obie postacie: AF 6, OF 3, AM 4, OM 2, Ż 60, W 60. Ustawienia domyślne to F we wszystkich
 /// slotach, więc bloki są pełne.
 const BASE: Stats = stats(6, 3, 4, 2, 60, 60);
+#[path = "cards/covenant.rs"]
+mod covenant;
+#[path = "cards/eclipse.rs"]
+mod eclipse;
+#[path = "cards/final_packets.rs"]
+mod final_packets;
 
 fn card(key: &str) -> &'static CardDef {
     let id = CARD_KEYS
@@ -146,6 +152,15 @@ fn scenario(card: &CardDef) -> Scenario {
 /// Rozgrywa `skip` rund bez kart, a potem rundę, w której A rzuca kartę z pozycji 0. `b` zmienia
 /// ruch B z domyślnego.
 fn play(card: &CardDef, scenario: Scenario, skip: u8, b: impl Fn(Move) -> Move) -> Run {
+    play_as(card, scenario, skip, |mv| mv, b)
+}
+fn play_as(
+    card: &CardDef,
+    scenario: Scenario,
+    skip: u8,
+    a: impl Fn(Move) -> Move,
+    b: impl Fn(Move) -> Move,
+) -> Run {
     let content = content();
     let mut state = scenario.build();
     let mut events = EventBuf::new();
@@ -155,10 +170,10 @@ fn play(card: &CardDef, scenario: Scenario, skip: u8, b: impl Fn(Move) -> Move) 
     }
     let before = state.clone();
     events.clear();
-    let a = Move {
+    let a = a(Move {
         card: CardAction::Cast(0),
         ..default_move(&state, Side::A)
-    };
+    });
     let moves = [a, b(default_move(&state, Side::B))];
     resolve_round(&mut state, &content, &moves, &mut events)
         .unwrap_or_else(|error| panic!("karta {}: {error:?}", card.id));
@@ -210,6 +225,230 @@ fn check(key: &str) {
     let c = card(key);
     let name = key.trim_start_matches("card.");
     match name {
+        "chronicle_veil" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(run.resource(Side::A, Resource::Focus), 2);
+        }
+        "grave_halo" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(run.damaged(Side::B), 2);
+        }
+        "dawn_embodiment" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(
+                (
+                    run.stat_delta(Side::A, Stat::PhysDef),
+                    run.stat_delta(Side::A, Stat::MagDef)
+                ),
+                (1, 1)
+            );
+            assert_eq!(run.healed(Side::A), 1);
+        }
+        "steadfast_blessing" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(run.healed(Side::A), 2);
+            assert_eq!(run.resource(Side::A, Resource::Stamina), 2);
+        }
+        "essence_road" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(run.state.schools(Side::A).level(School::Arcane), 3);
+            assert_eq!(run.resource(Side::A, Resource::Stamina), 1);
+        }
+        "sword_oath" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(run.stat_delta(Side::A, Stat::PhysAtk), 2);
+            assert_eq!(run.resource(Side::A, Resource::Stamina), 1);
+        }
+        "living_elixir" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(run.healed(Side::A), 3);
+        }
+        "wild_current" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(run.resource(Side::A, Resource::Stamina), 3);
+        }
+        "calming_regulator" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(
+                (
+                    run.stat_delta(Side::B, Stat::PhysAtk),
+                    run.stat_delta(Side::B, Stat::MagAtk)
+                ),
+                (-1, -1)
+            );
+        }
+        "sage_stone" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(run.healed(Side::A), 1);
+            assert_eq!(run.resource(Side::A, Resource::Focus), 1);
+        }
+        "fury_catalyst" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(
+                (
+                    run.stat_delta(Side::A, Stat::PhysAtk),
+                    run.stat_delta(Side::A, Stat::MagAtk)
+                ),
+                (2, 2)
+            );
+            assert_eq!(run.resource(Side::A, Resource::Stamina), -1);
+        }
+        "runic_workshop" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(run.resource(Side::A, Resource::Focus), 1);
+            assert_eq!(run.resource(Side::A, Resource::Stamina), 2);
+        }
+        "radiant_scepter" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(run.state.schools(Side::A).level(School::Divine), 3);
+            assert_eq!(run.healed(Side::A), 1);
+        }
+        "astral_scepter" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(run.state.schools(Side::A).level(School::Arcane), 3);
+            assert_eq!(run.resource(Side::A, Resource::Focus), 1);
+        }
+        "verdant_staff" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(run.state.schools(Side::A).level(School::Element), 3);
+            assert_eq!(run.resource(Side::A, Resource::Stamina), 2);
+        }
+        "martial_staff" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(run.state.schools(Side::A).level(School::Combat), 3);
+            assert_eq!(run.resource(Side::A, Resource::Stamina), 1);
+        }
+        "mending_halo" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(run.healed(Side::A), 2);
+            assert_eq!(run.resource(Side::A, Resource::Stamina), 1);
+        }
+        "night_rite" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(run.stat_delta(Side::A, Stat::MagAtk), 2);
+            assert_eq!(run.damaged(Side::A), 1);
+        }
+        "ember_rain" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(run.damaged(Side::B), 3);
+        }
+        "lumen_optimizer" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(run.state.schools(Side::A).level(School::Divine), 1);
+            assert_eq!(run.resource(Side::A, Resource::Stamina), 1);
+        }
+        "patient_commander" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(run.resource(Side::A, Resource::Stamina), 6);
+        }
+        "sable_exchange" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(run.resource(Side::A, Resource::Stamina), 2);
+            assert_eq!(run.resource(Side::B, Resource::Stamina), -2);
+        }
+        "aether_field" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(run.stat_delta(Side::A, Stat::MagDef), 2);
+            assert_eq!(run.resource(Side::A, Resource::Stamina), 1);
+        }
+        "sable_curse" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(
+                (
+                    run.stat_delta(Side::B, Stat::PhysDef),
+                    run.stat_delta(Side::B, Stat::MagDef)
+                ),
+                (-1, -1)
+            );
+        }
+        "dune_mantle" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(run.resource(Side::B, Resource::Stamina), -3);
+        }
+        "sword_dancer" => {
+            let run = play(c, scenario(c), 0, b_defends_magic);
+            assert!(run.enchanted());
+            assert_eq!(run.hit(Side::A), vec![0, 1, 2]);
+            assert_eq!(run.resource(Side::A, Resource::Stamina), 3);
+            assert_eq!(run.resource(Side::A, Resource::Focus), 3);
+        }
+        "temporal_hollow" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(run.resource(Side::B, Resource::Focus), -1);
+            assert_eq!(run.resource(Side::B, Resource::Stamina), -1);
+        }
+        "blood_chalice" => {
+            let run = play(c, scenario(c), 0, b_defends_magic);
+            assert!(run.enchanted());
+            assert_eq!(run.damaged(Side::B), 3);
+            assert_eq!(run.healed(Side::A), 3);
+        }
+        "moonbound_skin" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(
+                (
+                    run.stat_delta(Side::A, Stat::PhysAtk),
+                    run.stat_delta(Side::A, Stat::MagDef)
+                ),
+                (1, 1)
+            );
+        }
+        "aether_amplifier" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(run.stat_delta(Side::A, Stat::MagAtk), 2);
+            assert_eq!(run.resource(Side::A, Resource::Stamina), 1);
+        }
+        "foundry_wisdom" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(run.state.schools(Side::A).level(School::Tech), 3);
+            assert_eq!(run.resource(Side::A, Resource::Stamina), 1);
+        }
+        "dread_idol" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(run.stat_delta(Side::B, Stat::PhysAtk), -2);
+            assert_eq!(run.resource(Side::B, Resource::Stamina), -1);
+        }
+        "primal_heart" => {
+            let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
+            assert!(run.enchanted());
+            assert_eq!(
+                (
+                    run.stat_delta(Side::A, Stat::PhysDef),
+                    run.stat_delta(Side::A, Stat::MagAtk)
+                ),
+                (1, 1)
+            );
+        }
         "shield_line" => {
             let run = play(c, scenario(c).stamina(Side::A, 30), 0, |mv| mv);
             assert_eq!(run.stat_delta(Side::A, Stat::PhysDef), 3);
@@ -1053,6 +1292,9 @@ fn check(key: &str) {
                 run.before.schools(Side::A).level(school) + 1
             );
         }
+        other if covenant::check(other) => {}
+        other if eclipse::check(other) => {}
+        other if final_packets::check(other) => {}
         _ => panic!("karta {key} nie ma testu scenariuszowego w tests/cards.rs"),
     }
 }

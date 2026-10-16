@@ -13,6 +13,9 @@ use crate::db;
 pub struct Health {
     status: &'static str,
     version: &'static str,
+    release: &'static str,
+    engine: &'static str,
+    content: String,
 }
 
 /// `/healthz`: proces działa. Nie sprawdza zależności, więc chwilowa awaria bazy nie powoduje
@@ -21,6 +24,12 @@ pub async fn healthz() -> Json<Health> {
     Json(Health {
         status: "ok",
         version: env!("CARGO_PKG_VERSION"),
+        release: option_env!("GAME_RELEASE").unwrap_or("development"),
+        engine: engine::VERSION,
+        content: engine_content::CONTENT_VERSION
+            .iter()
+            .map(|byte| format!("{byte:02x}"))
+            .collect(),
     })
 }
 

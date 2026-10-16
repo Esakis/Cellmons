@@ -6,6 +6,24 @@ edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
 
+[dependencies]
+anyhow.workspace = true
+axum = { workspace = true, features = ["ws"] }
+engine-content.workspace = true
+futures-util = { version = "0.3.34", features = ["sink"] }
+hdrhistogram = "7.6.0"
+protocol = { path = "../protocol" }
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+server = { path = "../server" }
+sha2 = "0.11.1"
+sqlx = { workspace = true, features = ["runtime-tokio", "postgres", "uuid"] }
+tokio = { workspace = true, features = ["macros", "net", "rt-multi-thread", "sync", "time", "signal"] }
+tokio-tungstenite = "0.30.0"
+toml.workspace = true
+tracing-subscriber.workspace = true
+uuid = { version = "1.28.0", features = ["v7"] }
+
 [lints.rust]
 unsafe_code = "forbid"
 

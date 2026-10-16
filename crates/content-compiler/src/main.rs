@@ -52,9 +52,18 @@ fn main() -> ExitCode {
     match result {
         Ok(()) => {
             println!(
-                "Treść poprawna: {} kart, {} postaci, {} zestawów startowych; content_version {}.",
+                "Treść poprawna: {} kart, {} szablonów + {} dróg, {} zestawów startowych; content_version {}.",
                 compiled.cards.len(),
-                compiled.avatars.len(),
+                compiled
+                    .avatars
+                    .iter()
+                    .filter(|a| a.src.path.is_none())
+                    .count(),
+                compiled
+                    .avatars
+                    .iter()
+                    .filter(|a| a.src.path.is_some())
+                    .count(),
                 compiled.starters.len(),
                 hex(&output::version(&compiled))
             );

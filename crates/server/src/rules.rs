@@ -10,13 +10,16 @@ pub struct Rules {
     pub unlock: Unlock,
     pub economy: Economy,
     pub junkyard: Junkyard,
+    pub progression: Progression,
+    pub clan: Clan,
+    pub tournament: Tournament,
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Rating {
     pub k: u32,
 }
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Experience {
     pub base: u32,
@@ -54,6 +57,31 @@ pub struct Junkyard {
     pub reward_threshold: u32,
     pub fallback_ducats: u32,
 }
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Progression {
+    pub level_xp: [i32; 20],
+    pub reincarnation_xp: i32,
+    pub reincarnation_bonus_dp: [i16; 3],
+}
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Clan {
+    pub min_members: i64,
+    pub max_members: i64,
+    pub max_applications: i64,
+}
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Tournament {
+    pub first_fight_s: i64,
+    pub next_fight_s: i64,
+    pub ready_grace_s: i64,
+    pub registration_hours: i64,
+    pub max_players: usize,
+    pub max_teams: usize,
+    pub max_fee: i64,
+}
 pub static RULES: LazyLock<Rules> = LazyLock::new(|| {
     let rules: Rules = toml::from_str(include_str!("../../../content/rules.toml"))
         .expect("validated server rules");
@@ -88,6 +116,35 @@ pub static RULES: LazyLock<Rules> = LazyLock::new(|| {
         (1..=1_000_000).contains(&rules.junkyard.reward_threshold)
             && rules.junkyard.rarity_points.iter().all(|v| *v <= 10_000)
             && rules.junkyard.fallback_ducats <= 1_000_000
+    );
+    assert!(
+        rules.progression.level_xp[0] == 0
+            && rules.progression.level_xp.windows(2).all(|p| p[0] < p[1])
+            && rules.progression.reincarnation_xp >= rules.progression.level_xp[19]
+            && rules.progression.reincarnation_xp <= rules.xp.cap
+            && rules
+                .progression
+                .reincarnation_bonus_dp
+                .iter()
+                .all(|p| *p >= 0 && *p <= 100)
+    );
+    assert!(
+        (2..=100).contains(&rules.clan.min_members)
+            && rules.clan.max_members >= rules.clan.min_members
+            && rules.clan.max_members <= 1000
+            && (1..=100).contains(&rules.clan.max_applications)
+    );
+    assert!(
+        rules.tournament.first_fight_s >= 1
+            && rules.tournament.first_fight_s <= 60
+            && rules.tournament.next_fight_s >= 1
+            && rules.tournament.next_fight_s <= 60
+            && rules.tournament.ready_grace_s >= rules.tournament.next_fight_s
+            && rules.tournament.ready_grace_s <= 600
+            && (1..=168).contains(&rules.tournament.registration_hours)
+            && (2..=256).contains(&rules.tournament.max_players)
+            && (2..=64).contains(&rules.tournament.max_teams)
+            && (0..=1_000_000).contains(&rules.tournament.max_fee)
     );
     rules
 });

@@ -1,0 +1,18 @@
+.native-settings {
+  margin-top: 2rem;
+  display: grid;
+  gap: 1rem;
+}
+.native-settings label {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+.native-settings input[type="checkbox"] {
+  width: 1.4rem;
+  min-height: 1.4rem;
+  flex-shrink: 0;
+}
+.native-settings [role="alert"] {
+  color: var(--error);
+}

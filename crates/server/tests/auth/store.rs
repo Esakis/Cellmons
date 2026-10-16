@@ -270,7 +270,7 @@ async fn f9_store_quote_ownership_hidden_contents_and_insufficient_funds(pool: P
     assert!(inventory.body["boosters"][0].get("seed").is_none());
     let denied=f.call("POST","/api/store",json!({"key":Uuid::now_v7(),"operation":{"action":"buy","kind":"bronze","quote":quote}}),&[("cookie",&token)]).await;
     assert_eq!(denied.body["error"], "INSUFFICIENT_FUNDS");
-    let second=f.call("POST","/api/auth/register",json!({"login":"SecondUser","email":"second@example.test","password":PASSWORD,"school":"tech"}),&[]).await;
+    let second=f.call("POST","/api/auth/register",json!({"login":"SecondUser","email":"second@example.test","password":PASSWORD,"school":"tech","terms_version":"2026-10-16","age_confirmed":true}),&[]).await;
     assert_eq!(second.status, StatusCode::CREATED);
     let login = f
         .call(

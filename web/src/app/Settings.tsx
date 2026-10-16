@@ -1,5 +1,11 @@
+import { lazy } from 'solid-js';
 import { language, setLanguage, t } from '../i18n';
 import { setSpeed, setTheme, speed, theme } from './session';
+
+const NativeSettings =
+  import.meta.env.VITE_PLATFORM === 'android'
+    ? lazy(() => import('../platform/Settings').then((m) => ({ default: m.NativeSettings })))
+    : null;
 
 export function Settings() {
   return (
@@ -30,6 +36,7 @@ export function Settings() {
         </select>
       </label>
       <p>{t('settings-note')}</p>
+      {NativeSettings && <NativeSettings />}
     </section>
   );
 }

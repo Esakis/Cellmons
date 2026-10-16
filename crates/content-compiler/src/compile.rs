@@ -781,8 +781,11 @@ pub fn dev_point_schedule(rarity: AvatarRarity) -> Option<Vec<(u8, u8)>> {
         AvatarRarity::Junkyard => {
             Some((2..=MAX_LEVEL).step_by(2).map(|level| (level, 1)).collect())
         }
-        // Cienie rozwijają się tylko przez PR (R-CIE); harmonogram ustali faza z cieniami.
-        AvatarRarity::Shade => None,
+        AvatarRarity::Shade => Some(
+            (2..=MAX_LEVEL)
+                .map(|level| (level, if level >= 19 { 2 } else { 1 }))
+                .collect(),
+        ),
     }
 }
 
@@ -823,6 +826,18 @@ fn compile_avatar(
         report("postać musi znać co najmniej jedną szkołę".to_owned());
     }
     let start = schools(&avatar.schools, "szkoły", &mut report);
+    if avatar.rarity == AvatarRarity::Shade
+        && ([b.phys_atk, b.phys_def, b.mag_atk, b.mag_def] != [2; 4]
+            || b.hp != 35
+            || b.stamina != 40
+            || avatar.schools.len() != 1
+            || avatar.schools.values().any(|level| *level != 1))
+    {
+        report(
+            "cień musi zaczynać z AF/OF/AM/OM 2, Ż 35, W 40 i jedną szkołą na poziomie 1"
+                .to_owned(),
+        );
+    }
 
     let mut growth = Vec::new();
     let mut current = start;
@@ -834,6 +849,12 @@ fn compile_avatar(
         ));
     }
     for step in &avatar.growth {
+        if avatar.rarity == AvatarRarity::Shade && step.d != [0, 0, 0, 0, 4, 4] {
+            report(format!(
+                "poziom {}: cień dostaje tylko +4 Ż i +4 W; ataki i obrony rozwija przez PR",
+                step.level
+            ));
+        }
         if step.d.iter().any(|delta| *delta < 0) {
             report(format!(
                 "poziom {}: przyrosty nie mogą być ujemne",

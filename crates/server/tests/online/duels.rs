@@ -1,5 +1,177 @@
 use super::*;
 
+#[sqlx::test(migrator = "server::db::MIGRATOR")]
+#[ignore = "requires PostgreSQL"]
+async fn deployment_drain_keeps_live_fight_and_replay_intact(pool: PgPool) {
+    let a = player(&pool, 1, true).await;
+    let b = player(&pool, 2, true).await;
+    let old = Server::new(pool.clone(), Settings::default()).await;
+    let mut one = old.connect(&a, None).await;
+    let mut two = old.connect(&b, None).await;
+    let id = begin(&mut one, &mut two, &b.login).await;
+    server::operations::drain(&pool, true).await.unwrap();
+    let status = server::operations::status(&pool).await.unwrap();
+    assert!(status.draining && !status.idle());
+    assert_eq!(status.duels, 1);
+    finish(&mut one, &mut two, &id).await;
+    one.event(|body| matches!(body, Body::DuelEnd(_))).await;
+    assert!(server::operations::status(&pool).await.unwrap().idle());
+    drop(one);
+    drop(two);
+    old.stop().await;
+    let replacement = Server::new(pool.clone(), Settings::default()).await;
+    let mut one = replacement.connect(&a, None).await;
+    assert!(snapshot(&mut one, &id).await.result.is_some());
+    assert!(matches!(
+        one.call(Client::MatchReplay(pb::MatchReplay { match_id: id }))
+            .await,
+        Body::MatchReplayData(_)
+    ));
+    server::operations::drain(&pool, false).await.unwrap();
+    drop(one);
+    replacement.stop().await;
+}
+
+#[sqlx::test(migrator = "server::db::MIGRATOR")]
+#[ignore = "requires PostgreSQL"]
+async fn blocked_journal_write_does_not_stall_the_lobby(pool: PgPool) {
+    let a = player(&pool, 1, true).await;
+    let b = player(&pool, 2, true).await;
+    let server = Server::new(pool.clone(), Settings::default()).await;
+    let mut one = server.connect(&a, None).await;
+    let mut two = server.connect(&b, None).await;
+    let id = begin(&mut one, &mut two, &b.login).await;
+    let view = snapshot(&mut one, &id).await.view.unwrap();
+    let mut lock = pool.begin().await.unwrap();
+    sqlx::query("SELECT id FROM duel_journal WHERE id=$1 FOR UPDATE")
+        .bind(Uuid::parse_str(&id).unwrap())
+        .execute(&mut *lock)
+        .await
+        .unwrap();
+    let request = one.send(submit(&id, &view)).await;
+    assert!(
+        tokio::time::timeout(Duration::from_millis(50), one.reply(request))
+            .await
+            .is_err()
+    );
+    let pong = tokio::time::timeout(
+        Duration::from_millis(250),
+        two.call(Client::Ping(pb::Ping {})),
+    )
+    .await
+    .expect("unrelated lobby requests must remain responsive");
+    assert!(matches!(pong, Body::Pong(_)));
+    lock.rollback().await.unwrap();
+    assert!(matches!(
+        one.reply(request).await,
+        Body::DuelMoveAccepted(_)
+    ));
+    drop(one);
+    drop(two);
+    server.stop().await;
+}
+
+#[sqlx::test(migrator = "server::db::MIGRATOR")]
+#[ignore = "requires PostgreSQL; check.bat runs this suite"]
+async fn incompatible_workers_do_not_claim_or_extend_other_releases(pool: PgPool) {
+    let a = player(&pool, 1, true).await;
+    let b = player(&pool, 2, true).await;
+    let server = Server::new(pool.clone(), Settings::default()).await;
+    let mut one = server.connect(&a, None).await;
+    let mut two = server.connect(&b, None).await;
+    let id = Uuid::parse_str(&begin(&mut one, &mut two, &b.login).await).unwrap();
+    drop(one);
+    drop(two);
+    server.stop().await;
+    let previous = Uuid::now_v7();
+    let candidate = Uuid::now_v7();
+    for (engine, content) in [
+        ("retained-engine", engine_content::CONTENT_VERSION.to_vec()),
+        (engine::VERSION, vec![0; 32]),
+    ] {
+        sqlx::query("UPDATE duel_journal SET engine_version=$2,content_version=$3,owner_instance=$4,lease_until=now()-interval '1 second' WHERE id=$1")
+            .bind(id).bind(engine).bind(content).bind(previous).execute(&pool).await.unwrap();
+        assert!(
+            server::duel::journal::recover(&pool, candidate, 30000)
+                .await
+                .unwrap()
+                .is_empty()
+        );
+        let (owner, expired) = sqlx::query_as::<_, (Uuid, bool)>(
+            "SELECT owner_instance,lease_until<=clock_timestamp() FROM duel_journal WHERE id=$1",
+        )
+        .bind(id)
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+        assert_eq!(owner, previous);
+        assert!(expired);
+    }
+    sqlx::query("UPDATE duel_journal SET engine_version=$2,content_version=$3 WHERE id=$1")
+        .bind(id)
+        .bind(engine::VERSION)
+        .bind(&engine_content::CONTENT_VERSION[..])
+        .execute(&pool)
+        .await
+        .unwrap();
+    assert_eq!(
+        server::duel::journal::recover(&pool, candidate, 30000)
+            .await
+            .unwrap()
+            .len(),
+        1
+    );
+}
+
+#[sqlx::test(migrator = "server::db::MIGRATOR")]
+#[ignore = "requires PostgreSQL; check.bat runs this suite"]
+async fn f10_shade_experience_is_ascent_and_last_level_grants_the_twenty_first_point(pool: PgPool) {
+    let a = player(&pool, 1, true).await;
+    let b = player(&pool, 2, true).await;
+    sqlx::query("UPDATE avatars SET template_id=29,is_shade=true,shade_school='arcane',level=19,xp=49950,dev_points_unspent=19 WHERE user_id=$1").bind(a.id).execute(&pool).await.unwrap();
+    sqlx::query("UPDATE avatars SET level=19,xp=45000 WHERE user_id=$1")
+        .bind(b.id)
+        .execute(&pool)
+        .await
+        .unwrap();
+    let server = Server::new(pool.clone(), Settings::default()).await;
+    let mut one = server.connect(&a, None).await;
+    let mut two = server.connect(&b, None).await;
+    let id = begin(&mut one, &mut two, &b.login).await;
+    assert_ok(
+        two.call(Client::DuelForfeit(pb::DuelTarget { duel_id: id }))
+            .await,
+    );
+    let Body::DuelEnd(end) = one.event(|b| matches!(b, Body::DuelEnd(_))).await else {
+        panic!()
+    };
+    assert_eq!(end.xp_gained, 61); // 100 × 1900 / (19 × 130 + 600), not 100.
+    let progress = sqlx::query_as::<_, (i32, i16, i16)>(
+        "SELECT xp,level,dev_points_unspent FROM avatars WHERE user_id=$1",
+    )
+    .bind(a.id)
+    .fetch_one(&pool)
+    .await
+    .unwrap();
+    assert_eq!(progress, (50011, 20, 21));
+    let Body::DuelEnd(lost) = two.event(|b| matches!(b, Body::DuelEnd(_))).await else {
+        panic!()
+    };
+    assert_eq!(lost.xp_gained, 0);
+    let id = begin(&mut one, &mut two, &b.login).await;
+    assert_ok(
+        one.call(Client::DuelForfeit(pb::DuelTarget { duel_id: id }))
+            .await,
+    );
+    let Body::DuelEnd(end) = two.event(|b| matches!(b, Body::DuelEnd(_))).await else {
+        panic!()
+    };
+    assert_eq!(end.xp_gained, 168); // The winner also receives the shade opponent's Ascent valuation.
+    drop(one);
+    drop(two);
+    server.stop().await;
+}
+
 async fn begin(one: &mut ClientSocket, two: &mut ClientSocket, name: &str) -> String {
     one.join("arena").await;
     two.join("arena").await;
@@ -400,7 +572,7 @@ async fn f7_chaos_kill_process_after_move_commit_then_recover_and_finish(pool: P
     drop(two);
     let child = process(&pool, address).await;
     // The former owner's lease must expire before the replacement can act.
-    for _ in 0..130 {
+    for _ in 0..500 {
         let owner=sqlx::query_scalar::<_,bool>("SELECT lease_until>clock_timestamp() AND owner_instance<>$2 FROM duel_journal WHERE id=$1").bind(Uuid::parse_str(&id).unwrap()).bind(Uuid::nil()).fetch_one(&pool).await.unwrap();
         let record = server::duel::journal::load(&pool, Uuid::parse_str(&id).unwrap())
             .await
@@ -645,6 +817,54 @@ async fn f8_foreign_school_deck_challenge_lock_and_guaranteed_arena_unlock(pool:
         .await,
         Body::MatchReplayData(_)
     ));
+    drop(one);
+    drop(two);
+    server.stop().await;
+}
+
+#[sqlx::test(migrator = "server::db::MIGRATOR")]
+#[ignore = "requires PostgreSQL"]
+async fn blocked_public_chat_write_does_not_stall_the_lobby(pool: PgPool) {
+    let a = player(&pool, 1, true).await;
+    let b = player(&pool, 2, true).await;
+    let server = Server::new(pool.clone(), Settings::default()).await;
+    let mut one = server.connect(&a, None).await;
+    let mut two = server.connect(&b, None).await;
+    one.join("arena").await;
+    two.join("arena").await;
+    let mut lock = pool.begin().await.unwrap();
+    sqlx::query("LOCK TABLE chat_log IN ACCESS EXCLUSIVE MODE")
+        .execute(&mut *lock)
+        .await
+        .unwrap();
+    let request = one.send(chat("A stalled durable public message")).await;
+    assert!(
+        tokio::time::timeout(Duration::from_millis(50), one.reply(request))
+            .await
+            .is_err()
+    );
+    let pong = tokio::time::timeout(
+        Duration::from_millis(250),
+        two.call(Client::Ping(pb::Ping {})),
+    )
+    .await
+    .expect("public chat persistence must not stall unrelated requests");
+    assert!(matches!(pong, Body::Pong(_)));
+    assert_ok(two.call(Client::SetAfk(pb::SetAfk { afk: true })).await);
+    tokio::time::timeout(
+        Duration::from_millis(250),
+        one.event(
+            |body| matches!(body,Body::RoomDelta(delta) if delta.updated.iter().any(|p|p.afk)),
+        ),
+    )
+    .await
+    .expect("a pending write must not pause the same socket's outgoing events");
+    lock.rollback().await.unwrap();
+    assert_ok(one.reply(request).await);
+    let body = two.event(|body| matches!(body, Body::ChatMessage(_))).await;
+    assert!(
+        matches!(body,Body::ChatMessage(message) if message.text=="A stalled durable public message")
+    );
     drop(one);
     drop(two);
     server.stop().await;

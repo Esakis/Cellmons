@@ -21,6 +21,12 @@ use std::{
 };
 use tokio::sync::watch;
 
+#[derive(serde::Deserialize)]
+struct Advance {
+    login: String,
+    avatar: uuid::Uuid,
+}
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     let url = std::env::var("E2E_DATABASE_URL")
@@ -64,6 +70,7 @@ async fn run(options: PgConnectOptions) -> anyhow::Result<()> {
         server::db::migrate(&db).await?;
         let mut config = AuthConfig::local();
         config.public_origin = "http://localhost:4173".into();
+        config.admin=Some(server::admin::Config::new([73;32],vec!["127.0.0.1/32".parse().unwrap()])?);
         let messages = Arc::new(Mutex::new(Vec::<server::auth::mail::Mail>::new()));
         let auth = Auth::new(config, Mailer::Capture(messages.clone()));
         let state = AppState::new(db.clone(), auth, Settings::default());
@@ -109,10 +116,32 @@ async fn run(options: PgConnectOptions) -> anyhow::Result<()> {
                 },
             ),
         ));
+        // Progress fixture lives only in this loopback example and its disposable database.
+        let progression_db = db.clone();
+        let app = app.merge(Router::new().route("/__advance", post(move |Json(input): Json<Advance>| {
+            let db = progression_db.clone();
+            async move {
+                let mut tx = db.begin().await.map_err(|_| axum::http::StatusCode::SERVICE_UNAVAILABLE)?;
+                let user = sqlx::query_scalar::<_, uuid::Uuid>("SELECT id FROM users WHERE login=$1::citext FOR UPDATE").bind(input.login).fetch_one(&mut *tx).await.map_err(|_| axum::http::StatusCode::NOT_FOUND)?;
+                let result = sqlx::query("UPDATE avatars SET level=20,xp=65000,revision=revision+1 WHERE id=$1 AND user_id=$2 AND deleted_at IS NULL").bind(input.avatar).bind(user).execute(&mut *tx).await.map_err(|_| axum::http::StatusCode::SERVICE_UNAVAILABLE)?;
+                if result.rows_affected() != 1 { return Err(axum::http::StatusCode::NOT_FOUND); }
+                tx.commit().await.map_err(|_| axum::http::StatusCode::SERVICE_UNAVAILABLE)?;
+                Ok(axum::http::StatusCode::NO_CONTENT)
+            }
+        })));
+        let staff_db=db.clone();
+        let app=app.merge(Router::new().route("/__make_staff",post(move |Json(input):Json<std::collections::HashMap<String,String>>| {
+            let db=staff_db.clone();async move {
+                let login=input.get("login").ok_or(axum::http::StatusCode::BAD_REQUEST)?;
+                let changed=sqlx::query("UPDATE users SET role='admin' WHERE login=$1::citext AND status='active' AND email_verified_at IS NOT NULL").bind(login).execute(&db).await.map_err(|_|axum::http::StatusCode::SERVICE_UNAVAILABLE)?;
+                if changed.rows_affected()!=1 {return Err(axum::http::StatusCode::NOT_FOUND);}
+                Ok(axum::http::StatusCode::NO_CONTENT)
+            }
+        })));
         let listener = tokio::net::TcpListener::bind("127.0.0.1:18092").await?;
         println!("Playwright backend ready on 127.0.0.1:18092 (isolated database, captured mail)");
         axum::serve(
-            listener,
+            server::gateway::realtime_listener(listener),
             app.into_make_service_with_connect_info::<SocketAddr>(),
         )
         .with_graceful_shutdown(async move {

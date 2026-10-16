@@ -1,0 +1,7 @@
+scenario = "soak"
+connections = 2500
+duels = 1000
+room_members = 500
+chat_per_second = 40
+seconds = 86400
+think_ms = 10000

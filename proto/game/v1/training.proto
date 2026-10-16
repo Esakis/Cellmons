@@ -25,6 +25,8 @@ message TrainingCustomPlayer {
   uint32 level = 1;
   repeated uint32 spent = 2;
   repeated uint32 deck = 3;
+  string specialization = 4;
+  uint32 gift_id = 5;
 }
 message TrainingForfeit {}
 message TrainingReplay {}

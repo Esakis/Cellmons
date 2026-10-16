@@ -1,0 +1,46 @@
+name: Nightly load smoke
+on:
+  schedule:
+    - cron: '23 3 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: nightly-load
+  cancel-in-progress: false
+jobs:
+  duels:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      LOADTEST_DATABASE_URL: postgres://game:game@127.0.0.1:5432/game
+    services:
+      postgres:
+        image: postgres:18.6-alpine3.24@sha256:77f585114c32fbca283dc835b0596f4e52b51b4c6662d7810b2f4084f60a1873
+        env: { POSTGRES_USER: game, POSTGRES_PASSWORD: game, POSTGRES_DB: game }
+        ports: ['5432:5432']
+        options: --health-cmd "pg_isready -U game -d game" --health-interval 2s --health-timeout 3s --health-retries 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with: { persist-credentials: false }
+      - run: rustup toolchain install
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6
+      - name: Real WebSockets, durable rounds, reconnects and ledger
+        run: cargo run --release --locked -p loadtest -- --scenario duels --connections 500 --duels 100 --seconds 30 --think-ms 2000 --output target/nightly-load.json
+      - name: Round budget (shared runner smoke, not target VPS certification)
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('target/nightly-load.json').read_bytes())
+          assert report['success'], report.get('error')
+          rounds = report['latencies']['round_result']
+          assert rounds['unit'] == 'microseconds' and rounds['count'] >= 100
+          assert rounds['p95'] <= 100000, f"Round p95 {rounds['p95']} us exceeds 100 ms"
+          PY
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        if: always()
+        with:
+          name: nightly-load-proof
+          path: target/nightly-load.json
+          retention-days: 14

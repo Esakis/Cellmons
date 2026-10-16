@@ -145,6 +145,26 @@ fn start(setup: wire::TrainingSetup) -> Result<Session, String> {
         deck: Default::default(),
     };
     if let Some(custom) = setup.custom {
+        if !custom.specialization.is_empty() || custom.gift_id != 0 {
+            let path = engine_content::path(id).ok_or("invalid_setup")?;
+            if !custom.specialization.is_empty() {
+                player.avatar.specialization = Some(
+                    *path
+                        .specializations
+                        .iter()
+                        .find(|s| engine_content::specialization_key(**s) == custom.specialization)
+                        .ok_or("invalid_setup")?,
+                );
+            }
+            if custom.gift_id != 0 {
+                let gift = u16::try_from(custom.gift_id).map_err(|_| "invalid_setup")?;
+                if !path.gifts.contains(&gift) {
+                    return Err("invalid_setup".into());
+                }
+                player.avatar.gift = Some(gift);
+            }
+        }
+
         if custom.spent.len() != 6 || custom.spent.iter().any(|v| *v > 100) {
             return Err("invalid_setup".into());
         }
@@ -304,6 +324,8 @@ mod tests {
             .map(|(id, _)| u32::from(*id))
             .collect::<Vec<_>>();
         setup.custom = Some(wire::TrainingCustomPlayer {
+            specialization: String::new(),
+            gift_id: 0,
             level: 5,
             spent: vec![1, 0, 0, 0, 2, 0],
             deck: ids
@@ -323,6 +345,47 @@ mod tests {
         assert_eq!(view.me.as_ref().unwrap().hp_start, base.stats.hp_max + 14);
         assert!(view.hand.iter().all(|id| ids.contains(id)));
         setup.custom.as_mut().unwrap().spent = vec![1];
+        assert_eq!(
+            call(
+                &mut Training::new(),
+                1,
+                wire::training_request::Body::Start(setup)
+            )
+            .error,
+            "invalid_setup"
+        );
+    }
+    #[test]
+    fn reincarnated_local_training_uses_its_path_specialization_and_free_gift() {
+        let path = engine_content::PATHS
+            .iter()
+            .find(|p| p.base_avatar == 1)
+            .unwrap();
+        let mut setup = setup();
+        setup.avatar_id = u32::from(path.avatar.id);
+        setup.autoplay = false;
+        setup.custom = Some(wire::TrainingCustomPlayer {
+            level: 1,
+            spent: vec![0; 6],
+            deck: vec![],
+            specialization: engine_content::specialization_key(path.specializations[0]).into(),
+            gift_id: u32::from(path.gifts[0]),
+        });
+        let reply = call(
+            &mut Training::new(),
+            1,
+            wire::training_request::Body::Start(setup.clone()),
+        );
+        assert!(reply.error.is_empty(), "{}", reply.error);
+        assert!(
+            reply
+                .view
+                .unwrap()
+                .enchantments
+                .iter()
+                .any(|e| e.side == 0 && e.card_id == u32::from(path.gifts[0]))
+        );
+        setup.custom.as_mut().unwrap().gift_id = 1;
         assert_eq!(
             call(
                 &mut Training::new(),

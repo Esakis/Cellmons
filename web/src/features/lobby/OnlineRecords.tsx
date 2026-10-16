@@ -1,4 +1,4 @@
-import { createSignal, For, onMount, Show } from 'solid-js';
+import { createSignal, For, lazy, onMount, Show } from 'solid-js';
 import type { PublicPlayer } from '../../generated/proto/game/v1/lobby_pb';
 import type {
   MatchHistory,
@@ -7,7 +7,8 @@ import type {
 } from '../../generated/proto/game/v1/online_duel_pb';
 import { t } from '../../i18n';
 import type { ClientBody, ServerBody } from '../../net/client';
-import { OnlineDuel } from './OnlineDuel';
+
+const OnlineDuel = lazy(() => import('./OnlineDuel').then((m) => ({ default: m.OnlineDuel })));
 
 export function OnlineRecords(props: {
   mode: 'ranking' | 'history';

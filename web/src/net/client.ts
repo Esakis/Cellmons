@@ -1,13 +1,9 @@
-import { create, fromBinary, toBinary } from '@bufbuild/protobuf';
 import { account, authClient, restoreAccount, websocketURL } from '../app/account';
 import { content } from '../app/content';
-import {
-  type ClientMessage,
-  ClientMessageSchema,
-  type ServerMessage,
-  ServerMessageSchema,
-} from '../generated/proto/game/v1/envelope_pb';
+import { appForeground } from '../app/session';
+import type { ClientMessage, ServerMessage } from '../generated/proto/game/v1/envelope_pb';
 import { language } from '../i18n';
+import { decodeServer, encodeClient } from './wire';
 
 export type ClientBody = ClientMessage['body'];
 export type ServerBody = ServerMessage['body'];
@@ -45,6 +41,7 @@ export class OnlineClient {
   onMessage: (body: ServerBody) => void = () => {};
   onStatus: (status: Status) => void = () => {};
   private offline = () => {
+    this.rejectPending('DISCONNECTED');
     this.socket?.close();
     this.ready = false;
     this.onStatus('offline');
@@ -96,6 +93,7 @@ export class OnlineClient {
   }
   private schedule() {
     if (!this.active || this.fatal || account()?.kind !== 'account') return;
+    if (import.meta.env.VITE_PLATFORM === 'android' && !appForeground()) return;
     this.onStatus(navigator.onLine ? 'reconnecting' : 'offline');
     const delay =
       Math.min(8000, 500 * 2 ** Math.min(this.attempt++, 4)) * (0.8 + Math.random() * 0.2);
@@ -107,6 +105,7 @@ export class OnlineClient {
   private async connect() {
     const generation = ++this.generation;
     this.ready = false;
+    if (import.meta.env.VITE_PLATFORM === 'android' && !appForeground()) return;
     if (!navigator.onLine) {
       this.schedule();
       return;
@@ -114,6 +113,7 @@ export class OnlineClient {
     this.onStatus(this.attempt ? 'reconnecting' : 'connecting');
     try {
       const url = await websocketURL();
+      if (import.meta.env.VITE_PLATFORM === 'android' && !appForeground()) return;
       if (!this.active || generation !== this.generation || account()?.kind !== 'account') return;
       const socket = new WebSocket(url);
       this.socket = socket;
@@ -139,13 +139,18 @@ export class OnlineClient {
                 ),
                 locale: language(),
                 clientKind: authClient(),
-                nativeVersion: authClient() === 'android' ? '1.0.0' : '',
+                nativeVersion:
+                  authClient() === 'android'
+                    ? (import.meta.env.VITE_NATIVE_VERSION ?? '1.0.0')
+                    : '',
               },
             };
         void this.send(body, true).catch((error: NetError) => {
           if (generation !== this.generation || !this.active) return;
           if (error.code === 'RESUME_EXPIRED') this.resume = undefined;
           else if (error.code === 'VERSION_MISMATCH') {
+            if (import.meta.env.VITE_PLATFORM === 'android')
+              window.dispatchEvent(new Event('game-version-mismatch'));
             this.fatal = 'incompatible';
             this.onStatus('incompatible');
           }
@@ -161,13 +166,16 @@ export class OnlineClient {
         )
           return;
         try {
-          const reply = fromBinary(ServerMessageSchema, new Uint8Array(event.data));
+          const reply = decodeServer(new Uint8Array(event.data));
           if (reply.seq <= this.serverSeq) {
             socket.close();
             return;
           }
           this.serverSeq = reply.seq;
           const body = reply.body;
+          if (import.meta.env.VITE_PLATFORM === 'android' && body.case === 'duelSnapshot') {
+            window.dispatchEvent(new CustomEvent('game-duel-feedback', { detail: body.value }));
+          }
           if (body.case === 'welcome') {
             this.resume = body.value.resumeToken;
             this.ready = true;
@@ -224,7 +232,7 @@ export class OnlineClient {
       this.restart();
       return Promise.reject(new NetError('DISCONNECTED'));
     }
-    const bytes = toBinary(ClientMessageSchema, create(ClientMessageSchema, { seq, body }));
+    const bytes = encodeClient({ $typeName: 'game.v1.ClientMessage', seq, body });
     if (bytes.byteLength > 16384) return Promise.reject(new NetError('INVALID_MESSAGE'));
     return new Promise((resolve, reject) => {
       const timeout = window.setTimeout(() => {

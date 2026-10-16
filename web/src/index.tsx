@@ -24,3 +24,5 @@ render(
 );
 
 void registerOffline();
+if (import.meta.env.VITE_PLATFORM === 'android')
+  void import('./platform/android').then((m) => m.initialize()).catch(() => {});

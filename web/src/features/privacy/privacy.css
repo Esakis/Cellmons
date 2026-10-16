@@ -1,0 +1,41 @@
+.privacy-controls {
+  display: grid;
+  gap: 16px;
+  padding-block: 16px;
+  line-height: 1.6;
+}
+.privacy-controls h2,
+.privacy-controls h3,
+.privacy-controls p {
+  margin: 0;
+}
+.privacy-controls button {
+  justify-self: start;
+}
+.privacy-restore,
+.privacy-confirm {
+  display: grid;
+  gap: 16px;
+}
+.privacy-restore {
+  border-top: 1px solid var(--color-border);
+  padding-top: 24px;
+}
+.privacy-restore label,
+.privacy-confirm label {
+  display: grid;
+  gap: 8px;
+}
+.privacy-confirm .privacy-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.privacy-check input {
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+.privacy-controls input {
+  max-width: 100%;
+  min-width: 0;
+}

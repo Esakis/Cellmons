@@ -32,6 +32,11 @@ message PublicPlayer {
   repeated sint32 stats = 15; // AF, OF, AM, OM, max HP, max stamina.
   repeated uint32 schools = 16;
   bool busy = 17;
+  uint32 tier = 18;
+  uint32 path_id = 19;
+  string specialization = 20;
+  uint32 gift_id = 21;
+  bool mentor = 22;
 }
 message Welcome {
   PublicPlayer profile = 1;
@@ -54,6 +59,7 @@ message RoomSnapshot {
   repeated PublicPlayer players = 2;
   repeated ChatMessage messages = 3;
   repeated string recent_duels = 4;
+  string motd = 5; // Clan notice, sent only after membership authorization.
 }
 message RoomDelta {
   string room = 1;
@@ -135,6 +141,9 @@ message ChallengeRespond {
 }
 message ChallengeCancel {
   string challenge_id = 1;
+}
+message TournamentReady {
+  bool ready = 1;
 }
 message ChallengeReceived {
   string challenge_id = 1;

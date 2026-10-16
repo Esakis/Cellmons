@@ -10,7 +10,7 @@ import {
 import { language, setLanguage, t } from '../i18n';
 import { offlineStatus, updateApp, updateReady } from '../pwa';
 import styles from './App.module.css';
-import { duelActive, theme } from './session';
+import { duelActive, theme, updatesBlocked } from './session';
 
 export function Shell(props: ParentProps) {
   const lightQuery =
@@ -28,9 +28,17 @@ export function Shell(props: ParentProps) {
   });
   return (
     <>
-      <a class="skip-link" href="#main">
-        {t('training')}
-      </a>
+      <button
+        type="button"
+        class="skip-link"
+        onClick={() => {
+          const main = document.getElementById('main');
+          main?.focus();
+          main?.scrollIntoView();
+        }}
+      >
+        {t('skip-to-content')}
+      </button>
       <header class={styles.header}>
         <A class={styles.brand} href="/">
           <span class={styles.brandIcon} aria-hidden="true">
@@ -60,7 +68,7 @@ export function Shell(props: ParentProps) {
           <option value="en">EN</option>
         </select>
       </header>
-      <main id="main">
+      <main id="main" tabIndex={-1}>
         <ErrorBoundary
           fallback={
             <section class="settings-page">
@@ -82,6 +90,7 @@ export function Shell(props: ParentProps) {
       <Show when={!duelActive()}>
         <footer class={styles.footer}>
           <span>Spellgambit: Arcane Class</span>
+          <A href="/legal">{t('legal')}</A>
           <span role="status" data-testid="offline-status">
             {t(
               offlineStatus() === 'ready'
@@ -95,7 +104,7 @@ export function Shell(props: ParentProps) {
           </span>
         </footer>
       </Show>
-      <Show when={updateReady() && !duelActive()}>
+      <Show when={updateReady() && !updatesBlocked()}>
         <div class={styles.update} role="status">
           {t('update')}{' '}
           <button type="button" onClick={updateApp}>

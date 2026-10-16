@@ -1,7 +1,7 @@
 //! Online transport and bounded actors for presence, rooms and challenges (F6.3–F7.1).
 mod duels;
 pub mod hub;
-mod repo;
+pub(crate) mod repo;
 mod room;
 pub mod ws;
 
@@ -14,6 +14,7 @@ pub struct Settings {
     /// Disable only in isolated tests of the F7.1 reservation handoff.
     pub run_duels: bool,
     pub max_connections: usize,
+    pub room_capacity: usize,
     pub per_ip: usize,
     pub heartbeat: Duration,
     pub idle: Duration,
@@ -28,6 +29,7 @@ impl Default for Settings {
             duels: crate::duel::Settings::default(),
             run_duels: true,
             max_connections: 5000,
+            room_capacity: 1000,
             per_ip: 20,
             heartbeat: Duration::from_secs(15),
             idle: Duration::from_secs(30),
@@ -41,6 +43,16 @@ impl Default for Settings {
 impl Settings {
     pub fn from_env() -> anyhow::Result<Self> {
         let mut value = Self::default();
+        if let Some(limit) = std::env::var("WS_ROOM_CAPACITY")
+            .ok()
+            .filter(|s| !s.is_empty())
+        {
+            value.room_capacity = limit.parse()?;
+        }
+        anyhow::ensure!(
+            (1..=1000).contains(&value.room_capacity),
+            "invalid room capacity"
+        );
         if let Some(limit) = std::env::var("WS_CONNECTIONS_PER_IP")
             .ok()
             .filter(|s| !s.is_empty())
@@ -60,6 +72,24 @@ impl Settings {
                 && value.max_connections <= 50000,
             "invalid WebSocket connection limits"
         );
+        if let Some(limit) = std::env::var("DUEL_MAX_ACTIVE")
+            .ok()
+            .filter(|s| !s.is_empty())
+        {
+            value.duels.max_active = limit.parse()?;
+        }
+        anyhow::ensure!(
+            (1..=10000).contains(&value.duels.max_active),
+            "invalid duel actor limit"
+        );
+        if let Some(seconds) = std::env::var("DUEL_LEASE_SECONDS")
+            .ok()
+            .filter(|s| !s.is_empty())
+        {
+            let seconds: u64 = seconds.parse()?;
+            anyhow::ensure!((5..=60).contains(&seconds), "invalid duel lease duration");
+            value.duels.lease = Duration::from_secs(seconds);
+        }
         Ok(value)
     }
 }

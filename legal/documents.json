@@ -1,0 +1,155 @@
+{
+  "version": "2026-10-16",
+  "pl": {
+    "heading": "Regulamin i prywatność",
+    "draft": "Projekt lokalny. Dane operatora i odbiór prawny wymagają uzupełnienia przed publicznym uruchomieniem usługi.",
+    "contact": "Operator i administrator danych",
+    "terms": {
+      "title": "Regulamin Spellgambit: Arcane Class",
+      "sections": [
+        [
+          "Usługa",
+          "Spellgambit: Arcane Class to darmowa gra karciana z treningiem offline i rozgrywką sieciową. Nie oferujemy zakupów za prawdziwe pieniądze, reklam ani wypłat. Dukaty i karty nie mają wartości pieniężnej; nie wolno handlować nimi za pieniądze poza grą. Losowe zestawy zdobywa się wyłącznie za walutę z gry, a ich szanse są jawne w sklepie."
+        ],
+        [
+          "Konto i wiek",
+          "Do gry sieciowej potrzebne są login, e-mail i hasło. Konto jest przeznaczone dla jednej osoby. Z usługi mogą korzystać osoby, które ukończyły 16 lat, albo mają zgodę i nadzór opiekuna w zakresie wymaganym prawem. Nie podawaj w grze danych osobowych innych osób. Chroń hasło i korzystaj z listy sesji, aby zakończyć nieznane logowania. Gość nie tworzy konta: jego dane gry pozostają w pamięci frontendu i znikają po zakończeniu sesji."
+        ],
+        [
+          "Uczciwa gra",
+          "Zabronione są manipulowanie klientem, wykorzystywanie błędów, automatyzacja dająca przewagę, uzgadnianie wyników oraz używanie wielu kont do przekazywania korzyści. Sam wspólny adres sieciowy nie stanowi dowodu naruszenia. Wykryte sygnały ocenia człowiek; nie są automatyczną podstawą blokady."
+        ],
+        [
+          "Treści i moderacja",
+          "Nie publikuj treści nielegalnych, gróźb, nękania, spamu ani materiałów naruszających cudze prawa. Zachowujesz prawa do swoich wypowiedzi i udzielasz uprawnienia wyłącznie do ich wyświetlania, dostarczania adresatom i moderacji w usłudze. Zgłoszenie można wysłać w grze albo na kontakt operatora, podając treść, jej miejsce i uzasadnienie. Moderacja może ostrzec, wyciszyć lub zablokować konto. Uzasadnienie decyzji jest dostępne w koncie; odwołanie z identyfikatorem decyzji można wysłać do operatora."
+        ],
+        [
+          "Dostępność i zmiany",
+          "Do rozgrywki sieciowej wymagane jest aktualne oprogramowanie i połączenie z Internetem. Trening działa offline po pobraniu zasobów. Zmiany zasad, konserwacje i istotne zmiany regulaminu ogłaszamy w usłudze przed ich wejściem w życie. Nie zmieniamy zasad już rozpoczętego pojedynku. Wersja gry nie gwarantuje nieprzerwanej dostępności; operator usuwa zgłoszone usterki i informuje o istotnych awariach."
+        ],
+        [
+          "Zakończenie i reklamacje",
+          "Możesz zakończyć korzystanie z usługi i złożyć prośbę o usunięcie konta w panelu danych lub przez stronę usuwania konta. Opis karencji i danych pozostających w historii znajduje się w polityce prywatności. Reklamacje i odwołania przyjmuje operator pod podanym adresem kontaktowym. Regulamin nie ogranicza bezwzględnie obowiązujących praw konsumenta ani ochrony wynikającej z prawa właściwego dla użytkownika."
+        ]
+      ]
+    },
+    "privacy": {
+      "title": "Polityka prywatności Spellgambit: Arcane Class",
+      "sections": [
+        [
+          "Dane i cele",
+          "Przetwarzamy login, e-mail, hash hasła, sesje, informacje o urządzeniu i skróty adresów IP do ochrony konta, a także postacie, kolekcję, wyniki, czat, pocztę i zgłoszenia potrzebne do działania gry. Nie prosimy o imię, datę urodzenia, lokalizację, kontakty z telefonu ani dane płatnicze. Nie prowadzimy marketingowego śledzenia ani analityki reklamowej. Podanie danych konta jest dobrowolne, ale niezbędne do gry sieciowej; trening gościa nie wymaga konta."
+        ],
+        [
+          "Podstawy i odbiorcy",
+          "Działanie konta i gry służy wykonaniu umowy. Bezpieczeństwo, zapobieganie nadużyciom, rozpatrywanie zgłoszeń i obrona roszczeń służą uzasadnionym interesom operatora; obowiązki wynikające z prawa realizujemy na właściwej podstawie prawnej. Publicznie widoczne są wybrane informacje profilu i wyniki. Wiadomości prywatne widzą adresaci, a uprawniona moderacja może uzyskać niezbędny kontekst zgłoszenia. Aktualne podmioty przetwarzające i informacje o transferach podano poniżej."
+        ],
+        [
+          "Przechowywanie",
+          "Dane konta przechowujemy podczas świadczenia usługi. Dziennik czatu jest usuwany po 30 dniach. Sesje gry wygasają po 30 dniach bez aktywności; sesja wyłącznie do obsługi danych trwa 15 minut. Po prośbie o usunięcie konto natychmiast traci sesje i opuszcza klan. Przez 30 dni można cofnąć prośbę za pomocą dotychczasowego hasła. Po karencji zadanie usuwania usuwa dane kontaktowe, wiadomości i stan kolekcji oraz zastępuje nazwę w historii walk. Identyfikatory historii rozgrywki i rozliczeń pozostają pseudonimowe; nie należy traktować ich jako całkowicie anonimowych. Dane konieczne do bezpieczeństwa i sporów oraz kopie mają odrębne okresy podane przez operatora poniżej."
+        ],
+        [
+          "Twoje prawa",
+          "Możesz uzyskać dostęp do danych i eksport JSON, żądać sprostowania, usunięcia lub ograniczenia przetwarzania, otrzymać dane podlegające przenoszeniu oraz zgłosić sprzeciw wobec przetwarzania opartego na uzasadnionym interesie. Zakres praw wynika z przepisów i podstawy danego przetwarzania. Wnioski kieruj do administratora danych; może być potrzebne proporcjonalne sprawdzenie tożsamości. Masz prawo skargi do właściwego organu nadzorczego, w Polsce Prezesa UODO. Blokada rozgrywki nie odbiera dostępu do panelu danych. Nie podejmujemy decyzji o sankcjach wyłącznie automatycznie."
+        ],
+        [
+          "Przeglądarka, gość i Android",
+          "Przeglądarka używa niezbędnego ciasteczka sesji, pamięci ustawień i pamięci podręcznej zasobów PWA. Tryb gościa przechowuje stan i nowe ustawienia wyłącznie w RAM i nie wysyła danych gracza do API. Android szyfruje token sesji kluczem Keystore i wyłącza go z kopii zapasowych systemu. Eksport jest zapisywany dopiero po wybraniu przez użytkownika miejsca w systemowym oknie plików; dalsza ochrona tego pliku należy do użytkownika. Wibracje, niegasnący ekran i opcjonalne powiadomienia lokalne są sterowane ustawieniami; powiadomienia nie wymagają wysyłania tokenu push do serwera."
+        ]
+      ]
+    },
+    "deletion": {
+      "title": "Usunięcie konta Spellgambit: Arcane Class",
+      "sections": [
+        [
+          "Złóż prośbę bez instalowania aplikacji",
+          "Otwórz panel danych z odnośnika poniżej. Zaloguj się do gry albo potwierdź login lub e-mail i hasło w osobnej sesji do obsługi danych. Ta sesja działa także dla kont z blokadą. Wybierz usunięcie konta, wpisz dokładny login i hasło oraz potwierdź skutki. Jeśli nie możesz potwierdzić tożsamości lub konto ma uprawnienia administracji, skontaktuj się z operatorem; nie musisz instalować aplikacji."
+        ],
+        [
+          "Aktywność i skutki",
+          "Zakończ pojedynek, wymianę, turniej lub wyprawę. Mistrz klanu z innymi członkami powinien przekazać przywództwo lub rozwiązać klan. Po przyjęciu prośby sesje zostają zakończone i konto opuszcza klan. Cofnięcie prośby jest dostępne przez 30 dni w tym samym panelu; nie przywraca sesji, członkostwa ani nie znosi blokady."
+        ],
+        [
+          "Co zostaje usunięte",
+          "Po karencji usuwamy e-mail, hasło logowania, sesje, wiadomości, kontakty, kolekcję, talie i pozostałe Dukaty. Historia walk ma zastąpiony profil, a niezmienne rozliczenia zachowują pseudonimowy identyfikator. Niezbędne zapisy bezpieczeństwa i kopie mają osobne okresy przechowywania opisane w polityce. Wnioski o usunięcie wybranych danych można kierować do administratora danych."
+        ]
+      ]
+    }
+  },
+  "en": {
+    "heading": "Terms and privacy",
+    "draft": "Local draft. Operator details and legal approval must be completed before the service is made public.",
+    "contact": "Service operator and data controller",
+    "terms": {
+      "title": "Spellgambit: Arcane Class terms",
+      "sections": [
+        [
+          "Service",
+          "Spellgambit: Arcane Class is a free card game with offline training and online play. It has no real-money purchases, advertising or cash withdrawals. Dukats and cards have no monetary value and may not be traded for money outside the game. Random packs use currency earned through play; their probabilities are disclosed in the shop."
+        ],
+        [
+          "Account and age",
+          "Online play requires a login, email and password. An account is for one person. Players must be at least 16 or have the guardian permission and supervision required by applicable law. Do not post other people's personal information. Protect your password and use the session list to end unfamiliar logins. Guest mode creates no account: its game data stays in frontend memory and disappears when the session ends."
+        ],
+        [
+          "Fair play",
+          "Client manipulation, exploiting bugs, unfair automation, arranged results and using multiple accounts to transfer advantages are prohibited. Sharing a network address is not proof of wrongdoing. A person reviews abuse signals; signals do not automatically result in a ban."
+        ],
+        [
+          "Content and moderation",
+          "Do not post illegal content, threats, harassment, spam or material infringing others' rights. You retain rights to your messages and permit only their display, delivery and moderation within the service. Report content in the game or to the operator, identifying its location and explaining the concern. Moderators may warn, mute or ban accounts. Decision reasons are available through your account; appeals can be sent to the operator with the decision identifier."
+        ],
+        [
+          "Availability and changes",
+          "Online play requires supported software and an Internet connection. Training works offline after assets are downloaded. Rules, maintenance and material terms changes are announced before taking effect. Rules of an already started duel are preserved. Availability is not guaranteed to be uninterrupted; the operator addresses reported faults and communicates material outages."
+        ],
+        [
+          "Ending use and complaints",
+          "You may stop using the service and request account deletion through the data panel or the deletion page. The privacy policy explains the grace period and retained history. Send complaints and appeals to the operator's contact address. These terms do not limit mandatory consumer rights or protections under the law applicable to the user."
+        ]
+      ]
+    },
+    "privacy": {
+      "title": "Spellgambit: Arcane Class privacy policy",
+      "sections": [
+        [
+          "Data and purposes",
+          "We process your login, email, password hash, sessions, device information and IP hashes for account protection, plus characters, collection, results, chat, mail and reports needed for the game. We do not request your name, birth date, location, phone contacts or payment details. There is no advertising tracking or advertising analytics. Providing account data is optional but necessary for online play; guest training does not require an account."
+        ],
+        [
+          "Bases and recipients",
+          "Account and game processing performs the service contract. Security, abuse prevention, handling reports and defending legal claims serve the operator's legitimate interests; legal obligations use their applicable legal basis. Selected profile information and results are public. Private messages are visible to recipients; authorized moderators may access necessary report context. Current processors and transfer information are listed below."
+        ],
+        [
+          "Retention",
+          "Account data is retained while providing the service. Chat logs are removed after 30 days. Game sessions expire after 30 days without activity; data-access-only sessions last 15 minutes. A deletion request immediately ends sessions and removes clan membership. For 30 days the request can be cancelled using the existing password. Afterwards a scheduled erasure job removes contact data, messages and collection state and replaces the profile name in combat history. Gameplay and settlement identifiers remain pseudonymous and should not be treated as completely anonymous. Necessary security, dispute and backup records have separate operator-specified retention periods below."
+        ],
+        [
+          "Your rights",
+          "You can access data and a JSON export, request correction, erasure or restriction, receive data covered by portability rights and object to processing based on legitimate interests. The applicable rights depend on law and the basis for processing. Send requests to the controller; proportionate identity checks may be necessary. You can complain to the competent supervisory authority, including Poland's President of the Personal Data Protection Office. A gameplay ban does not remove access to the data panel. Sanctions are not decided solely by automated processing."
+        ],
+        [
+          "Browser, guest mode and Android",
+          "The browser uses an essential session cookie, settings storage and cached PWA assets. Guest mode keeps player state and new preferences in RAM and sends no player data to the API. Android encrypts the session token using Keystore and excludes it from system backups. Export data is written only after you select a destination in the system document picker; protecting that file afterwards is your responsibility. Haptics, screen wake and optional local notifications are controlled through settings; local notifications do not send a push token to the server."
+        ]
+      ]
+    },
+    "deletion": {
+      "title": "Delete a Spellgambit: Arcane Class account",
+      "sections": [
+        [
+          "Request deletion without installing the app",
+          "Open the data panel using the link below. Sign into the game or verify your account login or email and password in a separate data-access session. This also works for banned accounts. Choose account deletion, enter the exact login and password and confirm the consequences. Contact the operator if you cannot verify your identity or the account has staff privileges; installing the app is not required."
+        ],
+        [
+          "Active play and effects",
+          "Finish your duel, trade, tournament or expedition. A clan master with other members must transfer leadership or disband the clan. Once accepted, the request ends sessions and removes clan membership. You may cancel within 30 days through the same panel; cancellation does not restore sessions or membership or remove a ban."
+        ],
+        [
+          "Data removed",
+          "After the grace period we remove email, login credentials, sessions, messages, contacts, collection, decks and remaining Dukats. Combat history uses a replaced profile, while immutable settlements retain a pseudonymous identifier. Necessary security records and backups have separate retention periods in the privacy policy. Contact the data controller to request deletion of particular data."
+        ]
+      ]
+    }
+  }
+}

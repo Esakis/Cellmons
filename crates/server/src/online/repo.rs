@@ -37,14 +37,21 @@ pub async fn target(db: &PgPool, login: &str) -> Result<Uuid> {
 pub async fn clan(db: &PgPool, user: Uuid) -> Result<Option<Uuid>> {
     Ok(sqlx::query_scalar!("SELECT c.id FROM clan_members m JOIN clans c ON c.id=m.clan_id WHERE m.user_id=$1 AND c.status='active'",user).fetch_optional(db).await?)
 }
+pub(crate) async fn clan_on(connection: &mut PgConnection, user: Uuid) -> Result<Option<Uuid>> {
+    Ok(sqlx::query_scalar("SELECT c.id FROM clan_members m JOIN clans c ON c.id=m.clan_id WHERE m.user_id=$1 AND c.status='active'").bind(user).fetch_optional(connection).await?)
+}
 pub async fn clan_members(db: &PgPool, clan: Uuid) -> Result<HashSet<String>> {
     Ok(sqlx::query_scalar!("SELECT m.user_id FROM clan_members m JOIN clans c ON c.id=m.clan_id JOIN users u ON u.id=m.user_id WHERE m.clan_id=$1 AND c.status='active' AND u.status='active'",clan).fetch_all(db).await?.into_iter().map(|id|id.to_string()).collect())
 }
 pub async fn player(db: &PgPool, user: Uuid) -> Result<pb::PublicPlayer> {
-    let u=sqlx::query!("SELECT (EXISTS(SELECT 1 FROM duel_locks l WHERE l.user_id=u.id) OR EXISTS(SELECT 1 FROM activity_locks l WHERE l.user_id=u.id)) AS \"busy!\",u.id,u.login::text AS \"login!\",u.description,u.challenge_filter,u.email_verified_at IS NOT NULL AS \"verified!\",COALESCE(r.rating,1000) AS \"rating!\",c.id AS clan_id,c.name::text AS clan_name,m.title FROM users u LEFT JOIN ratings r ON r.user_id=u.id LEFT JOIN clan_members m ON m.user_id=u.id LEFT JOIN clans c ON c.id=m.clan_id AND c.status='active' WHERE u.id=$1 AND u.status='active'",user).fetch_optional(db).await?.ok_or(Error("UNAUTHENTICATED"))?;
-    let a=sqlx::query!("SELECT id,template_id,path_id,level,dp_phys_atk,dp_phys_def,dp_mag_atk,dp_mag_def,dp_hp,dp_stamina FROM avatars WHERE user_id=$1 AND is_active AND deleted_at IS NULL",user).fetch_optional(db).await?;
+    let mut connection = db.acquire().await?;
+    player_on(&mut connection, user).await
+}
+pub async fn player_on(connection: &mut PgConnection, user: Uuid) -> Result<pb::PublicPlayer> {
+    let u=sqlx::query!("SELECT (EXISTS(SELECT 1 FROM duel_locks l WHERE l.user_id=u.id) OR EXISTS(SELECT 1 FROM activity_locks l WHERE l.user_id=u.id)) AS \"busy!\",u.id,u.login::text AS \"login!\",u.description,u.challenge_filter,u.role,u.email_verified_at IS NOT NULL AS \"verified!\",COALESCE(r.rating,1000) AS \"rating!\",c.id AS clan_id,c.name::text AS clan_name,m.title FROM users u LEFT JOIN ratings r ON r.user_id=u.id LEFT JOIN clan_members m ON m.user_id=u.id LEFT JOIN clans c ON c.id=m.clan_id AND c.status='active' WHERE u.id=$1 AND u.status='active'",user).fetch_optional(&mut *connection).await?.ok_or(Error("UNAUTHENTICATED"))?;
+    let a=sqlx::query!("SELECT id,template_id,path_id,tier,specialization,gift_id,level,dp_phys_atk,dp_phys_def,dp_mag_atk,dp_mag_def,dp_hp,dp_stamina FROM avatars WHERE user_id=$1 AND is_active AND deleted_at IS NULL",user).fetch_optional(&mut *connection).await?;
     let rank = if u.verified {
-        sqlx::query_scalar!("SELECT count(*)+1 AS \"rank!\" FROM ratings r JOIN users u ON u.id=r.user_id WHERE u.status='active' AND u.email_verified_at IS NOT NULL AND (r.rating>$1 OR (r.rating=$1 AND r.user_id<$2))",u.rating,user).fetch_one(db).await?
+        sqlx::query_scalar!("SELECT count(*)+1 AS \"rank!\" FROM ratings r JOIN users u ON u.id=r.user_id WHERE u.status='active' AND u.email_verified_at IS NOT NULL AND (r.rating>$1 OR (r.rating=$1 AND r.user_id<$2))",u.rating,user).fetch_one(&mut *connection).await?
     } else {
         0
     };
@@ -55,6 +62,7 @@ pub async fn player(db: &PgPool, user: Uuid) -> Result<pb::PublicPlayer> {
         description: u.description,
         challenge_filter: u.challenge_filter,
         verified: u.verified,
+        mentor: u.role == "mentor",
         rating: u.rating,
         rank: rank.min(u32::MAX as i64) as u32,
         clan_id: u.clan_id.map(|id| id.to_string()).unwrap_or_default(),
@@ -82,6 +90,10 @@ pub async fn player(db: &PgPool, user: Uuid) -> Result<pb::PublicPlayer> {
         stats.stamina_max += 7 * i32::from(a.dp_stamina);
         p.avatar_id = a.id.to_string();
         p.template_id = a.template_id as u32;
+        p.path_id = a.path_id.unwrap_or(0) as u32;
+        p.tier = a.tier as u32;
+        p.specialization = a.specialization.unwrap_or_default();
+        p.gift_id = a.gift_id.unwrap_or(0) as u32;
         p.level = a.level as u32;
         p.stats = engine::Stat::ALL
             .iter()
@@ -207,6 +219,14 @@ pub async fn challenge_filter(db: &PgPool, user: Uuid, filter: &str) -> Result<(
     Ok(())
 }
 pub async fn log_chat(db: &PgPool, message: &pb::ChatMessage, clan: Option<Uuid>) -> Result<()> {
+    let mut connection = db.acquire().await?;
+    log_chat_on(&mut connection, message, clan).await
+}
+pub(crate) async fn log_chat_on(
+    db: &mut sqlx::PgConnection,
+    message: &pb::ChatMessage,
+    clan: Option<Uuid>,
+) -> Result<()> {
     let id = Uuid::parse_str(&message.id).map_err(|_| Error("INTERNAL"))?;
     let from = Uuid::parse_str(&message.from_id).map_err(|_| Error("INTERNAL"))?;
     let to = Uuid::parse_str(&message.to).ok();

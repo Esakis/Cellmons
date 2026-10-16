@@ -54,8 +54,12 @@ async fn clean_database_requires_migrations_and_repeated_migration_is_safe(pool:
             .await
             .unwrap();
     assert_eq!(before, after);
-    let tables: i64 = sqlx::query_scalar("SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name IN ('users','sessions','email_tokens','unlocked_templates','avatars','collection','decks','deck_presets','ratings','friends','ignores','mail','clans','clan_members','chat_log','duel_journal','duel_locks','duel_journal_rounds','matches','rating_history','player_stats','arena_progress','match_projections','wallets','ledger_transactions','ledger_entries','daily_counters','idempotency_keys','boosters','junkyard','activity_locks','trades')").fetch_one(&pool).await.unwrap();
-    assert_eq!(tables, 32);
+    let tables: i64 = sqlx::query_scalar("SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name IN ('users','sessions','email_tokens','unlocked_templates','avatars','collection','decks','deck_presets','ratings','friends','ignores','mail','clans','clan_members','chat_log','duel_journal','duel_locks','duel_journal_rounds','matches','rating_history','player_stats','arena_progress','match_projections','wallets','ledger_transactions','ledger_entries','daily_counters','idempotency_keys','boosters','junkyard','activity_locks','trades','reincarnation_history','avatar_sacrifices','clan_applications','clan_audit')").fetch_one(&pool).await.unwrap();
+    assert_eq!(tables, 36);
+    let tournament_tables:i64=sqlx::query_scalar("SELECT count(*) FROM information_schema.tables WHERE table_schema='public' AND table_name IN ('tournaments','tournament_entries','tournament_requests','tournament_fights')").fetch_one(&pool).await.unwrap();
+    assert_eq!(tournament_tables, 4);
+    let expedition_tables:i64=sqlx::query_scalar("SELECT count(*) FROM information_schema.tables WHERE table_schema='public' AND table_name IN ('expeditions','expedition_fights','expedition_requests')").fetch_one(&pool).await.unwrap();
+    assert_eq!(expedition_tables, 3);
 }
 
 #[sqlx::test(migrations = false)]

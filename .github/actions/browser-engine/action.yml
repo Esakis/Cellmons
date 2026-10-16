@@ -18,4 +18,6 @@ runs:
         tool: wasm-bindgen@${{ steps.version.outputs.version }}
     - name: Browser assets
       shell: bash
-      run: pnpm --filter web prepare:assets
+      run: |
+        cargo fetch --locked
+        pnpm --filter web prepare:assets

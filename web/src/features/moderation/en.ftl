@@ -1,0 +1,16 @@
+report-title = Report to moderators
+report-help = The server will attach the relevant context. Describe the problem. Reports do not impose automatic sanctions.
+report-reason = Report reason
+report-send = Send report
+report-error = The report could not be confirmed. You can retry sending it.
+report-limit = The report limit was reached. Try again later.
+report-maintenance = Maintenance is in progress. New activities are temporarily unavailable.
+report-announcements = Announcements
+report-decisions = Moderation decisions
+report-kind-warning = Warning
+report-kind-ban = Ban
+report-kind-unban = Unban
+report-kind-mute = Mute
+report-kind-unmute = Unmute
+report-kind-report = Report decision
+report-kind-role = Role change

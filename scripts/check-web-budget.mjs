@@ -5,11 +5,9 @@ import { brotliCompressSync } from 'node:zlib';
 
 const output = fileURLToPath(new URL('../web/dist/', import.meta.url));
 const manifest = JSON.parse(await readFile(join(output, '.vite/manifest.json'), 'utf8'));
-const onlineAssets = new Set(
-  JSON.parse(await readFile(join(output, 'online-assets.json'), 'utf8')).excluded.map((f) =>
-    join(output, f),
-  ),
-);
+const assetGroups = JSON.parse(await readFile(join(output, 'online-assets.json'), 'utf8'));
+const android = assetGroups.platform === 'android';
+const onlineAssets = new Set(assetGroups.excluded.map((f) => join(output, f)));
 function graph(key, files = new Set()) {
   const entry = manifest[key];
   if (!entry || files.has(entry.file)) return files;
@@ -20,7 +18,53 @@ function graph(key, files = new Set()) {
 }
 const startup = new Set();
 for (const [key, entry] of Object.entries(manifest)) if (entry.isEntry) graph(key, startup);
-const duel = graph('src/features/training/Training.tsx');
+const duel = graph('src/features/offline.ts');
+// F11 adds optional game modes. Keep the existing account/lobby budget and measure each mode
+// separately; every mode also remains excluded from the fixed 200 KiB offline package.
+const coreOnline = new Set(
+  [
+    'src/features/lobby/Lobby.tsx',
+    'src/features/lobby/OnlineDuel.tsx',
+    'src/features/lobby/OnlineRecords.tsx',
+    'src/features/lobby/Trade.tsx',
+    'src/features/account/Account.tsx',
+    'src/features/store/Store.tsx',
+    'src/features/clans/Clans.tsx',
+    'src/features/collection/Progression.tsx',
+    'src/app/pathArt.ts',
+    'src/app/pathCatalog.ts',
+  ]
+    .flatMap((key) => [...graph(key)])
+    .map((f) => join(output, f))
+    .filter((f) => onlineAssets.has(f)),
+);
+const tournaments = new Set(
+  [...graph('src/features/tournaments/Tournaments.tsx')]
+    .filter((f) => !startup.has(f) && !coreOnline.has(join(output, f)))
+    .map((f) => join(output, f)),
+);
+const expeditions = new Set(
+  [...graph('src/features/expeditions/Expeditions.tsx')]
+    .filter((f) => !startup.has(f) && !coreOnline.has(join(output, f)))
+    .map((f) => join(output, f)),
+);
+const administration = new Set(
+  [
+    'src/features/admin/Admin.tsx',
+    'src/features/moderation/Report.tsx',
+    'src/features/moderation/Notices.tsx',
+  ]
+    .flatMap((key) => [...graph(key)])
+    .filter((f) => !startup.has(f) && !coreOnline.has(join(output, f)))
+    .map((f) => join(output, f)),
+);
+const lobbyRoute = new Set([...startup, ...graph('src/features/lobby/Lobby.tsx')]);
+const privacy = new Set(
+  ['src/features/privacy/Privacy.tsx', 'src/features/legal/Legal.tsx']
+    .flatMap((key) => [...graph(key)])
+    .filter((f) => !startup.has(f) && !coreOnline.has(join(output, f)))
+    .map((f) => join(output, f)),
+);
 // Card illustrations have their own budget (docs/13-wydajnosc.md, rozdz. 1.1).
 const illustrations = new Set(
   [manifest['src/app/cardArt.ts']?.file].filter(Boolean).map((f) => join(output, f)),
@@ -67,21 +111,52 @@ const rows = [
   ],
   ['WASM (Brotli)', await sum(files.filter((f) => f.endsWith('.wasm'))), 90],
   ['Card illustrations (Brotli)', await sum([...illustrations]), 80],
-  ['Online account and lobby on demand (Brotli)', await sum([...onlineAssets]), 45],
+  ['Online account and lobby on demand (Brotli)', await sum([...coreOnline]), 45],
+  ['Tournaments on demand (Brotli)', await sum([...tournaments]), 20],
+  ['Expeditions on demand (Brotli)', await sum([...expeditions]), 20],
+  ['Administration and moderation on demand (Brotli)', await sum([...administration]), 20],
+  ['Privacy and legal on demand (Brotli)', await sum([...privacy]), 20],
   [
-    'Complete offline app without card illustrations (Brotli, images/fonts original)',
+    'Software notices on demand (Brotli)',
     await sum(
-      files.filter(
-        (f) => !illustrations.has(f) && !onlineAssets.has(f) && !f.endsWith('online-assets.json'),
-      ),
-      async (f) => (/\.(woff2|png)$/.test(f) ? (await stat(f)).size : compressed(f)),
+      [...graph('src/features/legal/software.ts')]
+        .filter((f) => !startup.has(f))
+        .map((f) => join(output, f)),
     ),
-    200,
+    20,
   ],
+  [
+    'Complete initial lobby route JS (Brotli)',
+    await sum([...lobbyRoute].filter((f) => f.endsWith('.js')).map((f) => join(output, f))),
+    70,
+  ],
+  ...(!android
+    ? [
+        [
+          'Complete offline PWA without card illustrations (Brotli, images/fonts original)',
+          await sum(
+            files.filter(
+              (f) =>
+                !illustrations.has(f) && !onlineAssets.has(f) && !f.endsWith('online-assets.json'),
+            ),
+            async (f) => (/\.(woff2|png)$/.test(f) ? (await stat(f)).size : compressed(f)),
+          ),
+          200,
+        ],
+      ]
+    : [
+        [
+          // APKs contain every file, including online screens and native integrations.
+          // This uncompressed asset cap is separate from the unchanged 200 KiB browser PWA cap.
+          'All Android web assets including illustrations and native integrations (uncompressed)',
+          await sum(files, async (f) => (await stat(f)).size),
+          10 * 1024,
+        ],
+      ]),
 ];
 let failed = false;
 for (const [label, bytes, limit] of rows) {
-  console.log(`${label}: ${(bytes / 1024).toFixed(1)} / ${limit} KiB`);
+  console.log(`${label}: ${(bytes / 1024).toFixed(3)} / ${limit} KiB`);
   if (bytes > limit * 1024) failed = true;
 }
 if (failed) process.exitCode = 1;

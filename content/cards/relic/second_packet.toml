@@ -1,0 +1,352 @@
+# Original Relic packet 2
+
+[[card]]
+id = 232
+key = "card.tempered_chain"
+set = "relic"
+rarity = "bronze"
+requires = { combat = 1 }
+cost = { focus = 2, stamina = 6 }
+kind = "instant"
+coupling = { school = "combat", level = 2 }
+effects = [{ family = "stat_mod", target = "self", stat = "phys_atk", amount = 1, duration = "duel" }, { family = "stamina", target = "self", amount = 2 }]
+
+[[card]]
+id = 233
+key = "card.votive_spring"
+set = "relic"
+rarity = "bronze"
+requires = { divine = 1 }
+cost = { focus = 2, stamina = 6 }
+kind = "instant"
+coupling = { school = "divine", level = 2 }
+effects = [{ family = "heal", target = "self", amount = 3 }]
+
+[[card]]
+id = 234
+key = "card.tide_filament"
+set = "relic"
+rarity = "bronze"
+requires = { element = 1 }
+cost = { focus = 2, stamina = 6 }
+kind = "instant"
+coupling = { school = "element", level = 2 }
+effects = [{ family = "damage", target = "opponent", amount = 2 }, { family = "stamina", target = "opponent", amount = -1 }]
+
+[[card]]
+id = 235
+key = "card.memory_lattice"
+set = "relic"
+rarity = "bronze"
+requires = { arcane = 1 }
+cost = { focus = 2, stamina = 7 }
+kind = "instant"
+coupling = { school = "arcane", level = 2 }
+effects = [{ family = "focus", target = "self", amount = 1 }, { family = "stat_mod", target = "self", stat = "mag_def", amount = 1, duration = "duel" }]
+
+[[card]]
+id = 236
+key = "card.ossuary_link"
+set = "relic"
+rarity = "bronze"
+requires = { necro = 1 }
+cost = { focus = 2, stamina = 7 }
+kind = "instant"
+coupling = { school = "necro", level = 2 }
+effects = [{ family = "drain", pool = "hp", amount = 2 }]
+
+[[card]]
+id = 237
+key = "card.nested_flywheel"
+set = "relic"
+rarity = "bronze"
+requires = { tech = 1 }
+cost = { focus = 2, stamina = 7 }
+kind = "instant"
+coupling = { school = "tech", level = 2 }
+effects = [{ family = "stamina", target = "self", amount = 3 }, { family = "stat_mod", target = "self", stat = "mag_atk", amount = 1, duration = "round" }]
+
+[[card]]
+id = 238
+key = "card.victors_standard"
+set = "relic"
+rarity = "silver"
+requires = { combat = 2 }
+cost = { focus = 3, stamina = 9 }
+kind = "instant"
+condition = { type = "hp_percent_ahead" }
+effects = [{ family = "stat_mod", target = "self", stat = "phys_atk", amount = 3, duration = "duel" }, { family = "stat_mod", target = "self", stat = "phys_def", amount = 1, duration = "duel" }]
+
+[[card]]
+id = 239
+key = "card.unbroken_day"
+set = "relic"
+rarity = "silver"
+requires = { divine = 2 }
+cost = { focus = 3, stamina = 9 }
+kind = "instant"
+condition = { type = "hp_percent_ahead" }
+effects = [{ family = "heal", target = "self", amount = 8 }, { family = "stat_mod", target = "self", stat = "mag_def", amount = 1, duration = "duel" }]
+
+[[card]]
+id = 240
+key = "card.high_watermark"
+set = "relic"
+rarity = "silver"
+requires = { element = 2 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+condition = { type = "hp_percent_ahead" }
+effects = [{ family = "damage", target = "opponent", amount = 7 }, { family = "stamina", target = "self", amount = 4 }]
+
+[[card]]
+id = 241
+key = "card.keepers_footnote"
+set = "relic"
+rarity = "silver"
+requires = { arcane = 2 }
+cost = { focus = 2, stamina = 10 }
+kind = "instant"
+condition = { type = "hp_percent_ahead" }
+effects = [{ family = "focus", target = "self", amount = 3 }, { family = "stat_mod", target = "self", stat = "mag_atk", amount = 2, duration = "round" }]
+
+[[card]]
+id = 242
+key = "card.grave_precedence"
+set = "relic"
+rarity = "silver"
+requires = { necro = 2 }
+cost = { focus = 3, stamina = 10 }
+kind = "instant"
+condition = { type = "hp_percent_ahead" }
+effects = [{ family = "drain", pool = "hp", amount = 5 }, { family = "focus", target = "opponent", amount = -1 }]
+
+[[card]]
+id = 243
+key = "card.prime_regulator"
+set = "relic"
+rarity = "silver"
+requires = { tech = 2 }
+cost = { focus = 3, stamina = 9 }
+kind = "instant"
+condition = { type = "hp_percent_ahead" }
+effects = [{ family = "stat_mod", target = "self", stat = "phys_def", amount = 2, duration = "duel" }, { family = "stamina", target = "self", amount = 8 }]
+
+[[card]]
+id = 244
+key = "card.field_dispatch"
+set = "relic"
+rarity = "bronze"
+requires = { combat = 1 }
+cost = { focus = 2, stamina = 7 }
+kind = "instant"
+effects = [{ family = "hand", target = "self", action = "draw", count = 2 }, { family = "stat_mod", target = "self", stat = "phys_atk", amount = 1, duration = "round" }]
+
+[[card]]
+id = 245
+key = "card.pilgrims_satchel"
+set = "relic"
+rarity = "bronze"
+requires = { divine = 1 }
+cost = { focus = 2, stamina = 7 }
+kind = "instant"
+effects = [{ family = "hand", target = "self", action = "draw", count = 1 }, { family = "heal", target = "self", amount = 3 }]
+
+[[card]]
+id = 246
+key = "card.scattered_petals"
+set = "relic"
+rarity = "silver"
+requires = { element = 2 }
+cost = { focus = 3, stamina = 9 }
+kind = "instant"
+effects = [{ family = "hand", target = "opponent", action = "discard_random", count = 1 }, { family = "stamina", target = "opponent", amount = -3 }]
+
+[[card]]
+id = 247
+key = "card.palimpsest_case"
+set = "relic"
+rarity = "silver"
+requires = { arcane = 2 }
+cost = { focus = 3, stamina = 8 }
+kind = "instant"
+effects = [{ family = "hand", target = "self", action = "discard_random", count = 1 }, { family = "hand", target = "self", action = "draw", count = 3 }]
+
+[[card]]
+id = 248
+key = "card.sealed_testament"
+set = "relic"
+rarity = "silver"
+requires = { necro = 2 }
+cost = { focus = 4, stamina = 12 }
+kind = "instant"
+effects = [{ family = "hand", target = "opponent", action = "discard_random", count = 2 }, { family = "damage", target = "self", amount = 2 }]
+
+[[card]]
+id = 249
+key = "card.parts_drawer"
+set = "relic"
+rarity = "bronze"
+requires = { tech = 1 }
+cost = { focus = 2, stamina = 8 }
+kind = "instant"
+effects = [{ family = "hand", target = "self", action = "draw", count = 2 }, { family = "focus", target = "self", amount = -1 }]
+
+[[card]]
+id = 250
+key = "card.scouring_sabre"
+set = "relic"
+rarity = "silver"
+requires = { combat = 2 }
+cost = { focus = 4, stamina = 13 }
+kind = "instant"
+effects = [{ family = "dispel", target = "opponent" }, { family = "stat_mod", target = "self", stat = "phys_atk", amount = 1, duration = "round" }]
+
+[[card]]
+id = 251
+key = "card.purifying_censer"
+set = "relic"
+rarity = "silver"
+requires = { divine = 2 }
+cost = { focus = 3, stamina = 9 }
+kind = "instant"
+effects = [{ family = "dispel", target = "self" }, { family = "heal", target = "self", amount = 6 }]
+
+[[card]]
+id = 252
+key = "card.cleansing_rain"
+set = "relic"
+rarity = "silver"
+requires = { element = 2 }
+cost = { focus = 3, stamina = 9 }
+kind = "instant"
+effects = [{ family = "dispel", target = "self" }, { family = "stamina", target = "self", amount = 8 }]
+
+[[card]]
+id = 253
+key = "card.erasure_quill"
+set = "relic"
+rarity = "silver"
+requires = { arcane = 2 }
+cost = { focus = 4, stamina = 14 }
+kind = "instant"
+effects = [{ family = "dispel", target = "opponent" }, { family = "focus", target = "self", amount = 1 }]
+
+[[card]]
+id = 254
+key = "card.grave_solvent"
+set = "relic"
+rarity = "silver"
+requires = { necro = 2 }
+cost = { focus = 4, stamina = 15 }
+kind = "instant"
+effects = [{ family = "dispel", target = "opponent" }, { family = "drain", pool = "stamina", amount = 3 }]
+
+[[card]]
+id = 255
+key = "card.reset_socket"
+set = "relic"
+rarity = "silver"
+requires = { tech = 2 }
+cost = { focus = 3, stamina = 8 }
+kind = "instant"
+effects = [{ family = "dispel", target = "self" }, { family = "stat_mod", target = "self", stat = "mag_def", amount = 1, duration = "round" }, { family = "stamina", target = "self", amount = 5 }]
+
+[[card]]
+id = 256
+key = "card.impact_rivet"
+set = "relic"
+rarity = "silver"
+requires = { combat = 2 }
+cost = { focus = 3, stamina = 10 }
+kind = "enchantment"
+trigger = "on_hit"
+effects = [{ family = "stamina", target = "self", amount = 1 }, { family = "heal", target = "self", amount = 1 }]
+
+[[card]]
+id = 257
+key = "card.mercy_chime"
+set = "relic"
+rarity = "silver"
+requires = { divine = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_blocked"
+effects = [{ family = "heal", target = "self", amount = 1 }]
+
+[[card]]
+id = 258
+key = "card.rain_chain"
+set = "relic"
+rarity = "silver"
+requires = { element = 2 }
+cost = { focus = 3, stamina = 11 }
+kind = "enchantment"
+trigger = "on_damage_taken"
+effects = [{ family = "stamina", target = "self", amount = 1 }]
+
+[[card]]
+id = 259
+key = "card.echo_abacus"
+set = "relic"
+rarity = "silver"
+requires = { arcane = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_hit"
+effects = [{ family = "focus", target = "self", amount = 1 }]
+
+[[card]]
+id = 260
+key = "card.mourning_bell"
+set = "relic"
+rarity = "silver"
+requires = { necro = 2 }
+cost = { focus = 3, stamina = 12 }
+kind = "enchantment"
+trigger = "on_damage_taken"
+effects = [{ family = "stamina", target = "opponent", amount = -1 }]
+
+[[card]]
+id = 261
+key = "card.guard_escapement"
+set = "relic"
+rarity = "silver"
+requires = { tech = 2 }
+cost = { focus = 3, stamina = 11 }
+kind = "enchantment"
+trigger = "on_blocked"
+effects = [{ family = "focus", target = "self", amount = 1 }]
+
+[[card]]
+id = 262
+key = "card.last_banner"
+set = "relic"
+rarity = "gold"
+requires = { combat = 3 }
+cost = { focus = 5, stamina = 18 }
+kind = "instant"
+keywords = ["intervention"]
+effects = [{ family = "stat_mod", target = "self", stat = "phys_atk", amount = 5, duration = "round" }, { family = "stat_mod", target = "self", stat = "phys_def", amount = 3, duration = "round" }]
+
+[[card]]
+id = 263
+key = "card.daybreak_reliquary"
+set = "relic"
+rarity = "gold"
+requires = { divine = 3 }
+cost = { focus = 5, stamina = 20 }
+kind = "instant"
+keywords = ["intervention"]
+effects = [{ family = "heal", target = "self", amount = 16 }, { family = "dispel", target = "self" }]
+
+[[card]]
+id = 264
+key = "card.singularity_battery"
+set = "relic"
+rarity = "gold"
+requires = { tech = 3 }
+cost = { focus = 5, stamina = 12 }
+kind = "instant"
+keywords = ["intervention"]
+effects = [{ family = "stamina", target = "self", amount = 24 }, { family = "focus", target = "self", amount = 2 }, { family = "damage", target = "self", amount = 4 }]

@@ -1,0 +1,9 @@
+[Unit]
+Description=Restore the last verified Spellgambit firewall before public listeners
+Before=docker.service
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/usr/bin/python3 /srv/spellgambit/deploy/update-firewall.py --restore
+[Install]
+WantedBy=multi-user.target
