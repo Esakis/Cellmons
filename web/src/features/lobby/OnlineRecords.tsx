@@ -20,7 +20,7 @@ export function OnlineRecords(props: {
   const [replay, setReplay] = createSignal<MatchReplayData>();
   const [round, setRound] = createSignal(0);
   const [loading, setLoading] = createSignal(false);
-  let page = 0;
+  const [page, setPage] = createSignal(0);
   async function load(next = false) {
     setLoading(true);
     try {
@@ -32,7 +32,7 @@ export function OnlineRecords(props: {
         });
         if (reply?.case === 'rankingSnapshot') {
           setRanking(reply.value);
-          page = offset;
+          setPage(offset);
         }
       } else {
         const reply = await props.send({
@@ -68,7 +68,7 @@ export function OnlineRecords(props: {
         {t('refresh')}
       </button>
       <Show when={props.mode === 'ranking'}>
-        <ol start={page + 1} class="online-ranking">
+        <ol start={page() + 1} class="online-ranking">
           <For each={ranking()?.players}>
             {(p) => (
               <li>

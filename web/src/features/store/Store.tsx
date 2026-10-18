@@ -2,7 +2,9 @@ import { A } from '@solidjs/router';
 import { createEffect, createMemo, createSignal, For, onCleanup, Show } from 'solid-js';
 import { ApiError, account, accountEpoch, api, restoreAccount } from '../../app/account';
 import { avatars, cards, content, fluentKey } from '../../app/content';
+import { onlineIcon } from '../../app/onlineIcons';
 import { Modal } from '../../components/Modal';
+import { Scene } from '../../components/Scene';
 import { addTranslations, hasTranslation, language, t } from '../../i18n';
 import type { Snapshot } from '../collection/state';
 import en from './en.ftl?raw';
@@ -20,6 +22,14 @@ import {
 import '../online.css';
 
 addTranslations({ pl, en });
+// The shop's painting (art/paintings/scenes), the same as in the lobby's shop room.
+const [painting] = Object.values(
+  import.meta.glob<string>('../../assets/paintings/scenes/shop.avif', {
+    eager: true,
+    query: '?url',
+    import: 'default',
+  }),
+);
 const cardName = (id: number) => {
   const card = cards.get(id);
   return card ? t(fluentKey(card.key)) : `#${id}`;
@@ -148,7 +158,9 @@ export function Store() {
   }
   return (
     <section class="store-page">
-      <h1>{t('store')}</h1>
+      <Scene src={painting}>
+        <h1 class="plaque">{t('store')}</h1>
+      </Scene>
       <Show
         when={ready()}
         fallback={
@@ -159,6 +171,7 @@ export function Store() {
       >
         <div class="store-toolbar">
           <strong data-testid="wallet-balance">
+            <img class="icon" src={onlineIcon('ducats')} alt="" />
             {t('store-balance', { value: wallet()?.balance ?? '—' })}
           </strong>
           <button type="button" class="secondary" disabled={loading()} onClick={() => void load()}>
@@ -206,7 +219,10 @@ export function Store() {
             {(offer) => (
               <article>
                 <h3>{t(`store-pack-${offer.id}`)}</h3>
-                <p>{t('store-price', { value: offer.price })}</p>
+                <p>
+                  <img class="icon" src={onlineIcon('ducats')} alt="" />
+                  {t('store-price', { value: offer.price })}
+                </p>
                 <p>
                   <For each={offer.slots}>
                     {(slot) => (

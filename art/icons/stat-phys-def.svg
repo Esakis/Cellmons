@@ -1,4 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Obrona fizyczna (OF)">
-<title>Obrona fizyczna (OF)</title>
-<path d="M12 3l7 3v5c0 4.6-3 8.1-7 10-4-1.9-7-5.4-7-10V6z"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" aria-label="Obrona fizyczna (OF)" viewBox="0 0 512 512"><title>Obrona fizyczna (OF)</title><path d="M49 20v10c0 104 10 207 41 290s83 148 165 171h4c90-19 143-84 171-169 29-84 36-188 36-292V20l-11 1Q257 50 60 21zm19 21q94 13 190 13v184h174q-7 42-19 78c-28 80-74 138-155 156V238H87Q68 146 68 41"/></svg>

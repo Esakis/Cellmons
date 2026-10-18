@@ -7,6 +7,14 @@ import { t } from '../../i18n';
 import styles from './Training.module.css';
 
 const profiles = ['novice', 'apprentice', 'tactician', 'archmage'];
+// The welcome card is painted with the training grounds' scene (art/paintings/scenes, global.css).
+const [painting] = Object.values(
+  import.meta.glob<string>('../../assets/paintings/scenes/home.avif', {
+    eager: true,
+    query: '?url',
+    import: 'default',
+  }),
+);
 export function TrainingSetup() {
   const [selected, setSelected] = createSignal(Number(readPreference('avatar', '1')));
   const [bot, setBot] = createSignal(readPreference('bot', 'novice'));
@@ -22,7 +30,10 @@ export function TrainingSetup() {
   }
   return (
     <div class={styles.setup}>
-      <section class={styles.hero}>
+      <section
+        class={`${styles.hero} painted`}
+        style={{ '--scene': painting ? `url("${painting}")` : 'none' }}
+      >
         <div>
           <p class="eyebrow">{t('eyebrow')}</p>
           <h1>{t('home-title')}</h1>
@@ -59,6 +70,7 @@ export function TrainingSetup() {
             </h2>
             <p>{t('starter-deck')}</p>
           </div>
+          {/* Portraits load lazily: the painted welcome card is the largest paint and goes first. */}
           <div class={styles.avatars}>
             <For each={content.avatars}>
               {(avatar) => (
@@ -74,6 +86,7 @@ export function TrainingSetup() {
                     alt=""
                     width="120"
                     height="120"
+                    loading="lazy"
                   />
                   <strong>{t(fluentKey(avatar.key))}</strong>
                   <span>

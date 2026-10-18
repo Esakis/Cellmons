@@ -14,7 +14,7 @@
   padding: 34px 40px;
   border-radius: 14px;
   background:
-    radial-gradient(ellipse 60% 120% at 85% 50%, rgb(126 74 150 / 0.35), transparent 70%),
+    radial-gradient(ellipse 60% 120% at 85% 50%, rgb(150 112 62 / 0.16), transparent 70%),
     var(--panel-bg);
   box-shadow: var(--panel-shadow);
 }
@@ -131,6 +131,8 @@
   height: 112px;
   margin-bottom: 14px;
   border-radius: 50%;
+  object-fit: cover;
+  object-position: 50% 30%;
   box-shadow:
     0 0 0 3px var(--surface),
     0 0 0 5px var(--gold-dark);
@@ -319,33 +321,35 @@
 
 /* Duel window: a framed board with slim, square panels, metal plates and coins. */
 .duel {
-  --duel-edge: #050406;
-  --duel-band: #3a3530;
-  --duel-line: #a8874a;
+  --duel-edge: #000;
+  --duel-band: #26221e;
+  --duel-line: #8c7247;
   --duel-window:
-    radial-gradient(ellipse 70% 40% at 50% 0%, rgb(217 180 90 / 0.1), transparent 70%),
-    linear-gradient(180deg, #27221f, #151213);
-  --duel-panel: linear-gradient(180deg, #40213a, #221222);
-  --duel-panel-line: #6f4265;
-  --duel-center: linear-gradient(180deg, #1f2b26, #111815);
-  --duel-center-line: #46624f;
-  --duel-strip: linear-gradient(180deg, #2e2028, #120c10);
-  --duel-strip-text: #f1dfb4;
-  --duel-plate: linear-gradient(180deg, #3b3631, #1c1917);
-  --duel-inset: #0d0a0e;
-  --duel-tray: linear-gradient(180deg, #a56f3a, #6a4120);
-  --duel-tray-line: #331e0b;
-  --duel-card-body: linear-gradient(180deg, #2f2829, #1b1617);
-  --duel-text-box: linear-gradient(180deg, #4a1a2d, #300e1d);
-  --duel-text-box-color: #f3e6d0;
-  --duel-on-dark: invert(92%) sepia(18%) saturate(420%) hue-rotate(358deg) brightness(98%);
-  --coin-gold: radial-gradient(circle at 35% 30%, #fff2bd, #d9b45a 50%, #87611d);
-  --coin-bronze: radial-gradient(circle at 35% 30%, #f3cf94, #b27c37 55%, #5c3a11);
-  --coin-phys: radial-gradient(circle at 35% 30%, #f4a07a, #a8392a 55%, #4e1309);
-  --coin-mag: radial-gradient(circle at 35% 30%, #aab3ff, #3f4ab0 55%, #191e5a);
-  --coin-focus: radial-gradient(circle at 35% 30%, #93b3f0, #2f4f8f 60%, #152649);
-  --coin-stamina: radial-gradient(circle at 35% 30%, #92ddad, #2e7d4f 60%, #133b24);
-  --coin-red: radial-gradient(circle at 35% 30%, #ff9c84, #c0291c 60%, #640d06);
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgb(179 146 90 / 0.08), transparent 70%),
+    linear-gradient(180deg, #161415, #0b0a0b);
+  --duel-panel: linear-gradient(180deg, #1a1718, #0f0e10);
+  --duel-panel-line: #3a3129;
+  --duel-center: radial-gradient(ellipse 100% 70% at 50% 35%, #1e1813, #0e0b09);
+  --duel-center-line: #4a3a28;
+  --duel-strip: linear-gradient(180deg, #25201c, #120f0e);
+  --duel-strip-text: #e3d3ad;
+  --duel-plate: linear-gradient(180deg, #29241f, #141110);
+  --duel-inset: #070606;
+  --duel-tray: linear-gradient(180deg, #221e1b, #100e0d);
+  --duel-tray-line: #5a4628;
+  --duel-card-body: linear-gradient(180deg, #1b1816, #0e0c0b);
+  --duel-text-box: linear-gradient(180deg, #1a1613, #0f0c0b);
+  --duel-text-box-color: #d6cab3;
+  --duel-on-dark: var(--icon-filter);
+  /* Metal rim around the enamel coins. */
+  --duel-rim: linear-gradient(160deg, #f0dba6, #a8874f 35%, #4a3618 70%, #c9a96a);
+  --coin-gold: radial-gradient(circle at 35% 30%, #f1dfac, #b8924f 45%, #6a5026 75%, #3a2b12);
+  --coin-bronze: radial-gradient(circle at 35% 30%, #d9ae78, #8a5a2e 55%, #3d240f);
+  --coin-phys: radial-gradient(circle at 35% 28%, #b8493c, #6e1b15 55%, #2c0806);
+  --coin-mag: radial-gradient(circle at 35% 28%, #5f80b8, #253a63 55%, #0c1528);
+  --coin-focus: radial-gradient(circle at 35% 30%, #8fa8c6, #3b5574 55%, #18263a);
+  --coin-stamina: radial-gradient(circle at 35% 30%, #9db084, #4a6338 55%, #1f2c16);
+  --coin-red: radial-gradient(circle at 35% 30%, #c8574a, #861f17 60%, #3a0a07);
 }
 :global(:root[data-theme="light"]) .duel {
   --duel-edge: #5e430f;
@@ -365,6 +369,7 @@
   --duel-card-body: linear-gradient(180deg, #f7eed8, #e8d7b0);
   --duel-text-box: linear-gradient(180deg, #fffaf0, #f1e4c8);
   --duel-text-box-color: #2b2118;
+  --duel-on-dark: invert(92%) sepia(18%) saturate(420%) hue-rotate(358deg) brightness(98%);
 }
 .table,
 .board {
@@ -372,7 +377,7 @@
   padding: 0 16px 14px;
   border: 1px solid var(--duel-edge);
   border-radius: 3px;
-  background: var(--duel-window);
+  background: var(--grain), var(--duel-window);
   box-shadow:
     inset 0 0 0 3px var(--duel-band),
     inset 0 0 0 4px var(--duel-line),
@@ -498,7 +503,7 @@
   padding: 10px;
   border: 1px solid var(--duel-panel-line);
   border-radius: 2px;
-  background: var(--duel-panel);
+  background: var(--grain), var(--duel-panel);
   box-shadow:
     0 0 0 1px var(--duel-edge),
     inset 0 1px 0 rgb(255 255 255 / 0.06),
@@ -543,21 +548,34 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6px;
+  padding: 3px;
+  border: 6px solid transparent;
   background:
-    radial-gradient(circle at 50% 45%, rgb(217 180 90 / 0.2), transparent 65%), var(--duel-inset);
-  border: 1px solid var(--duel-line);
+    var(--duel-inset) padding-box,
+    var(--rarity-gold) border-box;
   box-shadow:
     0 0 0 1px var(--duel-edge),
     inset 0 0 0 1px var(--duel-edge),
-    inset 0 0 22px rgb(0 0 0 / 0.55);
+    inset 0 0 22px rgb(0 0 0 / 0.55),
+    0 6px 16px rgb(0 0 0 / 0.5);
 }
 .sidePortrait {
   display: block;
   width: min(100%, 168px);
   height: auto;
   aspect-ratio: 1;
-  object-fit: contain;
+  object-fit: cover;
+  object-position: 50% 35%;
+}
+/* Painted portraits get a soft vignette and a thin inner line, like a framed canvas. */
+.portraitFrame::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 0.7),
+    inset 0 0 28px rgb(0 0 0 / 0.65);
 }
 .schools {
   display: flex;
@@ -610,14 +628,15 @@
 }
 .pill dd {
   font-family: var(--font-display);
-  font-size: 0.95rem;
+  font-size: 1.3rem;
   font-weight: 700;
-  line-height: 1.15;
+  line-height: 1.1;
   color: var(--heading);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.8);
 }
 .medalIcon {
-  width: 17px;
-  height: 17px;
+  width: 20px;
+  height: 20px;
 }
 .enchantments {
   display: flex;
@@ -652,12 +671,14 @@
 .gauge > span {
   position: absolute;
   inset: auto 0 0;
-  background: linear-gradient(90deg, #f6b27a, #cc5f2c 50%, #7d2a10);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.45);
+  background: linear-gradient(90deg, #c4453a, #8e2219 50%, #4a0d09);
+  box-shadow:
+    inset 0 1px 0 rgb(255 200 180 / 0.35),
+    0 0 10px rgb(160 30 20 / 0.45);
   transition: height 0.4s ease-out;
 }
 .gauge > span[data-low="true"] {
-  background: linear-gradient(90deg, #ff7a6a, #b3141e 55%, #5e0a0f);
+  background: linear-gradient(90deg, #ff6a55, #b0201a 55%, #5e0a0f);
 }
 .command {
   position: relative;
@@ -669,7 +690,7 @@
   padding: 10px 12px;
   border: 1px solid var(--duel-center-line);
   border-radius: 2px;
-  background: var(--duel-center);
+  background: var(--grain), var(--duel-center);
   box-shadow:
     0 0 0 1px var(--duel-edge),
     inset 0 1px 0 rgb(255 255 255 / 0.05),
@@ -701,29 +722,31 @@
   place-items: center;
   align-content: center;
   flex-shrink: 0;
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   font-family: var(--font-display);
-  font-size: 1rem;
+  font-size: 1.3rem;
   font-weight: 700;
   line-height: 1;
-  color: #2a1a08;
+  color: #1e140a;
+  text-shadow: 0 1px 0 rgb(255 240 200 / 0.35);
   background: var(--coin-gold);
-  border: 1px solid #5e430f;
+  border: 1px solid #3a2b12;
   box-shadow:
     0 0 0 2px var(--duel-edge),
     0 0 0 3px var(--duel-line),
-    0 3px 8px rgb(0 0 0 / 0.5);
+    inset 0 -3px 6px rgb(0 0 0 / 0.35),
+    0 3px 8px rgb(0 0 0 / 0.6);
 }
 .focusOrb small {
   font-family: "Inter Variable", system-ui, sans-serif;
-  font-size: 0.45rem;
+  font-size: 0.5rem;
 }
 .slotOrb {
-  width: 32px;
-  height: 32px;
-  font-size: 0.9rem;
+  width: 36px;
+  height: 36px;
+  font-size: 1.1rem;
 }
 .sequence {
   --coin: 52px;
@@ -751,17 +774,38 @@
   margin: 0;
   padding: 0 11px;
 }
+/* An iron tray with brass edges and rivets at both ends. */
 .slots {
-  padding: 6px 10px;
+  position: relative;
+  padding: 7px 14px;
   border: 1px solid var(--duel-tray-line);
-  border-radius: 4px;
-  background: var(--duel-tray);
+  border-radius: 3px;
+  background: var(--grain), var(--duel-tray);
   box-shadow:
     0 0 0 1px var(--duel-edge),
-    inset 0 1px 0 rgb(255 255 255 / 0.3),
-    inset 0 -3px 8px rgb(0 0 0 / 0.35),
-    0 3px 8px rgb(0 0 0 / 0.35);
+    inset 0 1px 0 rgb(240 220 170 / 0.12),
+    inset 0 -4px 10px rgb(0 0 0 / 0.55),
+    0 4px 10px rgb(0 0 0 / 0.5);
 }
+.slots::before,
+.slots::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  margin-top: -2.5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #f0dba6, #8c7247 60%, #3a2b12);
+  box-shadow: 0 1px 1px rgb(0 0 0 / 0.8);
+}
+.slots::before {
+  left: 5px;
+}
+.slots::after {
+  right: 5px;
+}
+/* Enamel medallions in a brass rim: crimson for physical, deep blue for magical. */
 .slot {
   position: relative;
   display: grid;
@@ -771,26 +815,27 @@
   height: var(--coin);
   min-height: 0;
   padding: 0;
-  border: 2px solid #2b1408;
+  border: 2px solid transparent;
   border-radius: 50%;
-  background: var(--coin-phys);
+  background:
+    var(--coin-phys) padding-box,
+    var(--duel-rim) border-box;
   box-shadow:
-    inset 0 0 0 2px rgb(255 214 160 / 0.45),
-    inset 0 -5px 9px rgb(0 0 0 / 0.35),
-    0 2px 5px rgb(0 0 0 / 0.55);
+    0 0 0 1px #000,
+    inset 0 0 0 1px rgb(0 0 0 / 0.55),
+    inset 0 2px 3px rgb(255 220 190 / 0.18),
+    inset 0 -6px 10px rgb(0 0 0 / 0.55),
+    0 3px 6px rgb(0 0 0 / 0.65);
 }
 .slot[data-kind="1"] {
-  border-color: #10143a;
-  background: var(--coin-mag);
-  box-shadow:
-    inset 0 0 0 2px rgb(200 210 255 / 0.45),
-    inset 0 -5px 9px rgb(0 0 0 / 0.35),
-    0 2px 5px rgb(0 0 0 / 0.55);
+  background:
+    var(--coin-mag) padding-box,
+    var(--duel-rim) border-box;
 }
 .slot img {
-  width: 52%;
-  height: 52%;
-  filter: brightness(0) invert(1) drop-shadow(0 1px 1px rgb(0 0 0 / 0.6));
+  width: 56%;
+  height: 56%;
+  filter: var(--icon-filter-bone) drop-shadow(0 1px 1px rgb(0 0 0 / 0.9));
 }
 .slot kbd {
   position: absolute;
@@ -798,15 +843,16 @@
   bottom: -3px;
   display: grid;
   place-items: center;
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   font-family: inherit;
-  font-size: 0.55rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  color: #2a1a08;
+  color: #1e140a;
   background: var(--coin-gold);
-  border: 1px solid #5e430f;
+  border: 1px solid #3a2b12;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.8);
 }
 .ghostSlot {
   display: grid;
@@ -822,17 +868,17 @@
   color: var(--color-text-muted);
 }
 .ghostSlot[data-kind="0"] {
-  border: 1px solid #2b1408;
+  border: 1px solid #8c7247;
   background: var(--coin-phys);
 }
 .ghostSlot[data-kind="1"] {
-  border: 1px solid #10143a;
+  border: 1px solid #8c7247;
   background: var(--coin-mag);
 }
 .ghostSlot .ghostIcon {
-  width: 12px;
-  height: 12px;
-  filter: brightness(0) invert(1);
+  width: 13px;
+  height: 13px;
+  filter: var(--icon-filter-bone);
 }
 .opponentCaption {
   font-size: 0.56rem;
@@ -854,18 +900,18 @@
   grid-row: span 2;
   display: grid;
   place-items: center;
-  min-width: 40px;
-  height: 36px;
+  min-width: 44px;
+  height: 40px;
   padding: 0 6px;
   font-family: var(--font-display);
-  font-size: 1.1rem;
+  font-size: 1.4rem;
   color: var(--heading);
   background: var(--duel-inset);
   border: 1px solid var(--duel-edge);
   box-shadow: inset 0 1px 6px rgb(0 0 0 / 0.5);
 }
 .timerBox span {
-  font-size: 0.74rem;
+  font-size: 0.82rem;
   font-weight: 600;
 }
 .timerBox small {
@@ -926,36 +972,52 @@
   display: block;
   width: 120px;
   height: 120px;
+  object-fit: cover;
+  object-position: 50% 30%;
 }
 .popup {
   position: absolute;
   left: 50%;
   top: 30%;
   z-index: 2;
-  padding: 1px 7px;
-  font-size: 1.35rem;
-  font-weight: 800;
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  font-weight: 700;
   white-space: nowrap;
-  background: rgb(255 253 248 / 0.92);
-  border-radius: 3px;
-  box-shadow: 0 2px 6px rgb(0 0 0 / 0.2);
   pointer-events: none;
   opacity: 0;
-  color: #c62828;
+  color: #ff7461;
+  text-shadow:
+    0 0 2px #000,
+    0 2px 0 #000,
+    0 0 16px rgb(210 40 25 / 0.9);
   animation-name: popup;
   animation-timing-function: ease-out;
   animation-fill-mode: both;
 }
 .popup[data-tone="heal"] {
-  color: #2e7d32;
+  color: #b5e39a;
+  text-shadow:
+    0 0 2px #000,
+    0 2px 0 #000,
+    0 0 16px rgb(90 170 60 / 0.9);
 }
 .popup[data-tone="block"],
 .popup[data-tone="miss"] {
-  font-size: 0.9rem;
-  color: #3d5a80;
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #c4d4ea;
+  text-shadow:
+    0 0 2px #000,
+    0 2px 0 #000,
+    0 0 14px rgb(90 130 200 / 0.9);
 }
 .popup[data-tone="miss"] {
-  color: var(--color-text-muted);
+  color: #b0a594;
+  text-shadow:
+    0 0 2px #000,
+    0 2px 0 #000;
 }
 @keyframes popup {
   0% {
@@ -988,20 +1050,24 @@
   border-radius: 50%;
   pointer-events: none;
   color: #fff;
-  background: radial-gradient(circle at 35% 30%, #f0b37a, #b23a2e 70%);
-  box-shadow: 0 0 14px 4px rgb(178 58 46 / 0.55);
+  background: radial-gradient(circle at 35% 30%, #ffd9b0, #c8463b 45%, #5e140e 80%);
+  box-shadow:
+    0 0 0 2px rgb(240 219 166 / 0.6),
+    0 0 18px 6px rgb(200 60 40 / 0.6);
   animation-name: strike;
   animation-timing-function: cubic-bezier(0.5, 0, 0.9, 0.6);
   animation-fill-mode: both;
 }
 .strike[data-kind="1"] {
-  background: radial-gradient(circle at 35% 30%, #c5cbff, #3949ab 70%);
-  box-shadow: 0 0 18px 6px rgb(92 107 192 / 0.6);
+  background: radial-gradient(circle at 35% 30%, #d6e2ff, #4a6bb0 45%, #172a55 80%);
+  box-shadow:
+    0 0 0 2px rgb(214 226 255 / 0.5),
+    0 0 22px 8px rgb(90 130 220 / 0.6);
 }
 .strike img {
-  width: 22px;
-  height: 22px;
-  filter: brightness(0) invert(1);
+  width: 24px;
+  height: 24px;
+  filter: var(--icon-filter-bone) drop-shadow(0 1px 1px rgb(0 0 0 / 0.9));
 }
 .strike b {
   position: absolute;
@@ -1042,7 +1108,13 @@
 .healthLabel {
   display: flex;
   justify-content: space-between;
-  font-size: 0.68rem;
+  align-items: baseline;
+  font-size: 0.74rem;
+}
+.healthLabel strong {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: var(--heading);
 }
 .health {
   position: relative;
@@ -1143,8 +1215,8 @@
 .medal {
   display: grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border: 1px solid #3b2410;
   border-radius: 50%;
   background: var(--coin-bronze);
@@ -1159,10 +1231,11 @@
 }
 .statRow dd {
   font-family: var(--font-display);
-  font-size: 1.05rem;
+  font-size: 1.4rem;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.15;
   color: var(--heading);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.8);
 }
 .statDealt {
   width: 100%;
@@ -1178,11 +1251,11 @@
 .statDealt dd {
   display: grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   font-family: var(--font-display);
-  font-size: 1rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: #2a1a08;
   background: var(--coin-gold);
@@ -1312,10 +1385,12 @@
   background:
     var(--duel-card-body) padding-box,
     var(--rarity) border-box;
-  border: 3px solid transparent;
-  border-radius: 3px;
+  border: 5px solid transparent;
+  border-radius: 2px;
   box-shadow:
     0 0 0 1px var(--duel-edge),
+    inset 0 0 0 1px var(--duel-edge),
+    inset 0 0 0 2px rgb(217 180 90 / 0.18),
     0 6px 14px rgb(0 0 0 / 0.45);
 }
 .card[data-rarity="silver"],
@@ -1338,9 +1413,9 @@
   transform: translateY(-4px);
   box-shadow:
     0 0 0 1px var(--duel-edge),
-    0 0 0 3px var(--gold-bright),
-    0 0 22px rgb(255 170 60 / 0.55),
-    0 10px 22px rgb(0 0 0 / 0.5);
+    0 0 0 2px var(--gold-bright),
+    0 0 26px rgb(224 198 142 / 0.4),
+    0 12px 24px rgb(0 0 0 / 0.6);
 }
 .cardMain {
   display: flex;
@@ -1369,8 +1444,8 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  min-height: 24px;
-  padding: 2px 30px 2px 6px;
+  min-height: 30px;
+  padding: 2px 36px 2px 6px;
   color: var(--duel-strip-text);
   background: var(--duel-strip);
   border: 1px solid var(--duel-edge);
@@ -1381,7 +1456,7 @@
   min-width: 0;
   overflow: hidden;
   font-family: var(--font-display);
-  font-size: 0.7rem;
+  font-size: 0.78rem;
   font-weight: 600;
   letter-spacing: 0.02em;
   text-overflow: ellipsis;
@@ -1389,7 +1464,7 @@
 }
 .cardTop > kbd {
   font-family: inherit;
-  font-size: 0.55rem;
+  font-size: 0.68rem;
   color: rgb(241 223 180 / 0.6);
 }
 .focusBadge,
@@ -1398,41 +1473,49 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  border: 2px solid transparent;
   border-radius: 50%;
-  font-size: 0.68rem;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
   font-weight: 700;
   line-height: 1;
   color: #fff;
-  text-shadow: 0 1px 1px rgb(0 0 0 / 0.5);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.9);
   box-shadow:
     0 0 0 1px var(--duel-edge),
-    inset 0 1px 0 rgb(255 255 255 / 0.35),
-    0 1px 3px rgb(0 0 0 / 0.5);
+    inset 0 1px 0 rgb(255 255 255 / 0.3),
+    0 1px 3px rgb(0 0 0 / 0.6);
 }
+/* Enamel coins in a gilt rim, like the coins on the board. */
 .focusBadge {
   position: absolute;
   top: 50%;
   right: 2px;
-  width: 22px;
-  height: 22px;
-  margin-top: -11px;
-  background: var(--coin-focus);
+  width: 28px;
+  height: 28px;
+  margin-top: -14px;
+  background:
+    var(--coin-focus) padding-box,
+    var(--duel-rim) border-box;
 }
 .staminaBadge {
-  width: 19px;
-  height: 19px;
-  background: var(--coin-stamina);
+  width: 26px;
+  height: 26px;
+  background:
+    var(--coin-stamina) padding-box,
+    var(--duel-rim) border-box;
 }
 .focusBadge small,
 .staminaBadge small {
-  font-size: 0.42rem;
+  font-family: "Inter Variable", system-ui, sans-serif;
+  font-size: 0.48rem;
 }
 .requirements {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.65rem;
-  font-weight: 600;
+  font-size: 0.8rem;
+  font-weight: 700;
 }
 .requirements > span {
   display: inline-flex;
@@ -1449,9 +1532,11 @@
   width: 100%;
   aspect-ratio: 8 / 5;
   overflow: hidden;
-  background: var(--duel-inset);
-  border: 1px solid var(--duel-edge);
-  box-shadow: 0 0 0 1px rgb(217 180 90 / 0.28);
+  border: 2px solid transparent;
+  background:
+    var(--duel-inset) padding-box,
+    var(--gilt) border-box;
+  box-shadow: 0 0 0 1px var(--duel-edge);
 }
 /* Positioned, so the picture always fits the box whatever height the card gets. */
 .cardArt img {
@@ -1459,12 +1544,23 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
+}
+/* Inner shadow over the painting, so it sits in the frame like a canvas. */
+.cardArt::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 0.7),
+    inset 0 0 22px rgb(0 0 0 / 0.55);
 }
 .cardArt[data-picture="false"] img {
   inset: 18%;
   width: 64%;
   height: 64%;
+  object-fit: contain;
   opacity: 0.6;
   filter: var(--icon-filter);
 }
@@ -1478,15 +1574,15 @@
   align-items: center;
   justify-content: space-between;
   gap: 6px;
-  min-height: 22px;
+  min-height: 28px;
   padding: 1px 2px 1px 6px;
   color: var(--duel-strip-text);
   background: var(--duel-strip);
   border: 1px solid var(--duel-edge);
 }
 .cardStrip .requirements img {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   filter: var(--duel-on-dark);
 }
 .cardText {
@@ -1495,7 +1591,7 @@
   height: calc(3 * 1.35em + 10px);
   overflow: hidden;
   padding: 4px 6px;
-  font-size: 0.66rem;
+  font-size: 0.7rem;
   line-height: 1.35;
   color: var(--duel-text-box-color);
   background: var(--duel-text-box);
@@ -1542,16 +1638,19 @@
   line-height: 1.35;
   color: var(--error);
 }
-/* A card chosen to cast glows orange; a card chosen to discard turns grey. */
+/* A card chosen to cast glows like hot brass; a card chosen to discard turns grey and bloodied. */
 .card[data-action="1"] .cardText {
-  color: #fff4e2;
-  background: linear-gradient(180deg, #cf6a22, #8c3a0c);
+  color: #f6e7c6;
+  background: linear-gradient(180deg, #5a3f17, #2c1d09);
+  box-shadow:
+    inset 0 0 0 1px rgb(224 198 142 / 0.45),
+    inset 0 0 16px rgb(224 170 80 / 0.25);
 }
 .card[data-action="2"] {
   box-shadow:
     0 0 0 1px var(--duel-edge),
-    0 0 0 3px #c0392b,
-    0 0 18px rgb(192 57 43 / 0.5),
+    0 0 0 2px #9e2a1f,
+    0 0 20px rgb(158 42 31 / 0.5),
     0 10px 22px rgb(0 0 0 / 0.5);
 }
 .card[data-action="2"] .cardArt {

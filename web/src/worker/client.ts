@@ -61,11 +61,14 @@ export class TrainingClient {
     const bytes = encodeRequest({ $typeName: 'game.v1.TrainingRequest', seq, body });
     return new Promise<TrainingReply>((resolve, reject) => {
       const timer = setTimeout(() => {
-        this.pending.delete(seq);
-        reject(new Error('worker_failed'));
+        this.fail();
       }, 30_000);
       this.pending.set(seq, { resolve, reject, timer });
-      this.worker.postMessage(bytes.buffer, [bytes.buffer]);
+      try {
+        this.worker.postMessage(bytes.buffer, [bytes.buffer]);
+      } catch {
+        this.fail();
+      }
     }).then((reply) => {
       if (
         import.meta.env.VITE_PLATFORM === 'android' &&
@@ -77,7 +80,9 @@ export class TrainingClient {
   }
 
   private fail() {
+    if (this.unavailable) return;
     this.unavailable = true;
+    this.worker.terminate();
     for (const waiting of this.pending.values()) {
       clearTimeout(waiting.timer);
       waiting.reject(new Error('worker_failed'));
@@ -86,7 +91,6 @@ export class TrainingClient {
   }
 
   dispose() {
-    this.worker.terminate();
     this.fail();
   }
 }

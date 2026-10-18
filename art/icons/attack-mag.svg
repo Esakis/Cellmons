@@ -1,4 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Atak magiczny (M)">
-<title>Atak magiczny (M)</title>
-<circle cx="12" cy="12" r="8"/><path d="M12 8l1.2 2.8L16 12l-2.8 1.2L12 16l-1.2-2.8L8 12l2.8-1.2z"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" aria-label="Atak magiczny (M)" viewBox="0 0 512 512"><title>Atak magiczny (M)</title><path d="M248 19C138 18 20 97 20 245l21-52c-9 72-8 147 39 203l-42-19c39 70 127 91 201 93A243 243 0 0 1 64 246C57 35 325 29 405 171q-6-30-16-56c77 89 59 214-21 253-24 4-49 12-61 19-59 33-6 126 53 92q15-9 37-32c64-59 98-118 93-188q-11 44-36 84c63-147 8-264-145-301q19 9 34 23c-57-24-131-22-187 4 28-26 65-44 102-50zm-20 160-20 101-9 9-26-49-22 12 31 61q7 18 15 29c28 43 65 35 96 9l87-48-13-23-66 37-5-9 68-65-18-19-66 64-7-7 45-78-23-13-45 78-12-2 16-82z"/></svg>

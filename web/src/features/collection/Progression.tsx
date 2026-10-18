@@ -1,5 +1,6 @@
 import { createMemo, createSignal, For, Show } from 'solid-js';
 import { avatars, cardArgs, cards, content, fluentKey } from '../../app/content';
+import { Stats } from '../../components/Stats';
 import { addTranslations, t } from '../../i18n';
 import en from './progression.en.ftl?raw';
 import pl from './progression.pl.ftl?raw';
@@ -103,16 +104,16 @@ export function Progression(props: {
               {(p) => (
                 <article>
                   <h3>{t(fluentKey(p.key))}</h3>
-                  <p>
-                    {t('collection-path-stats', {
-                      af: p.base.phys_atk,
-                      of: p.base.phys_def,
-                      am: p.base.mag_atk,
-                      om: p.base.mag_def,
-                      hp: p.base.hp,
-                      stamina: p.base.stamina,
-                    })}
-                  </p>
+                  <Stats
+                    values={[
+                      p.base.phys_atk,
+                      p.base.phys_def,
+                      p.base.mag_atk,
+                      p.base.mag_def,
+                      p.base.hp,
+                      p.base.stamina,
+                    ]}
+                  />
                   <p>
                     {Object.entries(p.schools)
                       .map(([s, n]) => `${t(`school-${s}-name`)} ${n}`)

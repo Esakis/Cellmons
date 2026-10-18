@@ -39,10 +39,10 @@ import {
   TrainingForfeitSchema,
   TrainingSetupSchema,
 } from '../../worker/wire';
+import { advanceAnimation } from './animation';
 import styles from './Training.module.css';
 
 const profiles = ['novice', 'apprentice', 'tactician', 'archmage'];
-const statKeys = ['PhysAtk', 'PhysDef', 'MagAtk', 'MagDef'];
 const cardKeys = ['q', 'w', 'e', 'r', 't'];
 const attackEvents = ['hit', 'block', 'miss'];
 type Fx = { tone: 'damage' | 'heal' | 'block' | 'miss'; text: string; ms: number; delay: number };
@@ -842,7 +842,7 @@ export function Duel() {
       // Health drops at the moment of impact, not when the attacker starts moving.
       await wait(impact);
       if (disposed || generation !== animationGeneration) return;
-      advanceAnimation(event);
+      setAnimationView((current) => current && advanceAnimation(current, event));
       await wait(ms - impact);
     }
     if (disposed || generation !== animationGeneration) return;
@@ -854,54 +854,6 @@ export function Duel() {
       setAnimationView(undefined);
       setFx([]);
     }
-  }
-  function advanceAnimation(event: DuelEvent) {
-    const current = animationView();
-    if (!current?.me || !current.opponent) return;
-    const next = structuredClone(current);
-    const sides = [next.me, next.opponent];
-    const side = sides[event.side];
-    if (!side) return;
-    switch (event.kind) {
-      case 'reveal':
-        if (next.me) next.me.focus -= event.oldValue;
-        if (next.opponent) next.opponent.focus -= event.newValue;
-        for (const [index, move] of event.moves.entries()) {
-          const actor = sides[index];
-          if (actor) {
-            actor.attacks = move.attacks;
-            actor.defenses = move.defenses;
-          }
-        }
-        break;
-      case 'cast':
-      case 'countered':
-        side.focus -= event.oldValue;
-        side.stamina -= event.newValue;
-        break;
-      case 'hit': {
-        const defender = sides[1 - event.side];
-        if (defender) defender.hp = Math.max(0, defender.hp - event.amount);
-        side.stamina = Math.max(0, side.stamina - event.newValue);
-        break;
-      }
-      case 'damage':
-        side.hp = Math.max(0, side.hp - event.amount);
-        break;
-      case 'heal':
-        side.hp += event.amount;
-        break;
-      case 'resource':
-        if (event.detail === 'Stamina') side.stamina = event.newValue;
-        if (event.detail === 'Focus') side.focus = event.newValue;
-        break;
-      case 'stat': {
-        const index = [...statKeys, 'HpMax', 'StaminaMax'].indexOf(event.detail);
-        if (index >= 0) side.stats[index] = event.newValue;
-        break;
-      }
-    }
-    setAnimationView(next);
   }
   async function submit() {
     if (locked() || pendingPreview() || preview()?.error) return;

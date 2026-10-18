@@ -13,7 +13,6 @@
   gap: 12px;
   margin-block: 16px;
 }
-.collection-heading h1,
 .collection-heading h2 {
   margin-right: auto;
 }
@@ -43,6 +42,7 @@
   border: 1px solid var(--color-border);
   min-width: 0;
   padding: 16px;
+  background: var(--surface);
 }
 .collection-points {
   display: grid;
@@ -75,14 +75,30 @@
 .collection-cards h3 {
   margin-top: 0;
 }
+/* The card's illustration across the top of its tile, like on a playing card. */
+.collection-art {
+  display: block;
+  width: calc(100% + 32px);
+  height: auto;
+  aspect-ratio: 8 / 5;
+  margin: -16px -16px 12px;
+  object-fit: cover;
+  border-bottom: 1px solid var(--gold-dark);
+  border-radius: 8px 8px 0 0;
+}
 .collection-cards p {
   font-size: 0.85rem;
 }
 .collection-error {
   color: var(--error);
 }
+/* A panel, so the editor stays readable over the bright painting behind the page. */
 .collection-editor {
   min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--surface);
 }
 @media (max-width: 700px) {
   .collection-layout {

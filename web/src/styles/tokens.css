@@ -2,51 +2,100 @@
 :root {
   color-scheme: dark;
   --font-display: "Cinzel", "Inter Variable", Georgia, serif;
-  --color-bg: #120e14;
+  /* Blackened iron, aged brass and oxblood; colour is kept for meaning (health, schools, costs). */
+  --color-bg: #0a090a;
+  /* Fine film grain, drawn once as a tile and repeated over panels and the page. */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .78 0 0 0 0 .7 0 0 0 0 .58 0 0 0 .3 -.1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
   --page-glow:
-    radial-gradient(ellipse 90% 55% at 50% -12%, rgb(126 74 150 / 0.38), transparent 70%),
-    radial-gradient(ellipse 70% 40% at 50% 112%, rgb(150 92 30 / 0.28), transparent 70%);
-  --surface: #1f1820;
-  --surface-raised: #2b2129;
-  --panel-bg: linear-gradient(180deg, #2b2129, #1a1419);
+    var(--grain),
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgb(150 112 62 / 0.16), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 50% 112%, rgb(112 22 16 / 0.2), transparent 70%);
+  --backdrop-veil:
+    radial-gradient(ellipse 75% 65% at 50% 35%, transparent, rgb(10 9 10 / 0.6)),
+    linear-gradient(180deg, rgb(10 9 10 / 0.25), rgb(10 9 10 / 0.45) 55%, rgb(10 9 10 / 0.85));
+  --surface: #151315;
+  --surface-raised: #1d1a1c;
+  --panel-bg: linear-gradient(180deg, #1b181a, #100f11);
   --panel-shadow:
-    0 0 0 1px #050306, inset 0 0 0 1px rgb(226 191 106 / 0.14), 0 10px 30px rgb(0 0 0 / 0.45);
-  --color-text: #f1e6d0;
-  --heading: #f6dd93;
-  --heading-shadow: 0 2px 12px rgb(0 0 0 / 0.35);
-  --color-text-muted: #b8a88e;
-  --color-border: #4d3b2b;
-  --gold: #d9b45a;
-  --gold-bright: #f6dd93;
-  --gold-dark: #7a5a1c;
-  --accent: #e5c36f;
-  --focus-ring: #8fb3ff;
-  --selected: #3b2d1b;
-  --selected-border: #e5c36f;
-  --physical-bg: linear-gradient(180deg, #4a2a22, #2c1a16);
-  --physical-border: #8a4a36;
-  --magical-bg: linear-gradient(180deg, #27305a, #181c36);
-  --magical-border: #4f5ea8;
-  --inset-bg: #0d0a0f;
-  --error: #ff9a85;
-  --primary-bg: linear-gradient(180deg, #f6dd93, #d9b45a 45%, #9c7424);
-  --primary-border: #5e430f;
-  --primary-text: #2a1a08;
-  --hp-fill: linear-gradient(180deg, #ff7a62, #c4352a 55%, #861a14);
-  --hp-low: linear-gradient(180deg, #ff5a5a, #a3101a);
-  --hp-ghost: #f0b45a;
-  --hit: #ff7a66;
-  --block: #9fb8ff;
-  --heal: #7fe08a;
-  --card-bg: linear-gradient(180deg, #f7eed8, #e8d7b0);
+    0 0 0 1px #000, inset 0 0 0 1px rgb(196 164 104 / 0.1), 0 12px 32px rgb(0 0 0 / 0.6);
+  --color-text: #dbd0bc;
+  --heading: #e3cf9d;
+  --heading-shadow: 0 2px 10px rgb(0 0 0 / 0.7);
+  --color-text-muted: #948876;
+  --color-border: #3a3027;
+  --gold: #b3925a;
+  --gold-bright: #e0c68e;
+  --gold-dark: #5a4628;
+  --accent: #cbae78;
+  --focus-ring: #9db4d6;
+  --selected: #2a2216;
+  --selected-border: #cbae78;
+  --physical-bg: linear-gradient(180deg, #3a1714, #1f0d0b);
+  --physical-border: #7a2a22;
+  --magical-bg: linear-gradient(180deg, #172338, #0d1420);
+  --magical-border: #3b557f;
+  --inset-bg: #080708;
+  --error: #e58b78;
+  --primary-bg: linear-gradient(180deg, #8c2b22, #5e1812 55%, #3b0e0a);
+  --primary-border: #b3925a;
+  --primary-text: #f2e3c3;
+  --hp-fill: linear-gradient(180deg, #c8463b, #8e2219 55%, #520f0b);
+  --hp-low: linear-gradient(180deg, #ff6a55, #b0201a);
+  --hp-ghost: #b9904f;
+  --hit: #e8604f;
+  --block: #9db4d6;
+  --heal: #8fbf6a;
+  --card-bg: linear-gradient(180deg, #e3d5b6, #cdb88f);
   --card-text: #2b2118;
   --card-muted: #6b5a42;
-  --card-line: #cdb88e;
+  --card-line: #b39f78;
   --card-error: #8a2a17;
-  --icon-filter: invert(92%) sepia(18%) saturate(420%) hue-rotate(358deg) brightness(98%);
-  --rarity-bronze: linear-gradient(160deg, #f0bd85, #a8672f 45%, #5a3315);
-  --rarity-silver: linear-gradient(160deg, #f4f7fa, #9aa4b0 45%, #4c535c);
-  --rarity-gold: linear-gradient(160deg, #fff0a8, #d4a72c 45%, #6e5000);
+  /* Black glyphs tinted to aged brass (#d4bb86) and, on dark enamel, to bone (#dccfb6). */
+  --icon-filter: invert(79%) sepia(8%) saturate(1326%) hue-rotate(3deg) brightness(94%)
+    contrast(93%);
+  --icon-filter-bone: invert(85%) sepia(28%) saturate(174%) hue-rotate(1deg) brightness(92%)
+    contrast(96%);
+  /* Card frames as moulded picture frames: bands of light and shadow across the profile. */
+  --rarity-bronze: linear-gradient(
+    160deg,
+    #b0844f,
+    #5e3c1d 20%,
+    #2a1a0c 42%,
+    #8a6034 62%,
+    #3a2412 84%,
+    #a77a48
+  );
+  --rarity-silver: linear-gradient(
+    160deg,
+    #e6e9ec,
+    #8d949b 20%,
+    #383d43 42%,
+    #b1b8bf 62%,
+    #4a5057 84%,
+    #c9cfd5
+  );
+  --rarity-gold: linear-gradient(
+    160deg,
+    #f7e7b4,
+    #c39a45 20%,
+    #5e4413 42%,
+    #dcb867 62%,
+    #6e5220 84%,
+    #ecd28c
+  );
+  /* Gilt slip around paintings, like the inner fillet of a museum frame. */
+  --gilt: linear-gradient(160deg, #f5e4b0, #b8913f 30%, #5a4116 55%, #d3ae5f 78%, #7a5c24);
+  /* Name plaques mounted on painting frames look the same in both themes. */
+  --plaque-bg: linear-gradient(180deg, #2a2118, #110e0b);
+  --plaque-text: #e8cf94;
+  /* Veil over a painted card: the text side on wide screens, the whole card on phones. */
+  --hero-veil: linear-gradient(
+    90deg,
+    rgb(16 14 16 / 0.94) 25%,
+    rgb(16 14 16 / 0.6) 60%,
+    rgb(16 14 16 / 0.3)
+  );
+  --hero-veil-narrow: linear-gradient(180deg, rgb(16 14 16 / 0.62), rgb(16 14 16 / 0.9) 60%);
 }
 
 :root[data-theme="light"] {
@@ -55,6 +104,12 @@
   --page-glow:
     radial-gradient(ellipse 90% 55% at 50% -12%, rgb(217 180 90 / 0.3), transparent 70%),
     radial-gradient(ellipse 70% 40% at 50% 112%, rgb(150 92 30 / 0.12), transparent 70%);
+  --backdrop-veil: linear-gradient(
+    180deg,
+    rgb(243 234 215 / 0.8),
+    rgb(243 234 215 / 0.9) 55%,
+    rgb(243 234 215 / 0.96)
+  );
   --surface: #fffaf0;
   --surface-raised: #fffdf8;
   --panel-bg: linear-gradient(180deg, #fffdf8, #f6eedd);
@@ -86,4 +141,12 @@
   --block: #3d5a80;
   --heal: #2e7d32;
   --icon-filter: none;
+  --grain: none;
+  --hero-veil: linear-gradient(
+    90deg,
+    rgb(255 250 240 / 0.95) 25%,
+    rgb(255 250 240 / 0.7) 60%,
+    rgb(255 250 240 / 0.35)
+  );
+  --hero-veil-narrow: linear-gradient(180deg, rgb(255 250 240 / 0.72), rgb(255 250 240 / 0.94) 60%);
 }

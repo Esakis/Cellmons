@@ -119,6 +119,7 @@ Zasada R-FAI-01: zakaz umawiania wyników i nabijania PD lub rankingu.
   - Ochrona prawnoautorska utworów powstałych w dużej mierze z udziałem AI jest niepewna: zależy od wkładu twórczego człowieka i od jurysdykcji. Dlatego dokumentujemy wkład właściciela (opis, wybór wariantu, poprawki, kompozycja).
   - Jako wzorów nie używamy cudzych chronionych grafik, w tym grafik z oryginalnego Cellmons.
   - Rozpoznawalność chroni znak towarowy, bo ochrona marki nie zależy od praw autorskich do grafik.
+  - Od ADR-021 ilustracje kart i portrety to obrazy z domeny publicznej (Wikimedia Commons, wyłącznie Public domain albo CC0; pochodzenie każdego pliku w `art/paintings/sources.json`), a ikony pochodzą z game-icons.net na licencji CC BY 3.0 z podpisem autorów w grze. Obrazy w domenie publicznej nie dają wyłączności.
 - **Rejestr pochodzenia** każdej grafiki i tekstu: autor lub narzędzie, data, opis zamówienia, zatwierdzający, licencja. Gdyby kiedyś grafiki zamawiano u ilustratorów: umowy z przeniesieniem autorskich praw majątkowych.
 - **Nazwa produktu:** „Spellgambit: Arcane Class”. Firma zgłasza znak słowny SPELLGAMBIT w EUIPO w kl. 9 i 41. Wyniki sprawdzenia znaków i domen, wykaz towarów i usług oraz kroki zgłoszenia są w `20-nazwa-i-znak-towarowy.md`.
 

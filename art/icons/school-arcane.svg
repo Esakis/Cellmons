@@ -1,4 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Magia">
-<title>Magia</title>
-<path d="M12 2.5l2.2 7.3 7.3 2.2-7.3 2.2-2.2 7.3-2.2-7.3L2.5 12l7.3-2.2z"/><circle cx="12" cy="12" r="1.5"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" aria-label="Arkana" viewBox="0 0 512 512"><title>Arkana</title><path d="M255 21a168 168 0 1 0 119 49q-53-49-119-49m-1 18q40 0 75 20-22-6-35 6c-14 14-7 44 15 67 23 22 53 29 67 15q13-14 5-38a149 149 0 0 1-126 229q13-3 24-13c29-29 16-89-29-134-46-46-106-59-135-30q-6 6-9 14A149 149 0 0 1 254 39m133 280c-72 73-191 73-264 0v-1q-19 15-19 32c0 37 67 67 151 67s152-30 152-67q-1-17-19-32m40 55c-23 32-92 56-173 56s-150-24-172-56q-20 17-20 38c0 47 85 85 192 85s193-38 193-85q0-21-20-38"/></svg>

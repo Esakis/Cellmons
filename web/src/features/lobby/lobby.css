@@ -53,29 +53,76 @@
   flex-wrap: wrap;
 }
 .lobby-tabs [aria-pressed="true"],
-.lobby-map .current {
+.lobby-toolbar [aria-pressed="true"] {
   border-color: var(--gold);
   color: var(--gold);
 }
+.lobby-value {
+  white-space: nowrap;
+}
+/* Places as framed paintings with a name plaque; inside a place the map shrinks to small doors. */
 .lobby-map {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.75rem;
+  gap: 0.9rem;
   margin-bottom: 1.25rem;
 }
-.lobby-map button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 0.6rem;
-  min-height: 105px;
-  background: linear-gradient(145deg, var(--surface), var(--color-bg));
-  border-radius: 10px;
+.lobby-map.lobby-map-compact {
+  grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+  gap: 0.5rem;
 }
-.lobby-map button span {
-  font-size: 1.75rem;
-  color: var(--gold);
+.lobby-map button {
+  min-height: 0;
+  padding: 0;
+}
+.lobby-map button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 45%, rgb(8 7 8 / 0.85));
+  box-shadow: inset 0 0 32px rgb(0 0 0 / 0.65);
+}
+.lobby-map img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+}
+.lobby-map span {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  bottom: 0.55rem;
+  transform: translateX(-50%);
+  max-width: calc(100% - 0.75rem);
+  padding: 0.15rem 0.8rem;
+  overflow: hidden;
+  font-size: 0.9rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lobby-map.lobby-map-compact span {
+  bottom: 0.3rem;
+  padding: 0.05rem 0.4rem;
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+}
+.lobby-map .current {
+  box-shadow:
+    0 0 0 1px #000,
+    0 0 0 3px rgb(224 198 142 / 0.55),
+    0 0 26px rgb(224 198 142 / 0.4);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .lobby-map img {
+    transition: transform 0.35s ease;
+  }
+  .lobby-map button:hover:not(:disabled) img {
+    transform: scale(1.05);
+  }
+}
+.lobby-enter {
+  margin-bottom: 1rem;
 }
 .lobby-panel,
 .lobby-chat {
@@ -134,9 +181,10 @@
   overflow: auto;
 }
 .lobby-player-list button {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  justify-items: start;
+  gap: 0.15rem 0.75rem;
   width: 100%;
   border: 0;
   border-bottom: 1px solid var(--color-border);
@@ -144,6 +192,15 @@
   background: transparent;
   text-align: left;
   padding: 0.6rem;
+}
+.lobby-player-list .portrait {
+  grid-row: span 3;
+  align-self: center;
+  width: 40px;
+  height: 40px;
+}
+.lobby-player-list button > :not(.portrait) {
+  grid-column: 2;
 }
 .lobby-profile {
   position: relative;
@@ -153,18 +210,6 @@
   position: absolute;
   right: 0.5rem;
   top: 0.5rem;
-}
-.lobby-stats {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  text-align: center;
-  font-size: 0.8rem;
-}
-.lobby-stats dt {
-  grid-row: 1;
-}
-.lobby-stats dd {
-  margin: 0.5rem 0;
 }
 .lobby-actions {
   display: flex;
@@ -224,11 +269,35 @@
     gap: 1rem;
   }
   .lobby-map {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
   }
-  .lobby-map button {
-    min-height: 85px;
-    font-size: 0.8rem;
+  .lobby-map.lobby-map-compact {
+    grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr));
+    gap: 0.4rem;
+  }
+  .lobby-map span {
+    font-size: 0.75rem;
+    padding: 0.1rem 0.6rem;
+  }
+  /* Tabs in one row: icon above the label. */
+  nav.lobby-tabs {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.35rem;
+  }
+  nav.lobby-tabs button {
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.45rem 0.15rem;
+    font-size: 0.68rem;
+    line-height: 1.2;
+    text-align: center;
+  }
+  nav.lobby-tabs .icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin: 0;
   }
   .lobby-heading {
     align-items: flex-start;
@@ -239,6 +308,10 @@
   .lobby-log {
     height: 240px;
   }
+}
+.lobby-tabs [aria-pressed="true"] .icon,
+.lobby-toolbar [aria-pressed="true"] .icon {
+  filter: var(--icon-filter) drop-shadow(0 0 5px rgb(224 198 142 / 0.7));
 }
 
 .online-duel {
@@ -323,11 +396,22 @@
   padding-block: 0.75rem;
   border-bottom: 1px solid var(--color-border);
 }
+/* Bots as character cards: portrait and name (the name ends with the bot's level). */
 .online-bots {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+  gap: 0.6rem;
   margin-block: 0.75rem;
+}
+.online-bots button {
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.8rem 0.4rem;
+  overflow-wrap: anywhere;
+}
+.online-bots .portrait {
+  width: 64px;
+  height: 64px;
 }
 .online-ranking li {
   padding-block: 0.5rem;

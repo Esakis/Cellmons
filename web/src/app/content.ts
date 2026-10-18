@@ -57,7 +57,16 @@ const symbols = import.meta.glob<string>('../assets/icons/*.svg', {
   query: '?raw',
   import: 'default',
 });
+// Painted portraits (art/paintings) are separate AVIF files; path variants share the base painting.
+const paintings = import.meta.glob<string>('../assets/paintings/avatars/*.avif', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+});
 export function portrait(key: string) {
+  const base = key.replace('avatar.', '').replace(/_path_[01]$/, '');
+  const painting = paintings[`../assets/paintings/avatars/${base}.avif`];
+  if (painting) return painting;
   const decorate = pathDecorator();
   const isPath = /_path_[01]$/.test(key);
   if (isPath && !decorate && !loadingPaths) {
@@ -77,6 +86,15 @@ export const icon = (key: string) => {
   const svg = symbols[`../assets/icons/${key}.svg`];
   return svg && `data:image/svg+xml,${encodeURIComponent(svg)}`;
 };
+// Character stats in protocol order (AF, OF, AM, OM, max HP, max stamina): icon and name.
+export const statIcons = [
+  ['stat-phys-atk', 'stat-PhysAtk'],
+  ['stat-phys-def', 'stat-PhysDef'],
+  ['stat-mag-atk', 'stat-MagAtk'],
+  ['stat-mag-def', 'stat-MagDef'],
+  ['stat-hp', 'stat-HpMax'],
+  ['stat-stamina', 'stat-StaminaMax'],
+] as const;
 export const fluentKey = (key: string, field = 'name') => `${key.replace('.', '-')}-${field}`;
 
 export function cardArgs(card: Card): Record<string, number> {

@@ -14,11 +14,14 @@ import {
   cards,
   content,
   fluentKey,
+  icon,
   loadPaths,
   portrait,
+  statIcons,
 } from '../../app/content';
 import { setTrainingPlayer } from '../../app/trainingPlayer';
 import { Modal } from '../../components/Modal';
+import { Scene } from '../../components/Scene';
 import { addTranslations, hasTranslation, t } from '../../i18n';
 import en from './en.ftl?raw';
 import pl from './pl.ftl?raw';
@@ -30,10 +33,22 @@ addTranslations({ pl, en });
 const Progression = lazy(() =>
   import('./Progression').then((module) => ({ default: module.Progression })),
 );
-const statKeys = ['PhysAtk', 'PhysDef', 'MagAtk', 'MagDef', 'HpMax', 'StaminaMax'];
 const schools = ['combat', 'divine', 'element', 'arcane', 'necro', 'tech'];
+// The collection's painting (art/paintings/scenes) and the card illustrations, which load with
+// their own module as in the duel (app/cardArt.ts).
+const [painting] = Object.values(
+  import.meta.glob<string>('../../assets/paintings/scenes/collection.avif', {
+    eager: true,
+    query: '?url',
+    import: 'default',
+  }),
+);
+const [pictures, setPictures] = createSignal(new Map<string, string>());
 
 export function Collection() {
+  if (!pictures().size) {
+    void import('../../app/cardArt').then((module) => setPictures(module.cardPictures));
+  }
   const [data, setData] = createSignal<Snapshot>();
   const [selected, setSelected] = createSignal('');
   const [draft, setDraft] = createSignal<number[]>([]);
@@ -189,10 +204,12 @@ export function Collection() {
   }
   return (
     <section class="collection-page">
-      <div class="collection-heading">
-        <h1>{t('collection-title')}</h1>
-        <A href="/lobby">{t('lobby')}</A>
-      </div>
+      <Scene src={painting}>
+        <h1 class="plaque">{t('collection-title')}</h1>
+        <p>
+          <A href="/lobby">{t('lobby')}</A>
+        </p>
+      </Scene>
       <Show
         when={account()}
         fallback={
@@ -312,13 +329,14 @@ export function Collection() {
                         <fieldset disabled={loading()}>
                           <legend>{t('collection-points', { count: avatar().unspent })}</legend>
                           <div class="collection-points">
-                            <For each={statKeys}>
-                              {(stat, index) => (
+                            <For each={statIcons}>
+                              {([symbol, stat], index) => (
                                 <label>
-                                  {t(`stat-${stat}`)}: {avatar().stats[index()]}
+                                  <img class="icon" src={icon(symbol)} alt="" />
+                                  {t(stat)}: {avatar().stats[index()]}
                                   <input
                                     aria-label={t('collection-point-stat', {
-                                      stat: t(`stat-${stat}`),
+                                      stat: t(stat),
                                     })}
                                     type="number"
                                     min="0"
@@ -533,6 +551,18 @@ export function Collection() {
                           const copies = () => draft().filter((id) => id === card.id).length;
                           return (
                             <article>
+                              <Show when={pictures().get(card.key)}>
+                                {(src) => (
+                                  <img
+                                    class="collection-art"
+                                    src={src()}
+                                    alt=""
+                                    width="512"
+                                    height="320"
+                                    loading="lazy"
+                                  />
+                                )}
+                              </Show>
                               <h3>{t(fluentKey(card.key))}</h3>
                               <p>{t(fluentKey(card.key, 'text'), cardArgs(card))}</p>
                               <p>

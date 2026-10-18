@@ -5,9 +5,18 @@ const sources = import.meta.glob<string>('../assets/cards/*.svg', {
   query: '?raw',
   import: 'default',
 });
-export const cardPictures = new Map(
-  Object.entries(sources).map(([path, svg]) => [
-    `card.${path.slice(path.lastIndexOf('/') + 1, -'.svg'.length)}`,
+// Painted illustrations (art/paintings) are separate AVIF files; they replace the SVG drawings.
+const paintings = import.meta.glob<string>('../assets/paintings/cards/*.avif', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+});
+const cardKey = (path: string) =>
+  `card.${path.slice(path.lastIndexOf('/') + 1, path.lastIndexOf('.'))}`;
+export const cardPictures = new Map([
+  ...Object.entries(sources).map(([path, svg]): [string, string] => [
+    cardKey(path),
     `data:image/svg+xml,${encodeURIComponent(svg)}`,
   ]),
-);
+  ...Object.entries(paintings).map(([path, url]): [string, string] => [cardKey(path), url]),
+]);

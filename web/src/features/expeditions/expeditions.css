@@ -2,14 +2,15 @@
   margin-block: 1rem;
   padding: 1rem;
   min-width: 0;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--surface);
   overflow-wrap: anywhere;
 }
 .expeditions fieldset {
   min-width: 0;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
   margin-block: 1rem;
 }
 .expeditions button {
@@ -38,9 +39,9 @@
 }
 .exp-enemy {
   padding: 1rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--surface-raised);
 }
 .exp-enemy-lower {
   border-top: 4px solid #4f9567;
@@ -56,6 +57,6 @@
 }
 .exp-award {
   padding: 0.5rem 1rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
 }

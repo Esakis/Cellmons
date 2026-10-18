@@ -1,14 +1,15 @@
 # Przewodnik stylu grafiki
 
-Źródła grafik gry w SVG (ADR-016, `docs/03-tresc-gry.md`, rozdz. 9). Grafiki tworzy asystent AI element po elemencie, a właściciel projektu wybiera warianty i zatwierdza wersje końcowe. Każdy plik ma wpis w [rejestrze pochodzenia](PROVENANCE.md). Do przeglądu służy [galeria](gallery.html): otwórz ją przez lokalny serwer, np. `python -m http.server` w katalogu `art/`, bo strona wczytuje pliki SVG.
+Źródła grafik gry (ADR-016 i ADR-021, `docs/03-tresc-gry.md`, rozdz. 9). Każdy plik ma wpis w [rejestrze pochodzenia](PROVENANCE.md). Do przeglądu służą [galeria SVG](gallery.html) i [przegląd obrazów](paintings-review.html): otwórz je przez lokalny serwer, np. `python -m http.server` w katalogu `art/`.
 
-**Status:** wersja z kroku F3.6, zatwierdzona przez właściciela 2026-10-15.
+**Status:** kierunek „dla dorosłych” (ADR-021) zatwierdzony przez właściciela 2026-10-15 po porównaniu zrzutów prototypu. Wcześniejsza wersja SVG z kroku F3.6 została zatwierdzona 2026-10-15 i zostaje dla ramek, interfejsu i kart bez obrazu.
 
 ## 1. Kierunek
 
-- Motywem przewodnim są emblematy i sygile szkół.
-- Portrety i ilustracje kart są ilustracjami wektorowymi w klimacie fantasy (gradienty, światło, tło sceny). Nie ma realistycznego malarstwa ani faktur.
-- Ikony są proste i płaskie, bez cieni i faktur. Grafiki mają być czytelne od 32 px (ikony) do pełnej karty na ekranie telefonu.
+- Ciemne fantasy dla dorosłych: czernione żelazo, postarzany mosiądz i bordo, drobne ziarno zamiast płaskich gradientów.
+- Ilustracje kart i portrety postaci to obrazy dawnych mistrzów w domenie publicznej, kadrowane i przepuszczone przez wspólną korektę barwną, żeby różni malarze tworzyli jedną całość (rozdz. 5a i 6).
+- Ikony to pełne sylwetki z game-icons.net: na ciemnym tle w kolorze mosiądzu, na emaliowanych monetach ataku i obrony w kolorze kości.
+- Kolor niesie znaczenie, a nie dekorację: życie (bordo), typ ataku (fizyczny: bordo, magiczny: granat), koszty K i W, kolory szkół.
 - Nie wzorujemy się na grafikach z oryginalnego Cellmons ani na innych chronionych grafikach (`docs/12-bezpieczenstwo-i-prawo.md`, rozdz. 8).
 
 ## 2. Paleta
@@ -24,38 +25,42 @@ Kolory szkół są też w `content/schools.toml` (pola `color` i `color_dark`); 
 | Nekromancja | `#6a1b9a` | `#b77fd1` |
 | Technologia | `#00838f` | `#4dd0e1` |
 
-Kolory wspólne:
+Interfejs w motywie ciemnym (`web/src/styles/tokens.css`, ekran walki: `Training.module.css`):
 
 | Rola | Wartość |
 |---|---|
-| Pergamin (tło karty i jasnego motywu) | `#f8f3e8` |
-| Pole tekstu karty | `#fffdf8` |
-| Tekst | `#2b2118` |
-| Tekst pomocniczy | `#6b5d4f` |
-| Tło ciemnego motywu | `#1d1a22` |
-| Koszt K (koncentracja) | `#2f4f8f` |
-| Koszt W (wytrzymałość) | `#2e7d4f` |
+| Tło strony | `#0a090a` z ziarnem (`--grain`) |
+| Panele | `#1b181a` → `#100f11` |
+| Mosiądz: linie, ramki | `#8c7247`, `#b3925a` |
+| Mosiądz: nagłówki | `#e3cf9d` |
+| Tekst / tekst pomocniczy | `#dbd0bc` / `#948876` |
+| Przycisk główny (bordo) | `#8c2b22` → `#3b0e0a`, tekst `#f2e3c3` |
+| Moneta ataku fizycznego | emalia `#b8493c` → `#2c0806` w mosiężnej oprawie |
+| Moneta ataku magicznego | emalia `#5f80b8` → `#0c1528` w mosiężnej oprawie |
+| Ikony na ciemnym tle | filtr `--icon-filter` (mosiądz `#d4bb86`) |
+| Ikony na emalii | filtr `--icon-filter-bone` (kość `#dccfb6`) |
 
-Rzadkości kart (gradient metalu od jasnego do ciemnego):
+Rzadkości kart (gradient metalu z odblaskiem):
 
 | Rzadkość | Jasny | Środek | Ciemny |
 |---|---|---|---|
-| Brązowa | `#e2a86a` | `#b8773d` | `#6f4420` |
-| Srebrna | `#e6eaef` | `#a8b0ba` | `#5f6670` |
-| Złota | `#f6dc7a` | `#c9a227` | `#7a5a00` |
+| Brązowa | `#d6a06a` | `#8a5428` | `#3f230d` |
+| Srebrna | `#eef1f4` | `#8f98a2` | `#3c4249` |
+| Złota | `#f6e3a1` | `#b48a2c` | `#5a4210` |
 
 ## 3. Typografia
 
-- Jedna czcionka zmienna z polskimi znakami (`latin-ext`): **Inter** (licencja SIL OFL 1.1), do interfejsu i tekstów kart. Plik WOFF2 dojdzie razem z klientem w fazie F5 (`docs/10-klient-web.md`, rozdz. 9). Do tego czasu i jako zapas: czcionki systemowe (`system-ui, sans-serif`).
-- Nazwa karty: 13–15 px, grubość 700. Tekst efektu: 11–13 px, grubość 400, słowa kluczowe (np. „Umagicznienie”, „Interwencja”) pogrubione.
-- Liczby kosztów na kartach: grubość 700, biały tekst na kolorze kosztu.
+- Nagłówki i nazwy: **Cinzel** (SIL OFL 1.1), interfejs i teksty kart: **Inter** (SIL OFL 1.1); pliki WOFF2 w `web/src/styles/fonts/`.
+- Nazwa karty: 13–15 px, grubość 600–700. Tekst efektu: 11–13 px, grubość 400.
+- Liczby na monetach: Cinzel, grubość 700.
 
 ## 4. Ikony (`icons/`)
 
-- Siatka 24 × 24, linia 1,75 px, zaokrąglone końce i narożniki, bez wypełnień (poza drobnymi akcentami).
-- Kolor z `currentColor`, więc ikona przyjmuje kolor tekstu albo szkoły i działa w obu motywach.
-- Zestaw: 6 szkół (`school-*`), typy ataku F i M (`attack-*`), statystyki AF, OF, AM, OM, Ż, W i K (`stat-*`).
-- Każda ikona ma `<title>` i `aria-label` z polską nazwą; w kliencie trafią do jednego sprite'a SVG.
+- Źródło: [game-icons.net](https://game-icons.net) (repozytorium `game-icons/icons`), licencja CC BY 3.0. Autorzy użytych ikon: Lorc, Delapouite, Sbed i Carl Olsen. Podpis jest w ustawieniach gry, a mapa plików w rejestrze pochodzenia.
+- Pliki zachowują kształt oryginału (siatka 512 × 512, jedna ścieżka); usunięte jest tylko czarne tło. Kolor nadaje klient filtrem CSS. Ikony interfejsu (`nav-*`, `online/`) mają siatkę 128 × 128 z zaokrąglonymi współrzędnymi: są lżejsze o ok. 30%, a różnicy nie widać.
+- Zestaw: 6 szkół (`school-*`), typy ataku F i M (`attack-*`), statystyki AF, OF, AM, OM, Ż, W i K (`stat-*`), nawigacja (`nav-*`: Trening, Lobby, Kolekcja, Sklep, Konto, Ustawienia).
+- `online/`: ikony ekranów sieciowych, poza pakietem offline: zakładki lobby (`tab-*`; `tab-ranking` oznacza też RP), Dukaty, PD, poziom i nieobecność (AFK).
+- Każda ikona ma `<title>` i `aria-label` z polską nazwą.
 
 ## 5. Karta (`frames/`)
 
@@ -66,29 +71,32 @@ Format 250 × 350 (proporcje 5 : 7). Układ pokazuje `frames/card-layout.svg`:
 | Koszt K | lewy górny róg, koło Ø 34 | liczba K |
 | Koszt W | pod kosztem K, koło Ø 26 | liczba W |
 | Nazwa | pasek u góry, obok kosztów | nazwa karty w języku gracza |
-| Ilustracja | okno 210 × 122 | ilustracja karty z `cards/` albo ikona szkoły |
+| Ilustracja | okno 8 : 5 | obraz z `paintings/cards/`, SVG z `cards/` albo ikona szkoły |
 | Wymagania | pasek pod ilustracją | ikony szkół z wymaganym poziomem |
-| Tekst | pole 210 × 84 | tekst efektu i słowa kluczowe |
-| Rzadkość | klejnot na dolnej krawędzi | kolor metalu ramki |
+| Tekst | pole pod wymaganiami | tekst efektu i słowa kluczowe |
+| Rzadkość | ramka | kolor metalu ramki |
 
 Ramki (`frame-bronze.svg`, `frame-silver.svg`, `frame-gold.svg`) nie zawierają tekstu: nazwę, koszty i opis wstawia klient z `content.json` i plików tekstów, więc ta sama ramka działa po polsku i po angielsku.
 
-## 5a. Ilustracje kart (`cards/`)
+## 5a. Ilustracje kart (`paintings/cards/`, zapasowo `cards/`)
 
-- Scena 160 × 100 (proporcje 8 : 5): tło z gradientem w kolorach szkoły, promienie światła, tło sceny szkoły (arena, świątynia, wzgórza, gwiazdy, cmentarz, warsztat), drobinki, cień na ziemi, winieta i złota ozdobna ramka.
-- Motyw na środku: przedmiot, istota lub zjawisko z działania karty. Kontur ciemny 1,2–1,8 px, połysk metalu i szkła gradientami.
-- W odróżnieniu od ikon ilustracje mają gradienty i światło, ale nadal bez faktur i realistycznego malarstwa.
-- Nazwy plików to klucze kart z `content/cards` bez prefiksu `card.`. Karta bez ilustracji pokazuje ikonę szkoły.
-- W kliencie wszystkie ilustracje trafiają do jednego, leniwie ładowanego modułu (`web/src/app/cardArt.ts`), bo razem kompresują się kilka razy lepiej niż osobne pliki (budżet aplikacji offline).
+- Obrazy dawnych mistrzów z Wikimedia Commons, wyłącznie z licencją „Public domain” albo CC0. Nie używamy plików CC BY-SA ani zdjęć sal muzealnych z własną licencją. Unikamy aktów i drastycznych scen.
+- Temat obrazu odpowiada nazwie albo działaniu karty (np. „Groza” — „Zmora” Füssliego, „Wyspa” Böcklina dla „Milczącego dworu”, kuźnie Wright of Derby dla Runotechniki).
+- Kadr 8 : 5, plik 512 × 320 AVIF (jakość 45, a gdy plik przekracza 30 KB, np. przy drobnych rycinach, jakość spada co 3 do najwyżej 30), zwykle 10–25 KB. Wspólna korekta barwna: poziomy, gamma do wspólnej jasności, lekka desaturacja, ciepłe cienie i jasne tony pergaminu, delikatna krzywa S i winieta. W kliencie obraz wypełnia okno (`object-fit: cover`) i ma wewnętrzny cień jak płótno w ramie.
+- Źródłem prawdy jest `paintings/sources.json`: plik w Commons, strona opisu, malarz, licencja, kadr (ułamki szerokości i wysokości źródła) i ewentualne poprawki korekty. `scripts/generate-paintings.py` odtwarza z niego pliki AVIF i stronę przeglądu.
+- Karta bez obrazu pokazuje ilustrację SVG z `cards/`, a bez niej ikonę szkoły. Nazwy plików to klucze kart z `content/cards` bez prefiksu `card.`.
 
-## 6. Portrety postaci (`avatars/`)
+## 6. Portrety postaci (`paintings/avatars/`, zapasowo `avatars/`)
 
-- Koło 200 × 200 z obwódką w kolorze szkoły; tło sceny w gradiencie szkoły (promienie, gwiazdy, las, warsztat).
-- Ilustrowane popiersie klasy (od 2026-10-15): twarz z oczami i cieniowaniem, strój i rekwizyt szkoły: hełm z pióropuszem i miecz (Wojownik), aureola i laska słońca (Kapłan), wieniec z poroża i liści (Druid), kapelusz z gwiazdami i kula światła (Mag), kaptur i czaszka (Nekromantka), gogle i koło zębate (Runotechnik).
-- Nazwy plików to klucze postaci z `content/avatars` bez prefiksu `avatar.`.
+- Portrety i postacie z obrazów dawnych mistrzów dobrane do klasy (np. Wojownik — „Mężczyzna w zbroi” Rembrandta, Nekromantka — „Medea” Sandysa, Runotechnik — „Alchemik” Wright of Derby).
+- Kadr 3 : 2, plik 576 × 384 AVIF; twarz w środkowej części kadru, bo klient wycina z niego kwadrat i koło (`object-fit: cover`).
+- Drogi postaci (`*_path_0`, `*_path_1`) używają obrazu postaci bazowej. Postać bez obrazu pokazuje portret SVG z `avatars/`.
 
 ## 7. Pliki i optymalizacja
 
-- `icons/`, `frames/`, `avatars/`, `cards/`: źródła SVG pisane ręcznie, bez zbędnych atrybutów edytorów.
-- Przed włączeniem do klienta (faza F5) pliki przechodzą przez SVGO; wersje zoptymalizowane trafiają do `web/src/assets/`, a źródła zostają tutaj.
-- Nowa grafika: opis → 2–3 warianty → wybór właściciela → poprawki → plik w `art/` → wpis w `PROVENANCE.md`.
+- `icons/` (z `icons/online/`), `frames/`, `avatars/`, `cards/`: źródła SVG; przed włączeniem do klienta przechodzą przez SVGO (`scripts/prepare-web.mjs`).
+- `paintings/backdrops/`: tła widoków (16 : 9, rozmyte i przyciemnione; `Shell.tsx` wybiera tło według trasy, `default` dla pozostałych).
+- `paintings/scenes/`: sceny miejsc (16 : 9, 960 × 540, ostre): kafle mapy lobby, baner miejsca, w którym jest gracz (poza pomieszczeniami `lobby`), tło strony w tym miejscu oraz banery ekranów (`home`, `collection`, `shop`, `clan`, `account`, `settings`, `tournament`).
+- `paintings/`: pliki AVIF i `sources.json`; `prepare-web.mjs` kopiuje je do `web/src/assets/paintings/` i pomija SVG o tej samej nazwie.
+- Budżet (`scripts/check-web-budget.mjs`): obrazy ≤ 6 MB łącznie i ≤ 32 KB na plik; pozostałe budżety z `docs/13-wydajnosc.md` bez zmian.
+- Nowy obraz: wybór pliku w Commons (licencja!) → wpis w `sources.json` → `python scripts/generate-paintings.py card.klucz` → przegląd → wpis w `PROVENANCE.md`.

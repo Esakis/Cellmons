@@ -1,6 +1,6 @@
 // Reproducible browser assets from the same content and Rust engine as the server.
 import { spawnSync } from 'node:child_process';
-import { cp, mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
+import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { optimize } from 'svgo';
 
@@ -40,10 +40,25 @@ for (const locale of ['pl', 'en']) {
   if (cardMessages.length !== cards.length * 2) throw new Error(`Missing ${locale} card messages`);
   await writeFile(`web/src/generated/cards.${locale}.ftl`, cardMessages.join(''));
 }
-for (const group of ['avatars', 'icons', 'frames', 'cards']) {
+// Painted illustrations, view backdrops and location scenes (AVIF, art/paintings); paintings replace the SVG drawings of the same name.
+await rm('web/src/assets/paintings', { recursive: true, force: true });
+const painted = {};
+for (const group of ['avatars', 'cards', 'backdrops', 'scenes']) {
+  await mkdir(`web/src/assets/paintings/${group}`, { recursive: true });
+  const names = (await readdir(`art/paintings/${group}`)).filter((name) => name.endsWith('.avif'));
+  for (const name of names) {
+    await cp(`art/paintings/${group}/${name}`, `web/src/assets/paintings/${group}/${name}`);
+  }
+  painted[group] = new Set(names.map((name) => name.slice(0, -'.avif'.length)));
+}
+for (const group of ['avatars', 'icons', 'icons/online', 'frames', 'cards']) {
   await mkdir(`web/src/assets/${group}`, { recursive: true });
   for (const name of await readdir(`art/${group}`)) {
     if (!name.endsWith('.svg')) continue;
+    if (painted[group]?.has(name.slice(0, -'.svg'.length))) {
+      await rm(`web/src/assets/${group}/${name}`, { force: true });
+      continue;
+    }
     const svg = await readFile(`art/${group}/${name}`, 'utf8');
     const result = optimize(svg, { multipass: true });
     await writeFile(`web/src/assets/${group}/${name}`, result.data);

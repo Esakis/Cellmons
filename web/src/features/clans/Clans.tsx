@@ -3,6 +3,7 @@ import { createEffect, createMemo, createSignal, For, lazy, onCleanup, Show } fr
 import { ApiError, account, accountEpoch, api, restoreAccount } from '../../app/account';
 import { content } from '../../app/content';
 import { Modal } from '../../components/Modal';
+import { Scene } from '../../components/Scene';
 import { addTranslations, hasTranslation, language, t } from '../../i18n';
 import en from './en.ftl?raw';
 import pl from './pl.ftl?raw';
@@ -10,6 +11,14 @@ import type { Member, Mutation, Profile, Snapshot } from './types';
 import '../online.css';
 
 addTranslations({ pl, en });
+// The clans' painting (art/paintings/scenes), the same as in the lobby's clan room.
+const [painting] = Object.values(
+  import.meta.glob<string>('../../assets/paintings/scenes/clan.avif', {
+    eager: true,
+    query: '?url',
+    import: 'default',
+  }),
+);
 const Report = lazy(() => import('../moderation/Report').then((m) => ({ default: m.Report })));
 
 export function Clans() {
@@ -165,10 +174,12 @@ export function Clans() {
   };
   return (
     <section class="clans-page">
-      <header class="clans-heading">
-        <h1>{t('clans')}</h1>
-        <A href="/lobby">{t('lobby')}</A>
-      </header>
+      <Scene src={painting}>
+        <h1 class="plaque">{t('clans')}</h1>
+        <p>
+          <A href="/lobby">{t('lobby')}</A>
+        </p>
+      </Scene>
       <Show
         when={account()?.kind === 'account'}
         fallback={

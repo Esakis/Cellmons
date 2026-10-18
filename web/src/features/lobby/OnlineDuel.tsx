@@ -9,7 +9,15 @@ import {
   onMount,
   Show,
 } from 'solid-js';
-import { avatars, cardArgs, cards, fluentKey, portrait } from '../../app/content';
+import {
+  avatars,
+  type Card,
+  cardArgs,
+  cards,
+  content,
+  fluentKey,
+  portrait,
+} from '../../app/content';
 import { setDuelActive, setOnlineDuelActive } from '../../app/session';
 import { Modal } from '../../components/Modal';
 import type {
@@ -17,7 +25,7 @@ import type {
   DuelMovePreview,
   DuelSnapshot,
 } from '../../generated/proto/game/v1/online_duel_pb';
-import type { DuelMove, DuelSide } from '../../generated/proto/game/v1/training_pb';
+import type { DuelEvent, DuelMove, DuelSide } from '../../generated/proto/game/v1/training_pb';
 import { hasTranslation, t } from '../../i18n';
 import type { ClientBody, ServerBody } from '../../net/client';
 
@@ -38,9 +46,10 @@ export function OnlineDuel(props: {
   const [preview, setPreview] = createSignal<DuelMovePreview>();
   const [sending, setSending] = createSignal(false);
   const [confirm, setConfirm] = createSignal(false);
-  const [chronicle, setChronicle] = createSignal<{ round: number; lines: string[] }[]>([]);
+  const [chronicle, setChronicle] = createSignal<{ round: number; events: DuelEvent[] }[]>([]);
   const [pictures, setPictures] = createSignal(new Map<string, string>());
   let current = '';
+  let currentDuel = '';
   let disposed = false;
   let generation = 0;
   let lastRevision = -1;
@@ -54,6 +63,7 @@ export function OnlineDuel(props: {
   const finished = () => !!view()?.outcome;
   const locked = () =>
     !props.connected || props.snapshot.submitted || finished() || sending() || !!props.replay;
+  const canSubmit = () => !locked() && !!preview()?.preview && !preview()?.preview?.error;
   const move = (): DuelMove => ({
     $typeName: 'game.v1.DuelMove',
     attacks: attacks(),
@@ -66,6 +76,12 @@ export function OnlineDuel(props: {
   );
   createEffect(() => {
     const snapshot = props.snapshot;
+    if (snapshot.duelId !== currentDuel) {
+      currentDuel = snapshot.duelId;
+      lastRevision = -1;
+      setChronicle([]);
+      setConfirm(false);
+    }
     const key = `${snapshot.duelId}:${snapshot.view?.round}`;
     if (key !== current) {
       current = key;
@@ -75,35 +91,24 @@ export function OnlineDuel(props: {
       setHandIndex(snapshot.yourMove?.handIndex ?? 0);
       setPreview(undefined);
     }
-    if (snapshot.revision > lastRevision && snapshot.events.length) {
+    if (props.replay || snapshot.revision > lastRevision) {
       lastRevision = snapshot.revision;
-      const lines = snapshot.events
-        .filter((e) => !['draw', 'round', 'reveal', 'end'].includes(e.kind))
-        .map((e) => {
-          const key = `event-${e.kind}`;
-          const card = cards.get(e.cardId);
-          return hasTranslation(key)
-            ? t(key, {
-                amount: e.amount,
-                slot: e.slot + 1,
-                old: e.oldValue,
-                new: e.newValue,
-                card: card ? t(fluentKey(card.key)) : '',
-                name: e.side === 0 ? (snapshot.you?.login ?? '') : (snapshot.opponent?.login ?? ''),
-                detail: e.detail,
-                kind: t(e.attackKind === 0 ? 'online-physical' : 'online-magical'),
-              })
-            : '';
-        })
-        .filter(Boolean);
-      const resolvedRound =
-        snapshot.events.find((e) => e.kind === 'round')?.amount ??
-        Math.max(1, (snapshot.view?.round ?? 1) - (finished() ? 0 : 1));
-      if (lines.length)
+      const events = snapshot.events.filter(
+        (e) =>
+          !['draw', 'round', 'reveal', 'end'].includes(e.kind) && hasTranslation(`event-${e.kind}`),
+      );
+      const nextRound = snapshot.events.find((e) => e.kind === 'round')?.amount;
+      const resolvedRound = Math.max(
+        1,
+        nextRound === undefined ? (snapshot.view?.round ?? 1) : nextRound - 1,
+      );
+      if (props.replay) setChronicle(events.length ? [{ round: resolvedRound, events }] : []);
+      else if (events.length)
         setChronicle((rows) =>
-          [...rows.filter((r) => r.round !== resolvedRound), { round: resolvedRound, lines }].slice(
-            -10,
-          ),
+          [
+            ...rows.filter((r) => r.round !== resolvedRound),
+            { round: resolvedRound, events },
+          ].slice(-10),
         );
     }
     if (!props.replay) {
@@ -111,10 +116,27 @@ export function OnlineDuel(props: {
       setOnlineDuelActive(!finished());
     }
   });
+  function eventText(event: DuelEvent) {
+    const card = cards.get(event.cardId);
+    return t(`event-${event.kind}`, {
+      amount: event.amount,
+      slot: event.slot + 1,
+      old: event.oldValue,
+      new: event.newValue,
+      card: card ? t(fluentKey(card.key)) : '',
+      name:
+        event.side === 0
+          ? (props.snapshot.you?.login ?? '')
+          : (props.snapshot.opponent?.login ?? ''),
+      detail: event.detail,
+      kind: t(event.attackKind === 0 ? 'online-physical' : 'online-magical'),
+    });
+  }
   createEffect(() => {
     const mv = move();
     const snapshot = props.snapshot;
     const request = ++generation;
+    setPreview(undefined);
     if (locked() || attacks().length !== 3) return;
     const timer = setTimeout(async () => {
       const reply = await props.send({
@@ -144,6 +166,7 @@ export function OnlineDuel(props: {
     }
   });
   async function submit() {
+    if (!canSubmit()) return;
     setSending(true);
     try {
       const response = await props.send({
@@ -163,6 +186,12 @@ export function OnlineDuel(props: {
     } finally {
       if (!disposed) setSending(false);
     }
+  }
+  function cardCost(index: number, card: Card) {
+    const option = preview()?.castOptions[index];
+    return option
+      ? [option.focusCost - option.changes * content.rules.duel.change_cost, option.staminaCost]
+      : [card.cost.focus, card.cost.stamina];
   }
   function side(data: DuelSide | undefined, login: string, template: number) {
     return (
@@ -288,7 +317,8 @@ export function OnlineDuel(props: {
                         <>
                           <p>{t(fluentKey(selected().key, 'text'), cardArgs(selected()))}</p>
                           <small>
-                            K {selected().cost.focus} · W {selected().cost.stamina}
+                            K {cardCost(index(), selected())[0]} · W{' '}
+                            {cardCost(index(), selected())[1]}
                           </small>
                         </>
                       )}
@@ -313,7 +343,7 @@ export function OnlineDuel(props: {
           <button
             class="primary"
             type="button"
-            disabled={locked() || !!preview()?.preview?.error}
+            disabled={!canSubmit()}
             onClick={() => void submit()}
           >
             {t('online-submit')}
@@ -369,7 +399,7 @@ export function OnlineDuel(props: {
             {(r) => (
               <div>
                 <h3>{t('online-round', { round: r.round, total: view()?.totalRounds ?? 5 })}</h3>
-                <For each={r.lines}>{(line) => <p>{line}</p>}</For>
+                <For each={r.events}>{(event) => <p>{eventText(event)}</p>}</For>
               </div>
             )}
           </For>

@@ -3,15 +3,11 @@
   margin: auto;
   padding: 0 1rem;
 }
-.clans-heading,
 .clans-toolbar {
   display: flex;
   gap: 0.75rem;
   align-items: center;
   flex-wrap: wrap;
-}
-.clans-heading {
-  justify-content: space-between;
 }
 .clan-layout {
   display: grid;

@@ -1,4 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Walka">
-<title>Walka</title>
-<path d="M3 3h3l9 9-3 3-9-9z"/><path d="M21 3h-3l-9 9 3 3 9-9z"/><path d="M7.5 17.5l4-4M16.5 17.5l-4-4"/><path d="M5 19l2-2M19 19l-2-2"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" aria-label="Oręż" viewBox="0 0 512 512"><title>Oręż</title><path d="M20 14c59 113 142 203 232 293l4 4 66 66q-28 22-60 40l29 29 68-69q64 43 105 106l28-28c-43-28-80-60-106-104l68-69-28-28q-16 32-40 60-64-66-130-125v-1C184 123 109 64 20 14m472 0c-83 47-154 101-222 162l22 21 57-57 13 14-56 56 25 23c61-67 117-137 161-219M162 140l201 201-14 13-200-200zM85 254l-28 28 69 69c-26 44-64 76-106 104l28 28q42-63 104-106l69 69 28-29q-31-18-60-40l53-53-24-26-56 56-13-13 56-56-25-25-55 54q-22-28-40-60"/></svg>

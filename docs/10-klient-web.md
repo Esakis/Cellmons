@@ -97,6 +97,10 @@ stateDiagram-v2
 | Ustawienia | język, dźwięk, animacje (pełne, skrócone, bez), powiadomienia, konto (eksport danych, usunięcie) | — |
 | Samouczek | prowadzony trening z botem: ustawienia, koncentracja, czar, combo, wynik | — |
 
+Nawigacja główna (`app/Shell.tsx`) to ikony z podpisami (`art/icons/nav-*`). Na telefonie (do 650 px) tworzy pasek przyklejony do dolnej krawędzi ekranu, jak w grach mobilnych. Na tablecie (do 960 px) zajmuje osobny rząd pod nazwą gry. Ekrany sieciowe pokazują ikonami zamiast skrótów poziom, RP, Dukaty, statystyki i stany graczy (AFK, zajęty). Nazwa wartości zostaje w tekście alternatywnym i podpowiedzi. Ikony ekranów sieciowych (`art/icons/online/`, `app/onlineIcons.ts`) nie trafiają do pakietu offline. Lista graczy i boty treningowe mają małe portrety postaci.
+
+Każdy ekran zaczyna się obrazem swojego miejsca w złoconej ramie z tytułem na tabliczce (`components/Scene.tsx`, `art/paintings/scenes`). Mają go Kolekcja, Sklep, Klany, Konto i Ustawienia, a w Zamku także panel turniejów. Na ekranie startowym obraz wypełnia kartę powitalną pod zasłoną od strony tekstu. Każdy ekran pobiera tylko swoją scenę, więc sceny ekranów sieciowych nie trafiają do pakietu offline. Biblioteka czarów w Kolekcji pokazuje ilustracje kart (`app/cardArt.ts`, ładowany jak w walce).
+
 ## 6. Ekran walki
 
 ### 6.1. Układ
@@ -174,7 +178,7 @@ Ustawienia: tempo ×1, ×2 albo „natychmiast”. Kliknięcie lub `Spacja` prze
 
 | Rodzaj | Format | Zasady |
 |---|---|---|
-| Ilustracje kart i postaci | SVG tworzone przez asystenta AI (ADR-016), optymalizowane przez SVGO | ładowane leniwie; zwykle 3–30 KB na ilustrację. Rastrowe AVIF/WebP tylko, gdy kiedyś pojawią się ilustracje malowane |
+| Ilustracje kart i postaci | obrazy z domeny publicznej w AVIF (ADR-021): karta 512 × 320, portret 576 × 384; SVG asystenta (ADR-016) dla kart bez obrazu | w pakiecie offline; zwykle 10–25 KB na obraz |
 | Ikony (szkoły, typy ataków, statystyki) | SVG w jednym sprite | dziedziczą kolor, skalują się bez strat |
 | Czcionka | jedna czcionka zmienna, podzbiór łaciński z polskimi znakami (`latin-ext`), WOFF2 | `font-display: swap`; alternatywnie czcionki systemowe |
 | Dźwięki | efekty generowane przez Web Audio API (bez plików, `03-tresc-gry.md`, rozdz. 9); muzyka opcjonalnie później (Opus i AAC) | kontekst audio uruchamiany po pierwszej interakcji |
@@ -226,6 +230,8 @@ Ten sam klient działa w aplikacji Android (Capacitor). Różnice (logowanie tok
 ## Lobby F6.5
 
 Trasa `#/lobby` ładuje osobny moduł z PL/EN: mapę, listę graczy i profil, czat/komendy, filtry, AFK, znajomych/ignorowanych, pocztę z paginacją i wyzwania. `net/client.ts` obsługuje binarny Protobuf, korelację odpowiedzi, reconnect z rozrzutem 0,5–8 s, resume i przejęcie sesji przez inne urządzenie. `net/commands.ts` zamienia komendy na typowane żądania. Tekst użytkownika jest renderowany jako tekst, bez HTML. Konto i lobby wymagają sieci i są pobierane na żądanie; podstawowy trening, ustawienia i gość pozostają offline. Utrata sieci podczas otwartego lobby zachowuje klienta i jego token wznowienia w RAM.
+
+Mapa pokazuje miejsca jako obrazy w złoconych ramach z tabliczką nazwy (`art/paintings/scenes`, ADR-021). Nad zakładkami jest obraz miejsca, w którym jest gracz, z nazwą (nagłówek miejsca) i opisem; poza pomieszczeniami jest to obraz mapy. Po wejściu do miejsca mapa zmniejsza się do rzędu małych kafli, a tło strony zmienia się na obraz miejsca (`placeBackdrop` w `app/session.ts`, ustawiane przez lobby).
 
 ## Walka online F7
 

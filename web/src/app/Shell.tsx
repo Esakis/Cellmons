@@ -1,4 +1,4 @@
-import { A } from '@solidjs/router';
+import { A, useLocation } from '@solidjs/router';
 import {
   createEffect,
   createSignal,
@@ -10,9 +10,25 @@ import {
 import { language, setLanguage, t } from '../i18n';
 import { offlineStatus, updateApp, updateReady } from '../pwa';
 import styles from './App.module.css';
-import { duelActive, theme, updatesBlocked } from './session';
+import { icon } from './content';
+import { duelActive, placeBackdrop, theme, updatesBlocked } from './session';
+
+// Each view has its own dimmed painting behind the content (art/paintings/backdrops).
+const backdrops = import.meta.glob<string>('../assets/paintings/backdrops/*.avif', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+});
+const backdropViews = ['training', 'duel', 'lobby', 'collection', 'store'];
+
+function backdrop(path: string) {
+  const view = path.split('/')[1] || 'training';
+  const name = backdropViews.includes(view) ? view : 'default';
+  return backdrops[`../assets/paintings/backdrops/${name}.avif`];
+}
 
 export function Shell(props: ParentProps) {
+  const route = useLocation();
   const lightQuery =
     typeof matchMedia === 'function' ? matchMedia('(prefers-color-scheme: light)') : undefined;
   const [systemLight, setSystemLight] = createSignal(lightQuery?.matches ?? false);
@@ -25,6 +41,10 @@ export function Shell(props: ParentProps) {
   createEffect(() => {
     const light = theme() === 'light' || (theme() === 'system' && systemLight());
     document.documentElement.dataset.theme = light ? 'light' : 'dark';
+  });
+  createEffect(() => {
+    const url = placeBackdrop() ?? backdrop(route.pathname);
+    document.documentElement.style.setProperty('--backdrop', url ? `url("${url}")` : 'none');
   });
   return (
     <>
@@ -48,15 +68,32 @@ export function Shell(props: ParentProps) {
             Spellgambit <small>{t('brand-subtitle')}</small>
           </span>
         </A>
+        {/* On phones this is the icon bar along the bottom edge, like in mobile games. */}
         <nav aria-label={t('app-title')}>
           <A href="/" end>
+            <img src={icon('nav-training')} alt="" width="24" height="24" />
             {t('training')}
           </A>
-          <A href="/settings">{t('settings')}</A>
-          <A href="/lobby">{t('lobby')}</A>
-          <A href="/collection">{t('collection')}</A>
-          <A href="/store">{t('store')}</A>
-          <A href="/account">{t('auth-account')}</A>
+          <A href="/lobby">
+            <img src={icon('nav-lobby')} alt="" width="24" height="24" />
+            {t('lobby')}
+          </A>
+          <A href="/collection">
+            <img src={icon('nav-collection')} alt="" width="24" height="24" />
+            {t('collection')}
+          </A>
+          <A href="/store">
+            <img src={icon('nav-store')} alt="" width="24" height="24" />
+            {t('store')}
+          </A>
+          <A href="/account">
+            <img src={icon('nav-account')} alt="" width="24" height="24" />
+            {t('auth-account')}
+          </A>
+          <A href="/settings">
+            <img src={icon('nav-settings')} alt="" width="24" height="24" />
+            {t('settings')}
+          </A>
         </nav>
         <select
           class={styles.language}

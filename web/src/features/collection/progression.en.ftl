@@ -7,7 +7,6 @@ collection-reincarnation-ready = Requires level 20 and { $target } XP. Current: 
 collection-specialization = Specialization
 collection-gift = Gift
 collection-final-tier = The final reincarnation tier has been reached.
-collection-path-stats = PA { $af } · PD { $of } · MA { $am } · MD { $om } · HP { $hp } · STA { $stamina }
 collection-choose-path = Choose path: { $name }
 collection-choose-spec = Choose specialization: { $name }
 collection-choose-gift = Choose gift: { $name }

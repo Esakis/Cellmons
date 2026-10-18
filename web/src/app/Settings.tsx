@@ -1,6 +1,20 @@
 import { lazy } from 'solid-js';
-import { language, setLanguage, t } from '../i18n';
+import { Scene } from '../components/Scene';
+import { addTranslations, language, setLanguage, t } from '../i18n';
+import styles from './App.module.css';
 import { setSpeed, setTheme, speed, theme } from './session';
+import en from './settings.en.ftl?raw';
+import pl from './settings.pl.ftl?raw';
+
+addTranslations({ pl, en });
+// The settings' painting (art/paintings/scenes).
+const [painting] = Object.values(
+  import.meta.glob<string>('../assets/paintings/scenes/settings.avif', {
+    eager: true,
+    query: '?url',
+    import: 'default',
+  }),
+);
 
 const NativeSettings =
   import.meta.env.VITE_PLATFORM === 'android'
@@ -10,8 +24,9 @@ const NativeSettings =
 export function Settings() {
   return (
     <section class="settings-page">
-      <p class="eyebrow">SPELLGAMBIT</p>
-      <h1>{t('settings')}</h1>
+      <Scene src={painting}>
+        <h1 class="plaque">{t('settings')}</h1>
+      </Scene>
       <label>
         {t('language')}
         <select value={language()} onChange={(event) => setLanguage(event.currentTarget.value)}>
@@ -35,7 +50,21 @@ export function Settings() {
           <option value="instant">{t('instant')}</option>
         </select>
       </label>
-      <p>{t('settings-note')}</p>
+      <div class={styles.notes}>
+        <p>{t('settings-note')}</p>
+        {/* Attribution required by the CC BY 3.0 licence of the icons. */}
+        <p>
+          {t('credits-paintings')} {t('credits-icons')}{' '}
+          <a href="https://game-icons.net" target="_blank" rel="noreferrer">
+            game-icons.net
+          </a>
+          ,{' '}
+          <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noreferrer">
+            CC BY 3.0
+          </a>
+          .
+        </p>
+      </div>
       {NativeSettings && <NativeSettings />}
     </section>
   );

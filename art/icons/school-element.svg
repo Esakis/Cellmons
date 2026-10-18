@@ -1,4 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Elementalizm">
-<title>Elementalizm</title>
-<path d="M12 2.5c1.2 3.6 5.5 5.6 5.5 10.6a5.5 5.5 0 0 1-11 0c0-2.6 1.5-4.2 2.6-5.7.3 2 1.2 3.1 2.6 3.6-.5-3 .1-5.6.3-8.5z"/><path d="M12 20a2.5 2.5 0 0 1-2.5-2.5c0-1.6 1.4-2.4 2.5-4 1.1 1.6 2.5 2.4 2.5 4A2.5 2.5 0 0 1 12 20z"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" aria-label="Żywioły" viewBox="0 0 512 512"><title>Żywioły</title><path d="M245 16c34 48-23 320-90 136C107 325 39 333 39 253c-72 79 44 220 87 243h52c-46-40-76-78-82-135 48 9 72 20 81-63 61 87 101-49 138-107-2 41-4 94 22 130 9 12 34 16 55 16-10 16-45 69-17 89s33 0 26 16c-13 21-23 40-59 54h56c60-18 112-91 95-135q-34 30-62 29c50-72 38-145 15-221-20 73-33 83-54 100 29-69-86-215-147-253"/></svg>

@@ -2,6 +2,7 @@ import { createEffect, createSignal, For, lazy, onCleanup, Show, untrack } from 
 import { ApiError, account, accountEpoch, api } from '../../app/account';
 import { avatars, content, fluentKey } from '../../app/content';
 import { Modal } from '../../components/Modal';
+import { Scene } from '../../components/Scene';
 import { addTranslations, hasTranslation, t } from '../../i18n';
 import type { ClientBody, ServerBody } from '../../net/client';
 import en from './en.ftl?raw';
@@ -10,6 +11,14 @@ import type { Mutation, Pair, Profile, Snapshot, Terms } from './types';
 import './tournaments.css';
 
 addTranslations({ pl, en });
+// The tournament painting heads the panel in the Castle (art/paintings/scenes).
+const [painting] = Object.values(
+  import.meta.glob<string>('../../assets/paintings/scenes/tournament.avif', {
+    eager: true,
+    query: '?url',
+    import: 'default',
+  }),
+);
 const TournamentCard = lazy(() =>
   import('../../app/CardCatalogView').then((m) => ({ default: m.TournamentCard })),
 );
@@ -196,7 +205,9 @@ export function Tournaments(props: {
     user()?.email_verified;
   return (
     <section class="tournaments" data-testid="tournaments">
-      <h2>{t('tourney-title')}</h2>
+      <Scene src={painting}>
+        <h2 class="plaque">{t('tourney-title')}</h2>
+      </Scene>
       <p>
         {t('tourney-help', {
           first: data()?.first_fight_s ?? 20,

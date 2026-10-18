@@ -164,6 +164,16 @@ test('real registration, two-client chat, contacts, mail, challenges and reconne
     await expect(a.locator('.online-match')).toContainText(alice);
     await a.getByRole('button', { name: 'Replay', exact: true }).click();
     await expect(a.getByLabel('Replay position')).toBeVisible();
+    const replayPosition = a.getByLabel('Replay position');
+    await replayPosition.press('Home');
+    await replayPosition.press('ArrowRight');
+    await expect(duelA.locator('details h3')).toHaveText('Round 1 / 5');
+    await replayPosition.press('ArrowRight');
+    await expect(duelA.locator('details h3')).toHaveText('Round 2 / 5');
+    await replayPosition.press('ArrowLeft');
+    await expect(duelA.locator('details h3')).toHaveText('Round 1 / 5');
+    await replayPosition.press('Home');
+    await expect(duelA.locator('details')).toHaveCount(0);
     await a.getByRole('button', { name: 'Map', exact: true }).click();
     await a.getByRole('button', { name: 'Training', exact: true }).click();
     await expect(a.locator('.online-bots button')).toHaveCount(8);

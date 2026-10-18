@@ -7,6 +7,8 @@ export const [accountRightsBusy, setAccountRightsBusy] = createSignal(false);
 export const [onlineDuelActive, setOnlineDuelActive] = createSignal(false);
 export const [sessionKnown, setSessionKnown] = createSignal(false);
 export const [appForeground, setAppForeground] = createSignal(true);
+// Painting of the place the player is in (lobby room); replaces the view's backdrop while set.
+export const [placeBackdrop, setPlaceBackdrop] = createSignal<string>();
 export const updatesBlocked = () =>
   duelActive() || activityBusy() || accountRightsBusy() || !sessionKnown();
 export const [speed, setSpeedSignal] = createSignal(readPreference('speed', 'normal'));

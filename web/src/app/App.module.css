@@ -46,25 +46,40 @@
   display: flex;
   flex-wrap: wrap;
   min-width: 0;
-  gap: 28px;
-  font-size: 0.8rem;
+  gap: 24px;
+  font-size: 0.72rem;
   align-self: stretch;
   align-items: center;
 }
 .header nav a {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
   color: var(--color-text-muted);
   text-decoration: none;
 }
 .header nav a {
   font-family: var(--font-display);
   letter-spacing: 0.08em;
+  text-shadow: var(--heading-shadow);
+}
+.header nav img {
+  width: 24px;
+  height: 24px;
+  opacity: 0.8;
+  filter: var(--icon-filter);
 }
 .header nav a[aria-current="page"] {
   color: var(--accent);
   font-weight: 650;
   text-decoration: underline;
   text-decoration-color: var(--gold);
-  text-underline-offset: 10px;
+  text-underline-offset: 6px;
+}
+.header nav a[aria-current="page"] img {
+  opacity: 1;
+  filter: var(--icon-filter) drop-shadow(0 0 6px rgb(224 198 142 / 0.7));
 }
 .header .language {
   margin-left: auto;
@@ -97,25 +112,51 @@
   font-size: 0.8rem;
   z-index: 10;
 }
+/* Too narrow for one row: the navigation gets its own centred row under the brand. */
+@media (max-width: 960px) {
+  .header {
+    flex-wrap: wrap;
+    row-gap: 14px;
+  }
+  .header nav {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+}
 @media (max-width: 650px) {
   .header {
     padding: 16px;
     gap: 16px;
     flex-wrap: wrap;
   }
+  /* Icon bar fixed to the bottom edge; global.css keeps the page clear of it. */
   .header nav {
+    position: fixed;
+    z-index: 10;
+    inset: auto 0 0;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    order: 3;
-    width: 100%;
-    padding-top: 6px;
-    gap: 6px 16px;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0;
+    padding: 4px 4px calc(4px + env(safe-area-inset-bottom, 0px));
+    font-size: 0.625rem;
+    background: var(--panel-bg);
+    border-top: 1px solid var(--gold-dark);
+    box-shadow: 0 -6px 18px rgb(40 28 10 / 0.25);
   }
   .header nav a {
-    display: inline-flex;
-    align-items: center;
-    min-height: 44px;
     justify-content: center;
+    min-width: 0;
+    min-height: 52px;
+    font-family: inherit;
+    letter-spacing: 0;
+  }
+  .header nav a[aria-current="page"] {
+    text-decoration: none;
+    background: radial-gradient(circle at 50% 35%, rgb(224 198 142 / 0.18), transparent 70%);
+  }
+  .update {
+    bottom: calc(76px + env(safe-area-inset-bottom, 0px));
   }
   .brand {
     font-size: 1.25rem;
@@ -125,4 +166,10 @@
     flex-direction: column;
     gap: 8px;
   }
+}
+/* Settings page: the storage note and the art credits, small and muted. */
+.notes p {
+  font-size: 0.8rem;
+  line-height: 1.8;
+  color: var(--color-text-muted);
 }

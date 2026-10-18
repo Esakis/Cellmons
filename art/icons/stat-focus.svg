@@ -1,4 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Koncentracja (K)">
-<title>Koncentracja (K)</title>
-<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" aria-label="Koncentracja (K)" viewBox="0 0 512 512"><title>Koncentracja (K)</title><path d="M164 18C38 20-60 250 154 479-43 239 164-69 328 190 287 66 222 17 164 18m201 4c198 241-9 549-174 289 128 388 489 49 174-289m-98 156a77 77 0 1 0 0 154 77 77 0 0 0 0-154"/></svg>

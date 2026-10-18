@@ -10,8 +10,11 @@ import {
   Show,
 } from 'solid-js';
 import { account, restoreAccount } from '../../app/account';
-import { avatars, portrait } from '../../app/content';
-import { setActivityBusy } from '../../app/session';
+import { avatars, icon, portrait } from '../../app/content';
+import { onlineIcon } from '../../app/onlineIcons';
+import { setActivityBusy, setPlaceBackdrop } from '../../app/session';
+import { Scene } from '../../components/Scene';
+import { Stats } from '../../components/Stats';
 import '../../app/pathCatalog';
 import type {
   ChallengeReceived,
@@ -37,6 +40,39 @@ const Trade = lazy(() => import('./Trade').then((m) => ({ default: m.Trade })));
 
 addTranslations({ pl, en });
 const rooms = ['arena', 'training', 'castle', 'portal', 'bazaar', 'shop', 'tower'];
+// Every clan room shares one place: its name, description and painting (art/paintings/scenes);
+// outside the rooms the player is on the map ("lobby" painting).
+const place = (room: string) => (room.startsWith('clan:') ? 'clan' : room);
+const scenes = import.meta.glob<string>(
+  '../../assets/paintings/scenes/{arena,training,castle,portal,expedition,bazaar,shop,tower,clan,lobby}.avif',
+  { eager: true, query: '?url', import: 'default' },
+);
+const scene = (room: string) => scenes[`../../assets/paintings/scenes/${place(room)}.avif`];
+
+// A number with an icon in place of its text label; the label stays as the alt text and tooltip.
+function Value(props: { icon: string | undefined; label: string; value: number }) {
+  return (
+    <span class="lobby-value">
+      <img class="icon" src={props.icon} alt={props.label} title={props.label} />
+      {props.value}
+    </span>
+  );
+}
+function Standing(props: { player: PublicPlayer }) {
+  return (
+    <>
+      <Value icon={onlineIcon('level')} label={t('lobby-level-label')} value={props.player.level} />{' '}
+      <Value icon={onlineIcon('tab-ranking')} label="RP" value={props.player.rating} />
+    </>
+  );
+}
+function Portrait(props: { player: PublicPlayer }) {
+  return (
+    <Show when={avatars.get(props.player.pathId || props.player.templateId)}>
+      {(avatar) => <img class="portrait" src={portrait(avatar().key)} alt="" loading="lazy" />}
+    </Show>
+  );
+}
 const Tournaments = lazy(() =>
   import('../tournaments/Tournaments').then((module) => ({ default: module.Tournaments })),
 );
@@ -85,6 +121,7 @@ export function Lobby() {
     const profile = me();
     if (profile) setActivityBusy(profile.busy);
   });
+  createEffect(() => setPlaceBackdrop(room() ? scene(room()) : undefined));
   const sorted = createMemo(() =>
     [...players()].sort((a, b) =>
       sort() === 'login'
@@ -239,6 +276,7 @@ export function Lobby() {
   onCleanup(() => {
     disposed = true;
     client.stop();
+    setPlaceBackdrop(undefined);
   });
   function socialChange(player: string, ignore: boolean, add: boolean) {
     const value = { $typeName: 'game.v1.PlayerTarget' as const, player };
@@ -388,7 +426,7 @@ export function Lobby() {
             <div class="lobby-toolbar">
               <strong>{self().login}</strong>
               <span>
-                {t('lobby-level', { level: self().level })} · {self().rating} RP
+                <Standing player={self()} />
               </span>
               <label>
                 {t('lobby-challenges')}
@@ -426,7 +464,8 @@ export function Lobby() {
                     setMe((p) => (p ? { ...p, afk: !p.afk } : p));
                 }}
               >
-                AFK {self().afk ? '✓' : ''}
+                <img class="icon" src={onlineIcon('afk')} alt="" />
+                AFK
               </button>
             </div>
             <Show when={!self().verified}>
@@ -434,6 +473,14 @@ export function Lobby() {
             </Show>
             <div class="lobby-layout">
               <div class="lobby-main">
+                <Scene
+                  src={scene(room() || 'lobby')}
+                  about={t(room() ? `lobby-room-${place(room())}-about` : 'lobby-map-about')}
+                >
+                  <h2 class="plaque">
+                    {t(room() ? `lobby-room-${place(room())}` : 'lobby-tab-map')}
+                  </h2>
+                </Scene>
                 <nav class="lobby-tabs" aria-label={t('lobby')}>
                   <For each={['map', 'social', 'mail', 'ranking', 'history'] as const}>
                     {(value) => (
@@ -445,18 +492,25 @@ export function Lobby() {
                           if (value === 'mail') void loadMail();
                         }}
                       >
+                        <img class="icon" src={onlineIcon(`tab-${value}`)} alt="" />
                         {t(`lobby-tab-${value}`)}
                       </button>
                     )}
                   </For>
                 </nav>
                 <Show when={tab() === 'map'}>
-                  <section class="lobby-map" aria-label={t('lobby-tab-map')}>
+                  <section
+                    class="lobby-map"
+                    classList={{ 'lobby-map-compact': Boolean(room()) }}
+                    aria-label={t('lobby-tab-map')}
+                  >
                     <For each={self().clanId ? [...rooms, `clan:${self().clanId}`] : rooms}>
                       {(name) => (
                         <button
                           type="button"
+                          class="scene-frame"
                           classList={{ current: room() === name }}
+                          aria-current={room() === name ? 'location' : undefined}
                           disabled={!connected()}
                           onClick={() =>
                             void send({
@@ -465,10 +519,8 @@ export function Lobby() {
                             })
                           }
                         >
-                          <span aria-hidden="true">
-                            {name === 'arena' ? '⚔' : name === 'tower' ? '♜' : '✦'}
-                          </span>
-                          {t(name.startsWith('clan:') ? 'lobby-room-clan' : `lobby-room-${name}`)}
+                          <img src={scene(name)} alt="" width="960" height="540" />
+                          <span class="plaque">{t(`lobby-room-${place(name)}`)}</span>
                         </button>
                       )}
                     </For>
@@ -481,7 +533,9 @@ export function Lobby() {
                   <OnlineRecords mode="history" send={send} select={setSelected} />
                 </Show>
                 <Show when={room() === 'shop'}>
-                  <A href="/store">{t('store')}</A>
+                  <A class="button primary lobby-enter" href="/store">
+                    {t('store')}
+                  </A>
                 </Show>
                 <Show when={room() === 'castle' && tab() === 'map'}>
                   <div hidden={Boolean(duel() || trade())}>
@@ -494,7 +548,9 @@ export function Lobby() {
                   </div>
                 </Show>
                 <Show when={room() === 'tower' || self().clanId}>
-                  <A href="/clans">{t('clans')}</A>
+                  <A class="button secondary lobby-enter" href="/clans">
+                    {t('clans')}
+                  </A>
                 </Show>
                 <Show when={room() === 'portal' || room() === 'expedition'}>
                   <div hidden={Boolean(duel() || trade())}>
@@ -534,6 +590,7 @@ export function Lobby() {
                               })
                             }
                           >
+                            <Portrait player={bot} />
                             {bot.login}
                           </button>
                         )}
@@ -661,11 +718,7 @@ export function Lobby() {
                     <p class="lobby-notice">{roomMotd()}</p>
                   </Show>
                   <div class="lobby-chat-heading">
-                    <h2>
-                      {room()
-                        ? t(room().startsWith('clan:') ? 'lobby-room-clan' : `lobby-room-${room()}`)
-                        : t('lobby-choose-room')}
-                    </h2>
+                    <h2>{t(room() ? 'lobby-chat' : 'lobby-choose-room')}</h2>
                     <label>
                       {t('lobby-chat-filter')}
                       <select
@@ -779,12 +832,28 @@ export function Lobby() {
                               })
                             }
                           >
+                            <Portrait player={p} />
                             <span>
                               {p.login} {p.mentor ? ` · ${t('lobby-mentor')}` : ''}{' '}
-                              {p.afk ? '☾' : ''} {p.busy ? '⚔' : ''}
+                              <Show when={p.afk}>
+                                <img
+                                  class="icon"
+                                  src={onlineIcon('afk')}
+                                  alt={t('lobby-afk')}
+                                  title={t('lobby-afk')}
+                                />
+                              </Show>
+                              <Show when={p.busy}>
+                                <img
+                                  class="icon"
+                                  src={icon('school-combat')}
+                                  alt={t('lobby-busy')}
+                                  title={t('lobby-busy')}
+                                />
+                              </Show>
                             </span>
                             <small>
-                              {t('lobby-level', { level: p.level })} · {p.rating} RP
+                              <Standing player={p} />
                             </small>
                             <small>
                               {t(`lobby-${p.title}`)} ·{' '}
@@ -831,7 +900,7 @@ export function Lobby() {
                         </button>
                       </Show>
                       <p>
-                        {t('lobby-level', { level: p.level })} · {p.rating} RP · #{p.rank || '—'}
+                        <Standing player={p} /> · #{p.rank || '—'}
                       </p>
                       <Show when={p.title}>
                         <p>{t(`lobby-${p.title}`)}</p>
@@ -840,16 +909,7 @@ export function Lobby() {
                         <p>{p.clanName}</p>
                       </Show>
                       <p>{p.description}</p>
-                      <dl class="lobby-stats">
-                        <For each={p.stats}>
-                          {(stat, index) => (
-                            <>
-                              <dt>{['AF', 'OF', 'AM', 'OM', 'HP', 'STA'][index()]}</dt>
-                              <dd>{stat}</dd>
-                            </>
-                          )}
-                        </For>
-                      </dl>
+                      <Stats values={p.stats} />
                       <Show when={p.id !== self().id}>
                         <div class="lobby-actions">
                           <button
@@ -930,20 +990,12 @@ export function Lobby() {
                               )}
                             </Show>
                             <p>
-                              {t('lobby-level', { level: p.level })} · {p.rating} RP · #
-                              {p.rank || '—'}
+                              <Standing player={p} /> · #{p.rank || '—'}
                             </p>
                             <p>
                               {t(`lobby-${p.title}`)} {p.clanName}
                             </p>
-                            <p>
-                              {p.stats
-                                .map(
-                                  (value, index) =>
-                                    `${['AF', 'OF', 'AM', 'OM', 'HP', 'STA'][index]} ${value}`,
-                                )
-                                .join(' · ')}
-                            </p>
+                            <Stats values={p.stats} />
                             <p>{p.description}</p>
                           </>
                         )}

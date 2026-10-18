@@ -12,12 +12,23 @@ import {
   signIn,
   signOut,
 } from '../../app/account';
+import { icon } from '../../app/content';
+import { onlineIcon } from '../../app/onlineIcons';
+import { Scene } from '../../components/Scene';
 import { version as legalVersion } from '../../generated/legal-version.json';
 import { addTranslations, hasTranslation, t } from '../../i18n';
 import en from './en.ftl?raw';
 import pl from './pl.ftl?raw';
 
 addTranslations({ pl, en });
+// The account's painting (art/paintings/scenes).
+const [painting] = Object.values(
+  import.meta.glob<string>('../../assets/paintings/scenes/account.avif', {
+    eager: true,
+    query: '?url',
+    import: 'default',
+  }),
+);
 const Notices = lazy(() => import('../moderation/Notices').then((m) => ({ default: m.Notices })));
 const Privacy = lazy(() => import('../privacy/Privacy').then((m) => ({ default: m.Privacy })));
 
@@ -224,11 +235,12 @@ export function AccountPage() {
 
   return (
     <section class="account-page">
-      <p class="eyebrow">SPELLGAMBIT</p>
       <Show when={account()?.kind !== 'guest'}>
         <Notices />
       </Show>
-      <h1>{t('auth-account')}</h1>
+      <Scene src={painting}>
+        <h1 class="plaque">{t('auth-account')}</h1>
+      </Scene>
       <Show when={!isGuest()}>
         <details
           open={privacyOpen()}
@@ -276,7 +288,9 @@ export function AccountPage() {
               {user.email} · {t(user.email_verified ? 'auth-confirmed' : 'auth-unconfirmed')}
             </p>
             <p>
+              <img class="icon" src={icon(`school-${user.start_school}`)} alt="" />
               {t(`school-${user.start_school}-name`)} ·{' '}
+              <img class="icon" src={onlineIcon('level')} alt="" />
               {t('auth-level', { level: user.avatar?.level ?? 1, xp: user.avatar?.xp ?? 0 })}
             </p>
             <Show when={!user.email_verified}>

@@ -16,6 +16,24 @@ body {
   padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
     env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
 }
+/* The view's painting (Shell sets --backdrop), veiled so text and panels stay readable. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    var(--grain),
+    var(--backdrop-veil),
+    var(--backdrop, none) center 30% / cover no-repeat;
+}
+/* On phones the main navigation is a bar along the bottom edge (App.module.css). */
+@media (max-width: 650px) {
+  body {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  }
+}
 h1,
 h2 {
   font-family: var(--font-display);
@@ -66,7 +84,7 @@ a.primary {
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.45),
     0 4px 14px rgb(0 0 0 / 0.35);
-  text-shadow: 0 1px 0 rgb(255 255 255 / 0.3);
+  text-shadow: 0 1px 1px rgb(0 0 0 / 0.5);
 }
 button.secondary,
 a.secondary {
@@ -81,6 +99,120 @@ button.quiet {
 }
 a {
   color: var(--accent);
+}
+img[src$=".avif"] {
+  object-fit: cover;
+  object-position: 50% 35%;
+}
+/* An icon inside a line of text (art/icons), tinted like the theme's ornaments. */
+.icon {
+  width: 1.3em;
+  height: 1.3em;
+  margin-right: 0.25em;
+  vertical-align: -0.3em;
+  filter: var(--icon-filter);
+}
+/* Stat values under their icons (components/Stats.tsx). */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  text-align: center;
+  font-size: 0.8rem;
+}
+.stats dt {
+  grid-row: 1;
+}
+.stats .icon {
+  width: 1.4rem;
+  height: 1.4rem;
+  margin: 0;
+}
+.stats dd {
+  margin: 0.5rem 0;
+}
+/* A small round character portrait with a gilt ring (player lists, bots). */
+.portrait {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow:
+    0 0 0 2px var(--gold),
+    0 0 0 3px #000;
+}
+/* A place's painting in a gilt frame with its name on a plaque (components/Scene.tsx, lobby map). */
+.scene {
+  margin-bottom: 1.25rem;
+  text-align: center;
+}
+.scene-frame {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border: 3px solid transparent;
+  border-radius: 3px;
+  background: var(--gilt) border-box;
+  box-shadow:
+    0 0 0 1px #000,
+    0 10px 22px rgb(0 0 0 / 0.55);
+}
+.scene img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 21 / 8;
+  object-position: 50% 45%;
+}
+.plaque {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--plaque-text);
+  text-shadow: none;
+  background: var(--plaque-bg);
+  border: 1px solid var(--gold);
+  box-shadow:
+    0 0 0 1px #000,
+    0 3px 10px #000;
+}
+.scene .plaque {
+  position: relative;
+  display: inline-block;
+  max-width: 90%;
+  margin: -1.35rem 0 0;
+  padding: 0.3rem 1.6rem;
+  font-size: 1.35rem;
+  letter-spacing: 0.16em;
+}
+.scene p {
+  max-width: 40rem;
+  margin: 0.8rem auto 0;
+  line-height: 1.6;
+}
+@media (max-width: 760px) {
+  .scene img {
+    aspect-ratio: 16 / 9;
+  }
+  .scene .plaque {
+    margin-top: -1.15rem;
+    padding: 0.25rem 1.1rem;
+    font-size: 1.1rem;
+  }
+}
+/* The start screen's welcome card painted with its scene (Setup.tsx sets --scene). */
+section.painted {
+  background:
+    var(--hero-veil),
+    var(--scene) center 40% / cover no-repeat;
+}
+@media (max-width: 650px) {
+  section.painted {
+    background:
+      var(--hero-veil-narrow),
+      var(--scene) center 40% / cover no-repeat;
+  }
 }
 :focus-visible {
   outline: 3px solid var(--focus-ring);

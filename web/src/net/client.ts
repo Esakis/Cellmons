@@ -41,8 +41,12 @@ export class OnlineClient {
   onMessage: (body: ServerBody) => void = () => {};
   onStatus: (status: Status) => void = () => {};
   private offline = () => {
+    this.generation++;
+    if (this.retry !== undefined) clearTimeout(this.retry);
+    this.retry = undefined;
     this.rejectPending('DISCONNECTED');
     this.socket?.close();
+    this.socket = undefined;
     this.ready = false;
     this.onStatus('offline');
   };
@@ -50,6 +54,7 @@ export class OnlineClient {
     if (!this.active || this.ready || this.fatal) return;
     if (this.retry !== undefined) clearTimeout(this.retry);
     this.retry = undefined;
+    this.rejectPending('DISCONNECTED');
     this.socket?.close();
     void this.connect();
   };

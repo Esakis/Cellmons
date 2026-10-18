@@ -1,10 +1,15 @@
 .tournaments {
   padding: 1rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--surface);
   margin-block: 1rem;
   min-width: 0;
   overflow-wrap: anywhere;
+}
+/* A slim strip of the tournament painting heads the panel. */
+.tournaments .scene img {
+  aspect-ratio: 4 / 1;
 }
 .tourney-actions {
   display: flex;
@@ -15,8 +20,8 @@
 .tourney-create fieldset {
   min-width: 0;
   margin-block: 1rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
 }
 .tourney-create label {
   display: block;
@@ -27,9 +32,9 @@
   min-height: 48px;
   width: 100%;
   padding: 0.6rem 0.75rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--bg);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--inset-bg);
   color: inherit;
   font: inherit;
 }
@@ -50,7 +55,7 @@
   margin-block: 0.6rem;
 }
 .tourney-profile {
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--color-border);
   margin-block-start: 1rem;
   padding-block-start: 0.5rem;
 }

@@ -7,7 +7,6 @@ collection-reincarnation-ready = Wymagany poziom 20 i { $target } PD. Obecnie: {
 collection-specialization = Specjalizacja
 collection-gift = Dar
 collection-final-tier = Osiągnięto ostatni stopień reinkarnacji.
-collection-path-stats = AF { $af } · OF { $of } · AM { $am } · OM { $om } · Ż { $hp } · W { $stamina }
 collection-choose-path = Wybierz drogę: { $name }
 collection-choose-spec = Wybierz specjalizację: { $name }
 collection-choose-gift = Wybierz dar: { $name }

@@ -11,8 +11,9 @@ Wydajność jest głównym wymaganiem projektu. Ten dokument określa budżety (
 | JS na start (trasa logowania i mapy), po Brotli | ≤ 70 KB | kontrola rozmiaru w CI |
 | CSS na start, po Brotli | ≤ 20 KB | kontrola rozmiaru w CI |
 | Czcionki | ≤ 40 KB | kontrola rozmiaru w CI |
-| Pierwsze załadowanie łącznie (bez ilustracji kart) | ≤ 200 KB | Lighthouse CI; kontrola rozmiaru w CI (cała aplikacja offline bez modułu ilustracji) |
+| Pierwsze załadowanie łącznie (bez ilustracji kart) | ≤ 205 KB | Lighthouse CI; kontrola rozmiaru w CI (cała aplikacja offline bez modułu ilustracji) |
 | Ilustracje kart (jeden leniwie ładowany moduł `cardArt`), po Brotli | ≤ 80 KB | kontrola rozmiaru w CI |
+| Malowane ilustracje i portrety (AVIF, w pakiecie offline, ADR-021) | ≤ 6 MB łącznie, ≤ 32 KB na plik | kontrola rozmiaru w CI |
 | Pakiet ekranu walki (ładowany leniwie) | ≤ 40 KB | kontrola rozmiaru w CI |
 | `engine-wasm` po Brotli | ≤ 90 KB | kontrola rozmiaru w CI |
 | Dane treści (`content.<hash>.json`) po Brotli | ≤ 50 KB | kontrola rozmiaru w CI |
@@ -26,7 +27,7 @@ Wydajność jest głównym wymaganiem projektu. Ten dokument określa budżety (
 
 ### 1.2. Sieć
 
-Moduły konta i lobby mają dodatkowy limit implementacyjny 45 KiB Brotli. Turnieje, wyprawy oraz administracja z moderacją mają osobne limity po 20 KiB i nie należą do aplikacji offline. `check-web-budget.mjs` mierzy te zakresy oddzielnie, bez podnoszenia limitu 200 KiB offline. Od F12 kontroluje też **pełny początkowy graf trasy lobby wraz ze wspólnym kodem startowym** (59,3/70 KiB w pełnym przebiegu F12). Katalog 330 kart z tekstami jest ładowany z kolekcją lub walką i nadal w całości należy do pakietu offline (199,4/200 KiB). Sam moduł startowy ma 41,0 KiB, a dodatkowy kod walki wraz z katalogiem 37,6/40 KiB. Historia, wymiana i walka online są ładowane po wejściu w daną funkcję. Te pomiary nie zastępują testów urządzeń, LCP/INP ani obciążenia serwera w F13.
+Moduły konta i lobby mają dodatkowy limit implementacyjny 50 KiB Brotli. Turnieje, wyprawy oraz administracja z moderacją mają osobne limity po 20 KiB i nie należą do aplikacji offline. `check-web-budget.mjs` mierzy te zakresy oddzielnie od pakietu offline. 2026-10-18 właściciel podniósł limity na potrzeby malowanego interfejsu (ADR-021): pakiet offline z 200 do 205 KiB, moduły konta i lobby z 45 do 50 KiB. Od F12 kontroluje też **pełny początkowy graf trasy lobby wraz ze wspólnym kodem startowym** (59,3/70 KiB w pełnym przebiegu F12). Katalog 330 kart z tekstami jest ładowany z kolekcją lub walką i nadal w całości należy do pakietu offline (199,4/200 KiB). Sam moduł startowy ma 41,0 KiB, a dodatkowy kod walki wraz z katalogiem 37,6/40 KiB. Historia, wymiana i walka online są ładowane po wejściu w daną funkcję. Te pomiary nie zastępują testów urządzeń, LCP/INP ani obciążenia serwera w F13.
 
 | Miara | Budżet |
 |---|---|
@@ -61,7 +62,7 @@ Budżety silnika i AI: `06-silnik-gry.md`, rozdz. 10 oraz `11-ai-i-symulacje.md`
 - SolidJS bez wirtualnego DOM. Brak dużych bibliotek; każda zależność sprawdzana pod kątem rozmiaru.
 - Krytyczny CSS w `index.html`, reszta w plikach CSS według tras.
 - Animacje wyłącznie na `transform` i `opacity`. Bez odczytów układu w pętli animacji.
-- Ilustracje: AVIF i WebP w dwóch rozmiarach, `loading="lazy"`, wymiary zadeklarowane z góry (brak skoków układu).
+- Ilustracje: malowane obrazy AVIF w jednym rozmiarze (karta 512 × 320, portret 576 × 384, ADR-021); okno ilustracji ma stałe proporcje w układzie (brak skoków układu).
 - Ikony jako jeden sprite SVG.
 - Czcionka zmienna z podzbiorem znaków (łacina z polskimi znakami) albo czcionki systemowe.
 - Service Worker z precache szkieletu aplikacji: drugie i kolejne wejścia praktycznie bez sieci.

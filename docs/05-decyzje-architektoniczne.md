@@ -19,9 +19,10 @@ Każda decyzja ma status, kontekst, rozważone alternatywy i konsekwencje. Zmian
 | 013 | Wersja zasad: klasyczna 2004–2009 (bez Eteru) | przyjęta (decyzja właściciela) |
 | 014 | Aplikacja Android: Capacitor opakowujący klienta web; Google Play (AAB) + APK ze strony | przyjęta (decyzja właściciela) |
 | 015 | Logowanie w aplikacji: token sesji + jednorazowy bilet WebSocket (uzupełnia ADR-010) | przyjęta |
-| 016 | Grafika wektorowa (SVG) tworzona przez asystenta AI, element po elemencie | przyjęta (decyzja właściciela) |
+| 016 | Grafika wektorowa (SVG) tworzona przez asystenta AI, element po elemencie | przyjęta (decyzja właściciela); ilustracje, portrety i ikony zastąpione przez ADR-021 |
 | 017 | Trening offline: sesja WASM z binarnym dispatch, treść wersjonowana razem z klientem | przyjęta |
 | 018 | Gość lokalny bez konta, sieci i zapisu danych; osobno konto z niepotwierdzonym e-mailem | przyjęta (decyzja właściciela) |
+| 021 | Ilustracje kart i portrety: obrazy z domeny publicznej w korekcie barwnej gry; ikony z game-icons.net (CC BY 3.0) | przyjęta (decyzja właściciela) |
 
 ---
 
@@ -341,3 +342,32 @@ Konto z niepotwierdzonym e-mailem pozostaje trwałym kontem z ograniczeniami R-K
 **Decyzja.** Serwer Linux x86_64 jest statycznie linkowany z musl i działa jako UID 65532 w `distroless/static-debian13`. PostgreSQL 18 używa oficjalnego Alpine 3.24 z aktualizacją pakietów. pgBackRest 2.59.3 budujemy ze źródła zweryfikowanego SHA-256, bez opcjonalnego libssh2/SFTP; repozytoria używane przez wdrożenie to S3 i lokalne fixture. Budowanie wykonuje również test smoke producenta. Skan Grype nie ma wykluczeń podatności; kody błędów blokują wydanie.
 
 **Konsekwencje.** Obrazy nadal wymagają regularnej przebudowy i skanu. Migracja istniejącej bazy między dystrybucjami wymaga osobnego odbioru danych, rozszerzeń i porządkowania znaków; nie jest zwykłym rolloutem aplikacji. Obraz odtwarzania musi odpowiadać źródłu kopii. Gotowy pipeline buduje x86_64; inna architektura wymaga osobnej kompilacji i testów.
+
+## ADR-021. Ilustracje z domeny publicznej i ikony game-icons.net
+
+**Kontekst.** 2026-10-15 właściciel ocenił ikony, kolory i ilustracje SVG z ADR-016 jako „mało profesjonalne” i „jak gra dla dzieci”. Zażądał grafik fantasy „dla dorosłych”, a jeśli asystent nie potrafi ich narysować, grafik darmowych. Malarstwa tej jakości nie da się sensownie zapisać kodem SVG, a darmowe paczki grafik fantasy mają po kilka–kilkanaście obrazów w różnych stylach i na różnych licencjach, więc nie pokrywają kilkuset kart.
+
+**Decyzja** (zatwierdzona przez właściciela 2026-10-15 po porównaniu zrzutów prototypu):
+- Ilustracje kart i portrety postaci to obrazy dawnych mistrzów z Wikimedia Commons, wyłącznie z licencją „Public domain” albo CC0. Nie używamy plików CC BY-SA ani zdjęć z własną licencją fotografa. Unikamy aktów i drastycznych scen.
+- Obraz jest kadrowany do 8 : 5 (karta, 512 × 320) albo 3 : 2 (portret, 576 × 384) i przechodzi wspólną korektę barwną (poziomy, gamma, lekka desaturacja, ciepłe cienie, winieta). Plik AVIF ma zwykle 10–25 KB.
+- Źródłem prawdy jest `art/paintings/sources.json` (plik w Commons, malarz, licencja, kadr, poprawki korekty). `scripts/generate-paintings.py` odtwarza pliki AVIF w `art/paintings/` i stronę przeglądu. Karta lub postać bez obrazu pokazuje dotychczasowe SVG.
+- Ikony szkół, ataków i statystyk pochodzą z game-icons.net (CC BY 3.0; autorzy: Lorc, Delapouite, Sbed, Carl Olsen). Podpis autorów jest w ustawieniach gry i w `art/PROVENANCE.md`.
+- Paleta interfejsu: czernione żelazo, postarzany mosiądz i bordo z drobnym ziarnem. Kolor niesie znaczenie (życie, typ ataku, koszty), a nie dekorację.
+- Obrazy są częścią pakietu offline (PWA, APK). Budżet: ≤ 6 MB łącznie i ≤ 32 KB na plik (`scripts/check-web-budget.mjs`); pozostałe budżety bez zmian.
+- Uzupełnienie 2026-10-18 (prośba właściciela: „wchodzę w zamek i grafika zamków”, jak w grach na telefon): każde miejsce ma scenę z tego samego źródła i z tą samą korektą (`art/paintings/scenes/`, 16 : 9, 960 × 540, ostra). Mapa lobby to obrazy miejsc w złoconych ramach z tabliczką nazwy; po wejściu do miejsca nad zakładkami jest jego obraz z nazwą i opisem, a tło strony zmienia się na ten obraz. Na ten interfejs właściciel podniósł limity: pakiet offline 205 KiB, moduły konta i lobby 50 KiB (`13-wydajnosc.md`). Ikony z game-icons.net zastępują tekst w nawigacji (na telefonie pasek u dołu ekranu), w zakładkach lobby oraz przy poziomie, RP, Dukatach, statystykach i stanach graczy; lista graczy i boty mają małe portrety. Pozostałe ekrany (start, Kolekcja, Sklep, Klany, Konto, Ustawienia, turnieje w Zamku) zaczynają się obrazem w ramie z tytułem na tabliczce, a biblioteka czarów pokazuje ilustracje kart.
+
+**Alternatywy:**
+
+| Opcja | Za | Przeciw |
+|---|---|---|
+| Lepsze SVG asystenta | małe pliki, pełna kontrola stylu | właściciel odrzucił ten styl; malarstwo w kodzie SVG wygląda umownie |
+| Darmowe paczki (itch.io, OpenGameArt) | gotowe grafiki | kilka–kilkanaście obrazów, różne style, częste licencje BY-SA albo NC |
+| Obrazy generowane modelem AI | spójny styl | osobne narzędzie i model, niepewne prawa i powtarzalność |
+| Zamówienie u ilustratora | autorski, spójny styl | koszt i czas; możliwe później, np. dla kart kluczowych |
+
+**Konsekwencje.**
+- (+) Dojrzały, malarski wygląd, pewna sytuacja prawna (domena publiczna), brak kosztów.
+- (−) Pakiet offline (PWA i APK) rośnie o ok. 5 MB: 367 plików AVIF (330 kart, 31 postaci i 6 teł widoków; drogi postaci używają obrazu postaci bazowej).
+- (−) Obrazy w domenie publicznej nie dają wyłączności, a część jest rozpoznawalna. Rozpoznawalność gry chroni znak towarowy (ADR-012, `20-nazwa-i-znak-towarowy.md`).
+- (−) Różni malarze to różne style; spójność pilnuje wspólna korekta barwna i kadr.
+- ADR-016 pozostaje w mocy dla ramek, elementów interfejsu i kart bez obrazu.

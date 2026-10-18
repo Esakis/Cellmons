@@ -1,6 +1,7 @@
 import { createEffect, createSignal, For, lazy, onCleanup, Show, untrack } from 'solid-js';
 import { ApiError, account, accountEpoch, api } from '../../app/account';
 import { avatars, content, portrait } from '../../app/content';
+import { onlineIcon } from '../../app/onlineIcons';
 import { Modal } from '../../components/Modal';
 import { addTranslations, hasTranslation, language, t } from '../../i18n';
 import type { ClientBody, ServerBody } from '../../net/client';
@@ -198,6 +199,7 @@ export function Expeditions(props: {
               {t(`exp-difficulty-${current().difficulty}`)} · {t(`exp-status-${current().status}`)}
             </h3>
             <p>
+              <img class="icon" src={onlineIcon('xp')} alt="" />
               {t('exp-progress', {
                 stage: Math.min(current().stage + 1, current().stages),
                 total: current().stages,
@@ -297,7 +299,10 @@ export function Expeditions(props: {
             <Show when={current().award}>
               {(award) => (
                 <div role="status" class="exp-award">
-                  <p>{t('exp-award', { xp: award().xp, ducats: award().ducats })}</p>
+                  <p>
+                    <img class="icon" src={onlineIcon('ducats')} alt="" />
+                    {t('exp-award', { xp: award().xp, ducats: award().ducats })}
+                  </p>
                   <Show when={award().template}>
                     {(id) => <p>{t('exp-award-avatar', { name: avatarName(id()) })}</p>}
                   </Show>

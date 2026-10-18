@@ -1,4 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Wytrzymałość (W)">
-<title>Wytrzymałość (W)</title>
-<path d="M13.5 2.5L5 13.5h6.5l-1 8 8.5-11h-6.5z"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" aria-label="Wytrzymałość (W)" viewBox="0 0 512 512"><title>Wytrzymałość (W)</title><path d="M256 29a9 9 0 0 0-9 10v118l-15 19 1 16v11l23-29 23 29v-11l1-16-15-19V39a9 9 0 0 0-9-10m-80 92q-7 0-27 12-18 13-38 34c-26 27-49 62-54 91-8 38-12 81-12 119s5 70 11 83l7 4 19 1q26-2 57-13 32-13 54-31t22-37V192c0-14-4-33-11-48q-12-22-28-23m160 0q-16 1-28 23c-7 15-11 34-11 48v192q1 19 22 37 22 19 54 31 31 11 57 13l19-1 7-4c6-13 11-45 11-83s-4-81-12-119c-5-29-28-64-54-91q-20-21-38-34-19-12-27-12"/></svg>

@@ -1,4 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Nekromancja">
-<title>Nekromancja</title>
-<path d="M12 3a7 7 0 0 0-7 7c0 2.6 1.4 4.4 3 5.3V20h8v-4.7c1.6-.9 3-2.7 3-5.3a7 7 0 0 0-7-7z"/><circle cx="9.5" cy="11" r="1.6"/><circle cx="14.5" cy="11" r="1.6"/><path d="M10.5 20v-2.5M13.5 20v-2.5"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" aria-label="Nekromancja" viewBox="0 0 512 512"><title>Nekromancja</title><path d="M256 16C136 16 16 76 16 166c0 60 45 90 45 150 0 45-15 45-15 75 0 15 48 32 90 45v60h240v-60s91-28 90-45c-1-28-15-30-15-75 0-30 46-91 45-150 0-90-120-150-240-150m-90 180a60 60 0 1 1 0 120 60 60 0 0 1 0-120m180 0a60 60 0 1 1 0 120 60 60 0 0 1 0-120m-90 105c15 0 45 60 45 75 0 30 0 30-15 30h-60c-15 0-15 0-15-30 0-15 30-75 45-75"/></svg>

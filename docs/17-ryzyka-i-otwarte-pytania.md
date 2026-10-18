@@ -13,7 +13,7 @@ Skala: P = prawdopodobieństwo, W = wpływ (N niski, Ś średni, W wysoki). Reje
 | RY-05 | Puste lobby na starcie (za mało graczy na PvP) | W | W | boty w sali treningowej, trening offline, wyprawy PvE, turnieje systemowe z botami do uzupełnienia, beta na zaproszenia, budowanie społeczności przed startem | M4, M6 |
 | RY-06 | Ekonomia bez płatności wymknie się spod kontroli (inflacja lub niedobór Dukatów) | Ś | Ś | metryki źródeł i ujść, parametry `economy.*`, przeglądy cotygodniowe | F9, F15 |
 | RY-07 | Oszustwa („podkładanie się”, wiele kont, boty) | Ś | Ś | wykrywanie i sankcje (`12-bezpieczenstwo-i-prawo.md`, rozdz. 4) | F12, F15 |
-| RY-08 | Niespójna lub zbyt prosta grafika (grafiki SVG tworzone przez asystenta AI, ADR-016) | Ś | Ś | przewodnik stylu zatwierdzony na starcie (F3.6), warianty do wyboru przy każdym elemencie, zatwierdzanie przez właściciela, ograniczona i spójna paleta | F3, F9, F10 |
+| RY-08 | Niespójna lub zbyt prosta grafika (SVG asystenta AI, ADR-016; od ADR-021 obrazy różnych malarzy) | Ś | Ś | wspólny kadr i korekta barwna obrazów, ikony z jednego zestawu, przegląd i zatwierdzanie przez właściciela, ograniczona i spójna paleta | F3, F9, F10 |
 | RY-09 | Wolniejszy rozwój w Rust (krzywa uczenia, czas kompilacji) | Ś | Ś | mały, dobrze wydzielony silnik; szablony modułów serwera; ponowne rozważenie ADR-001/002 po F1, jeśli tempo jest wyraźnie za niskie | po F1 |
 | RY-10 | WASM lub animacje za wolne na słabych telefonach | N | Ś | F5: WASM 68 KiB Brotli, Lighthouse 100 i trening offline potwierdzone w emulatorze; pierwszy start aktywności 3,4 s, kolejne 1,5/1,1 s. Brak pomiarów 60 FPS i gotowości UI na fizycznych telefonach — wymagane 2–3 urządzenia przed zamknięciem F5.6; szczegóły w `21-trening-offline-testy.md` | F5.6, F13 |
 | RY-11 | Jeden serwer to pojedynczy punkt awarii | Ś | W | kopie z PITR, monitoring na osobnej maszynie, procedura R4 (nowy serwer ≤ 1 h) | F14 |
@@ -34,7 +34,7 @@ Każde pytanie ma odpowiedź domyślną, przyjętą w dokumentacji, dopóki nie 
 | ID | Pytanie | Domyślnie | Do kiedy |
 |---|---|---|---|
 | P-01 | Nazwa produktu i własny świat (fabuła, nazwy szkół, postaci, tytułów) | **Nazwa zdecydowana (13.10.2026):** „Spellgambit: Arcane Class”, znak słowny SPELLGAMBIT (`20-nazwa-i-znak-towarowy.md`). Otwarte: własny świat. W kodzie nazwy neutralne | świat: przed betą (F9.6) |
-| P-02 | Kto przygotuje grafikę? | **Zdecydowane:** grafiki tworzy asystent AI jako SVG, element po elemencie, a zatwierdza właściciel (ADR-016) | — |
+| P-02 | Kto przygotuje grafikę? | **Zdecydowane:** interfejs i ramki to SVG asystenta AI (ADR-016); ilustracje i portrety to obrazy z domeny publicznej, a ikony pochodzą z game-icons.net (ADR-021); zatwierdza właściciel | — |
 | P-03 | Rynek i języki | polski i angielski od początku | F5 |
 | P-04 | Kto jest administratorem danych osobowych? | **Zdecydowane:** firma właściciela projektu. Do uzupełnienia: dane rejestrowe w polityce prywatności i na koncie Google Play | F13 |
 | P-05 | Czy wyrównywać przewagę inicjatywy (np. +1 K dla gracza bez inicjatywy)? | nie, chyba że symulacje pokażą > 60% wygranych | po F3 |

@@ -353,11 +353,11 @@ flowchart LR
 
 ## 9. Grafika i dźwięk
 
-Decyzja ADR-016: grafiki tworzy asystent AI (Claude) jako **grafikę wektorową SVG**, element po elemencie, a właściciel projektu wybiera warianty i zatwierdza wersje końcowe.
+Decyzja ADR-016: grafiki tworzy asystent AI (Claude) jako **grafikę wektorową SVG**, element po elemencie, a właściciel projektu wybiera warianty i zatwierdza wersje końcowe. **Od 2026-10-15 (ADR-021)** ilustracje kart i portrety postaci to obrazy dawnych mistrzów w domenie publicznej w korekcie barwnej gry, a ikony szkół, ataków i statystyk pochodzą z game-icons.net (CC BY 3.0). SVG zostają dla ramek, interfejsu i kart bez obrazu.
 
-**Styl** (do ustalenia w przewodniku stylu, krok F3.6):
-- emblematy i sygile szkół jako główny motyw wizualny;
-- geometryczne, stylizowane portrety postaci (sylwetka, symbol, kolor szkoły), a nie realistyczne malarstwo;
+**Styl** (przewodnik stylu `art/README.md`):
+- malarskie ilustracje i portrety w ciemnej, ciepłej tonacji: czernione żelazo, postarzany mosiądz, bordo (ADR-021);
+- ikony jako pełne sylwetki: mosiężne na ciemnym tle, w kolorze kości na emaliowanych monetach ataku i obrony;
 - ramki kart według rzadkości (brązowa, srebrna, złota) i czytelny układ karty: nazwa, koszty K i W, wymagania, tekst, ilustracja;
 - spójna paleta: jeden kolor przewodni na szkołę, wersje dla motywu jasnego i ciemnego.
 
@@ -371,7 +371,7 @@ Decyzja ADR-016: grafiki tworzy asystent AI (Claude) jako **grafikę wektorową 
 | F10 (pełna treść) | pozostałe karty, drogi, dary, cienie |
 | F12A (Android) | ikona aplikacji, ekran startowy, grafiki do Google Play (ikona 512 × 512, grafika 1024 × 500, zrzuty ekranu) |
 
-**Proces dla każdego elementu:** opis → 2–3 warianty SVG → wybór i uwagi właściciela → poprawki → wersja końcowa w `art/` → optymalizacja SVGO → wpis w rejestrze pochodzenia (`12-bezpieczenstwo-i-prawo.md`, rozdz. 8). Do przeglądu służy prosta strona z galerią wariantów.
+**Proces dla każdego elementu:** opis → 2–3 warianty SVG → wybór i uwagi właściciela → poprawki → wersja końcowa w `art/` → optymalizacja SVGO → wpis w rejestrze pochodzenia (`12-bezpieczenstwo-i-prawo.md`, rozdz. 8). Do przeglądu służy prosta strona z galerią wariantów. Obrazy z domeny publicznej: wybór pliku w Commons (tylko Public domain albo CC0) → wpis w `art/paintings/sources.json` → `scripts/generate-paintings.py` → przegląd na `art/paintings-review.html` → wpis w rejestrze pochodzenia.
 
 **Pliki:** źródła w `art/` (SVG i przewodnik stylu), wersje zoptymalizowane trafiają do pakietu klienta. Pliki PNG (Google Play, ikony PWA) są renderowane automatycznie z SVG w CI. Formaty i rozmiary: `10-klient-web.md`, rozdz. 9.
 
