@@ -99,7 +99,7 @@ stateDiagram-v2
 
 Nawigacja główna (`app/Shell.tsx`) to ikony z podpisami (`art/icons/nav-*`). Na telefonie (do 650 px) tworzy pasek przyklejony do dolnej krawędzi ekranu, jak w grach mobilnych. Na tablecie (do 960 px) zajmuje osobny rząd pod nazwą gry. Ekrany sieciowe pokazują ikonami zamiast skrótów poziom, RP, Dukaty, statystyki i stany graczy (AFK, zajęty). Nazwa wartości zostaje w tekście alternatywnym i podpowiedzi. Ikony ekranów sieciowych (`art/icons/online/`, `app/onlineIcons.ts`) nie trafiają do pakietu offline. Lista graczy i boty treningowe mają małe portrety postaci.
 
-Każdy ekran zaczyna się obrazem swojego miejsca w złoconej ramie z tytułem na tabliczce (`components/Scene.tsx`, `art/paintings/scenes`). Mają go Kolekcja, Sklep, Klany, Konto i Ustawienia, a w Zamku także panel turniejów. Na ekranie startowym obraz wypełnia kartę powitalną pod zasłoną od strony tekstu. Każdy ekran pobiera tylko swoją scenę, więc sceny ekranów sieciowych nie trafiają do pakietu offline. Biblioteka czarów w Kolekcji pokazuje ilustracje kart (`app/cardArt.ts`, ładowany jak w walce).
+Każdy ekran zaczyna się obrazem swojego miejsca w złoconej ramie z tytułem na tabliczce (`components/Scene.tsx`, `art/paintings/scenes`). Mają go Kolekcja, Sklep, Klany, Konto i Ustawienia, a w Zamku także panel turniejów. Kolekcja, Sklep i Klany są w mieście budynkami, więc w rogu obrazu mają okrągły przycisk powrotu do mapy (`components/BackToMap.tsx`), taki sam jak wnętrza lobby. Na ekranie startowym obraz wypełnia kartę powitalną pod zasłoną od strony tekstu. Każdy ekran pobiera tylko swoją scenę, więc sceny ekranów sieciowych nie trafiają do pakietu offline. Biblioteka czarów w Kolekcji pokazuje ilustracje kart (`app/cardArt.ts`, ładowany jak w walce).
 
 ## 6. Ekran walki
 
@@ -231,7 +231,19 @@ Ten sam klient działa w aplikacji Android (Capacitor). Różnice (logowanie tok
 
 Trasa `#/lobby` ładuje osobny moduł z PL/EN: mapę, listę graczy i profil, czat/komendy, filtry, AFK, znajomych/ignorowanych, pocztę z paginacją i wyzwania. `net/client.ts` obsługuje binarny Protobuf, korelację odpowiedzi, reconnect z rozrzutem 0,5–8 s, resume i przejęcie sesji przez inne urządzenie. `net/commands.ts` zamienia komendy na typowane żądania. Tekst użytkownika jest renderowany jako tekst, bez HTML. Konto i lobby wymagają sieci i są pobierane na żądanie; podstawowy trening, ustawienia i gość pozostają offline. Utrata sieci podczas otwartego lobby zachowuje klienta i jego token wznowienia w RAM.
 
-Mapa pokazuje miejsca jako obrazy w złoconych ramach z tabliczką nazwy (`art/paintings/scenes`, ADR-021). Nad zakładkami jest obraz miejsca, w którym jest gracz, z nazwą (nagłówek miejsca) i opisem; poza pomieszczeniami jest to obraz mapy. Po wejściu do miejsca mapa zmniejsza się do rzędu małych kafli, a tło strony zmienia się na obraz miejsca (`placeBackdrop` w `app/session.ts`, ustawiane przez lobby).
+Mapa to jeden obraz miasta, jak ekran zamku w Heroes 3 albo menu gier mobilnych (`features/lobby/Town.tsx`, ADR-021). Miejsca są budynkami na obrazie (`art/paintings/scenes/town.avif`, obrysy w `art/paintings/town.json`):
+- Wieża, Biblioteka, Zamek, Portal, Arena, Klan, Trening, Bazar i Sklep.
+- Biblioteka prowadzi do Kolekcji. Klan bez klanu prowadzi do listy klanów.
+
+Budynki do kliknięcia są jasne już w pliku obrazu, a reszta miasta jest przygaszona i rozmyta. W kliencie każdy budynek ma złoty obrys i tabliczkę z nazwą, widoczne także bez najeżdżania, bo na telefonie najeżdżania nie ma. Najechanie albo fokus klawiatury rozjaśnia budynek, pogrubia obrys i pokazuje krótki opis. Gdy na gracza czeka wyzwanie, obrys Areny powoli pulsuje i ma czerwony znaczek, chyba że system prosi o ograniczenie ruchu.
+
+Dostępność i telefony:
+- Klawiatura i czytnik ekranu obsługują tabliczki (przyciski z nazwą miejsca). Kształty budynków to dodatkowe cele dla wskaźnika poza kolejnością Tab.
+- Na telefonie miasto ma stałą wysokość i przewija się w bok.
+
+Po wejściu do miejsca widać jego obraz w ramie z nazwą i opisem. W rogu jest okrągły przycisk powrotu do mapy, pod obrazem rząd tabliczek z pozostałymi miejscami, a niżej treść miejsca. Tło strony zmienia się wtedy na obraz miejsca, rozmyty i przygaszony, żeby nie konkurował z panelami (`placeBackdrop` w `app/session.ts`, atrybut `data-place`). Zakładka Mapa wraca do miasta bez wychodzenia z pomieszczenia, więc czat i lista graczy zostają.
+
+Pasek gracza nad zakładkami pokazuje portret, poziom i RP, ustawienie wyzwań, AFK i stan połączenia.
 
 ## Walka online F7
 

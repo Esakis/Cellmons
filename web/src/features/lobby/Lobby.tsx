@@ -13,6 +13,7 @@ import { account, restoreAccount } from '../../app/account';
 import { avatars, icon, portrait } from '../../app/content';
 import { onlineIcon } from '../../app/onlineIcons';
 import { setActivityBusy, setPlaceBackdrop } from '../../app/session';
+import { BackArrow } from '../../components/BackToMap';
 import { Scene } from '../../components/Scene';
 import { Stats } from '../../components/Stats';
 import '../../app/pathCatalog';
@@ -31,6 +32,7 @@ import pl from './pl.ftl?raw';
 import '../online.css';
 import type { DuelEnd, DuelSnapshot } from '../../generated/proto/game/v1/online_duel_pb';
 import type { TradeSnapshot } from '../../generated/proto/game/v1/trade_pb';
+import { placeIcon, Town } from './Town';
 
 const OnlineDuel = lazy(() => import('./OnlineDuel').then((m) => ({ default: m.OnlineDuel })));
 const OnlineRecords = lazy(() =>
@@ -41,10 +43,10 @@ const Trade = lazy(() => import('./Trade').then((m) => ({ default: m.Trade })));
 addTranslations({ pl, en });
 const rooms = ['arena', 'training', 'castle', 'portal', 'bazaar', 'shop', 'tower'];
 // Every clan room shares one place: its name, description and painting (art/paintings/scenes);
-// outside the rooms the player is on the map ("lobby" painting).
+// outside the rooms the player looks at the town (Town.tsx).
 const place = (room: string) => (room.startsWith('clan:') ? 'clan' : room);
 const scenes = import.meta.glob<string>(
-  '../../assets/paintings/scenes/{arena,training,castle,portal,expedition,bazaar,shop,tower,clan,lobby}.avif',
+  '../../assets/paintings/scenes/{arena,training,castle,portal,expedition,bazaar,shop,tower,clan}.avif',
   { eager: true, query: '?url', import: 'default' },
 );
 const scene = (room: string) => scenes[`../../assets/paintings/scenes/${place(room)}.avif`];
@@ -87,6 +89,8 @@ export function Lobby() {
   const [status, setStatus] = createSignal<Status>('connecting');
   const [me, setMe] = createSignal<PublicPlayer>();
   const [room, setRoom] = createSignal('');
+  // Inside the room's building, or back on the town map while still in the room (its chat and players).
+  const [inside, setInside] = createSignal(false);
   const [roomMotd, setRoomMotd] = createSignal('');
   const [players, setPlayers] = createSignal<PublicPlayer[]>([]);
   const [messages, setMessages] = createSignal<ChatMessage[]>([]);
@@ -121,7 +125,7 @@ export function Lobby() {
     const profile = me();
     if (profile) setActivityBusy(profile.busy);
   });
-  createEffect(() => setPlaceBackdrop(room() ? scene(room()) : undefined));
+  createEffect(() => setPlaceBackdrop(inside() && room() ? scene(room()) : undefined));
   const sorted = createMemo(() =>
     [...players()].sort((a, b) =>
       sort() === 'login'
@@ -195,6 +199,7 @@ export function Lobby() {
         break;
       case 'roomSnapshot':
         setRoom(body.value.room);
+        setInside(true);
         setRoomMotd(body.value.motd);
         setPlayers(body.value.players);
         setMessages(body.value.messages);
@@ -365,14 +370,69 @@ export function Lobby() {
   }
   const time = (value: bigint) =>
     new Date(Number(value)).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  function enter(name: string) {
+    if (name === room()) setInside(true);
+    else void send({ case: 'roomJoin', value: { $typeName: 'game.v1.RoomJoin', room: name } });
+  }
+  // A challenge waiting for the player's answer marks the arena on the map.
+  const challenged = () => offers().some((offer) => offer.to?.id === me()?.id);
+  const inRoom = () => tab() === 'map' && inside() && Boolean(room());
   return (
     <section class="lobby-page">
-      <div class="lobby-heading">
-        <div>
-          <p class="eyebrow">SPELLGAMBIT · ONLINE</p>
-          <h1>{t('lobby')}</h1>
-        </div>
-        <p role="status" data-testid="connection-status">
+      {/* The player's bar, as in mobile games: portrait, level and rating, challenge settings. */}
+      <div class="lobby-hud">
+        <h1 class="visually-hidden">{t('lobby')}</h1>
+        <Show when={me()}>
+          {(self) => (
+            <>
+              <Portrait player={self()} />
+              <strong>{self().login}</strong>
+              <span>
+                <Standing player={self()} />
+              </span>
+              <label>
+                <span class="lobby-hud-label">{t('lobby-challenges')}</span>
+                <select
+                  aria-label={t('lobby-challenges')}
+                  value={self().challengeFilter}
+                  disabled={!connected()}
+                  onChange={async (e) => {
+                    const filter = e.currentTarget.value;
+                    if (
+                      await send({
+                        case: 'setChallengeFilter',
+                        value: { $typeName: 'game.v1.SetChallengeFilter', filter },
+                      })
+                    )
+                      setMe((p) => (p ? { ...p, challengeFilter: filter } : p));
+                  }}
+                >
+                  <option value="all">{t('lobby-all')}</option>
+                  <option value="level_pm2">±2 {t('lobby-level-label')}</option>
+                  <option value="none">{t('lobby-none')}</option>
+                </select>
+              </label>
+              <button
+                type="button"
+                disabled={!connected()}
+                aria-pressed={self().afk}
+                onClick={async () => {
+                  if (
+                    await send({
+                      case: 'setAfk',
+                      value: { $typeName: 'game.v1.SetAfk', afk: !self().afk },
+                    })
+                  )
+                    setMe((p) => (p ? { ...p, afk: !p.afk } : p));
+                }}
+              >
+                <img class="icon" src={onlineIcon('afk')} alt="" />
+                AFK
+              </button>
+            </>
+          )}
+        </Show>
+        <p class="lobby-connection" role="status" data-testid="connection-status">
           {t(`lobby-status-${status()}`)}
         </p>
       </div>
@@ -423,72 +483,21 @@ export function Lobby() {
       <Show when={me()}>
         {(self) => (
           <>
-            <div class="lobby-toolbar">
-              <strong>{self().login}</strong>
-              <span>
-                <Standing player={self()} />
-              </span>
-              <label>
-                {t('lobby-challenges')}
-                <select
-                  aria-label={t('lobby-challenges')}
-                  value={self().challengeFilter}
-                  disabled={!connected()}
-                  onChange={async (e) => {
-                    const filter = e.currentTarget.value;
-                    if (
-                      await send({
-                        case: 'setChallengeFilter',
-                        value: { $typeName: 'game.v1.SetChallengeFilter', filter },
-                      })
-                    )
-                      setMe((p) => (p ? { ...p, challengeFilter: filter } : p));
-                  }}
-                >
-                  <option value="all">{t('lobby-all')}</option>
-                  <option value="level_pm2">±2 {t('lobby-level-label')}</option>
-                  <option value="none">{t('lobby-none')}</option>
-                </select>
-              </label>
-              <button
-                type="button"
-                disabled={!connected()}
-                aria-pressed={self().afk}
-                onClick={async () => {
-                  if (
-                    await send({
-                      case: 'setAfk',
-                      value: { $typeName: 'game.v1.SetAfk', afk: !self().afk },
-                    })
-                  )
-                    setMe((p) => (p ? { ...p, afk: !p.afk } : p));
-                }}
-              >
-                <img class="icon" src={onlineIcon('afk')} alt="" />
-                AFK
-              </button>
-            </div>
             <Show when={!self().verified}>
               <p class="lobby-hint">{t('lobby-unverified')}</p>
             </Show>
             <div class="lobby-layout">
               <div class="lobby-main">
-                <Scene
-                  src={scene(room() || 'lobby')}
-                  about={t(room() ? `lobby-room-${place(room())}-about` : 'lobby-map-about')}
-                >
-                  <h2 class="plaque">
-                    {t(room() ? `lobby-room-${place(room())}` : 'lobby-tab-map')}
-                  </h2>
-                </Scene>
-                <nav class="lobby-tabs" aria-label={t('lobby')}>
+                <nav class="lobby-tabs lobby-menu" aria-label={t('lobby')}>
                   <For each={['map', 'social', 'mail', 'ranking', 'history'] as const}>
                     {(value) => (
                       <button
                         type="button"
+                        class="plaque"
                         aria-pressed={tab() === value}
                         onClick={() => {
                           setTab(value);
+                          if (value === 'map') setInside(false);
                           if (value === 'mail') void loadMail();
                         }}
                       >
@@ -499,32 +508,47 @@ export function Lobby() {
                   </For>
                 </nav>
                 <Show when={tab() === 'map'}>
-                  <section
-                    class="lobby-map"
-                    classList={{ 'lobby-map-compact': Boolean(room()) }}
-                    aria-label={t('lobby-tab-map')}
+                  <Show
+                    when={inRoom()}
+                    fallback={
+                      <Town
+                        connected={connected()}
+                        clan={self().clanId}
+                        alert={challenged() ? 'arena' : ''}
+                        enter={enter}
+                      />
+                    }
                   >
-                    <For each={self().clanId ? [...rooms, `clan:${self().clanId}`] : rooms}>
-                      {(name) => (
-                        <button
-                          type="button"
-                          class="scene-frame"
-                          classList={{ current: room() === name }}
-                          aria-current={room() === name ? 'location' : undefined}
-                          disabled={!connected()}
-                          onClick={() =>
-                            void send({
-                              case: 'roomJoin',
-                              value: { $typeName: 'game.v1.RoomJoin', room: name },
-                            })
-                          }
-                        >
-                          <img src={scene(name)} alt="" width="960" height="540" />
-                          <span class="plaque">{t(`lobby-room-${place(name)}`)}</span>
-                        </button>
-                      )}
-                    </For>
-                  </section>
+                    {/* Inside a building: its painting, the way back and a quick way to the others. */}
+                    <Scene src={scene(room())} about={t(`lobby-room-${place(room())}-about`)}>
+                      <h2 class="plaque">{t(`lobby-room-${place(room())}`)}</h2>
+                      <button
+                        type="button"
+                        class="back-to-map medal"
+                        aria-label={t('back-to-map')}
+                        title={t('back-to-map')}
+                        onClick={() => setInside(false)}
+                      >
+                        <BackArrow />
+                      </button>
+                    </Scene>
+                    <nav class="lobby-travel" aria-label={t('lobby-travel')}>
+                      <For each={self().clanId ? [...rooms, `clan:${self().clanId}`] : rooms}>
+                        {(name) => (
+                          <button
+                            type="button"
+                            class="plaque"
+                            aria-current={room() === name ? 'location' : undefined}
+                            disabled={!connected()}
+                            onClick={() => enter(name)}
+                          >
+                            <img class="icon" src={placeIcon(place(name))} alt="" />
+                            {t(`lobby-room-${place(name)}`)}
+                          </button>
+                        )}
+                      </For>
+                    </nav>
+                  </Show>
                 </Show>
                 <Show when={tab() === 'ranking'}>
                   <OnlineRecords mode="ranking" send={send} select={setSelected} />
@@ -532,12 +556,12 @@ export function Lobby() {
                 <Show when={tab() === 'history'}>
                   <OnlineRecords mode="history" send={send} select={setSelected} />
                 </Show>
-                <Show when={room() === 'shop'}>
+                <Show when={inRoom() && room() === 'shop'}>
                   <A class="button primary lobby-enter" href="/store">
                     {t('store')}
                   </A>
                 </Show>
-                <Show when={room() === 'castle' && tab() === 'map'}>
+                <Show when={inRoom() && room() === 'castle'}>
                   <div hidden={Boolean(duel() || trade())}>
                     <Tournaments
                       send={send}
@@ -547,12 +571,12 @@ export function Lobby() {
                     />
                   </div>
                 </Show>
-                <Show when={room() === 'tower' || self().clanId}>
+                <Show when={inRoom() && (room() === 'tower' || room().startsWith('clan:'))}>
                   <A class="button secondary lobby-enter" href="/clans">
                     {t('clans')}
                   </A>
                 </Show>
-                <Show when={room() === 'portal' || room() === 'expedition'}>
+                <Show when={inRoom() && (room() === 'portal' || room() === 'expedition')}>
                   <div hidden={Boolean(duel() || trade())}>
                     <Expeditions
                       avatar={self().avatarId}
@@ -564,7 +588,7 @@ export function Lobby() {
                     />
                   </div>
                 </Show>
-                <Show when={room() === 'training' && tab() === 'map'}>
+                <Show when={inRoom() && room() === 'training'}>
                   <section class="lobby-panel">
                     <h2>{t('online-bots')}</h2>
                     <p>{t('online-training-help')}</p>

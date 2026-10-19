@@ -50,9 +50,11 @@
   --card-muted: #6b5a42;
   --card-line: #b39f78;
   --card-error: #8a2a17;
-  /* Black glyphs tinted to aged brass (#d4bb86) and, on dark enamel, to bone (#dccfb6). */
-  --icon-filter: invert(79%) sepia(8%) saturate(1326%) hue-rotate(3deg) brightness(94%)
+  /* Black glyphs tinted to aged brass (#d4bb86) and, on dark enamel, to bone (#dccfb6).
+     Brass on plaques and medals stays in the light theme too, because they stay dark. */
+  --icon-filter-brass: invert(79%) sepia(8%) saturate(1326%) hue-rotate(3deg) brightness(94%)
     contrast(93%);
+  --icon-filter: var(--icon-filter-brass);
   --icon-filter-bone: invert(85%) sepia(28%) saturate(174%) hue-rotate(1deg) brightness(92%)
     contrast(96%);
   /* Card frames as moulded picture frames: bands of light and shadow across the profile. */

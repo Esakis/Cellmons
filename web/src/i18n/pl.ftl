@@ -156,6 +156,7 @@ auth-play-guest = Graj jako gość
 auth-guest-short = Wypróbuj grę bez konta. Tryb gościa działa lokalnie, bez zapisywania danych i postępu.
 auth-guest-active = Grasz jako gość. Dane i postęp znikną po odświeżeniu strony.
 lobby = Lobby
+back-to-map = Wróć do mapy
 lobby-gate = Lobby wymaga konta i połączenia z internetem. Gość korzysta z treningu offline.
 
 collection = Kolekcja

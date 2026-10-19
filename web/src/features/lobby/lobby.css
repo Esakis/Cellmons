@@ -11,8 +11,6 @@
   border-radius: 6px;
   padding: 0.65rem;
 }
-.lobby-heading,
-.lobby-toolbar,
 .lobby-chat-heading,
 .lobby-social-row {
   display: flex;
@@ -21,20 +19,40 @@
   gap: 1rem;
   flex-wrap: wrap;
 }
-.lobby-heading h1 {
-  margin: 0.2rem 0 1rem;
+/* The player's bar, as in mobile games: portrait, level and rating, challenges, connection. */
+.lobby-hud {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
+  padding: 0.6rem 1rem;
+  border-radius: 12px;
+  background: var(--panel-bg);
+  box-shadow: var(--panel-shadow);
 }
-.lobby-toolbar {
-  justify-content: flex-start;
-  padding: 1rem 0;
-  border-block: 1px solid var(--color-border);
+.lobby-hud .portrait {
+  width: 48px;
+  height: 48px;
 }
-.lobby-toolbar label,
+.lobby-hud strong {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.05em;
+  color: var(--heading);
+}
+.lobby-hud label,
 .lobby-chat-heading label {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-size: 0.85rem;
+}
+.lobby-connection {
+  margin: 0 0 0 auto;
+  padding: 0.3rem 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  font-size: 0.75rem;
 }
 .lobby-layout {
   display: grid;
@@ -53,73 +71,189 @@
   flex-wrap: wrap;
 }
 .lobby-tabs [aria-pressed="true"],
-.lobby-toolbar [aria-pressed="true"] {
+.lobby-hud [aria-pressed="true"] {
   border-color: var(--gold);
   color: var(--gold);
+}
+/* The lobby's own menu: plaques with the icon above the name. */
+.lobby-menu {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+.lobby-menu button {
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.5rem 0.2rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+}
+.lobby-menu .icon {
+  width: 1.6rem;
+  height: 1.6rem;
+  margin: 0;
+}
+.lobby-menu [aria-pressed="true"] {
+  color: var(--plaque-text);
+  border-color: var(--gold-bright);
+  box-shadow: 0 0 14px rgb(224 198 142 / 0.45);
 }
 .lobby-value {
   white-space: nowrap;
 }
-/* Places as framed paintings with a name plaque; inside a place the map shrinks to small doors. */
-.lobby-map {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.9rem;
-  margin-bottom: 1.25rem;
-}
-.lobby-map.lobby-map-compact {
-  grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
-  gap: 0.5rem;
-}
-.lobby-map button {
-  min-height: 0;
-  padding: 0;
-}
-.lobby-map button::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, transparent 45%, rgb(8 7 8 / 0.85));
-  box-shadow: inset 0 0 32px rgb(0 0 0 / 0.65);
-}
-.lobby-map img {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 16 / 10;
-}
-.lobby-map span {
-  position: absolute;
-  z-index: 1;
-  left: 50%;
-  bottom: 0.55rem;
-  transform: translateX(-50%);
-  max-width: calc(100% - 0.75rem);
-  padding: 0.15rem 0.8rem;
+/* The town map (Town.tsx): the painting keeps its proportions; phones pan it sideways. */
+.town-view {
   overflow: hidden;
-  font-size: 0.9rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.lobby-map.lobby-map-compact span {
-  bottom: 0.3rem;
-  padding: 0.05rem 0.4rem;
-  font-size: 0.66rem;
-  letter-spacing: 0.08em;
-}
-.lobby-map .current {
+  border: 3px solid transparent;
+  border-radius: 4px;
+  background: var(--gilt) border-box;
   box-shadow:
     0 0 0 1px #000,
-    0 0 0 3px rgb(224 198 142 / 0.55),
-    0 0 26px rgb(224 198 142 / 0.4);
+    0 10px 22px rgb(0 0 0 / 0.55);
+  margin-bottom: 1rem;
 }
+.town-canvas {
+  position: relative;
+  aspect-ratio: 1920 / 1302;
+}
+.town-canvas > img,
+.town-canvas > svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.town-canvas > svg {
+  pointer-events: none;
+}
+/* Each building's own shape answers the pointer; the plaque is the control for keyboards. */
+.town-shape {
+  position: absolute;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+/* At rest the lit building has a faint gilt rim; hover or focus brightens it. */
+.town-shape.hot {
+  background: rgb(255 228 160 / 0.55);
+  mix-blend-mode: soft-light;
+}
+.town-edge {
+  fill: none;
+  stroke: #f3cf73;
+  stroke-opacity: 0.45;
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.town-edge.hot {
+  stroke: #ffe08a;
+  stroke-opacity: 1;
+  stroke-width: 3;
+}
+/* Something waits inside (a challenge): the rim breathes slowly. */
 @media (prefers-reduced-motion: no-preference) {
-  .lobby-map img {
-    transition: transform 0.35s ease;
+  .town-edge.alert {
+    animation: town-breathe 2.8s ease-in-out infinite;
   }
-  .lobby-map button:hover:not(:disabled) img {
-    transform: scale(1.05);
+}
+@keyframes town-breathe {
+  50% {
+    stroke-opacity: 0.95;
+    stroke-width: 2.6;
   }
+}
+.town-place {
+  position: absolute;
+  z-index: 1;
+  display: inline-flex;
+  min-height: 0;
+  gap: 7px;
+  padding: 2px 13px 2px 2px;
+  border-radius: 22px;
+  transform: translate(-50%, calc(-100% - 9px));
+  font-size: 0.8rem;
+  text-align: left;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform 0.15s;
+}
+.town-place::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -7px;
+  width: 11px;
+  height: 11px;
+  background: #110e0b;
+  transform: translateX(-50%) rotate(45deg);
+  box-shadow: 1px 1px 0 var(--gold);
+}
+.town-place.hot,
+.town-place:focus-visible {
+  z-index: 2;
+  transform: translate(-50%, calc(-100% - 9px)) scale(1.08);
+  box-shadow: 0 0 22px rgb(240 200 110 / 0.7);
+}
+.town-place .medal {
+  width: 30px;
+  height: 30px;
+}
+/* The one-line hint only on hover or keyboard focus: at rest the town shows names alone. */
+.town-hint {
+  display: none;
+  font:
+    500 0.68rem "Inter Variable",
+    system-ui,
+    sans-serif;
+  text-transform: none;
+}
+.town-place.hot .town-hint,
+.town-place:focus-visible .town-hint {
+  display: block;
+}
+.town-badge {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  min-width: 19px;
+  border-radius: 10px;
+  font:
+    700 11px / 19px "Inter Variable",
+    system-ui,
+    sans-serif;
+  text-align: center;
+  color: #fff;
+  background: #a62716;
+  box-shadow: 0 0 0 1.5px #000;
+}
+/* Inside a building: its painting with the way back to the map, then the other places. */
+.lobby-travel {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+.lobby-travel button {
+  min-height: 40px;
+  padding: 0.3rem 0.8rem 0.3rem 0.45rem;
+  border-radius: 22px;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+}
+.lobby-travel .icon {
+  width: 1.4rem;
+  height: 1.4rem;
+  margin-right: 0.1rem;
+}
+.lobby-travel [aria-current] {
+  border-color: var(--gold-bright);
+  box-shadow: 0 0 12px rgb(224 198 142 / 0.45);
 }
 .lobby-enter {
   margin-bottom: 1rem;
@@ -268,39 +402,60 @@
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 1rem;
   }
-  .lobby-map {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.6rem;
+  /* The town keeps a playable height and pans sideways instead of shrinking. */
+  .town-view {
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
   }
-  .lobby-map.lobby-map-compact {
-    grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr));
-    gap: 0.4rem;
+  .town-canvas {
+    --town-height: clamp(360px, 62svh, 540px);
+    width: calc(var(--town-height) * 1920 / 1302);
+    height: var(--town-height);
   }
-  .lobby-map span {
-    font-size: 0.75rem;
-    padding: 0.1rem 0.6rem;
+  .town-place {
+    font-size: 0.66rem;
   }
-  /* Tabs in one row: icon above the label. */
-  nav.lobby-tabs {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+  .town-place .medal {
+    width: 24px;
+    height: 24px;
+  }
+  .lobby-menu {
     gap: 0.35rem;
   }
-  nav.lobby-tabs button {
-    flex-direction: column;
-    gap: 0.2rem;
-    padding: 0.45rem 0.15rem;
-    font-size: 0.68rem;
-    line-height: 1.2;
-    text-align: center;
+  .lobby-menu button {
+    min-height: 0;
+    padding: 0.35rem 0.1rem;
+    font-size: 0.56rem;
+    letter-spacing: 0.04em;
   }
-  nav.lobby-tabs .icon {
-    width: 1.5rem;
-    height: 1.5rem;
-    margin: 0;
+  .lobby-menu .icon {
+    width: 1.3rem;
+    height: 1.3rem;
   }
-  .lobby-heading {
-    align-items: flex-start;
+  /* A slim player's bar: the select keeps its name for screen readers. */
+  .lobby-hud {
+    gap: 0.4rem 0.6rem;
+    padding: 0.45rem 0.6rem;
+  }
+  .lobby-hud .portrait {
+    width: 36px;
+    height: 36px;
+  }
+  .lobby-hud strong {
+    font-size: 0.85rem;
+  }
+  .lobby-hud-label {
+    display: none;
+  }
+  .lobby-hud select,
+  .lobby-hud button {
+    min-height: 40px;
+    padding-block: 0.3rem;
+  }
+  .lobby-connection {
+    padding: 0.2rem 0.6rem;
   }
   .lobby-chat-heading select {
     max-width: 160px;
@@ -309,9 +464,11 @@
     height: 240px;
   }
 }
-.lobby-tabs [aria-pressed="true"] .icon,
-.lobby-toolbar [aria-pressed="true"] .icon {
+.lobby-hud [aria-pressed="true"] .icon {
   filter: var(--icon-filter) drop-shadow(0 0 5px rgb(224 198 142 / 0.7));
+}
+.lobby-menu [aria-pressed="true"] .icon {
+  filter: var(--icon-filter-brass) drop-shadow(0 0 5px rgb(224 198 142 / 0.7));
 }
 
 .online-duel {

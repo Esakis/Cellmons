@@ -15,6 +15,7 @@ dist/
 /deploy/private/
 /web/src/generated/paths.json
 /web/src/generated/path-overlays.json
+/web/src/generated/town.json
 /web/src/generated/training-wire.json
 /web/src/generated/online-wire.json
 __pycache__/

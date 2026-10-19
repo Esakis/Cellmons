@@ -3,6 +3,7 @@ import { createEffect, createMemo, createSignal, For, onCleanup, Show } from 'so
 import { ApiError, account, accountEpoch, api, restoreAccount } from '../../app/account';
 import { avatars, cards, content, fluentKey } from '../../app/content';
 import { onlineIcon } from '../../app/onlineIcons';
+import { BackToMap } from '../../components/BackToMap';
 import { Modal } from '../../components/Modal';
 import { Scene } from '../../components/Scene';
 import { addTranslations, hasTranslation, language, t } from '../../i18n';
@@ -160,6 +161,7 @@ export function Store() {
     <section class="store-page">
       <Scene src={painting}>
         <h1 class="plaque">{t('store')}</h1>
+        <BackToMap />
       </Scene>
       <Show
         when={ready()}

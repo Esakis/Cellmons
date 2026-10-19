@@ -28,6 +28,11 @@ body::before {
     var(--backdrop-veil),
     var(--backdrop, none) center 30% / cover no-repeat;
 }
+/* A place's painting (a lobby room) sits behind panels and text: soft and quiet, so it does not compete. */
+:root[data-place] body::before {
+  filter: blur(3px) saturate(0.8);
+  transform: scale(1.03);
+}
 /* On phones the main navigation is a bar along the bottom edge (App.module.css). */
 @media (max-width: 650px) {
   body {
@@ -104,6 +109,15 @@ img[src$=".avif"] {
   object-fit: cover;
   object-position: 50% 35%;
 }
+/* Named for screen readers only. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
 /* An icon inside a line of text (art/icons), tinted like the theme's ornaments. */
 .icon {
   width: 1.3em;
@@ -141,8 +155,9 @@ img[src$=".avif"] {
     0 0 0 2px var(--gold),
     0 0 0 3px #000;
 }
-/* A place's painting in a gilt frame with its name on a plaque (components/Scene.tsx, lobby map). */
+/* A place's painting in a gilt frame with its name on a plaque (components/Scene.tsx). */
 .scene {
+  position: relative;
   margin-bottom: 1.25rem;
   text-align: center;
 }
@@ -185,6 +200,37 @@ img[src$=".avif"] {
   padding: 0.3rem 1.6rem;
   font-size: 1.35rem;
   letter-spacing: 0.16em;
+}
+/* Dark enamel in a gilt ring: icons on places, menus and the way back. Like plaques, the same in both themes. */
+.medal {
+  display: grid;
+  place-items: center;
+  flex: none;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 35%, #3a2d1d, #120d09 70%);
+  box-shadow:
+    0 0 0 2px #c9a75c,
+    0 0 0 3px #000;
+}
+.medal img,
+.medal svg {
+  width: 60%;
+  height: 60%;
+}
+.plaque .icon,
+.medal img,
+.medal svg {
+  filter: var(--icon-filter-brass);
+}
+/* The way back from a place to the town map, at the top left of its painting. */
+.back-to-map {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 48px;
+  min-height: 48px;
+  padding: 0;
+  border: 0;
 }
 .scene p {
   max-width: 40rem;

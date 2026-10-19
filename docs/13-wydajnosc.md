@@ -13,7 +13,7 @@ Wydajność jest głównym wymaganiem projektu. Ten dokument określa budżety (
 | Czcionki | ≤ 40 KB | kontrola rozmiaru w CI |
 | Pierwsze załadowanie łącznie (bez ilustracji kart) | ≤ 205 KB | Lighthouse CI; kontrola rozmiaru w CI (cała aplikacja offline bez modułu ilustracji) |
 | Ilustracje kart (jeden leniwie ładowany moduł `cardArt`), po Brotli | ≤ 80 KB | kontrola rozmiaru w CI |
-| Malowane ilustracje i portrety (AVIF, w pakiecie offline, ADR-021) | ≤ 6 MB łącznie, ≤ 32 KB na plik | kontrola rozmiaru w CI |
+| Malowane ilustracje i portrety (AVIF, w pakiecie offline, ADR-021) | ≤ 6 MB łącznie, ≤ 32 KB na plik; obraz miasta w lobby ≤ 64 KB | kontrola rozmiaru w CI |
 | Pakiet ekranu walki (ładowany leniwie) | ≤ 40 KB | kontrola rozmiaru w CI |
 | `engine-wasm` po Brotli | ≤ 90 KB | kontrola rozmiaru w CI |
 | Dane treści (`content.<hash>.json`) po Brotli | ≤ 50 KB | kontrola rozmiaru w CI |
@@ -27,7 +27,7 @@ Wydajność jest głównym wymaganiem projektu. Ten dokument określa budżety (
 
 ### 1.2. Sieć
 
-Moduły konta i lobby mają dodatkowy limit implementacyjny 50 KiB Brotli. Turnieje, wyprawy oraz administracja z moderacją mają osobne limity po 20 KiB i nie należą do aplikacji offline. `check-web-budget.mjs` mierzy te zakresy oddzielnie od pakietu offline. 2026-10-18 właściciel podniósł limity na potrzeby malowanego interfejsu (ADR-021): pakiet offline z 200 do 205 KiB, moduły konta i lobby z 45 do 50 KiB. Od F12 kontroluje też **pełny początkowy graf trasy lobby wraz ze wspólnym kodem startowym** (59,3/70 KiB w pełnym przebiegu F12). Katalog 330 kart z tekstami jest ładowany z kolekcją lub walką i nadal w całości należy do pakietu offline (199,4/200 KiB). Sam moduł startowy ma 41,0 KiB, a dodatkowy kod walki wraz z katalogiem 37,6/40 KiB. Historia, wymiana i walka online są ładowane po wejściu w daną funkcję. Te pomiary nie zastępują testów urządzeń, LCP/INP ani obciążenia serwera w F13.
+Moduły konta i lobby mają dodatkowy limit implementacyjny 53 KiB Brotli. Turnieje, wyprawy oraz administracja z moderacją mają osobne limity po 20 KiB i nie należą do aplikacji offline. `check-web-budget.mjs` mierzy te zakresy oddzielnie od pakietu offline. 2026-10-18 właściciel podniósł limity na potrzeby malowanego interfejsu (ADR-021): pakiet offline z 200 do 205 KiB, moduły konta i lobby z 45 do 50 KiB. 2026-10-19 limit modułów konta i lobby podniesiony do 53 KiB na mapę miasta i wnętrza budynków (ok. 1,8 KiB samego miasta; lobby ładuje jeden obraz miasta zamiast kilku obrazów kafli). Od F12 kontroluje też **pełny początkowy graf trasy lobby wraz ze wspólnym kodem startowym** (59,3/70 KiB w pełnym przebiegu F12). Katalog 330 kart z tekstami jest ładowany z kolekcją lub walką i nadal w całości należy do pakietu offline (199,4/200 KiB). Sam moduł startowy ma 41,0 KiB, a dodatkowy kod walki wraz z katalogiem 37,6/40 KiB. Historia, wymiana i walka online są ładowane po wejściu w daną funkcję. Te pomiary nie zastępują testów urządzeń, LCP/INP ani obciążenia serwera w F13.
 
 | Miara | Budżet |
 |---|---|

@@ -20,6 +20,7 @@ import {
   statIcons,
 } from '../../app/content';
 import { setTrainingPlayer } from '../../app/trainingPlayer';
+import { BackToMap } from '../../components/BackToMap';
 import { Modal } from '../../components/Modal';
 import { Scene } from '../../components/Scene';
 import { addTranslations, hasTranslation, t } from '../../i18n';
@@ -206,9 +207,7 @@ export function Collection() {
     <section class="collection-page">
       <Scene src={painting}>
         <h1 class="plaque">{t('collection-title')}</h1>
-        <p>
-          <A href="/lobby">{t('lobby')}</A>
-        </p>
+        <BackToMap />
       </Scene>
       <Show
         when={account()}

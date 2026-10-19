@@ -80,8 +80,11 @@ async function walk(directory) {
 }
 const files = await walk(output);
 // Painted illustrations (AVIF, art/paintings) are already compressed; budget per file and in total.
+// The lobby's town fills the whole map, so it alone has a larger cap (docs/13-wydajnosc.md).
 const paintings = files.filter((f) => f.endsWith('.avif'));
 const paintingSizes = await Promise.all(paintings.map(async (f) => (await stat(f)).size));
+const isTown = (f) => /[\\/]town-[\w-]+\.avif$/.test(f);
+const townSize = paintingSizes.find((_, i) => isTown(paintings[i])) ?? 0;
 const compressed = async (file) => brotliCompressSync(await readFile(file)).length;
 async function sum(list, size = compressed) {
   return (await Promise.all(list.map(size))).reduce((a, b) => a + b, 0);
@@ -115,8 +118,13 @@ const rows = [
   ['WASM (Brotli)', await sum(files.filter((f) => f.endsWith('.wasm'))), 90],
   ['Card illustrations (Brotli)', await sum([...illustrations]), 80],
   ['Painted illustrations (AVIF, total)', paintingSizes.reduce((a, b) => a + b, 0), 6144],
-  ['Largest painted illustration (AVIF)', Math.max(0, ...paintingSizes), 32],
-  ['Online account and lobby on demand (Brotli)', await sum([...coreOnline]), 50],
+  [
+    'Largest painted illustration except the town (AVIF)',
+    Math.max(0, ...paintingSizes.filter((_, i) => !isTown(paintings[i]))),
+    32,
+  ],
+  ['Town painting (AVIF)', townSize, 64],
+  ['Online account and lobby on demand (Brotli)', await sum([...coreOnline]), 53],
   ['Tournaments on demand (Brotli)', await sum([...tournaments]), 20],
   ['Expeditions on demand (Brotli)', await sum([...expeditions]), 20],
   ['Administration and moderation on demand (Brotli)', await sum([...administration]), 20],

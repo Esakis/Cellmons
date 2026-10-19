@@ -96,7 +96,9 @@ Ramki (`frame-bronze.svg`, `frame-silver.svg`, `frame-gold.svg`) nie zawierają 
 
 - `icons/` (z `icons/online/`), `frames/`, `avatars/`, `cards/`: źródła SVG; przed włączeniem do klienta przechodzą przez SVGO (`scripts/prepare-web.mjs`).
 - `paintings/backdrops/`: tła widoków (16 : 9, rozmyte i przyciemnione; `Shell.tsx` wybiera tło według trasy, `default` dla pozostałych).
-- `paintings/scenes/`: sceny miejsc (16 : 9, 960 × 540, ostre): kafle mapy lobby, baner miejsca, w którym jest gracz (poza pomieszczeniami `lobby`), tło strony w tym miejscu oraz banery ekranów (`home`, `collection`, `shop`, `clan`, `account`, `settings`, `tournament`).
+- `paintings/scenes/`: sceny miejsc (16 : 9, 960 × 540, ostre): baner miejsca, w którym jest gracz, tło strony w tym miejscu oraz banery ekranów (`home`, `collection`, `shop`, `clan`, `account`, `settings`, `tournament`).
+- `paintings/scenes/town.avif` i `paintings/town.json`: mapa lobby jako jedno miasto (1920 × 1302, limit 64 KB). `town.json` trzyma rozmiar obrazu, obrysy budynków i punkty tabliczek w procentach obrazu. Na jego podstawie `generate-paintings.py` przygasza wszystko poza budynkami, a klient (`Town.tsx`) rysuje obrysy i tabliczki. Po przesunięciu budynku trzeba poprawić `town.json` i wygenerować obraz od nowa (`python scripts/generate-paintings.py scene.town`).
 - `paintings/`: pliki AVIF i `sources.json`; `prepare-web.mjs` kopiuje je do `web/src/assets/paintings/` i pomija SVG o tej samej nazwie.
 - Budżet (`scripts/check-web-budget.mjs`): obrazy ≤ 6 MB łącznie i ≤ 32 KB na plik; pozostałe budżety z `docs/13-wydajnosc.md` bez zmian.
 - Nowy obraz: wybór pliku w Commons (licencja!) → wpis w `sources.json` → `python scripts/generate-paintings.py card.klucz` → przegląd → wpis w `PROVENANCE.md`.
+- Ilustracja karty musi być czytelna w rozmiarze karty: jeden temat, duże kształty, bez drobnej faktury na całym kadrze (ryciny, rękopisy, tłumy). Skrypt podaje czytelność każdej karty i kończy się błędem poniżej 3; `python scripts/generate-paintings.py --check` sprawdza wszystkie karty bez pobierania źródeł.

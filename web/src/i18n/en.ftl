@@ -156,6 +156,7 @@ auth-play-guest = Play as guest
 auth-guest-short = Try the game without an account. Guest mode runs locally without saving data or progress.
 auth-guest-active = Playing as guest. Your data and progress disappear when you reload the page.
 lobby = Lobby
+back-to-map = Back to the map
 lobby-gate = Lobby requires an account and an internet connection. Guests can play offline training.
 
 collection = Collection

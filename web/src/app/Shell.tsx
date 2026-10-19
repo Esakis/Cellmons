@@ -45,6 +45,7 @@ export function Shell(props: ParentProps) {
   createEffect(() => {
     const url = placeBackdrop() ?? backdrop(route.pathname);
     document.documentElement.style.setProperty('--backdrop', url ? `url("${url}")` : 'none');
+    document.documentElement.toggleAttribute('data-place', Boolean(placeBackdrop()));
   });
   return (
     <>

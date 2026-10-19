@@ -355,6 +355,15 @@ Konto z niepotwierdzonym e-mailem pozostaje trwałym kontem z ograniczeniami R-K
 - Paleta interfejsu: czernione żelazo, postarzany mosiądz i bordo z drobnym ziarnem. Kolor niesie znaczenie (życie, typ ataku, koszty), a nie dekorację.
 - Obrazy są częścią pakietu offline (PWA, APK). Budżet: ≤ 6 MB łącznie i ≤ 32 KB na plik (`scripts/check-web-budget.mjs`); pozostałe budżety bez zmian.
 - Uzupełnienie 2026-10-18 (prośba właściciela: „wchodzę w zamek i grafika zamków”, jak w grach na telefon): każde miejsce ma scenę z tego samego źródła i z tą samą korektą (`art/paintings/scenes/`, 16 : 9, 960 × 540, ostra). Mapa lobby to obrazy miejsc w złoconych ramach z tabliczką nazwy; po wejściu do miejsca nad zakładkami jest jego obraz z nazwą i opisem, a tło strony zmienia się na ten obraz. Na ten interfejs właściciel podniósł limity: pakiet offline 205 KiB, moduły konta i lobby 50 KiB (`13-wydajnosc.md`). Ikony z game-icons.net zastępują tekst w nawigacji (na telefonie pasek u dołu ekranu), w zakładkach lobby oraz przy poziomie, RP, Dukatach, statystykach i stanach graczy; lista graczy i boty mają małe portrety. Pozostałe ekrany (start, Kolekcja, Sklep, Klany, Konto, Ustawienia, turnieje w Zamku) zaczynają się obrazem w ramie z tytułem na tabliczce, a biblioteka czarów pokazuje ilustracje kart.
+- Uzupełnienie 2026-10-18, wieczorem. Właściciel: „dodałeś grafiki tylko do tego, co miało symbole” i przykład ekranu zamku z Heroes 3. Do tego uwagi do makiety: elementy mają być wyróżnione także przed najechaniem, a obrazy mają za dużo szczegółów.
+  - Mapa lobby to jeden obraz miasta (Cole, „The Consummation”) z budynkami-miejscami.
+  - Analiza szczegółowości wykazała, że w oryginale wzrok ściąga niebo (budynki do kliknięcia, 14% obrazu, dostawały 33% uwagi). Filtr upraszczający nic nie dawał.
+  - `generate-paintings.py` zostawia więc budynki jasne i ostre, a resztę miasta przygasza, szarzy i rozmywa. Uwaga na budynkach rośnie do 56%, a plik maleje ze 137 do 55 KiB.
+  - Obraz miasta ma własny limit 64 KiB, bo wypełnia całą mapę. Moduły konta i lobby mają od 2026-10-19 limit 53 KiB (zgoda właściciela).
+  - W kliencie budynki mają stały złoty obrys i tabliczkę z nazwą; najechanie je rozjaśnia.
+  - Tło strony w pomieszczeniu jest rozmyte, żeby obraz nie konkurował z panelami.
+  - Ilustracja karty ma jeden temat i duże kształty, bo w grze karta ma ok. 176 × 110 px. Miara czytelności (kontrast dużych kształtów do drobnych szczegółów w rozmiarze karty) musi wynosić co najmniej 3; `generate-paintings.py` kończy się błędem poniżej progu, a `--check` sprawdza wszystkie karty. Po analizie 30 kart dostało inne obrazy (głównie ryciny, rękopisy i tłumy), a 12 ciaśniejszy kadr.
+  - Kolekcja, Sklep i Klany, które w mieście są budynkami, mają w rogu obrazu ten sam okrągły przycisk powrotu do mapy co wnętrza lobby (`components/BackToMap.tsx`).
 
 **Alternatywy:**
 

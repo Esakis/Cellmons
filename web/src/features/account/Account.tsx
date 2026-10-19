@@ -213,10 +213,12 @@ export function AccountPage() {
         setNotice(t('auth-email-sent'));
       } else if (current === 'verify') {
         await api('/api/auth/verify-email', { token: token() });
+        // Refresh first: the sign-in form appears only when the reset below can no longer
+        // clear what the player has started typing into it.
+        await restoreAccount();
         setToken('');
         setMode('login');
         setNotice(t('auth-verified'));
-        await restoreAccount();
       } else {
         await api('/api/auth/password-reset/confirm', {
           token: token(),

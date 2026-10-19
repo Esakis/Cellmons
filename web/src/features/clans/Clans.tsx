@@ -2,6 +2,7 @@ import { A, useBeforeLeave } from '@solidjs/router';
 import { createEffect, createMemo, createSignal, For, lazy, onCleanup, Show } from 'solid-js';
 import { ApiError, account, accountEpoch, api, restoreAccount } from '../../app/account';
 import { content } from '../../app/content';
+import { BackToMap } from '../../components/BackToMap';
 import { Modal } from '../../components/Modal';
 import { Scene } from '../../components/Scene';
 import { addTranslations, hasTranslation, language, t } from '../../i18n';
@@ -176,9 +177,7 @@ export function Clans() {
     <section class="clans-page">
       <Scene src={painting}>
         <h1 class="plaque">{t('clans')}</h1>
-        <p>
-          <A href="/lobby">{t('lobby')}</A>
-        </p>
+        <BackToMap />
       </Scene>
       <Show
         when={account()?.kind === 'account'}

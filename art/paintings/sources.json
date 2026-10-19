@@ -1,11 +1,10 @@
 {
   "card.absolute_interlock": {
-    "file": "File:Piranesi-Carceri-16Pfeiler mit Ketten.jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3APiranesi-Carceri-16Pfeiler_mit_Ketten.jpg",
-    "painter": "Giovanni Battista Piranesi",
-    "license": "CC0",
-    "box": [0, 0.05, 1, 0.89],
-    "grade": { "target_mean": 0.3, "ceiling": 0.82 }
+    "file": "File:Joseph Wright of Derby (1734-1797) - The Captive (from Laurence Sterne's 'A Sentimental Journey') - 1954-219-4 - Derby Museum and Art Gallery.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File%3AJoseph_Wright_of_Derby_%281734-1797%29_-_The_Captive_%28from_Laurence_Sterne%27s_%27A_Sentimental_Journey%27%29_-_1954-219-4_-_Derby_Museum_and_Art_Gallery.jpg",
+    "painter": "Joseph Wright of Derby",
+    "license": "Public domain",
+    "box": [0, 0, 1, 1]
   },
   "card.absolving_flame": {
     "file": "File:William Turner- The Angel, Standing in the Sun.JPG",
@@ -22,11 +21,11 @@
     "box": [0, 0.12, 1, 0.653]
   },
   "card.aether_amplifier": {
-    "file": "File:Tycho-Brahe-Mural-Quadrant.jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3ATycho-Brahe-Mural-Quadrant.jpg",
-    "painter": "anonim, rycina z „Astronomiae instauratae mechanica” Tychona Brahe (1598)",
+    "file": "File:Godefridus Schalcken - Lady at a Mirror by Candlelight - 159 - Mauritshuis.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File%3AGodefridus_Schalcken_-_Lady_at_a_Mirror_by_Candlelight_-_159_-_Mauritshuis.jpg",
+    "painter": "Godfried Schalcken",
     "license": "Public domain",
-    "box": [0, 0.22, 1, 0.683]
+    "box": [0.04, 0.14, 0.96, 0.62]
   },
   "card.aether_field": {
     "file": "File:Frederic Edwin Church - Aurora Borealis - Google Art Project.jpg",
@@ -44,11 +43,11 @@
     "box": [0, 0.03, 1, 0.96]
   },
   "card.apprentice_sigil": {
-    "file": "File:Albrecht Dürer, Melencolia I, 1514, NGA 6640.jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3AAlbrecht_D%C3%BCrer%2C_Melencolia_I%2C_1514%2C_NGA_6640.jpg",
-    "painter": "Albrecht Dürer",
-    "license": "CC0",
-    "box": [0, 0.08, 1, 0.568]
+    "file": "File:Jean Siméon Chardin - Young Student Drawing - Google Art Project.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File%3AJean_Sim%C3%A9on_Chardin_-_Young_Student_Drawing_-_Google_Art_Project.jpg",
+    "painter": "Jean-Baptiste-Siméon Chardin",
+    "license": "Public domain",
+    "box": [0, 0.12, 1, 0.7]
   },
   "card.apprentices_retort": {
     "file": "File:David Teniers de Jonge - The Alchemist - 261 - Mauritshuis.jpg",
@@ -58,11 +57,11 @@
     "box": [0, 0.05, 1, 0.9]
   },
   "card.arcane_amplifier": {
-    "file": "File:Jan Brueghel I & Peter Paul Rubens - Sight (Museo del Prado).jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3AJan_Brueghel_I_%26_Peter_Paul_Rubens_-_Sight_%28Museo_del_Prado%29.jpg",
-    "painter": "Jan Brueghel starszy i Peter Paul Rubens",
+    "file": "File:John William Waterhouse - The Crystal Ball.JPG",
+    "page": "https://commons.wikimedia.org/wiki/File%3AJohn_William_Waterhouse_-_The_Crystal_Ball.JPG",
+    "painter": "John William Waterhouse",
     "license": "Public domain",
-    "box": [0.4, 0.12, 0.98, 0.72]
+    "box": [0, 0.1, 1, 0.5]
   },
   "card.arcane_flick": {
     "file": "File:The Conjurer, ca. 1502.jpg",
@@ -76,7 +75,7 @@
     "page": "https://commons.wikimedia.org/wiki/File%3ABoys_King_Arthur_-_N._C._Wyeth_-_p246.jpg",
     "painter": "N. C. Wyeth",
     "license": "Public domain",
-    "box": [0, 0.2, 1, 0.7]
+    "box": [0.05, 0.3, 0.6, 0.58]
   },
   "card.armoured_accumulator": {
     "file": "File:LC-DIG-PGA-04044 (17016418074).jpg",
@@ -107,12 +106,11 @@
     "box": [0, 0.03, 1, 0.86]
   },
   "card.astral_prism": {
-    "file": "File:Flammarion.jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3AFlammarion.jpg",
-    "painter": "anonim, rycina z „L’atmosphère” Camille’a Flammariona (1888)",
+    "file": "File:Caspar David Friedrich - Gebirgslandschaft mit Regenbogen.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File%3ACaspar_David_Friedrich_-_Gebirgslandschaft_mit_Regenbogen.jpg",
+    "painter": "Caspar David Friedrich",
     "license": "Public domain",
-    "box": [0, 0.05, 1, 0.92],
-    "grade": { "target_mean": 0.3, "ceiling": 0.82 }
+    "box": [0, 0.08, 1, 0.9]
   },
   "card.astral_scepter": {
     "file": "File:Allegorical Portrait of Urania, Muse of Astronomy by Louis Tocqué.jpg",
@@ -133,7 +131,7 @@
     "page": "https://commons.wikimedia.org/wiki/File%3AAdolph_Menzel_-_Eisenwalzwerk_-_Google_Art_Project.jpg",
     "painter": "Adolph von Menzel",
     "license": "Public domain",
-    "box": [0.05, 0.04, 0.95, 0.946]
+    "box": [0.44, 0.36, 0.76, 0.68]
   },
   "card.bastion_oath": {
     "file": "File:January Suchodolski - Defence of Częstochowa - MNK II-a-8 - National Museum Kraków.jpg",
@@ -263,11 +261,11 @@
     "box": [0, 0.05, 1, 0.957]
   },
   "card.carrion_wind": {
-    "file": "File:The Triumph of Death by Pieter Bruegel the Elder.jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3AThe_Triumph_of_Death_by_Pieter_Bruegel_the_Elder.jpg",
-    "painter": "Pieter Brueghel the Elder",
+    "file": "File:Zdobycz kruków, Marceli Harasimowicz.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File%3AZdobycz_kruk%C3%B3w%2C_Marceli_Harasimowicz.jpg",
+    "painter": "Marceli Harasimowicz",
     "license": "Public domain",
-    "box": [0, 0.3, 0.7, 0.913]
+    "box": [0, 0, 1, 1]
   },
   "card.ceramic_shroud": {
     "file": "File:Herman Kähler i sit værksted.jpg",
@@ -277,11 +275,11 @@
     "box": [0, 0.05, 1, 0.812]
   },
   "card.charitable_leaf": {
-    "file": "File:Unknown painter - St Elizabeth Giving Bread and Wine to Beggars - WGA23780.jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3AUnknown_painter_-_St_Elizabeth_Giving_Bread_and_Wine_to_Beggars_-_WGA23780.jpg",
-    "painter": "nieznany mistrz szwabski, ok. 1515",
+    "file": "File:Charité, Millet.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File%3ACharit%C3%A9%2C_Millet.jpg",
+    "painter": "Jean-François Millet",
     "license": "Public domain",
-    "box": [0, 0.29, 1, 0.547]
+    "box": [0, 0.04, 1, 0.96]
   },
   "card.chronicle_veil": {
     "file": "File:Jan Vermeer - The Art of Painting - Google Art Project.jpg",
@@ -323,7 +321,7 @@
     "page": "https://commons.wikimedia.org/wiki/File%3AGiuseppe_Maria_Crespi_-_Buchregal_mit_Musikschriften_1725-30.jpeg",
     "painter": "Giuseppe Maria Crespi",
     "license": "Public domain",
-    "box": [0, 0.25, 1, 0.843]
+    "box": [0.015, 0.335, 0.615, 0.691]
   },
   "card.cloud_annotation": {
     "file": "File:Lib howard 1803-11 6.jpg",
@@ -340,11 +338,11 @@
     "box": [0.22, 0, 0.72, 0.611]
   },
   "card.combat_amplifier": {
-    "file": "File:Jan Brueghel Touch Prado.jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3AJan_Brueghel_Touch_Prado.jpg",
-    "painter": "Jan Brueghel starszy i Peter Paul Rubens",
+    "file": "File:Velázquez - Dios Marte (Museo del Prado, 1639-41).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File%3AVel%C3%A1zquez_-_Dios_Marte_%28Museo_del_Prado%2C_1639-41%29.jpg",
+    "painter": "Diego Velázquez",
     "license": "Public domain",
-    "box": [0, 0.43, 0.5, 0.97]
+    "box": [0, 0.08, 1, 0.4]
   },
   "card.commanders_silence": {
     "file": "File:Kutuzov fili.jpg",
@@ -440,11 +438,11 @@
     "box": [0, 0.2, 1, 0.7]
   },
   "card.daybreak_reliquary": {
-    "file": "File:Memling - The reliquary of Saint Ursula, 0040147059.jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3AMemling_-_The_reliquary_of_Saint_Ursula%2C_0040147059.jpg",
-    "painter": "Hans Memling",
+    "file": "File:Caspar David Friedrich - Das Kreuz im Gebirge.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File%3ACaspar_David_Friedrich_-_Das_Kreuz_im_Gebirge.jpg",
+    "painter": "Caspar David Friedrich",
     "license": "Public domain",
-    "box": [0, 0.083, 1, 0.917]
+    "box": [0, 0.28, 1, 0.9]
   },
   "card.debt_of_dust": {
     "file": "File:Hieronymus Bosch - Death and the Miser - Google Art Project.jpg",
@@ -461,12 +459,11 @@
     "box": [0, 0.05, 1, 0.855]
   },
   "card.defense_lattice": {
-    "file": "File:Moving Machinery - Dickinson's comprehensive pictures of the Great Exhibition (1854) vol 2, plate XXI - Royal Coll.jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3AMoving_Machinery_-_Dickinson%27s_comprehensive_pictures_of_the_Great_Exhibition_%281854%29_vol_2%2C_plate_XXI_-_Royal_Coll.jpg",
-    "painter": "Louis Haghe",
+    "file": "File:1888 Liebermann Die Netzflickerinnen anagoria.JPG",
+    "page": "https://commons.wikimedia.org/wiki/File%3A1888_Liebermann_Die_Netzflickerinnen_anagoria.JPG",
+    "painter": "Max Liebermann",
     "license": "Public domain",
-    "box": [0.02, 0, 0.98, 1],
-    "grade": { "target_mean": 0.28, "saturation": 0.7, "vignette": 0.55 }
+    "box": [0, 0.25, 1, 0.85]
   },
   "card.desiccation_orb": {
     "file": "File:William Holman Hunt - The Scapegoat.jpg",
@@ -504,11 +501,11 @@
     "box": [0, 0.06, 1, 0.92]
   },
   "card.divine_amplifier": {
-    "file": "File:Jan Brueghel I & Peter Paul Rubens - Hearing (Museo del Prado).jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3AJan_Brueghel_I_%26_Peter_Paul_Rubens_-_Hearing_%28Museo_del_Prado%29.jpg",
-    "painter": "Jan Brueghel starszy i Peter Paul Rubens",
+    "file": "File:Hunt-light-of-the-world.jpeg",
+    "page": "https://commons.wikimedia.org/wiki/File%3AHunt-light-of-the-world.jpeg",
+    "painter": "William Holman Hunt",
     "license": "Public domain",
-    "box": [0, 0.45, 0.48, 0.95]
+    "box": [0.2, 0.14, 0.8, 0.34]
   },
   "card.doomhelm": {
     "file": "File:Rembrandt (circle) - The Man with the Golden Helmet - Google Art Project.jpg",
@@ -562,11 +559,11 @@
     "grade": { "target_mean": 0.28 }
   },
   "card.element_amplifier": {
-    "file": "File:Jan Brueghel (I) - Allegory of Fire.jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3AJan_Brueghel_%28I%29_-_Allegory_of_Fire.jpg",
-    "painter": "Jan Brueghel the Elder",
+    "file": "File:Pierre-Jacques Volaire - Eruption of Vesuvius - M.Ob.2762 MNW - National Museum in Warsaw.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File%3APierre-Jacques_Volaire_-_Eruption_of_Vesuvius_-_M.Ob.2762_MNW_-_National_Museum_in_Warsaw.jpg",
+    "painter": "Pierre-Jacques Volaire",
     "license": "Public domain",
-    "box": [0, 0.38, 0.65, 0.975]
+    "box": [0.08, 0.04, 0.92, 0.86]
   },
   "card.ember_liturgy": {
     "file": "File:Domenico Fetti (Rome c. 1588-Venice 1623) - The Sacrifice of Elijah Before the Priests of Baal - RCIN 405466 - Royal Collection.jpg",
@@ -654,12 +651,11 @@
     "box": [0, 0.1, 1, 0.94]
   },
   "card.final_obol": {
-    "file": "File:Inferno Canto 08 - Styx (148618431).jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3AInferno_Canto_08_-_Styx_%28148618431%29.jpg",
-    "painter": "Gustave Doré",
+    "file": "File:CharonPsycheStanhope2.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File%3ACharonPsycheStanhope2.jpg",
+    "painter": "John Roddam Spencer Stanhope",
     "license": "Public domain",
-    "box": [0.12, 0.05, 0.87, 0.64],
-    "grade": { "target_mean": 0.3, "ceiling": 0.85 }
+    "box": [0, 0.1, 1, 0.9]
   },
   "card.folded_horizon": {
     "file": "File:Caspar David Friedrich - Mondaufgang am Meer - Google Art Project.jpg",
@@ -1041,19 +1037,18 @@
     "box": [0, 0.197, 1, 1]
   },
   "card.margin_note": {
-    "file": "File:Two knights Jousting - Luttrell Psalter (c.1325-1335), f.82 - BL Add MS 42130.jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3ATwo_knights_Jousting_-_Luttrell_Psalter_%28c.1325-1335%29%2C_f.82_-_BL_Add_MS_42130.jpg",
-    "painter": "Psałterz Luttrella, ok. 1325–1335",
+    "file": "File:Johannes Vermeer, A Lady Writing, c. 1665, NGA 46437.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File%3AJohannes_Vermeer%2C_A_Lady_Writing%2C_c._1665%2C_NGA_46437.jpg",
+    "painter": "Johannes Vermeer",
     "license": "CC0",
-    "box": [0, 0.585, 1, 1.0],
-    "grade": { "target_mean": 0.34, "ceiling": 0.9 }
+    "box": [0.04, 0.2, 0.96, 0.76]
   },
   "card.marrow_buckler": {
-    "file": "File:The Triumph of Death by Pieter Bruegel the Elder.jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3AThe_Triumph_of_Death_by_Pieter_Bruegel_the_Elder.jpg",
-    "painter": "Pieter Brueghel the Elder",
-    "license": "Public domain",
-    "box": [0.6, 0.4, 1, 0.75]
+    "file": "File:Caravaggio - Medusa Uffizi - High quality.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File%3ACaravaggio_-_Medusa_Uffizi_-_High_quality.jpg",
+    "painter": "Caravaggio",
+    "license": "CC0",
+    "box": [0.05, 0.15, 0.95, 0.75]
   },
   "card.marrow_oath": {
     "file": "File:Hans Baldung - Ritter, Tod und Mädchen.jpeg",
@@ -1106,11 +1101,11 @@
     "box": [0, 0.08, 1, 0.918]
   },
   "card.memory_vault": {
-    "file": "File:Domenico Remps - Cabinet of Curiosities.jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3ADomenico_Remps_-_Cabinet_of_Curiosities.jpg",
-    "painter": "Domenico Remps",
+    "file": "File:Willem Kalf - Pronk Still Life with Holbein Bowl, Nautilus Cup, Glass Goblet and Fruit Dish - Google Art Project.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File%3AWillem_Kalf_-_Pronk_Still_Life_with_Holbein_Bowl%2C_Nautilus_Cup%2C_Glass_Goblet_and_Fruit_Dish_-_Google_Art_Project.jpg",
+    "painter": "Willem Kalf",
     "license": "Public domain",
-    "box": [0, 0.05, 1, 0.9]
+    "box": [0, 0.14, 1, 0.72]
   },
   "card.mending_halo": {
     "file": "File:Jacob Toorenvliet - St. Peter healing the sick - M.Ob.1660 - National Museum in Warsaw.jpg",
@@ -1131,7 +1126,7 @@
     "page": "https://commons.wikimedia.org/wiki/File%3ALeo_the_Great_and_Attila_by_Raffael.png",
     "painter": "Raphael",
     "license": "Public domain",
-    "box": [0.2, 0.3, 0.8, 0.95]
+    "box": [0.22, 0.12, 0.47, 0.38]
   },
   "card.minor_ward": {
     "file": "File:The Magic Circle - John William Waterhouse.jpg",
@@ -1184,12 +1179,11 @@
     "box": [0.2, 0.15, 0.85, 0.798]
   },
   "card.mortal_coil": {
-    "file": "File:Frontispiece to Frankenstein 1831.jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3AFrontispiece_to_Frankenstein_1831.jpg",
-    "painter": "Theodor von Holst",
+    "file": "File:Hamlet et Horatio au cimetière - Eugène Delacroix - Musée du Louvre Peintures RF 1942.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File%3AHamlet_et_Horatio_au_cimeti%C3%A8re_-_Eug%C3%A8ne_Delacroix_-_Mus%C3%A9e_du_Louvre_Peintures_RF_1942.jpg",
+    "painter": "Eugène Delacroix",
     "license": "Public domain",
-    "box": [0, 0.138, 1, 0.622],
-    "grade": { "target_mean": 0.3, "ceiling": 0.85 }
+    "box": [0, 0.18, 1, 0.76]
   },
   "card.moss_band": {
     "file": "File:Still life of a thistle between carnations and cornflowers on a mossy forest floor, with butterflies and a cricket.jpg",
@@ -1218,7 +1212,7 @@
     "painter": "Joseph Wright of Derby",
     "note": "reprodukcja: Daderot",
     "license": "Public domain",
-    "box": [0.1, 0.39, 0.85, 0.975]
+    "box": [0.1, 0.36, 0.7, 0.86]
   },
   "card.nested_flywheel": {
     "file": "File:Velazquez-las hilanderas.jpg",
@@ -1299,7 +1293,7 @@
     "page": "https://commons.wikimedia.org/wiki/File%3AGustave_Dor%C3%A9_-_Dante_Alighieri_-_Inferno_-_Plate_8_%28Canto_III_-_Abandon_all_hope_ye_who_enter_here%29.jpg",
     "painter": "Gustave Doré",
     "license": "Public domain",
-    "box": [0.02, 0.115, 0.98, 0.846],
+    "box": [0.02, 0.232, 0.596, 0.671],
     "grade": { "target_mean": 0.3, "ceiling": 0.85 }
   },
   "card.ossuary_link": {
@@ -1338,11 +1332,11 @@
     "box": [0, 0.1, 1, 0.553]
   },
   "card.palimpsest_case": {
-    "file": "File:The Scribe at Work.jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3AThe_Scribe_at_Work.jpg",
-    "painter": "Jean Le Tavernier",
+    "file": "File:Jan Davidsz de Heem - Still Life with Books and a Violin - 613 - Mauritshuis.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File%3AJan_Davidsz_de_Heem_-_Still_Life_with_Books_and_a_Violin_-_613_-_Mauritshuis.jpg",
+    "painter": "Jan Davidsz. de Heem",
     "license": "Public domain",
-    "box": [0.01, 0.06, 0.99, 0.83]
+    "box": [0, 0.08, 1, 0.92]
   },
   "card.paradox": {
     "file": "File:An Experiment on a Bird in an Air Pump by Joseph Wright of Derby, 1768.jpg",
@@ -1500,11 +1494,11 @@
     "box": [0, 0.01, 1, 0.99]
   },
   "card.radiant_clause": {
-    "file": "File:Meister des Book of Kells 001.jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3AMeister_des_Book_of_Kells_001.jpg",
-    "painter": "anonim, Księga z Kells (ok. 800)",
+    "file": "File:Rembrandt - Moses with the Ten Commandments - Google Art Project.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File%3ARembrandt_-_Moses_with_the_Ten_Commandments_-_Google_Art_Project.jpg",
+    "painter": "Rembrandt",
     "license": "Public domain",
-    "box": [0, 0.1, 1, 0.56]
+    "box": [0, 0.04, 1, 0.56]
   },
   "card.radiant_scepter": {
     "file": "File:Ingres, Napoleon on his Imperial throne.jpg",
@@ -1572,11 +1566,11 @@
     "box": [0, 0.38, 1, 0.744]
   },
   "card.red_horizon": {
-    "file": "File:1871 Vereshchagin Apotheose des Krieges anagoria.JPG",
-    "page": "https://commons.wikimedia.org/wiki/File%3A1871_Vereshchagin_Apotheose_des_Krieges_anagoria.JPG",
-    "painter": "Vasily Vereshchagin",
+    "file": "File:Red Sunset on the Dnieper MET DT2557.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File%3ARed_Sunset_on_the_Dnieper_MET_DT2557.jpg",
+    "painter": "Arkhip Kuindzhi",
     "license": "Public domain",
-    "box": [0, 0.02, 1, 0.98]
+    "box": [0, 0.05, 1, 0.95]
   },
   "card.redacted_order": {
     "file": "File:Napoleon Las Casas.jpg",
@@ -1607,12 +1601,11 @@
     "box": [0, 0.2, 1, 0.669]
   },
   "card.reset_socket": {
-    "file": "File:Le diverse et artificiose machine del Capitano Agostino Ramelli Figure CLXXXVIII.jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3ALe_diverse_et_artificiose_machine_del_Capitano_Agostino_Ramelli_Figure_CLXXXVIII.jpg",
-    "painter": "Agostino Ramelli",
+    "file": "File:John Harrison Uhrmacher.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File%3AJohn_Harrison_Uhrmacher.jpg",
+    "painter": "Thomas King",
     "license": "Public domain",
-    "box": [0, 0.18, 1, 0.616],
-    "grade": { "target_mean": 0.3, "vignette": 0.55, "ceiling": 0.86 }
+    "box": [0, 0.2, 1, 0.78]
   },
   "card.resonant_cloud": {
     "file": "File:Lionel Bicknell Constable - Cloud Study - 2007.8.60 - Clark Art Institute.tiff",
@@ -1622,11 +1615,11 @@
     "box": [0, 0.05, 1, 0.83]
   },
   "card.rime_crown": {
-    "file": "File:Зима в лесу (Иней) (Шишкин).jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3A%D0%97%D0%B8%D0%BC%D0%B0_%D0%B2_%D0%BB%D0%B5%D1%81%D1%83_%28%D0%98%D0%BD%D0%B5%D0%B9%29_%28%D0%A8%D0%B8%D1%88%D0%BA%D0%B8%D0%BD%29.jpg",
-    "painter": "Ivan Shishkin",
+    "file": "File:Friedrich, Caspar David - Eichbaum im Schnee.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File%3AFriedrich%2C_Caspar_David_-_Eichbaum_im_Schnee.jpg",
+    "painter": "Caspar David Friedrich",
     "license": "Public domain",
-    "box": [0, 0.3, 1, 0.76]
+    "box": [0, 0.08, 1, 0.6]
   },
   "card.runic_workshop": {
     "file": "File:A Goldsmith Melting Down a Woman’s Jewellery in the Presence of a Notary- “The Alchemist” (SM 898).png",
@@ -1648,7 +1641,7 @@
     "page": "https://commons.wikimedia.org/wiki/File%3AFrederick_Sandys_-_Morgan-le-Fay_-_1925P104_-_Birmingham_Museum_and_Art_Gallery.jpg",
     "painter": "Frederick Sandys",
     "license": "Public domain",
-    "box": [0, 0.05, 1, 0.494]
+    "box": [0.2, 0.08, 0.85, 0.42]
   },
   "card.sable_exchange": {
     "file": "File:Massysm Quentin — The Moneylender and his Wife — 1514.jpg",
@@ -1732,7 +1725,7 @@
     "page": "https://commons.wikimedia.org/wiki/File%3AThe_Roses_of_Heliogabalus.jpg",
     "painter": "Lawrence Alma-Tadema",
     "license": "Public domain",
-    "box": [0, 0, 1, 1]
+    "box": [0.7, 0.66, 1, 0.97]
   },
   "card.scouring_sabre": {
     "file": "File:Wojciech Kossak - Polish Hussars Parading in Front of King John III Sobieski - MNK II-b-268 - National Museum Kraków.jpg",
@@ -1742,12 +1735,11 @@
     "box": [0, 0.06, 1, 0.97]
   },
   "card.scripted_lunge": {
-    "file": "File:Girard Thibault - Academie de l-Espee 1628 Met. museum.jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3AGirard_Thibault_-_Academie_de_l-Espee_1628_Met._museum.jpg",
-    "painter": "Girard Thibault",
+    "file": "File:Gari Melchers - The Fencing Master - 13.9 - Detroit Institute of Arts.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File%3AGari_Melchers_-_The_Fencing_Master_-_13.9_-_Detroit_Institute_of_Arts.jpg",
+    "painter": "Gari Melchers",
     "license": "Public domain",
-    "box": [0, 0.03, 1, 0.976],
-    "grade": { "target_mean": 0.32, "ceiling": 0.85 }
+    "box": [0.16, 0.1, 0.84, 0.35]
   },
   "card.sealed_horizon": {
     "file": "File:Caspar David Friedrich - Der Mönch am Meer - Google Art Project.jpg",
@@ -1876,7 +1868,7 @@
     "page": "https://commons.wikimedia.org/wiki/File%3ABlake_Dante_Hell_V.jpg",
     "painter": "William Blake",
     "license": "Public domain",
-    "box": [0, 0.02, 1, 0.866]
+    "box": [0.55, 0, 0.98, 0.5]
   },
   "card.sour_wine": {
     "file": "File:Young Sick Bacchus-Caravaggio (1593).jpg",
@@ -1886,12 +1878,11 @@
     "box": [0, 0, 1, 0.473]
   },
   "card.spare_capacitor": {
-    "file": "File:T1- d467- Fig. 242. — Expérience faite à Leyde.png",
-    "page": "https://commons.wikimedia.org/wiki/File%3AT1-_d467-_Fig._242._%E2%80%94_Exp%C3%A9rience_faite_%C3%A0_Leyde.png",
-    "painter": "Louis Figuier",
+    "file": "File:Joseph Siffrein Duplessis - Benjamin Franklin - Google Art Project.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File%3AJoseph_Siffrein_Duplessis_-_Benjamin_Franklin_-_Google_Art_Project.jpg",
+    "painter": "Joseph-Siffred Duplessis",
     "license": "Public domain",
-    "box": [0, 0.06, 1, 0.904],
-    "grade": { "target_mean": 0.3, "ceiling": 0.82 }
+    "box": [0, 0.1, 1, 0.62]
   },
   "card.spare_spring": {
     "file": "File:Willem Claesz. Heda - Still Life with Metal Vessels and a Watch on a Table - NB 128 - National Museum in Warsaw.jpg",
@@ -1912,7 +1903,7 @@
     "page": "https://commons.wikimedia.org/wiki/File%3AJoan_of_Arc_MET_DP-14201-049.jpg",
     "painter": "Jules Bastien-Lepage",
     "license": "CC0",
-    "box": [0.1, 0.08, 0.9, 0.632]
+    "box": [0.42, 0.28, 0.78, 0.56]
   },
   "card.spirit_sword": {
     "file": "File:GuidoReni MichaelDefeatsSatan.jpg",
@@ -2090,27 +2081,25 @@
     "box": [0, 0.06, 1, 0.832]
   },
   "card.thornhide": {
-    "file": "File:Sir edward coley burne-jones bt ara rws the prince entering the briar082828).jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3ASir_edward_coley_burne-jones_bt_ara_rws_the_prince_entering_the_briar082828%29.jpg",
-    "painter": "Edward Burne-Jones",
-    "license": "Public domain",
-    "box": [0.02, 0, 0.98, 1]
+    "file": "File:De bedreigde zwaan Rijksmuseum SK-A-4.jpeg",
+    "page": "https://commons.wikimedia.org/wiki/File%3ADe_bedreigde_zwaan_Rijksmuseum_SK-A-4.jpeg",
+    "painter": "Jan Asselijn",
+    "license": "CC0",
+    "box": [0.05, 0.08, 0.95, 0.72]
   },
   "card.thought_gear": {
-    "file": "File:Vinci, Leonardo Da - Volano (meccanica).jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3AVinci%2C_Leonardo_Da_-_Volano_%28meccanica%29.jpg",
-    "painter": "Leonardo da Vinci",
+    "file": "File:José de Ribera - Arquímedes.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File%3AJos%C3%A9_de_Ribera_-_Arqu%C3%ADmedes.jpg",
+    "painter": "Jusepe de Ribera",
     "license": "Public domain",
-    "box": [0, 0.1, 1, 0.77],
-    "grade": { "target_mean": 0.32, "ceiling": 0.85 }
+    "box": [0, 0.06, 1, 0.58]
   },
   "card.thunder_socket": {
-    "file": "File:Benjamin Franklin Lightning Experiment 1752.jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3ABenjamin_Franklin_Lightning_Experiment_1752.jpg",
-    "painter": "Currier & Ives",
+    "file": "File:Mårten Eskil Winge - Tor's Fight with the Giants - Google Art Project.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File%3AM%C3%A5rten_Eskil_Winge_-_Tor%27s_Fight_with_the_Giants_-_Google_Art_Project.jpg",
+    "painter": "Mårten Eskil Winge",
     "license": "Public domain",
-    "box": [0.02, 0, 0.98, 0.857],
-    "grade": { "target_mean": 0.32, "ceiling": 0.88 }
+    "box": [0, 0.04, 1, 0.5]
   },
   "card.thunderhead": {
     "file": "File:Martin Johnson Heade Approaching Thunderstorm ATC.jpg",
@@ -2165,11 +2154,11 @@
     "grade": { "target_mean": 0.3 }
   },
   "card.twilight_balance": {
-    "file": "File:BD Weighing of the Heart.jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3ABD_Weighing_of_the_Heart.jpg",
-    "painter": "anonim, Księga Umarłych Hunefera (Egipt, ok. 1275 p.n.e.)",
-    "license": "Public domain",
-    "box": [0.038, 0, 0.862, 1]
+    "file": "File:Johannes Vermeer, Woman Holding a Balance, c. 1664, NGA 1236.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File%3AJohannes_Vermeer%2C_Woman_Holding_a_Balance%2C_c._1664%2C_NGA_1236.jpg",
+    "painter": "Johannes Vermeer",
+    "license": "CC0",
+    "box": [0.35, 0.12, 1, 0.52]
   },
   "card.umbral_parallax": {
     "file": "File:Samuel van Hoogstraten - Perspective View with a Woman Reading a Letter - 66 - Mauritshuis.jpg",
@@ -2208,12 +2197,11 @@
     "grade": { "target_mean": 0.3 }
   },
   "card.vacuum_ratchet": {
-    "file": "File:Magdeburg.jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3AMagdeburg.jpg",
-    "painter": "Gaspar Schott",
+    "file": "File:Rembrandt van Rijn - The Mill - Google Art Project.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File%3ARembrandt_van_Rijn_-_The_Mill_-_Google_Art_Project.jpg",
+    "painter": "Rembrandt",
     "license": "Public domain",
-    "box": [0, 0.1, 1, 0.876],
-    "grade": { "target_mean": 0.32, "ceiling": 0.85 }
+    "box": [0.3, 0.04, 1, 0.74]
   },
   "card.venom": {
     "file": "File:Anthony van Dyck - The Brazen Serpent.jpg",
@@ -2227,7 +2215,7 @@
     "page": "https://commons.wikimedia.org/wiki/File%3A1415_Das_Paradiesg%C3%A4rtlein_anagoria.JPG",
     "painter": "Upper Rhenish Master",
     "license": "Public domain",
-    "box": [0, 0.03, 1, 0.86]
+    "box": [0.22, 0.1, 0.64, 0.46]
   },
   "card.verdant_staff": {
     "file": "File:Konrad Witz - Der hl. Christophorus (Kunstmuseum Basel).jpg",
@@ -2248,14 +2236,14 @@
     "page": "https://commons.wikimedia.org/wiki/File%3AHubert_von_Herkomer_1875_-_The_last_Muster.jpg",
     "painter": "Hubert von Herkomer",
     "license": "Public domain",
-    "box": [0, 0.38, 1, 0.875]
+    "box": [0.15, 0.46, 0.75, 0.76]
   },
   "card.victors_standard": {
-    "file": "File:Kossak Battle of Olszynka Grochowska.jpg",
-    "page": "https://commons.wikimedia.org/wiki/File%3AKossak_Battle_of_Olszynka_Grochowska.jpg",
-    "painter": "Wojciech Kossak",
+    "file": "File:Rembrandt - De vaandeldrager (Q21467444).jpeg",
+    "page": "https://commons.wikimedia.org/wiki/File%3ARembrandt_-_De_vaandeldrager_%28Q21467444%29.jpeg",
+    "painter": "Rembrandt",
     "license": "Public domain",
-    "box": [0, 0.01, 1, 0.988]
+    "box": [0, 0.08, 0.94, 0.62]
   },
   "card.vigilant_step": {
     "file": "File:Sentry of the Life-Guards Horse Regiment in the Winter Palace by Narkiz Bunin (1889).jpg",
@@ -2714,12 +2702,16 @@
     "license": "Public domain",
     "box": [0, 0, 1, 1]
   },
-  "scene.lobby": {
+  "scene.town": {
     "file": "File:Cole Thomas The Consummation The Course of the Empire 1836.jpg",
     "page": "https://commons.wikimedia.org/wiki/File%3ACole_Thomas_The_Consummation_The_Course_of_the_Empire_1836.jpg",
     "painter": "Thomas Cole",
     "license": "Public domain",
-    "box": [0, 0, 1, 1]
+    "box": [0, 0, 1, 1],
+    "width": 2400,
+    "grade": { "vignette": 0.25 },
+    "places": "town.json",
+    "max_kib": 62
   },
   "scene.collection": {
     "file": "File:Thomas Cole - Architect’s Dream - Google Art Project.jpg",
