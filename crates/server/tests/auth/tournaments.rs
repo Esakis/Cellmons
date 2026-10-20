@@ -12,6 +12,10 @@ async fn tournament_http_requires_verified_session_and_never_exports_private_rng
         StatusCode::UNAUTHORIZED
     );
     f.register().await;
+    sqlx::query("UPDATE users SET account_xp=16000,tutorial_step=3")
+        .execute(&pool)
+        .await
+        .unwrap();
     let session = cookie(&f.login(false).await);
     let id = Uuid::now_v7();
     let mutation = json!({"action":"create","id":id,"name":"HTTP Tournament","terms":{"teams":2,"team_size":1,"fee":0,"max_games":3,"min_level":1,"max_level":20,"tiers":[0,1,2,3],"only_clan":null,"allowed_clans":[]}});

@@ -1,5 +1,5 @@
 import { createMemo, createSignal, For, Show } from 'solid-js';
-import { avatars, cardArgs, cards, content, fluentKey } from '../../app/content';
+import { avatars, cardArgs, cards, content, fluentKey, isPlayableAvatar } from '../../app/content';
 import { Stats } from '../../components/Stats';
 import { addTranslations, t } from '../../i18n';
 import en from './progression.en.ftl?raw';
@@ -34,7 +34,11 @@ export function Progression(props: {
     ),
   );
   const chosenDonor = () => donors().find((a) => a.id === donor()) ?? donors()[0];
-  const disabled = () => props.disabled || !ready() || (props.avatar.is_shade && !chosenDonor());
+  const disabled = () =>
+    props.disabled ||
+    !isPlayableAvatar(props.avatar.template_id) ||
+    !ready() ||
+    (props.avatar.is_shade && !chosenDonor());
   function reincarnate(choice: Extract<Mutation, { action: 'reincarnate' }>['choice']) {
     props.confirm({
       action: 'reincarnate',
@@ -190,7 +194,13 @@ export function Progression(props: {
           )}
         </Show>
       </Show>
-      <Show when={props.avatar.tier === 3 && !props.avatar.is_shade}>
+      <Show
+        when={
+          props.avatar.tier === 3 &&
+          !props.avatar.is_shade &&
+          content.avatars.some((a) => a.playable && a.rarity === 'shade')
+        }
+      >
         <p>{t('collection-shade-explain')}</p>
         <label>
           {t('collection-shade-school')}{' '}

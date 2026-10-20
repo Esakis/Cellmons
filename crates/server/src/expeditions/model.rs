@@ -45,10 +45,11 @@ impl Config {
             || avatars.len() != self.avatar_pool.len()
             || self.avatar_pool.iter().any(|id| {
                 !engine_content::avatar(*id).is_some_and(|a| {
-                    matches!(
-                        a.rarity,
-                        AvatarRarity::Common | AvatarRarity::Uncommon | AvatarRarity::Rare
-                    )
+                    a.playable
+                        && matches!(
+                            a.rarity,
+                            AvatarRarity::Common | AvatarRarity::Uncommon | AvatarRarity::Rare
+                        )
                 })
             })
             || self.difficulties.len() != 3
@@ -163,7 +164,8 @@ impl Plan {
         let avatar_pool = engine_content::AVATARS
             .iter()
             .filter(|a| {
-                !owned.contains(&i32::from(a.id))
+                a.playable
+                    && !owned.contains(&i32::from(a.id))
                     && matches!(
                         (difficulty.rarity.as_str(), a.rarity),
                         ("common", AvatarRarity::Common)
@@ -216,7 +218,9 @@ impl Plan {
                     .avatar_pool
                     .iter()
                     .copied()
-                    .filter(|id| !owned.contains(&i32::from(*id)))
+                    .filter(|id| {
+                        engine_content::is_playable(*id) && !owned.contains(&i32::from(*id))
+                    })
                     .collect();
                 result.template = self.select(&pool);
             }

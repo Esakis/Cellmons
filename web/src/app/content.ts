@@ -26,6 +26,16 @@ export function registerCards(data: typeof cardData) {
 export const avatars = new Map<number, Avatar>(
   content.avatars.map((avatar) => [avatar.id, avatar]),
 );
+export const playableAvatars = content.avatars.filter((avatar) => avatar.playable);
+// Registration offers one character; the rest of the released roster is earned in play.
+export const startingAvatars = [4, 1, 2].flatMap((id) =>
+  playableAvatars.filter((avatar) => avatar.id === id),
+);
+export function isPlayableAvatar(id: number): boolean {
+  const definition = avatars.get(id);
+  const base = definition && 'path' in definition ? definition.path.base_avatar : id;
+  return content.avatars.some((avatar) => avatar.id === base && avatar.playable);
+}
 export function registerPaths(data: typeof pathData) {
   if (data.version !== content.version) throw new Error('CONTENT_MISMATCH');
   paths = data.paths;

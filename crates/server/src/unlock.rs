@@ -19,7 +19,8 @@ pub fn choose(seed: &[u8; 32], user: Uuid, wins: u32, owned: &[i32]) -> Option<u
     let available: Vec<_> = engine_content::AVATARS
         .iter()
         .filter(|a| {
-            !owned.contains(&i32::from(a.id))
+            a.playable
+                && !owned.contains(&i32::from(a.id))
                 && matches!(
                     a.rarity,
                     AvatarRarity::Common | AvatarRarity::Uncommon | AvatarRarity::Rare

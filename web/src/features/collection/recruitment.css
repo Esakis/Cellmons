@@ -1,0 +1,127 @@
+.recruitment {
+  border: 1px solid var(--gold);
+  border-radius: 12px;
+  padding: 16px;
+  margin-block: 16px;
+  background: var(--surface);
+}
+.recruitment summary {
+  cursor: pointer;
+  min-height: 44px;
+}
+.recruit-ready {
+  display: inline-block;
+  margin-left: 12px;
+  color: var(--gold);
+}
+.recruit-milestones {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(125px, 1fr));
+  gap: 8px;
+}
+.recruit-milestones li {
+  padding: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+.recruit-milestones span {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.8rem;
+}
+.recruit-milestones .ready {
+  border-color: var(--gold);
+}
+.recruit-milestones .earned {
+  color: var(--gold);
+}
+.recruit-milestones .seal::before,
+.recruit-seal-reward > strong::before {
+  content: "✦";
+  display: block;
+  width: 44px;
+  height: 44px;
+  line-height: 40px;
+  text-align: center;
+  color: var(--gold);
+  border: 3px double var(--gold);
+  border-radius: 50%;
+  margin-bottom: 8px;
+}
+.recruit-history {
+  margin-block: 12px;
+}
+.recruit-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+}
+.recruit-choices button {
+  flex-direction: column;
+  padding: 12px;
+  min-width: 0;
+}
+.recruit-choices img,
+.recruit-preview-heading img {
+  border-radius: 50%;
+  object-fit: cover;
+}
+.recruit-seal-reward {
+  display: grid;
+  gap: 12px;
+}
+.recruit-preview-heading {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.recruit-preview-heading img {
+  flex-shrink: 0;
+}
+.recruit-deck {
+  list-style: none;
+  padding: 0;
+}
+.recruit-deck li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-block: 12px;
+}
+.recruit-deck img {
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.recruit-deck small {
+  display: block;
+  color: var(--color-text-muted);
+}
+.recruit-deck p {
+  margin-block: 6px;
+}
+@media (max-width: 380px) {
+  .recruitment {
+    padding: 12px;
+  }
+  .recruit-milestones {
+    grid-template-columns: 1fr 1fr;
+  }
+  .recruit-choices {
+    grid-template-columns: 1fr 1fr;
+  }
+  .recruit-preview-heading {
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .recruit-preview-heading img {
+    width: 64px;
+    height: 64px;
+  }
+  .recruit-deck img {
+    width: 56px;
+    height: 35px;
+  }
+}

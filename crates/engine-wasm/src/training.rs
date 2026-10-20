@@ -135,6 +135,9 @@ fn start(setup: wire::TrainingSetup) -> Result<Session, String> {
     }
     let seed: [u8; 32] = setup.seed.try_into().map_err(|_| "invalid_seed")?;
     let id = u16::try_from(setup.avatar_id).map_err(|_| "invalid_avatar")?;
+    if !engine_content::is_playable(id) {
+        return Err("invalid_avatar".into());
+    }
     let avatar = engine_content::avatar(id).ok_or("invalid_avatar")?;
     let level = setup.custom.as_ref().map_or(1, |p| p.level);
     if !(1..=20).contains(&level) {
@@ -296,21 +299,36 @@ mod tests {
         }
     }
     #[test]
-    fn every_nonstarter_class_can_start_local_training() {
+    fn released_classes_and_paths_finish_training_and_retired_classes_are_rejected() {
+        use wire::training_request::Body;
         for avatar in engine_content::AVATARS
             .iter()
-            .filter(|a| !engine_content::STARTERS.iter().any(|s| s.avatar == a.id))
+            .chain(engine_content::PATHS.iter().map(|p| &p.avatar))
         {
             let mut setup = setup();
             setup.avatar_id = u32::from(avatar.id);
-            setup.autoplay = false;
-            let reply = call(
-                &mut Training::new(),
-                1,
-                wire::training_request::Body::Start(setup),
-            );
+            let mut training = Training::new();
+            let mut reply = call(&mut training, 1, Body::Start(setup));
+            if !engine_content::is_playable(avatar.id) {
+                assert_eq!(reply.error, "invalid_avatar", "{}", avatar.key);
+                continue;
+            }
             assert!(reply.error.is_empty(), "{}: {}", avatar.key, reply.error);
-            assert!(!reply.view.unwrap().hand.is_empty());
+            assert!(!reply.view.as_ref().unwrap().hand.is_empty());
+            for seq in 2..=6 {
+                let side = reply.view.as_ref().unwrap().me.as_ref().unwrap();
+                let mv = wire::DuelMove {
+                    attacks: side.attacks.clone(),
+                    defenses: side.defenses.clone(),
+                    ..Default::default()
+                };
+                reply = call(&mut training, seq, Body::Play(mv));
+                assert!(reply.error.is_empty(), "{}: {}", avatar.key, reply.error);
+                if reply.view.as_ref().unwrap().outcome.is_some() {
+                    break;
+                }
+            }
+            assert!(reply.view.unwrap().outcome.is_some(), "{}", avatar.key);
         }
     }
     #[test]

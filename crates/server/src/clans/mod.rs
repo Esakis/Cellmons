@@ -646,6 +646,9 @@ pub async fn post(
     let session = crate::auth::security::session(&state, &headers)
         .await
         .map_err(crate::game::HttpError)?;
+    crate::journey::require(&state.db, session.user, "clan")
+        .await
+        .map_err(crate::game::response)?;
     state
         .auth
         .limit("clan-write", &session.user.to_string(), 30, 60)

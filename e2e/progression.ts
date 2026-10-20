@@ -33,7 +33,7 @@ export async function progression(page: Page, login: string, project: string) {
   await page
     .locator('.collection-progression')
     .screenshot({ path: `../target/reincarnation-${project}.png` });
-  // Test the actual path/gift in local WASM before sacrificing the character.
+  // Test the actual path/gift in local WASM before checking the retired shade gate.
   await page.getByRole('link', { name: 'Test deck offline', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Confirm move', exact: true })).toBeEnabled();
   // The app uses its own forfeit modal when leaving a local duel.
@@ -48,28 +48,23 @@ export async function progression(page: Page, login: string, project: string) {
     ).ok(),
   ).toBe(true);
   await page.reload();
-  await page
-    .getByRole('combobox', { name: 'Shade school', exact: true })
-    .selectOption('arcane', { timeout: 10000 });
-  await page.getByRole('button', { name: 'Sacrifice for shade', exact: true }).click();
-  await expect(page.getByRole('dialog')).toContainText('permanently consumed');
-  await page
-    .getByRole('dialog')
-    .getByRole('button', { name: 'Confirm change', exact: true })
-    .click();
-  await expect(page.getByRole('heading', { name: 'Shade of Time', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Sacrifice for shade', exact: true })).toHaveCount(
+    0,
+  );
+  const before = await (await page.request.get('/api/game')).json();
+  const current = before.avatars.find((a: { id: string }) => a.id === id);
+  const denied = await page.request.post('/api/game', {
+    headers: { Origin: new URL(page.url()).origin, 'X-Requested-With': 'app' },
+    data: {
+      action: 'shade',
+      id,
+      revision: current.revision,
+      new_id: crypto.randomUUID(),
+      school: 'arcane',
+    },
+  });
+  expect((await denied.json()).error).toBe('AVATAR_LOCKED');
   const after = await (await page.request.get('/api/game')).json();
-  expect(after.avatars.some((a: { id: string }) => a.id === id)).toBe(false);
-  expect(after.avatars.find((a: { active: boolean }) => a.active).shade_school).toBe('arcane');
-  await expect(page.getByRole('button', { name: /^Choose path:/ })).toHaveCount(2);
-  await expect(page.getByRole('button', { name: /^Choose path:/ }).first()).toBeDisabled();
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
-    ),
-  ).toBe(false);
-  await page
-    .locator('.collection-progression')
-    .screenshot({ path: `../target/shade-${project}.png` });
+  expect(after.avatars).toEqual(before.avatars);
   await accessible(page);
 }

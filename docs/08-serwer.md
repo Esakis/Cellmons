@@ -171,6 +171,28 @@ Szczegóły i lokalne testy: [raport F14](38-wdrozenie-i-odtwarzanie.md), [instr
 - Boty akceptują wyzwania natychmiast. Każdy bot może prowadzić wiele pojedynków jednocześnie (to tylko logika, nie gracz).
 - Walki z botami nie zmieniają PD, rankingu ani statystyk.
 
+### 10.1. Stałe konta mieszkańców
+
+Od 2026-10-20 `server::bots` dodatkowo utrzymuje 40 kont ze zwykłymi nickami
+(`crates/server/src/bots/roster.toml`). Mają trwałe UUID, postacie sześciu klas,
+początkowe poziomy 1–8, kolekcje i legalne talie oraz cztery profile trudności AI.
+Informacja o sterowaniu jest wyłącznie w tabeli `bot_accounts`. W interfejsie
+korzystają ze zwykłych profili kont.
+
+Sterownik działa po `LOBBY_BOTS_ENABLED=true`. Konta korzystają z tego samego huba,
+limitów wyzwań, rezerwacji postaci, trwałego aktora walki i rozliczeń co gracze.
+Wyzwania przyjmują po około dwóch sekundach. Większość czeka na arenie,
+pozostałe co kilka minut zmieniają miejsce. Pięć kont może inicjować pojedynki
+z innymi kontami sterowanymi przez serwer; takie walki są treningami bez nagród.
+Kontroler nie wysyła automatycznych wyzwań ludziom ani wiadomości czatu.
+Parametry AI zapisują się w dzienniku walki, więc wznowienie używa tego samego profilu.
+
+Tworzenie jest transakcyjne i idempotentne. Konflikt nicku nie przejmuje istniejącego
+użytkownika. Osobna blokada sesyjna PostgreSQL chroni przed uruchomieniem dwóch
+sterowników na tej samej bazie. Wyłączenie konta jest stosowane w ciągu 30 s;
+wyłączenie całej grupy wymaga zmiany zmiennej i restartu. Instrukcja i testy:
+[CONTRIBUTING](../CONTRIBUTING.md#konta-sterowane-przez-serwer), decyzja ADR-022.
+
 ## 11. Zadania okresowe
 
 | Zadanie | Częstotliwość | Opis |

@@ -37,6 +37,7 @@ export function OnlineDuel(props: {
   send: (body: ClientBody) => Promise<ServerBody | undefined>;
   close: () => void;
   replay?: boolean;
+  tutorial?: boolean;
 }) {
   const view = () => props.snapshot.view;
   const [attacks, setAttacks] = createSignal<number[]>([]);
@@ -221,6 +222,12 @@ export function OnlineDuel(props: {
       aria-label={t('online-duel')}
       data-testid="online-duel"
     >
+      <Show when={props.tutorial && !finished()}>
+        <aside class="lobby-journey">
+          <strong>{t('online-tutorial-title')}</strong>
+          <p>{t((view()?.round ?? 1) === 1 ? 'online-tutorial-first' : 'online-tutorial-next')}</p>
+        </aside>
+      </Show>
       <div class="lobby-chat-heading">
         <h2>
           {t(props.replay ? 'online-replay' : 'online-duel')} ·{' '}

@@ -304,7 +304,11 @@ impl Actor {
             });
         }
         let due = now >= next.deadline_ms;
-        let needs_bot = (0..2).any(|i| next.seats[i].bot.is_some() && next.pending[i].is_none());
+        let needs_bot = (0..2).any(|i| {
+            next.seats[i].bot.is_some()
+                && next.pending[i].is_none()
+                && bot_ready(&next, i, &self.settings, now)
+        });
         if next.ended.is_none() && !due && !needs_bot {
             return Ok(false);
         }
@@ -328,6 +332,9 @@ impl Actor {
             let i = side.index();
             if next.pending[i].is_none() {
                 if let Some(bot) = next.seats[i].bot.clone() {
+                    if !timeout && !bot_ready(next, i, &self.settings, crate::online::now_ms()) {
+                        continue;
+                    }
                     let mv = choose_bot(next, &state, side, bot).await?;
                     next.pending[i] = Some(protocol::duel::encode_move(&mv).encode_to_vec());
                     next.deadline_ms = next
@@ -364,6 +371,13 @@ impl Actor {
         next.rebuild()
     }
 }
+// Account-backed opponents take a brief turn; offline/training NPCs remain immediate.
+// Once the opponent submits, the shortened deadline also allows a prompt reply.
+fn bot_ready(record: &Record, side: usize, settings: &Settings, now: i64) -> bool {
+    let delay = 1200 + (i64::from(record.seed[side]) * 7 + record.moves.len() as i64 * 173) % 1800;
+    record.seats[side].user.is_none() || now >= record.deadline_ms - settings.round_ms() + delay
+}
+
 async fn choose_bot(
     record: &Record,
     state: &engine::DuelState,
@@ -372,7 +386,8 @@ async fn choose_bot(
 ) -> Result<engine::Move> {
     let fallback = engine::default_move(state, side);
     let expedition = record.kind == "expedition";
-    let permit = if expedition {
+    let rewarded = expedition || record.seats[side.index()].user.is_some();
+    let permit = if rewarded {
         // Rewarded opponents must never become weaker merely because other AI slots are busy.
         tokio::time::timeout(Duration::from_millis(500), AI_SLOTS.acquire())
             .await
@@ -427,14 +442,14 @@ async fn choose_bot(
         bot.observe(&view);
         Some(bot.choose(&view, &engine_content::content()))
     });
-    let timeout = if expedition {
+    let timeout = if rewarded {
         Duration::from_secs(2)
     } else {
         Duration::from_millis(50)
     };
     match tokio::time::timeout(timeout, task).await {
         Ok(Ok(Some(mv))) => Ok(mv),
-        _ if expedition => Err(Error("AI_BUSY")),
+        _ if rewarded => Err(Error("AI_BUSY")),
         _ => Ok(fallback),
     }
 }

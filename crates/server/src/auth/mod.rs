@@ -235,6 +235,10 @@ pub(crate) fn routes() -> Router<AppState> {
         )
         .route("/api/game", get(crate::game::get).post(crate::game::post))
         .route(
+            "/api/journey",
+            get(crate::journey::get).post(crate::journey::post),
+        )
+        .route(
             "/api/clans",
             get(crate::clans::get).post(crate::clans::post),
         )

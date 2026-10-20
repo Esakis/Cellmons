@@ -57,7 +57,12 @@ async fn incompatible_release_cannot_join_or_claim_a_tournament(db: PgPool) {
 async fn user(db: &PgPool, index: usize) -> (Uuid, Uuid) {
     let id = Uuid::from_u128(index as u128 + 1000);
     let avatar = Uuid::from_u128(index as u128 + 2000);
-    let template = (index % 6 + 1) as i32;
+    let starters: Vec<_> = engine_content::STARTERS
+        .iter()
+        .filter(|s| engine_content::is_playable(s.avatar))
+        .collect();
+    let starter = starters[index % starters.len()];
+    let template = i32::from(starter.avatar);
     let mut tx = db.begin().await.unwrap();
     sqlx::query("INSERT INTO users(id,login,email,password_hash,start_school,email_verified_at) VALUES ($1,$2,$3,'$argon2id$v=19$m=19456,t=2,p=1$fixture$fixture','combat',now())")
         .bind(id).bind(format!("Tournament{index}")).bind(format!("tournament{index}@example.test")).execute(&mut *tx).await.unwrap();
@@ -83,7 +88,6 @@ async fn user(db: &PgPool, index: usize) -> (Uuid, Uuid) {
     .execute(&mut *tx)
     .await
     .unwrap();
-    let starter = &engine_content::STARTERS[index % 6];
     for (card, qty) in starter.cards {
         sqlx::query("INSERT INTO collection(user_id,card_id,qty) VALUES ($1,$2,$3)")
             .bind(id)

@@ -1,4 +1,19 @@
 collection-title = Postacie i kolekcja
+collection-preview = Podgląd karty: { $card }
+collection-available = Dostępne karty
+collection-current-deck = Twoja talia
+collection-character-development = Parametry i rozwój postaci
+collection-school = Szkoła
+collection-all-schools = Wszystkie szkoły
+collection-undo = Cofnij zmianę
+collection-draw-hand = Sprawdź rękę
+collection-draw-again = Rozdaj ponownie
+collection-hand-help = Przykładowe rozdanie z obecnej talii. Sprawdź koszty i kombinacje kart. To podgląd — nie zmienia talii.
+collection-requirements-missing = Postać nie spełnia wymagań czaru.
+collection-deck-full = Talia jest pełna. Aby wymienić kartę, usuń kopię przyciskiem −, a potem dodaj nową przyciskiem +.
+collection-deck-help = Dodawaj i usuwaj kopie przyciskami + i −. Dotknij miniatury, aby przeczytać kartę. Zmiany zapisz przyciskiem „Zapisz talię”.
+collection-deck-empty = Talia jest pusta. Wybierz dostępne karty i dodaj pierwszą.
+collection-no-cards = Brak kart pasujących do filtrów.
 collection-login = Zaloguj się albo otwórz lokalną kolekcję gościa.
 collection-guest = Kolekcja gościa istnieje tylko w RAM. Karty demonstracyjne nie są nagrodami online. Odświeżenie usuwa wszystkie zmiany.
 collection-create = Nowa postać
@@ -49,3 +64,6 @@ collection-error-INVALID_DECK = Talia przekracza limit kart, kopii lub posiadany
 collection-error-PRESETS_FULL = Osiągnięto limit 10 zapisanych zestawów.
 collection-test-deck = Przetestuj talię offline
 collection-error-CONTENT_MISMATCH = Treść gry została zaktualizowana. Odśwież aplikację przed kolejną zmianą.
+
+collection-error-AVATAR_LOCKED = Ta postać jest zablokowana w tej wersji gry. Wybierz dostępną klasę.
+collection-locked = Postać zablokowana do kolejnej aktualizacji.

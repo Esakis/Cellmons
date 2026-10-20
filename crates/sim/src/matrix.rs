@@ -5,7 +5,16 @@ use std::io::{self, Write};
 
 use engine::{Content, DuelSetup, DuelState, EventBuf, Outcome, PlayerSetup, Side, new_duel};
 use engine_ai::Level;
-use engine_content::{AVATARS, STARTERS, StarterDef};
+use engine_content::{AVATARS, StarterDef};
+use std::sync::LazyLock;
+
+static STARTERS: LazyLock<Vec<StarterDef>> = LazyLock::new(|| {
+    engine_content::STARTERS
+        .iter()
+        .copied()
+        .filter(|starter| engine_content::is_playable(starter.avatar))
+        .collect()
+});
 
 use crate::Duel;
 
@@ -258,7 +267,7 @@ mod tests {
     #[test]
     fn every_pair_plays_the_requested_number_of_games() {
         let matrix = play_matrix(4, 1, Level::L1);
-        assert_eq!(matrix.names.len(), 6);
+        assert_eq!(matrix.names.len(), 8);
         for row in &matrix.cells {
             assert!(
                 row.iter()
@@ -266,10 +275,10 @@ mod tests {
             );
         }
         // Wynik pary (i, j) jest lustrzany do (j, i) tylko co do sumy, bo ziarna są różne.
-        let total: u64 = (0..6)
+        let total: u64 = (0..matrix.names.len())
             .map(|row| matrix.total(row).wins + matrix.total(row).draws + matrix.total(row).losses)
             .sum();
-        assert_eq!(total, 6 * 5 * 4);
+        assert_eq!(total, 8 * 7 * 4);
         let mut out = Vec::new();
         report(&matrix, 4, 1, Level::L1, &mut out).expect("zapis do pamięci");
         assert!(

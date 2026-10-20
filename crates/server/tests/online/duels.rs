@@ -125,7 +125,7 @@ async fn incompatible_workers_do_not_claim_or_extend_other_releases(pool: PgPool
 
 #[sqlx::test(migrator = "server::db::MIGRATOR")]
 #[ignore = "requires PostgreSQL; check.bat runs this suite"]
-async fn f10_shade_experience_is_ascent_and_last_level_grants_the_twenty_first_point(pool: PgPool) {
+async fn retired_shade_cannot_start_a_duel_or_change_its_progress(pool: PgPool) {
     let a = player(&pool, 1, true).await;
     let b = player(&pool, 2, true).await;
     sqlx::query("UPDATE avatars SET template_id=29,is_shade=true,shade_school='arcane',level=19,xp=49950,dev_points_unspent=19 WHERE user_id=$1").bind(a.id).execute(&pool).await.unwrap();
@@ -137,15 +137,24 @@ async fn f10_shade_experience_is_ascent_and_last_level_grants_the_twenty_first_p
     let server = Server::new(pool.clone(), Settings::default()).await;
     let mut one = server.connect(&a, None).await;
     let mut two = server.connect(&b, None).await;
-    let id = begin(&mut one, &mut two, &b.login).await;
-    assert_ok(
-        two.call(Client::DuelForfeit(pb::DuelTarget { duel_id: id }))
-            .await,
-    );
-    let Body::DuelEnd(end) = one.event(|b| matches!(b, Body::DuelEnd(_))).await else {
-        panic!()
+    one.join("arena").await;
+    two.join("arena").await;
+    let Body::ChallengeReceived(offer) = one
+        .call(Client::ChallengeSend(pb::ChallengeSend {
+            target: b.login.clone(),
+        }))
+        .await
+    else {
+        panic!("offer");
     };
-    assert_eq!(end.xp_gained, 61); // 100 × 1900 / (19 × 130 + 600), not 100.
+    assert_error(
+        two.call(Client::ChallengeRespond(pb::ChallengeRespond {
+            challenge_id: offer.challenge_id,
+            accept: true,
+        }))
+        .await,
+        "AVATAR_LOCKED",
+    );
     let progress = sqlx::query_as::<_, (i32, i16, i16)>(
         "SELECT xp,level,dev_points_unspent FROM avatars WHERE user_id=$1",
     )
@@ -153,20 +162,14 @@ async fn f10_shade_experience_is_ascent_and_last_level_grants_the_twenty_first_p
     .fetch_one(&pool)
     .await
     .unwrap();
-    assert_eq!(progress, (50011, 20, 21));
-    let Body::DuelEnd(lost) = two.event(|b| matches!(b, Body::DuelEnd(_))).await else {
-        panic!()
-    };
-    assert_eq!(lost.xp_gained, 0);
-    let id = begin(&mut one, &mut two, &b.login).await;
-    assert_ok(
-        one.call(Client::DuelForfeit(pb::DuelTarget { duel_id: id }))
-            .await,
+    assert_eq!(progress, (49950, 19, 19));
+    assert_eq!(
+        sqlx::query_scalar::<_, i64>("SELECT count(*) FROM duel_locks")
+            .fetch_one(&pool)
+            .await
+            .unwrap(),
+        0
     );
-    let Body::DuelEnd(end) = two.event(|b| matches!(b, Body::DuelEnd(_))).await else {
-        panic!()
-    };
-    assert_eq!(end.xp_gained, 168); // The winner also receives the shade opponent's Ascent valuation.
     drop(one);
     drop(two);
     server.stop().await;

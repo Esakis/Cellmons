@@ -1,4 +1,19 @@
 collection-title = Characters and collection
+collection-preview = Preview card: { $card }
+collection-available = Available cards
+collection-current-deck = Your deck
+collection-character-development = Character stats and development
+collection-school = School
+collection-all-schools = All schools
+collection-undo = Undo change
+collection-draw-hand = Sample hand
+collection-draw-again = Deal again
+collection-hand-help = A sample draw from your current deck. Check costs and card combinations. This preview does not change your deck.
+collection-requirements-missing = This character cannot cast this spell.
+collection-deck-full = Your deck is full. To swap a card, remove a copy with −, then add a new one with +.
+collection-deck-help = Use + and − to change copies. Tap a thumbnail to read the card. Use Save deck to keep your changes.
+collection-deck-empty = Your deck is empty. Choose an available card and add it.
+collection-no-cards = No cards match these filters.
 collection-login = Sign in or open the local guest collection.
 collection-guest = The guest collection exists only in RAM. Demo cards are not online rewards. Reloading removes every change.
 collection-create = New character
@@ -49,3 +64,6 @@ collection-error-INVALID_DECK = The deck exceeds its size, copy limit or owned q
 collection-error-PRESETS_FULL = The limit of 10 saved presets has been reached.
 collection-test-deck = Test deck offline
 collection-error-CONTENT_MISMATCH = Game content has been updated. Refresh the app before making another change.
+
+collection-error-AVATAR_LOCKED = This character is locked in this release. Choose an available class.
+collection-locked = Character locked until a future release.

@@ -9,7 +9,7 @@ spell_bias = 100
 epsilon_percent = 15
 temperature_milli = 300
 deck_archetype = "balanced"
-avatar_pool = [1, 2, 3, 4, 5, 6]
+avatar_pool = [1, 2, 3, 4, 5, 11, 13, 32]
 
 [[bots]]
 id = "apprentice"
@@ -21,7 +21,7 @@ spell_bias = 100
 epsilon_percent = 15
 temperature_milli = 300
 deck_archetype = "burst"
-avatar_pool = [1, 2, 3, 4, 5, 6]
+avatar_pool = [1, 2, 3, 4, 5, 11, 13, 32]
 
 [[bots]]
 id = "tactician"
@@ -33,7 +33,7 @@ spell_bias = 80
 epsilon_percent = 15
 temperature_milli = 1000
 deck_archetype = "endurance"
-avatar_pool = [1, 2, 3, 4, 5, 6]
+avatar_pool = [1, 2, 3, 4, 5, 11, 13, 32]
 
 [[bots]]
 id = "archmage"
@@ -45,4 +45,4 @@ spell_bias = 120
 epsilon_percent = 15
 temperature_milli = 300
 deck_archetype = "enchantment"
-avatar_pool = [1, 2, 3, 4, 5, 6]
+avatar_pool = [1, 2, 3, 4, 5, 11, 13, 32]

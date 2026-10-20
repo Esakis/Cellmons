@@ -9,11 +9,11 @@ import {
   onMount,
   Show,
 } from 'solid-js';
-import { account, restoreAccount } from '../../app/account';
+import { account, accountEpoch, api, restoreAccount } from '../../app/account';
 import { avatars, icon, portrait } from '../../app/content';
 import { onlineIcon } from '../../app/onlineIcons';
 import { setActivityBusy, setPlaceBackdrop } from '../../app/session';
-import { BackArrow } from '../../components/BackToMap';
+import { BackToMap } from '../../components/BackToMap';
 import { Scene } from '../../components/Scene';
 import { Stats } from '../../components/Stats';
 import '../../app/pathCatalog';
@@ -24,14 +24,14 @@ import type {
   PublicPlayer,
   SocialSnapshot,
 } from '../../generated/proto/game/v1/lobby_pb';
-import { addTranslations, hasTranslation, t } from '../../i18n';
+import { hasTranslation, t } from '../../i18n';
 import { type ClientBody, OnlineClient, type ServerBody, type Status } from '../../net/client';
 import { parseCommand } from '../../net/commands';
-import en from './en.ftl?raw';
-import pl from './pl.ftl?raw';
+import './translations';
 import '../online.css';
 import type { DuelEnd, DuelSnapshot } from '../../generated/proto/game/v1/online_duel_pb';
 import type { TradeSnapshot } from '../../generated/proto/game/v1/trade_pb';
+import { canEnter, type Journey, requiredLevel } from './journey';
 import { placeIcon, Town } from './Town';
 
 const OnlineDuel = lazy(() => import('./OnlineDuel').then((m) => ({ default: m.OnlineDuel })));
@@ -40,7 +40,6 @@ const OnlineRecords = lazy(() =>
 );
 const Trade = lazy(() => import('./Trade').then((m) => ({ default: m.Trade })));
 
-addTranslations({ pl, en });
 const rooms = ['arena', 'training', 'castle', 'portal', 'bazaar', 'shop', 'tower'];
 // Every clan room shares one place: its name, description and painting (art/paintings/scenes);
 // outside the rooms the player looks at the town (Town.tsx).
@@ -101,12 +100,18 @@ export function Lobby() {
   const [error, setError] = createSignal('');
   const [notice, setNotice] = createSignal('');
   const [help, setHelp] = createSignal(false);
+  const [journey, setJourney] = createSignal<Journey>();
+  const [tutorialBusy, setTutorialBusy] = createSignal(false);
+  const [chatBusy, setChatBusy] = createSignal(false);
+  const [mailBusy, setMailBusy] = createSignal(false);
   const [report, setReport] = createSignal<{
     kind: 'chat' | 'player';
     target: string;
     label: string;
   }>();
-  const [tab, setTab] = createSignal<'map' | 'social' | 'mail' | 'ranking' | 'history'>('map');
+  const [tab, setTab] = createSignal<'map' | 'chat' | 'social' | 'mail' | 'ranking' | 'history'>(
+    'map',
+  );
   const [sort, setSort] = createSignal('login');
   const [mail, setMail] = createSignal<MailEntry[]>([]);
   const [sent, setSent] = createSignal(false);
@@ -119,8 +124,35 @@ export function Lobby() {
   let offset = 0;
   let lastPrivate = '';
   let disposed = false;
+  // A room snapshot opens its building only after the player's own choice or a reconnect;
+  // coming back to the lobby from another screen starts on the town map.
+  let joining = '';
+  let welcomed = false;
+  let rejoin = false;
   let chatLog: HTMLDivElement | undefined;
   const connected = () => status() === 'connected';
+  async function loadJourney() {
+    const epoch = accountEpoch();
+    try {
+      const result = await api<Journey>('/api/journey');
+      if (!disposed && epoch === accountEpoch()) setJourney(result);
+    } catch (reason) {
+      showError(reason);
+    }
+  }
+  async function advanceTutorial() {
+    if (tutorialBusy() || !journey()) return;
+    setTutorialBusy(true);
+    const epoch = accountEpoch();
+    try {
+      const result = await api<Journey>('/api/journey', { step: journey()?.tutorial_step });
+      if (!disposed && epoch === accountEpoch()) setJourney(result);
+    } catch (reason) {
+      showError(reason);
+    } finally {
+      setTutorialBusy(false);
+    }
+  }
   createEffect(() => {
     const profile = me();
     if (profile) setActivityBusy(profile.busy);
@@ -155,6 +187,8 @@ export function Lobby() {
     switch (body.case) {
       case 'welcome':
         setMe(body.value.profile);
+        rejoin = welcomed;
+        welcomed = true;
         offset = Number(body.value.serverTimeMs) - Date.now();
         setRoom('');
         setRoomMotd('');
@@ -162,6 +196,10 @@ export function Lobby() {
         setMessages([]);
         setOffers([]);
         setSelected(undefined);
+        void loadJourney();
+        // A new lobby visit starts on the town square, so its chat works before entering a building.
+        if (!rejoin)
+          void send({ case: 'roomJoin', value: { $typeName: 'game.v1.RoomJoin', room: 'square' } });
         if (trade())
           void send({
             case: 'tradeSnapshot',
@@ -193,13 +231,17 @@ export function Lobby() {
         break;
       case 'duelEnd':
         if (duel()?.duelId === body.value.duelId) setDuelEnd(body.value);
+        void loadJourney();
         break;
       case 'trainingBots':
         setBots(body.value.bots);
         break;
       case 'roomSnapshot':
         setRoom(body.value.room);
-        setInside(true);
+        if (body.value.room !== 'square' && (rejoin || body.value.room === joining))
+          setInside(true);
+        rejoin = false;
+        joining = '';
         setRoomMotd(body.value.motd);
         setPlayers(body.value.players);
         setMessages(body.value.messages);
@@ -276,6 +318,7 @@ export function Lobby() {
       setDuelEnd(undefined);
       setTrade(undefined);
       setBots([]);
+      setJourney(undefined);
     }
   });
   onCleanup(() => {
@@ -297,8 +340,11 @@ export function Lobby() {
   }
   async function chat(event: SubmitEvent) {
     event.preventDefault();
+    if (chatBusy()) return;
+    setChatBusy(true);
+    const submitted = text();
     try {
-      const command = parseCommand(text(), lastPrivate);
+      const command = parseCommand(submitted, lastPrivate);
       let result: ServerBody | undefined;
       if (command.kind === 'help') {
         setHelp(true);
@@ -333,9 +379,11 @@ export function Lobby() {
           case: 'whoIs',
           value: { $typeName: 'game.v1.PlayerTarget', player: command.player },
         });
-      if (result) setText('');
+      if (result && text() === submitted) setText('');
     } catch (reason) {
       showError(reason);
+    } finally {
+      setChatBusy(false);
     }
   }
   function loadMail(outgoing = sent(), beforeId = '') {
@@ -351,6 +399,8 @@ export function Lobby() {
   }
   async function compose(event: SubmitEvent) {
     event.preventDefault();
+    if (mailBusy()) return;
+    setMailBusy(true);
     const form = event.currentTarget as HTMLFormElement;
     const data = new FormData(form);
     if (
@@ -358,8 +408,8 @@ export function Lobby() {
         case: 'mailSend',
         value: {
           $typeName: 'game.v1.MailSend',
-          to: String(data.get('to')),
-          text: String(data.get('text')),
+          to: String(data.get('to')).trim(),
+          text: String(data.get('text')).trim(),
         },
       })
     ) {
@@ -367,18 +417,30 @@ export function Lobby() {
       setNotice(t('lobby-mail-sent'));
       if (sent()) await loadMail(true);
     }
+    setMailBusy(false);
   }
   const time = (value: bigint) =>
     new Date(Number(value)).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   function enter(name: string) {
+    if (!canEnter(journey(), name)) {
+      setError(t('lobby-location-locked', { level: requiredLevel(journey(), name) }));
+      return;
+    }
     if (name === room()) setInside(true);
-    else void send({ case: 'roomJoin', value: { $typeName: 'game.v1.RoomJoin', room: name } });
+    else {
+      joining = name;
+      void send({ case: 'roomJoin', value: { $typeName: 'game.v1.RoomJoin', room: name } });
+    }
   }
   // A challenge waiting for the player's answer marks the arena on the map.
-  const challenged = () => offers().some((offer) => offer.to?.id === me()?.id);
+  const challenged = () =>
+    offers().some((offer) => offer.to?.id === me()?.id && Number(offer.expiresAtMs) > now());
   const inRoom = () => tab() === 'map' && inside() && Boolean(room());
   return (
-    <section class="lobby-page">
+    <section
+      class="lobby-page"
+      classList={{ 'lobby-map-mode': tab() === 'map' && !inside() && !duel() && !trade() }}
+    >
       {/* The player's bar, as in mobile games: portrait, level and rating, challenge settings. */}
       <div class="lobby-hud">
         <h1 class="visually-hidden">{t('lobby')}</h1>
@@ -390,6 +452,13 @@ export function Lobby() {
               <span>
                 <Standing player={self()} />
               </span>
+              <Show when={journey()}>
+                {(progress) => (
+                  <span class="lobby-account-level">
+                    {t('lobby-account-level', { level: progress().level })}
+                  </span>
+                )}
+              </Show>
               <label>
                 <span class="lobby-hud-label">{t('lobby-challenges')}</span>
                 <select
@@ -461,9 +530,11 @@ export function Lobby() {
             connected={connected()}
             now={now()}
             send={send}
+            tutorial={(journey()?.tutorial_step ?? 3) < 3}
             close={() => {
               setDuel(undefined);
               setDuelEnd(undefined);
+              void loadJourney();
             }}
           />
         )}
@@ -489,7 +560,7 @@ export function Lobby() {
             <div class="lobby-layout">
               <div class="lobby-main">
                 <nav class="lobby-tabs lobby-menu" aria-label={t('lobby')}>
-                  <For each={['map', 'social', 'mail', 'ranking', 'history'] as const}>
+                  <For each={['map', 'chat', 'social', 'mail', 'ranking', 'history'] as const}>
                     {(value) => (
                       <button
                         type="button"
@@ -501,18 +572,72 @@ export function Lobby() {
                           if (value === 'mail') void loadMail();
                         }}
                       >
-                        <img class="icon" src={onlineIcon(`tab-${value}`)} alt="" />
+                        <img
+                          class="icon"
+                          src={onlineIcon(`tab-${value === 'chat' ? 'social' : value}`)}
+                          alt=""
+                        />
                         {t(`lobby-tab-${value}`)}
                       </button>
                     )}
                   </For>
                 </nav>
                 <Show when={tab() === 'map'}>
+                  <Show when={!inRoom() && journey()}>
+                    {(progress) => (
+                      <div class="lobby-journey">
+                        <Show
+                          when={progress().tutorial_step < 3}
+                          fallback={
+                            <p>
+                              {progress().next_xp === null
+                                ? t('lobby-account-complete')
+                                : t('lobby-account-progress', {
+                                    xp: progress().xp,
+                                    next: progress().next_xp ?? progress().xp,
+                                  })}
+                            </p>
+                          }
+                        >
+                          <strong>
+                            {t('lobby-tutorial-step', { step: progress().tutorial_step + 1 })}
+                          </strong>
+                          <p>{t(`lobby-tutorial-${progress().tutorial_step}`)}</p>
+                          <Show
+                            when={progress().tutorial_step < 2}
+                            fallback={
+                              <button
+                                type="button"
+                                class="primary"
+                                disabled={!connected()}
+                                onClick={() => enter('training')}
+                              >
+                                {t('lobby-tutorial-train')}
+                              </button>
+                            }
+                          >
+                            <button
+                              type="button"
+                              class="primary"
+                              disabled={tutorialBusy()}
+                              onClick={() => void advanceTutorial()}
+                            >
+                              {t('lobby-tutorial-next')}
+                            </button>
+                          </Show>
+                          <Show when={progress().tutorial_step === 1}>
+                            <A href="/collection">{t('lobby-tutorial-deck')}</A>
+                          </Show>
+                        </Show>
+                      </div>
+                    )}
+                  </Show>
                   <Show
                     when={inRoom()}
                     fallback={
                       <Town
                         connected={connected()}
+                        journey={journey()}
                         clan={self().clanId}
                         alert={challenged() ? 'arena' : ''}
                         enter={enter}
@@ -522,15 +647,7 @@ export function Lobby() {
                     {/* Inside a building: its painting, the way back and a quick way to the others. */}
                     <Scene src={scene(room())} about={t(`lobby-room-${place(room())}-about`)}>
                       <h2 class="plaque">{t(`lobby-room-${place(room())}`)}</h2>
-                      <button
-                        type="button"
-                        class="back-to-map medal"
-                        aria-label={t('back-to-map')}
-                        title={t('back-to-map')}
-                        onClick={() => setInside(false)}
-                      >
-                        <BackArrow />
-                      </button>
+                      <BackToMap onClick={() => setInside(false)} />
                     </Scene>
                     <nav class="lobby-travel" aria-label={t('lobby-travel')}>
                       <For each={self().clanId ? [...rooms, `clan:${self().clanId}`] : rooms}>
@@ -539,7 +656,7 @@ export function Lobby() {
                             type="button"
                             class="plaque"
                             aria-current={room() === name ? 'location' : undefined}
-                            disabled={!connected()}
+                            disabled={!connected() || !canEnter(journey(), name)}
                             onClick={() => enter(name)}
                           >
                             <img class="icon" src={placeIcon(place(name))} alt="" />
@@ -571,13 +688,14 @@ export function Lobby() {
                     />
                   </div>
                 </Show>
-                <Show when={inRoom() && (room() === 'tower' || room().startsWith('clan:'))}>
+                <Show when={inRoom() && (room() === 'tower' || self().clanId)}>
                   <A class="button secondary lobby-enter" href="/clans">
                     {t('clans')}
                   </A>
                 </Show>
-                <Show when={inRoom() && (room() === 'portal' || room() === 'expedition')}>
-                  <div hidden={Boolean(duel() || trade())}>
+                {/* Kept mounted while the player stays in the portal, so a chosen expedition survives a look at the map or mail. */}
+                <Show when={room() === 'portal' || room() === 'expedition'}>
+                  <div hidden={Boolean(duel() || trade()) || !inRoom()}>
                     <Expeditions
                       avatar={self().avatarId}
                       verified={self().verified}
@@ -602,7 +720,7 @@ export function Lobby() {
                       {t('refresh')}
                     </button>
                     <div class="online-bots">
-                      <For each={bots()}>
+                      <For each={(journey()?.tutorial_step ?? 3) < 3 ? bots().slice(0, 1) : bots()}>
                         {(bot) => (
                           <button
                             type="button"
@@ -730,19 +848,21 @@ export function Lobby() {
                         {t('lobby-message')}
                         <textarea name="text" required maxLength={1000} rows={3} />
                       </label>
-                      <button type="submit" disabled={!connected()}>
+                      <button type="submit" disabled={!connected() || mailBusy()}>
                         {t('lobby-send-mail')}
                       </button>
                     </form>
                   </div>
                 </Show>
-                <section class="lobby-chat">
+                <section class="lobby-chat" classList={{ 'lobby-chat-active': tab() === 'chat' }}>
                   <Notices bulletin />
                   <Show when={roomMotd()}>
                     <p class="lobby-notice">{roomMotd()}</p>
                   </Show>
                   <div class="lobby-chat-heading">
-                    <h2>{t(room() ? 'lobby-chat' : 'lobby-choose-room')}</h2>
+                    <h2>
+                      {t('lobby-chat')} · {t(`lobby-room-${place(room() || 'square')}`)}
+                    </h2>
                     <label>
                       {t('lobby-chat-filter')}
                       <select
@@ -814,10 +934,15 @@ export function Lobby() {
                       value={text()}
                       onInput={(e) => setText(e.currentTarget.value)}
                       maxLength={330}
-                      disabled={!connected()}
+                      disabled={!connected() || !room()}
+                      enterkeyhint="send"
                       placeholder={t('lobby-chat-placeholder')}
                     />
-                    <button type="submit" class="primary" disabled={!connected() || !text().trim()}>
+                    <button
+                      type="submit"
+                      class="primary"
+                      disabled={!connected() || !room() || chatBusy() || !text().trim()}
+                    >
                       {t('lobby-send')}
                     </button>
                     <button type="button" aria-expanded={help()} onClick={() => setHelp(!help())}>

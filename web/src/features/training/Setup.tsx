@@ -1,7 +1,7 @@
 import { A } from '@solidjs/router';
 import { createSignal, For, Show } from 'solid-js';
 import { account, enterGuest } from '../../app/account';
-import { avatars, content, fluentKey, icon, portrait } from '../../app/content';
+import { fluentKey, icon, isPlayableAvatar, playableAvatars, portrait } from '../../app/content';
 import { readPreference, writePreference } from '../../app/preferences';
 import { t } from '../../i18n';
 import styles from './Training.module.css';
@@ -18,7 +18,7 @@ const [painting] = Object.values(
 export function TrainingSetup() {
   const [selected, setSelected] = createSignal(Number(readPreference('avatar', '1')));
   const [bot, setBot] = createSignal(readPreference('bot', 'novice'));
-  const avatarId = () => (avatars.has(selected()) ? selected() : 1);
+  const avatarId = () => (isPlayableAvatar(selected()) ? selected() : 1);
   const profile = () => (profiles.includes(bot()) ? bot() : 'novice');
   function selectAvatar(id: number) {
     setSelected(id);
@@ -72,7 +72,7 @@ export function TrainingSetup() {
           </div>
           {/* Portraits load lazily: the painted welcome card is the largest paint and goes first. */}
           <div class={styles.avatars}>
-            <For each={content.avatars}>
+            <For each={playableAvatars}>
               {(avatar) => (
                 <button
                   type="button"

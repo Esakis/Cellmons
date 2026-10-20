@@ -9,6 +9,7 @@ Projekt gry karcianej z elementami RPG (przeglądarka i Android), odtwarzającej
 Potrzebne są: Rust (rustup), Node.js 24 LTS z pnpm (`corepack enable pnpm`) i Docker Desktop; klient wymaga też `wasm-bindgen-cli` 0.2.129. Szczegóły są w [CONTRIBUTING.md](CONTRIBUTING.md).
 
 - `run.bat` uruchamia bazę danych, stosuje migracje, uruchamia serwer gry i klienta, a potem otwiera przeglądarkę na http://localhost:5173.
+- `phone.bat` przygotowuje APK do gry na telefonie w tej samej sieci z 40 trwałymi przeciwnikami; [instrukcja](docs/40-testy-na-telefonie.md).
 - `check.bat` wykonuje wszystkie kontrole z CI i kończy się podsumowaniem.
 - `cargo run -p sim -- duel [ziarno]` rozgrywa pojedynek botów i opisuje go runda po rundzie.
 - `cargo run --release -p sim -- run --n 100000` rozgrywa serię pojedynków botów i podsumowuje wyniki.
@@ -40,6 +41,8 @@ Uzasadnienia: `docs/05-decyzje-architektoniczne.md`.
 ## Dokumentacja
 
 Zalecana kolejność czytania: 01 → 02 → 03 → 04 → 16, potem pozostałe według potrzeby.
+
+Wersja testowa udostępnia osiem klas: Mag, Wojownik, Kapłan, Druid, Nekromantka, Wampir, Żniwiarz i Mędrzec. Na start wybiera się jedną z trzech: Mag, Wojownik lub Kapłan. Samouczek i trwały poziom konta stopniowo otwierają lokacje, a poziomy 5, 8, 12, 16, 20, 24 i 28 dają wybór kolejnej nieposiadanej klasy w Kolekcji. Pozostałe 24 klasy są zablokowane. [Plan rozwoju i kontr każdej z ośmiu klas](docs/41-plan-progresji-i-sciezek.md) oddziela wdrożone mechaniki od propozycji kontraktów klasowych i nowego systemu srebro/złoto.
 
 | Dokument | Zawartość |
 |---|---|

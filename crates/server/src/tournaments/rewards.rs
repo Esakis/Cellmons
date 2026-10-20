@@ -51,6 +51,7 @@ pub async fn create_system(
         Reward::Avatar { template } => {
             if !engine_content::AVATARS.iter().any(|a| {
                 a.id == *template
+                    && a.playable
                     && matches!(
                         a.rarity,
                         engine_content::AvatarRarity::Common
@@ -147,6 +148,7 @@ pub(super) async fn grant(
     match frozen.reward {
         Reward::Ducats { .. } => {} // Cash was funded into the escrow, and follows the common payout path.
         Reward::Avatar { template } => {
+            crate::game::ensure_playable(i32::from(template))?;
             sqlx::query("INSERT INTO unlocked_templates(user_id,template_id,source) VALUES ($1,$2,'tournament') ON CONFLICT DO NOTHING").bind(user).bind(i32::from(template)).execute(db).await?;
         }
         Reward::Card { card } => {

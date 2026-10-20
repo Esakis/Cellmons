@@ -1,4 +1,5 @@
 import { A } from '@solidjs/router';
+import { Dynamic } from 'solid-js/web';
 import { t } from '../i18n';
 
 /** The arrow of the way back, drawn in the medal of `.back-to-map` (global.css). */
@@ -10,16 +11,22 @@ export function BackArrow() {
   );
 }
 
-/** A screen that is a building of the town (the library, the shop, the clans) leads back to the map. */
-export function BackToMap() {
+/**
+ * The way back to the town map: a link from a screen that is a building of the town (the
+ * library, the shop, the clans), or a button inside a lobby room (`onClick`).
+ */
+export function BackToMap(props: { onClick?: () => void }) {
   return (
-    <A
+    <Dynamic
+      component={props.onClick ? 'button' : A}
+      type={props.onClick ? 'button' : undefined}
+      href={props.onClick ? undefined : '/lobby'}
       class="back-to-map medal"
-      href="/lobby"
       aria-label={t('back-to-map')}
       title={t('back-to-map')}
+      onClick={props.onClick}
     >
       <BackArrow />
-    </A>
+    </Dynamic>
   );
 }

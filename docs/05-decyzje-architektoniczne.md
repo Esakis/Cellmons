@@ -23,6 +23,7 @@ Każda decyzja ma status, kontekst, rozważone alternatywy i konsekwencje. Zmian
 | 017 | Trening offline: sesja WASM z binarnym dispatch, treść wersjonowana razem z klientem | przyjęta |
 | 018 | Gość lokalny bez konta, sieci i zapisu danych; osobno konto z niepotwierdzonym e-mailem | przyjęta (decyzja właściciela) |
 | 021 | Ilustracje kart i portrety: obrazy z domeny publicznej w korekcie barwnej gry; ikony z game-icons.net (CC BY 3.0) | przyjęta (decyzja właściciela) |
+| 022 | 40 trwałych kont sterowanych przez serwer, ze zwykłymi nickami i profilami | przyjęta (decyzja właściciela) |
 
 ---
 
@@ -380,3 +381,29 @@ Konto z niepotwierdzonym e-mailem pozostaje trwałym kontem z ograniczeniami R-K
 - (−) Obrazy w domenie publicznej nie dają wyłączności, a część jest rozpoznawalna. Rozpoznawalność gry chroni znak towarowy (ADR-012, `20-nazwa-i-znak-towarowy.md`).
 - (−) Różni malarze to różne style; spójność pilnuje wspólna korekta barwna i kadr.
 - ADR-016 pozostaje w mocy dla ramek, elementów interfejsu i kart bez obrazu.
+
+## ADR-022. Stałe konta sterowane przez serwer
+
+**Kontekst.** Na start gry potrzebni są dostępni przeciwnicy i aktywność w lobby.
+2026-10-20 właściciel zamówił około 40 kont, ze zwykłymi nazwami i bez oznaczenia
+bota w interfejsie.
+
+**Decyzja.** Konta są trwałymi użytkownikami z własnymi postaciami, kolekcjami
+i legalnymi taliami. Prywatna tabela `bot_accounts` przypisuje profil AI i pozwala
+wyłączyć sterowanie. Kontroler korzysta z istniejącego huba i aktora pojedynku;
+przyjęcie wyzwania zapisuje profil AI w dzienniku. Własne pojedynki kont sterowanych
+przez serwer są treningami bez nagród, a walki z człowiekiem podlegają normalnym
+zasadom areny. Nie dodajemy automatycznego czatu ani udziału w turniejach.
+
+**Alternatywy.** Rozszerzenie wirtualnych botów treningowych nie zapewniałoby trwałych
+kont i ich historii. Osobne procesy klienckie wymagałyby przechowywania haseł i
+powielałyby logikę wyboru ruchu. Wspólny serwer korzysta z istniejących blokad,
+limitów i odtwarzania pojedynków.
+
+**Konsekwencje.** Jedna sesyjna blokada PostgreSQL ogranicza sterownik do jednego
+procesu na bazę. Obecność jest lokalna dla jego huba, zgodnie z wdrożeniem na jednym
+serwerze. Ponowne tworzenie nie zeruje postępu i nie przejmuje zajętych nicków.
+Zmiana `LOBBY_BOTS_ENABLED` wymaga restartu; indywidualne `enabled` jest odczytywane
+co 30 sekund. Przy utracie połączenia utrzymującego blokadę sterownik odłącza konta.
+Nadzorca próbuje ponownie co 10 sekund, również po zakończeniu poprzedniego procesu
+podczas wdrożenia. Niedostępność bazy nie blokuje startu serwera HTTP.

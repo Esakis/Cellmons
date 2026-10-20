@@ -141,6 +141,21 @@ async fn export_is_a_complete_snapshot_of_own_data_without_credentials_or_other_
     let a = f.user("PrivacyAlice").await;
     let b = f.user("PrivacyBob").await;
     let c = f.user("PrivacyCarol").await;
+    sqlx::query("UPDATE users SET account_xp=700 WHERE id=$1")
+        .bind(a.id)
+        .execute(&db)
+        .await
+        .unwrap();
+    server::game::mutate(
+        &db,
+        a.id,
+        server::game::Mutation::Recruit {
+            level: 5,
+            template_id: Some(2),
+        },
+    )
+    .await
+    .unwrap();
     for (from, to, text) in [
         (a.id, b.id, "My own letter"),
         (b.id, a.id, "A letter sent to me"),
@@ -188,6 +203,9 @@ async fn export_is_a_complete_snapshot_of_own_data_without_credentials_or_other_
             .contains("no-store")
     );
     assert_eq!(data["account"][0]["id"], a.id.to_string());
+    assert_eq!(data["account_progress"][0]["xp"], 700);
+    assert_eq!(data["recruitment_rewards"].as_array().unwrap().len(), 1);
+    assert_eq!(data["recruitment_rewards"][0]["template_id"], 2);
     assert_eq!(data["mail"].as_array().unwrap().len(), 2);
     assert_eq!(data["wallet"][0]["balance"], "40");
     assert!(!data["collection"].as_array().unwrap().is_empty());
@@ -430,6 +448,21 @@ async fn erasure_is_exactly_once_and_preserves_the_currency_ledger(db: PgPool) {
     let f = Fixture::new(db.clone());
     let a = f.user("EraseAlice").await;
     let b = f.user("UntouchedBob").await;
+    sqlx::query("UPDATE users SET account_xp=700 WHERE id=$1")
+        .bind(a.id)
+        .execute(&db)
+        .await
+        .unwrap();
+    server::game::mutate(
+        &db,
+        a.id,
+        server::game::Mutation::Recruit {
+            level: 5,
+            template_id: Some(2),
+        },
+    )
+    .await
+    .unwrap();
     assert_eq!(f.delete(&a).await, StatusCode::NO_CONTENT);
     sqlx::query("UPDATE users SET deletion_requested_at=now()-interval '31 days' WHERE id=$1")
         .bind(a.id)
@@ -480,6 +513,13 @@ async fn erasure_is_exactly_once_and_preserves_the_currency_ledger(db: PgPool) {
         .await
         .unwrap();
     assert_eq!(count, 0);
+    let claims: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM recruitment_claims WHERE user_id=$1")
+            .bind(a.id)
+            .fetch_one(&db)
+            .await
+            .unwrap();
+    assert_eq!(claims, 0);
     assert_eq!(server::auth::privacy::cleanup(&db).await.unwrap(), 0);
 }
 

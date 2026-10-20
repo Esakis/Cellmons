@@ -191,6 +191,7 @@ async fn erase_one(db: &PgPool, user: Uuid) -> Result<bool> {
     delete!("DELETE FROM junkyard WHERE user_id=$1");
     delete!("DELETE FROM daily_counters WHERE user_id=$1");
     delete!("DELETE FROM arena_progress WHERE user_id=$1");
+    delete!("DELETE FROM recruitment_claims WHERE user_id=$1");
     delete!("DELETE FROM idempotency_keys WHERE user_id=$1");
     delete!("DELETE FROM user_notices WHERE user_id=$1");
     delete!("DELETE FROM abuse_signals WHERE user_id=$1");

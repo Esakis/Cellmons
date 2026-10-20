@@ -530,7 +530,7 @@ async fn all_system_prize_types_settle_once_and_cancelled_cash_reconciles(db: Pg
     };
     for (index, reward) in [
         Reward::Ducats { amount: 100 },
-        Reward::Avatar { template: 7 },
+        Reward::Avatar { template: 32 },
         Reward::Card { card: 330 },
         Reward::Booster {
             booster: "basic".into(),
@@ -616,7 +616,7 @@ async fn all_system_prize_types_settle_once_and_cancelled_cash_reconciles(db: Pg
             ),
             Reward::Avatar { .. } => assert_eq!(
                 sqlx::query_scalar::<_, i64>(
-                    "SELECT count(*) FROM unlocked_templates WHERE user_id=$1 AND template_id=7"
+                    "SELECT count(*) FROM unlocked_templates WHERE user_id=$1 AND template_id=32"
                 )
                 .bind(a)
                 .fetch_one(&db)

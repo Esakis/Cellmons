@@ -12,7 +12,7 @@ import {
   signIn,
   signOut,
 } from '../../app/account';
-import { icon } from '../../app/content';
+import { content, fluentKey, icon, startingAvatars } from '../../app/content';
 import { onlineIcon } from '../../app/onlineIcons';
 import { Scene } from '../../components/Scene';
 import { version as legalVersion } from '../../generated/legal-version.json';
@@ -193,11 +193,16 @@ export function AccountPage() {
         await signIn(value('identity'), value('password'));
       } else if (current === 'register') {
         try {
+          const template = Number(value('template'));
+          const selectedStarter = content.starters.find(
+            (s) => s.avatar === startingAvatars.find((a) => a.id === template)?.key,
+          );
           await api('/api/auth/register', {
             login: value('login'),
             email: value('email'),
             password: value('password'),
-            school: value('school'),
+            school: selectedStarter?.school,
+            template_id: template,
             client: authClient(),
             captcha_token: captchaToken() || null,
             terms_version: legalVersion,
@@ -403,9 +408,9 @@ export function AccountPage() {
           <Show when={mode() === 'register'}>
             <label>
               {t('auth-school')}
-              <select name="school">
-                <For each={['combat', 'divine', 'element', 'arcane', 'necro', 'tech']}>
-                  {(school) => <option value={school}>{t(`school-${school}-name`)}</option>}
+              <select name="template">
+                <For each={startingAvatars}>
+                  {(avatar) => <option value={avatar.id}>{t(fluentKey(avatar.key))}</option>}
                 </For>
               </select>
             </label>

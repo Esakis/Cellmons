@@ -55,6 +55,8 @@ pub enum AvatarRarity {
 pub struct AvatarDef {
     pub id: u16,
     pub key: &'static str,
+    /// Release availability; path profiles inherit availability from their base template.
+    pub playable: bool,
     pub rarity: AvatarRarity,
     /// Szkoła, dla której postać jest startowa.
     pub starter_for: Option<School>,
@@ -168,6 +170,18 @@ pub fn path(id: u16) -> Option<&'static PathDef> {
     PATHS.iter().find(|path| path.avatar.id == id)
 }
 
+/// Locked content remains readable for old collections and match replays.
+#[must_use]
+pub fn is_playable(id: u16) -> bool {
+    let base = path(id).map_or(id, |p| p.base_avatar);
+    AVATARS.iter().any(|a| a.id == base && a.playable)
+}
+
+#[must_use]
+pub fn starter(id: u16) -> Option<&'static StarterDef> {
+    STARTERS.iter().find(|s| s.avatar == id)
+}
+
 /// Klucz karty, np. `card.bronze_edge`.
 #[must_use]
 pub fn card_key(id: CardId) -> Option<&'static str> {
@@ -180,6 +194,46 @@ pub fn card_key(id: CardId) -> Option<&'static str> {
 #[cfg(test)]
 mod tests {
     use super::{AVATARS, AvatarRarity, MAX_LEVEL, PATHS, STARTERS, avatar, content, rules};
+
+    #[test]
+    fn release_roster_has_eight_legal_starters_and_paths_inherit_the_lock() {
+        let released: Vec<_> = AVATARS
+            .iter()
+            .filter(|a| a.playable)
+            .map(|a| a.id)
+            .collect();
+        assert_eq!(released, [1, 2, 3, 4, 5, 11, 13, 32]);
+        let content = content();
+        for definition in AVATARS {
+            assert_eq!(super::is_playable(definition.id), definition.playable);
+            for path in PATHS.iter().filter(|p| p.base_avatar == definition.id) {
+                assert_eq!(super::is_playable(path.avatar.id), definition.playable);
+            }
+            if !definition.playable {
+                continue;
+            }
+            let starter = super::starter(definition.id).expect("released class needs a pack");
+            assert_eq!(starter.deck.len(), 20);
+            for id in starter.deck {
+                assert!(
+                    definition
+                        .schools
+                        .meets(&content.get(*id).unwrap().requires),
+                    "{}",
+                    definition.key
+                );
+                let count = starter.deck.iter().filter(|v| *v == id).count();
+                assert!(count <= 4);
+                assert!(
+                    starter
+                        .cards
+                        .iter()
+                        .any(|(card, qty)| card == id && usize::from(*qty) >= count)
+                );
+            }
+        }
+        assert!(!super::is_playable(u16::MAX));
+    }
 
     #[test]
     fn generated_content_is_accepted_by_the_engine() {

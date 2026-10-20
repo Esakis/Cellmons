@@ -1,5 +1,5 @@
 import { A, useBeforeLeave } from '@solidjs/router';
-import { createEffect, createMemo, createSignal, For, lazy, onCleanup, Show } from 'solid-js';
+import { createEffect, createSignal, For, lazy, onCleanup, Show } from 'solid-js';
 import {
   ApiError,
   account,
@@ -10,11 +10,10 @@ import {
 } from '../../app/account';
 import {
   avatars,
-  cardArgs,
-  cards,
   content,
   fluentKey,
   icon,
+  isPlayableAvatar,
   loadPaths,
   portrait,
   statIcons,
@@ -31,10 +30,15 @@ import { guestMutation, guestState, type Mutation, type Snapshot } from './state
 import './collection.css';
 
 addTranslations({ pl, en });
+const DeckWorkbench = lazy(() =>
+  import('./DeckWorkbench').then((module) => ({ default: module.DeckWorkbench })),
+);
 const Progression = lazy(() =>
   import('./Progression').then((module) => ({ default: module.Progression })),
 );
-const schools = ['combat', 'divine', 'element', 'arcane', 'necro', 'tech'];
+const Recruitment = lazy(() =>
+  import('./Recruitment').then((module) => ({ default: module.Recruitment })),
+);
 // The collection's painting (art/paintings/scenes) and the card illustrations, which load with
 // their own module as in the duel (app/cardArt.ts).
 const [painting] = Object.values(
@@ -55,11 +59,6 @@ export function Collection() {
   const [draft, setDraft] = createSignal<number[]>([]);
   const [points, setPoints] = createSignal([0, 0, 0, 0, 0, 0]);
   const [template, setTemplate] = createSignal(0);
-  const [query, setQuery] = createSignal('');
-  const [visibleCount, setVisibleCount] = createSignal(24);
-  const [rarity, setRarity] = createSignal('');
-  const [castable, setCastable] = createSignal(false);
-  const [ownedOnly, setOwnedOnly] = createSignal(false);
   const [presetName, setPresetName] = createSignal('');
   const [loading, setLoading] = createSignal(false);
   const [error, setError] = createSignal('');
@@ -133,6 +132,9 @@ export function Collection() {
     if (changed() && !window.confirm(t('collection-unsaved'))) event.preventDefault();
   });
   async function mutate(mutation: Mutation) {
+    if (loading()) return false;
+    if (mutation.action === 'recruit' && changed() && !window.confirm(t('collection-unsaved')))
+      return false;
     const epoch = accountEpoch();
     setLoading(true);
     setError('');
@@ -146,62 +148,30 @@ export function Collection() {
         setData(snapshot);
         if (mutation.action === 'spend') setPoints([0, 0, 0, 0, 0, 0]);
         if (mutation.action === 'create') setSelected(mutation.id);
+        if (mutation.action === 'recruit') {
+          const claimed = snapshot.recruitment?.milestones.find((m) => m.level === mutation.level);
+          if (claimed?.avatar_id && snapshot.avatars.some((a) => a.id === claimed.avatar_id))
+            setSelected(claimed.avatar_id);
+        }
         if (mutation.action === 'shade') setSelected(mutation.new_id);
         if (mutation.action === 'reincarnate') setPoints([0, 0, 0, 0, 0, 0]);
-        setNotice(t('collection-saved'));
+        setNotice(t(mutation.action === 'recruit' ? 'recruit-success' : 'collection-saved'));
+        return true;
       }
     } catch (reason) {
       if (!disposed && epoch === accountEpoch()) {
-        failure(reason);
         if (!guest()) await load();
+        failure(reason);
       }
     } finally {
       if (!disposed && epoch === accountEpoch()) setLoading(false);
     }
+    return false;
   }
-  const visible = createMemo(() =>
-    content.cards.filter((card) => {
-      if (
-        query() &&
-        !t(fluentKey(card.key)).toLocaleLowerCase().includes(query().toLocaleLowerCase())
-      )
-        return false;
-      if (rarity() && card.rarity !== rarity()) return false;
-      if (ownedOnly() && !data()?.collection.some((s) => s.card_id === card.id && s.qty > 0))
-        return false;
-      if (
-        castable() &&
-        Object.entries(card.requires).some(
-          ([school, level]) => (own()?.schools[schools.indexOf(school)] ?? 0) < level,
-        )
-      )
-        return false;
-      return true;
-    }),
-  );
-  createEffect(() => {
-    query();
-    rarity();
-    castable();
-    ownedOnly();
-    setVisibleCount(24);
-  });
   function select(id: string) {
     if (changed() && !window.confirm(t('collection-unsaved'))) return;
     setSelected(id);
     setPoints([0, 0, 0, 0, 0, 0]);
-  }
-  function add(id: number) {
-    const copies = draft().filter((value) => value === id).length;
-    if (
-      draft().length < content.rules.deck.size &&
-      copies <
-        Math.min(
-          content.rules.deck.max_copies,
-          data()?.collection.find((s) => s.card_id === id)?.qty ?? 0,
-        )
-    )
-      setDraft((rows) => [...rows, id]);
   }
   return (
     <section class="collection-page">
@@ -234,6 +204,18 @@ export function Collection() {
         <Show when={data()}>
           {(snapshot) => (
             <>
+              <Show when={!guest() && snapshot().recruitment}>
+                {(progress) => (
+                  <Recruitment
+                    state={progress()}
+                    full={snapshot().avatars.length >= 10}
+                    disabled={loading()}
+                    error={error()}
+                    pictures={pictures()}
+                    claim={mutate}
+                  />
+                )}
+              </Show>
               <fieldset disabled={loading()} class="collection-create">
                 <legend>{t('collection-create')}</legend>
                 <label>
@@ -286,6 +268,9 @@ export function Collection() {
                           <small>
                             {t('collection-level', { level: avatar.level })} · {avatar.xp} PD{' '}
                             {avatar.active ? '★' : ''}
+                            {!isPlayableAvatar(avatar.template_id)
+                              ? ` · ${t('collection-locked')}`
+                              : ''}
                           </small>
                         </span>
                       </button>
@@ -306,7 +291,11 @@ export function Collection() {
                           </h2>
                           <button
                             type="button"
-                            disabled={loading() || avatar().active}
+                            disabled={
+                              loading() ||
+                              avatar().active ||
+                              !isPlayableAvatar(avatar().template_id)
+                            }
                             onClick={() => void mutate({ action: 'activate', id: avatar().id })}
                           >
                             {t(avatar().active ? 'collection-active' : 'collection-activate')}
@@ -325,86 +314,99 @@ export function Collection() {
                             {t('collection-delete')}
                           </button>
                         </div>
-                        <fieldset disabled={loading()}>
-                          <legend>{t('collection-points', { count: avatar().unspent })}</legend>
-                          <div class="collection-points">
-                            <For each={statIcons}>
-                              {([symbol, stat], index) => (
-                                <label>
-                                  <img class="icon" src={icon(symbol)} alt="" />
-                                  {t(stat)}: {avatar().stats[index()]}
-                                  <input
-                                    aria-label={t('collection-point-stat', {
-                                      stat: t(stat),
-                                    })}
-                                    type="number"
-                                    min="0"
-                                    max={avatar().unspent}
-                                    value={points()[index()]}
-                                    onInput={(e) =>
-                                      setPoints((rows) =>
-                                        rows.map((v, i) =>
-                                          i === index()
-                                            ? Math.max(
-                                                0,
-                                                Math.floor(Number(e.currentTarget.value) || 0),
-                                              )
-                                            : v,
-                                        ),
-                                      )
-                                    }
-                                  />
-                                </label>
-                              )}
-                            </For>
-                          </div>
-                          <button
-                            type="button"
-                            disabled={!spent() || spent() > avatar().unspent}
-                            onClick={() =>
-                              setConfirm({
-                                action: 'spend',
-                                id: avatar().id,
-                                revision: avatar().revision,
-                                points: [...points()],
-                              })
-                            }
-                          >
-                            {t('collection-spend')}
-                          </button>
-                        </fieldset>
-                        <Show when={!guest()}>
-                          <Progression
-                            avatar={avatar()}
-                            avatars={snapshot().avatars}
-                            disabled={loading()}
-                            confirm={setConfirm}
-                          />
+                        <Show when={!isPlayableAvatar(avatar().template_id)}>
+                          <p>{t('collection-locked')}</p>
                         </Show>
-                        <section aria-label={t('collection-deck')}>
-                          <div class="collection-heading">
-                            <h2>
-                              {t('collection-deck')} ({draft().length}/{content.rules.deck.size})
-                            </h2>
-                            <A
-                              href={`/duel?avatar=${avatar().path_id ?? avatar().template_id}&bot=novice&custom=1`}
+                        <details
+                          class="collection-character-details"
+                          open={avatar().unspent > 0 || avatar().level >= 20}
+                        >
+                          <summary>{t('collection-character-development')}</summary>
+                          <fieldset disabled={loading() || !isPlayableAvatar(avatar().template_id)}>
+                            <legend>{t('collection-points', { count: avatar().unspent })}</legend>
+                            <div class="collection-points">
+                              <For each={statIcons}>
+                                {([symbol, stat], index) => (
+                                  <label>
+                                    <img class="icon" src={icon(symbol)} alt="" />
+                                    {t(stat)}: {avatar().stats[index()]}
+                                    <input
+                                      aria-label={t('collection-point-stat', {
+                                        stat: t(stat),
+                                      })}
+                                      type="number"
+                                      min="0"
+                                      max={avatar().unspent}
+                                      value={points()[index()]}
+                                      onInput={(e) =>
+                                        setPoints((rows) =>
+                                          rows.map((v, i) =>
+                                            i === index()
+                                              ? Math.max(
+                                                  0,
+                                                  Math.floor(Number(e.currentTarget.value) || 0),
+                                                )
+                                              : v,
+                                          ),
+                                        )
+                                      }
+                                    />
+                                  </label>
+                                )}
+                              </For>
+                            </div>
+                            <button
+                              type="button"
+                              disabled={!spent() || spent() > avatar().unspent}
                               onClick={() =>
-                                setTrainingPlayer({
-                                  avatar: avatar().path_id ?? avatar().template_id,
-                                  specialization: avatar().specialization ?? undefined,
-                                  gift_id: avatar().gift_id ?? undefined,
-                                  level: avatar().level,
-                                  spent: avatar().spent,
-                                  deck: draft(),
+                                setConfirm({
+                                  action: 'spend',
+                                  id: avatar().id,
+                                  revision: avatar().revision,
+                                  points: [...points()],
                                 })
                               }
                             >
-                              {t('collection-test-deck')}
-                            </A>
+                              {t('collection-spend')}
+                            </button>
+                          </fieldset>
+                          <Show when={!guest()}>
+                            <Progression
+                              avatar={avatar()}
+                              avatars={snapshot().avatars}
+                              disabled={loading()}
+                              confirm={setConfirm}
+                            />
+                          </Show>
+                        </details>
+                        <section aria-label={t('collection-deck')}>
+                          <div class="collection-heading collection-deck-heading">
+                            <h2>
+                              {t('collection-deck')} ({draft().length}/{content.rules.deck.size})
+                            </h2>
+                            <Show when={isPlayableAvatar(avatar().template_id)}>
+                              <A
+                                href={`/duel?avatar=${avatar().path_id ?? avatar().template_id}&bot=novice&custom=1`}
+                                onClick={() =>
+                                  setTrainingPlayer({
+                                    avatar: avatar().path_id ?? avatar().template_id,
+                                    specialization: avatar().specialization ?? undefined,
+                                    gift_id: avatar().gift_id ?? undefined,
+                                    level: avatar().level,
+                                    spent: avatar().spent,
+                                    deck: draft(),
+                                  })
+                                }
+                              >
+                                {t('collection-test-deck')}
+                              </A>
+                            </Show>
                             <button
                               type="button"
                               class="primary"
-                              disabled={loading() || !changed()}
+                              disabled={
+                                loading() || !changed() || !isPlayableAvatar(avatar().template_id)
+                              }
                               onClick={() =>
                                 void mutate({
                                   action: 'deck',
@@ -421,29 +423,18 @@ export function Collection() {
                             </button>
                           </div>
                           <p>{t('collection-fill')}</p>
-                          <div class="collection-deck">
-                            <For each={[...new Set(draft())]}>
-                              {(id) => (
-                                <button
-                                  type="button"
-                                  disabled={loading()}
-                                  aria-label={t('collection-remove-card', {
-                                    card: t(fluentKey(cards.get(id)?.key ?? '')),
-                                  })}
-                                  onClick={() =>
-                                    setDraft((rows) => {
-                                      const result = [...rows];
-                                      result.splice(result.indexOf(id), 1);
-                                      return result;
-                                    })
-                                  }
-                                >
-                                  {t(fluentKey(cards.get(id)?.key ?? ''))} ×
-                                  {draft().filter((value) => value === id).length} −
-                                </button>
-                              )}
-                            </For>
-                          </div>
+                          <Show when={avatar().id} keyed>
+                            {(_id) => (
+                              <DeckWorkbench
+                                draft={draft()}
+                                change={setDraft}
+                                collection={snapshot().collection}
+                                schools={avatar().schools}
+                                pictures={pictures()}
+                                disabled={loading()}
+                              />
+                            )}
+                          </Show>
                           <div class="collection-presets">
                             <label>
                               {t('collection-preset-name')}{' '}
@@ -502,107 +493,6 @@ export function Collection() {
                       </>
                     )}
                   </Show>
-                  <section aria-label={t('collection-library')}>
-                    <h2>{t('collection-library')}</h2>
-                    <div class="collection-filters">
-                      <label>
-                        {t('collection-search')}{' '}
-                        <input
-                          type="search"
-                          value={query()}
-                          onInput={(e) => setQuery(e.currentTarget.value)}
-                        />
-                      </label>
-                      <select
-                        aria-label={t('collection-rarity')}
-                        value={rarity()}
-                        onChange={(e) => setRarity(e.currentTarget.value)}
-                      >
-                        <option value="">{t('collection-all')}</option>
-                        <For each={['bronze', 'silver', 'gold']}>
-                          {(value) => (
-                            <option value={value}>{t(`collection-rarity-${value}`)}</option>
-                          )}
-                        </For>
-                      </select>
-                      <label>
-                        <input
-                          type="checkbox"
-                          checked={ownedOnly()}
-                          onChange={(e) => setOwnedOnly(e.currentTarget.checked)}
-                        />
-                        {t('collection-owned')}
-                      </label>
-                      <label>
-                        <input
-                          type="checkbox"
-                          checked={castable()}
-                          onChange={(e) => setCastable(e.currentTarget.checked)}
-                        />
-                        {t('collection-castable')}
-                      </label>
-                    </div>
-                    <div class="collection-cards">
-                      <For each={visible().slice(0, visibleCount())}>
-                        {(card) => {
-                          const quantity = () =>
-                            snapshot().collection.find((s) => s.card_id === card.id)?.qty ?? 0;
-                          const copies = () => draft().filter((id) => id === card.id).length;
-                          return (
-                            <article>
-                              <Show when={pictures().get(card.key)}>
-                                {(src) => (
-                                  <img
-                                    class="collection-art"
-                                    src={src()}
-                                    alt=""
-                                    width="512"
-                                    height="320"
-                                    loading="lazy"
-                                  />
-                                )}
-                              </Show>
-                              <h3>{t(fluentKey(card.key))}</h3>
-                              <p>{t(fluentKey(card.key, 'text'), cardArgs(card))}</p>
-                              <p>
-                                K {card.cost.focus} · W {card.cost.stamina} ·{' '}
-                                {t(`collection-rarity-${card.rarity}`)}
-                              </p>
-                              <p>
-                                {t('collection-quantity', { count: quantity(), deck: copies() })}
-                              </p>
-                              <button
-                                type="button"
-                                disabled={
-                                  loading() ||
-                                  !own() ||
-                                  draft().length >= content.rules.deck.size ||
-                                  copies() >= Math.min(quantity(), content.rules.deck.max_copies)
-                                }
-                                aria-label={t('collection-add-card', {
-                                  card: t(fluentKey(card.key)),
-                                })}
-                                onClick={() => add(card.id)}
-                              >
-                                {t('collection-add')}
-                              </button>
-                            </article>
-                          );
-                        }}
-                      </For>
-                    </div>
-                    <p>
-                      {t('collection-showing', {
-                        shown: Math.min(visibleCount(), visible().length),
-                        total: visible().length,
-                      })}
-                    </p>
-                    <Show when={visibleCount() < visible().length}>
-                      <button type="button" onClick={() => setVisibleCount((n) => n + 24)}>
-                        {t('collection-more')}
-                      </button>
-                    </Show>
-                  </section>
                 </div>
               </div>
             </>

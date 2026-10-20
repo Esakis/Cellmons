@@ -32,6 +32,7 @@ async fn load(tx: &mut PgConnection, user: Uuid, id: Uuid) -> Result<Avatar> {
     sqlx::query_as("SELECT id,slot,template_id,path_id,level,xp,tier,revision,is_active,is_shade,shade_school,specialization,gift_id FROM avatars WHERE id=$1 AND user_id=$2 AND deleted_at IS NULL FOR UPDATE").bind(id).bind(user).fetch_optional(tx).await?.ok_or(Error("NOT_FOUND"))
 }
 fn ready(avatar: &Avatar, revision: i32) -> Result<()> {
+    crate::game::ensure_playable(avatar.template_id)?;
     if avatar.revision != revision {
         return Err(Error("CONFLICT"));
     }
@@ -224,8 +225,8 @@ pub async fn create_shade(
     let school = parse_school(school)?;
     let shade = engine_content::AVATARS
         .iter()
-        .find(|a| a.rarity == AvatarRarity::Shade && a.schools.level(school) == 1)
-        .ok_or(Error("UNAVAILABLE"))?;
+        .find(|a| a.playable && a.rarity == AvatarRarity::Shade && a.schools.level(school) == 1)
+        .ok_or(Error("AVATAR_LOCKED"))?;
     sqlx::query(
         "UPDATE avatars SET deleted_at=now(),is_active=false,revision=revision+1 WHERE id=$1",
     )

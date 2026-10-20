@@ -193,6 +193,9 @@ pub async fn get(
     let session = crate::auth::security::session(&state, &headers)
         .await
         .map_err(crate::game::HttpError)?;
+    crate::journey::require(&state.db, session.user, "shop")
+        .await
+        .map_err(crate::game::response)?;
     state
         .auth
         .limit("store-read", &session.user.to_string(), 60, 60)
@@ -210,6 +213,9 @@ pub async fn post(
     let session = crate::auth::security::session(&state, &headers)
         .await
         .map_err(crate::game::HttpError)?;
+    crate::journey::require(&state.db, session.user, "shop")
+        .await
+        .map_err(crate::game::response)?;
     state
         .auth
         .limit("store-write", &session.user.to_string(), 30, 60)
@@ -246,11 +252,8 @@ pub async fn inventory(db: &PgPool, user: Uuid) -> Result<Inventory> {
         boosters,
         junkyard_points: junk.as_ref().map_or(0, |r| r.points).to_string(),
         junkyard_rewards: junk.as_ref().map_or(0, |r| r.rewards_granted).to_string(),
-        junkyard_available: engine_content::AVATARS
-            .iter()
-            .filter(|a| a.rarity == AvatarRarity::Junkyard)
-            .count()
-            == 3,
+        // Retired class rewards fall back to Ducats; discarding remains available.
+        junkyard_available: true,
     })
 }
 pub async fn execute(db: &PgPool, user: Uuid, request: Request) -> Result<Receipt> {
@@ -439,12 +442,9 @@ async fn discard(
 ) -> Result<Receipt> {
     let special: Vec<_> = engine_content::AVATARS
         .iter()
-        .filter(|a| a.rarity == AvatarRarity::Junkyard)
+        .filter(|a| a.playable && a.rarity == AvatarRarity::Junkyard)
         .map(|a| a.id)
         .collect();
-    if special.len() != 3 {
-        return Err(Error("UNAVAILABLE"));
-    }
     if cards.is_empty() || cards.len() > 200 {
         return Err(Error("INVALID_MESSAGE"));
     }

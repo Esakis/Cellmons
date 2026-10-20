@@ -4,6 +4,7 @@
 
 [[avatar]]
 id = 1
+playable = true
 key = "avatar.dune_wanderer"
 ref = "Nomad"
 rarity = "common"
@@ -37,6 +38,7 @@ growth = [
 
 [[avatar]]
 id = 2
+playable = true
 key = "avatar.dawn_warden"
 ref = "Mnich"
 rarity = "common"
@@ -69,6 +71,7 @@ growth = [
 
 [[avatar]]
 id = 3
+playable = true
 key = "avatar.ember_drake"
 ref = "Draco"
 rarity = "common"
@@ -102,6 +105,7 @@ growth = [
 
 [[avatar]]
 id = 4
+playable = true
 key = "avatar.star_adept"
 ref = "Czarodziej"
 rarity = "common"
@@ -135,6 +139,7 @@ growth = [
 
 [[avatar]]
 id = 5
+playable = true
 key = "avatar.ash_widow"
 ref = "Lady Kruk"
 rarity = "common"

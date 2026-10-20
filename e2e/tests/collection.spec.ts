@@ -17,24 +17,49 @@ test('guest builds a RAM-only collection and tests its deck offline', async ({
   await page.locator('header nav').getByRole('link', { name: 'Collection', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Characters and collection' })).toBeVisible();
   await expect(page.locator('.collection-avatars button')).toHaveCount(1);
+  await page.getByLabel('School requirements met', { exact: true }).uncheck();
   await expect(page.locator('.collection-cards article')).toHaveCount(24);
   await page.getByRole('button', { name: 'Show more spells', exact: true }).click();
   await expect(page.locator('.collection-cards article')).toHaveCount(48);
   await page.getByRole('searchbox', { name: 'Find spell', exact: true }).fill('Primal Heart');
   await expect(page.locator('.collection-cards article')).toHaveCount(1);
-  await expect(page.getByRole('heading', { name: 'Primal Heart', exact: true })).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Preview card: Primal Heart', exact: true }),
+  ).toBeVisible();
   await page.getByRole('searchbox', { name: 'Find spell', exact: true }).fill('');
   await expect(page.locator('.collection-cards article')).toHaveCount(24);
   await page.getByRole('button', { name: 'Create character', exact: true }).click();
   await expect(page.locator('.collection-avatars button')).toHaveCount(2);
   await page.getByRole('button', { name: 'Activate', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Deck (20/20)', exact: true })).toBeVisible();
+  const library = page.locator('.deck-library');
+  await library.getByRole('button', { name: 'Preview card: Bronze Blade', exact: true }).click();
+  await expect(page.getByRole('dialog').locator('img.deck-detail-art')).toBeVisible();
+  await page.getByRole('dialog').getByRole('button', { name: 'Close', exact: true }).click();
+  await page.getByRole('button', { name: 'Sample hand', exact: true }).click();
+  await expect(page.getByRole('dialog').locator('.deck-sample img')).toHaveCount(5);
+  await page.getByRole('dialog').getByRole('button', { name: 'Close', exact: true }).click();
+  await library
+    .getByRole('button', { name: 'Remove from deck: Bronze Blade', exact: true })
+    .click();
+  await expect(page.getByRole('heading', { name: 'Deck (19/20)', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Undo change', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Deck (20/20)', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Clear', exact: true }).click();
   for (let i = 0; i < 4; i++)
-    await page.getByRole('button', { name: 'Add to deck: Bronze Blade', exact: true }).click();
+    await page
+      .locator('.deck-library')
+      .getByRole('button', { name: 'Add to deck: Bronze Blade', exact: true })
+      .click();
   await expect(
-    page.getByRole('button', { name: 'Add to deck: Bronze Blade', exact: true }),
+    page
+      .locator('.deck-library')
+      .getByRole('button', { name: 'Add to deck: Bronze Blade', exact: true }),
   ).toBeDisabled();
   await page.getByRole('button', { name: 'Save deck', exact: true }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Changes saved.' })).toBeVisible();
+  await page.locator('.collection-deck-heading').scrollIntoViewIfNeeded();
+  await page.screenshot({ path: `../target/deck-editor-${info.project.name}.png` });
   await page.screenshot({ path: `../target/collection-${info.project.name}.png`, fullPage: true });
   expect(
     await page.evaluate(

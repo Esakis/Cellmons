@@ -10,8 +10,8 @@ auth-login-name = Login (3–20 letters, digits, _ or -)
 auth-email = Email
 auth-password = Password
 auth-password-hint = Use 10–128 characters. Avoid common passwords.
-auth-school = Starting school
-auth-school-hint = You receive this school's character and cards. This choice is permanent.
+auth-school = First character
+auth-school-hint = Choose a Mage, Warrior or Priest. You receive one character, its card pack and a ready 20-card deck. Earn the other characters by playing.
 auth-token = Code from the email link
 auth-submit-login = Sign in
 auth-submit-register = Create account
@@ -54,3 +54,5 @@ privacy-title = Data and account deletion
 auth-agreement = I accept the terms. I am at least 16 or have the required guardian permission.
 auth-error-LEGAL_VERSION = Documents changed. Refresh the app and read the current terms before registering.
 auth-error-LEGAL_REQUIRED = Confirm the terms and age requirement.
+
+auth-error-AVATAR_LOCKED = This character is locked in this release. Choose an available class.

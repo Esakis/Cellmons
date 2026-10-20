@@ -42,3 +42,21 @@ avatar = "avatar.cogwright"
 # 40 kart
 cards = { "card.short_circuit" = 3, "card.paradox" = 1, "card.attack_lattice" = 4, "card.defense_lattice" = 4, "card.phase_shift" = 2, "card.attack_calibration" = 4, "card.defense_calibration" = 4, "card.combat_amplifier" = 3, "card.divine_amplifier" = 3, "card.element_amplifier" = 3, "card.arcane_amplifier" = 3, "card.necro_amplifier" = 3, "card.tech_amplifier" = 3 }
 deck = { "card.short_circuit" = 3, "card.attack_lattice" = 4, "card.defense_lattice" = 4, "card.phase_shift" = 1, "card.attack_calibration" = 4, "card.defense_calibration" = 4 }
+
+[[starter]]
+school = "combat"
+avatar = "avatar.iron_reaver"
+cards = { "card.bronze_blade" = 4, "card.recruit_pauldron" = 4, "card.herbal_draught" = 4, "card.nimble_step" = 4, "card.tempered_blade" = 4, "card.beginners_luck" = 4, "card.brawl" = 2, "card.curved_blade" = 2, "card.relentlessness" = 2, "card.buckler" = 3, "card.truce" = 2, "card.armor_breaker" = 2, "card.preemptive_strike" = 2, "card.pitfall" = 1 }
+deck = { "card.bronze_blade" = 4, "card.herbal_draught" = 3, "card.nimble_step" = 3, "card.beginners_luck" = 4, "card.brawl" = 2, "card.curved_blade" = 2, "card.preemptive_strike" = 2 }
+
+[[starter]]
+school = "element"
+avatar = "avatar.root_sage"
+cards = { "card.feral_might" = 2, "card.sandstorm" = 2, "card.healing_mud" = 4, "card.thornhide" = 4, "card.toxic_fumes" = 2, "card.leeching_vine" = 2, "card.stone_spike" = 4, "card.desperate_blaze" = 4, "card.oakbark" = 4, "card.venom" = 4, "card.storm_spark" = 4, "card.surge_of_power" = 4 }
+deck = { "card.healing_mud" = 4, "card.thornhide" = 4, "card.stone_spike" = 4, "card.venom" = 4, "card.storm_spark" = 4 }
+
+[[starter]]
+school = "necro"
+avatar = "avatar.vampire"
+cards = { "card.bronze_blade" = 4, "card.treacherous_dagger" = 4, "card.cultist" = 4, "card.grave_ration" = 4, "card.soul_vortex" = 4, "card.dread" = 4, "card.blood_chalice" = 4, "card.frailty" = 4, "card.shadow_pact" = 4 }
+deck = { "card.bronze_blade" = 4, "card.treacherous_dagger" = 3, "card.cultist" = 3, "card.grave_ration" = 4, "card.soul_vortex" = 3, "card.dread" = 3 }

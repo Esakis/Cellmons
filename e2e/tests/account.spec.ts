@@ -36,7 +36,7 @@ test('R-KNT-04: guest completes offline training without API, cookies or persist
   await context.setOffline(true);
   await page.getByRole('button', { name: 'Play as guest' }).click();
   await expect(page.getByRole('status').filter({ hasText: 'Playing as guest.' })).toBeVisible();
-  await page.getByRole('button', { name: /Runesmith/ }).click();
+  await page.getByRole('button', { name: /Vampire/ }).click();
   await page.getByRole('button', { name: /Archmage/ }).click();
   await page.getByRole('link', { name: 'Settings', exact: true }).click();
   await page.getByRole('combobox', { name: 'Theme' }).selectOption('light');
@@ -114,6 +114,8 @@ test('account forms register, sign in and sign out using the API contract', asyn
   await page.getByLabel('Login (3–20 letters, digits, _ or -)').fill('PlayerOne');
   await page.getByLabel('Email', { exact: true }).fill('one@example.test');
   await page.getByLabel('Password', { exact: true }).fill('A long test password!');
+  await expect(page.locator('select[name=template] option')).toHaveCount(3);
+  await page.locator('select[name=template]').selectOption('1');
   await page.screenshot({ path: `../target/f62-${info.project.name}-account.png`, fullPage: true });
   await page.locator('input[name=agreement]').check();
   await page.getByRole('button', { name: 'Create account', exact: true }).click();

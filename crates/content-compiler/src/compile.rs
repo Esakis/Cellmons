@@ -938,24 +938,17 @@ fn compile_starters(source: &Source, errors: &mut Vec<Diagnostic>) -> Vec<Compil
         .map(|card| (card.item.key.as_str(), card.item.id))
         .collect();
     let mut compiled = Vec::new();
-    for key in SchoolKey::ALL {
-        let found: Vec<&StarterSrc> = starters
-            .iter()
-            .filter(|starter| starter.school == key)
-            .collect();
-        // Szkoła bez zestawu startowego jest dozwolona; pełną szóstkę sprawdzają testy treści.
-        let starter = match found.as_slice() {
-            [starter] => *starter,
-            [] => continue,
-            _ => {
-                errors.push(Diagnostic::new(
-                    file,
-                    Some(key.name()),
-                    "zestaw startowy szkoły opisany więcej niż raz",
-                ));
-                continue;
-            }
-        };
+    let mut seen = BTreeSet::new();
+    for starter in starters {
+        let key = starter.school;
+        if !seen.insert(&starter.avatar) {
+            errors.push(Diagnostic::new(
+                file,
+                Some(&starter.avatar),
+                "postać ma więcej niż jeden zestaw startowy",
+            ));
+            continue;
+        }
         let before = errors.len();
         let mut report =
             |message: String| errors.push(Diagnostic::new(file, Some(key.name()), message));
@@ -966,9 +959,13 @@ fn compile_starters(source: &Source, errors: &mut Vec<Diagnostic>) -> Vec<Compil
             .find(|avatar| avatar.key == starter.avatar);
         match avatar {
             None => report(format!("nieznana postać {}", starter.avatar)),
-            Some(avatar) if avatar.starter_for != Some(key) => {
+            Some(avatar)
+                if avatar.path.is_some()
+                    || avatar.starter_for.is_some_and(|school| school != key)
+                    || avatar.schools.get(&key).copied().unwrap_or(0) == 0 =>
+            {
                 report(format!(
-                    "postać {} nie ma starter_for = \"{}\"",
+                    "postać {} nie jest bazowym szablonem szkoły \"{}\"",
                     starter.avatar,
                     key.name()
                 ));

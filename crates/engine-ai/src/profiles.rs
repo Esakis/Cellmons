@@ -56,7 +56,7 @@ impl Profiles {
                 || profile
                     .avatar_pool
                     .iter()
-                    .any(|&id| engine_content::avatar(id).is_none())
+                    .any(|&id| !engine_content::is_playable(id))
             {
                 return Err(format!(
                     "bots.toml [{}]: niepoprawny lub powtórzony profil",

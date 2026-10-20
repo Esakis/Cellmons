@@ -10,6 +10,10 @@ async fn clan_http_requires_a_session_and_rejects_cross_origin_writes(pool: PgPo
         StatusCode::UNAUTHORIZED
     );
     f.register().await;
+    sqlx::query("UPDATE users SET account_xp=3050,tutorial_step=3")
+        .execute(&pool)
+        .await
+        .unwrap();
     let session = cookie(&f.login(false).await);
     let clan = Uuid::now_v7();
     let create = json!({"action":"create","id":clan,"name":"HTTP Guild"});

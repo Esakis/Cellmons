@@ -159,12 +159,28 @@
     bottom: calc(76px + env(safe-area-inset-bottom, 0px));
   }
   .brand {
+    font-size: 1.1rem;
+    gap: 10px;
+  }
+  .brandIcon {
+    width: 34px;
+    height: 34px;
     font-size: 1.25rem;
+  }
+  .header .language {
+    padding-inline: 8px;
+    min-height: 44px;
   }
   .footer {
     padding: 20px 16px;
     flex-direction: column;
     gap: 8px;
+  }
+  :global(body:has(.lobby-map-mode)) .footer {
+    display: none;
+  }
+  :global(body:has(.lobby-map-mode)) .header {
+    padding: 8px 12px;
   }
 }
 /* Settings page: the storage note and the art credits, small and muted. */

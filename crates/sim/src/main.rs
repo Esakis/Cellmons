@@ -802,11 +802,11 @@ mod tests {
             })
         );
         assert_eq!(
-            parse(&args("duel 2 --starters ash_widow,cogwright")),
+            parse(&args("duel 2 --starters ash_widow,vampire")),
             Some(Command::Duel {
                 seed: 2,
                 levels: l1,
-                starters: Some([4, 5])
+                starters: Some([4, 7])
             })
         );
         assert_eq!(
@@ -826,6 +826,7 @@ mod tests {
             })
         );
         assert_eq!(parse(&args("matrix --level 21")), None);
+        assert_eq!(parse(&args("duel --starters ash_widow,cogwright")), None);
         assert_eq!(parse(&args("matrix --a L0")), None);
         assert_eq!(parse(&args("run 5")), None);
         assert_eq!(parse(&args("duel --a L4")), None);

@@ -14,11 +14,12 @@ fn main() -> anyhow::Result<()> {
         [arg] if arg == "reconcile" => "reconcile",
         [arg] if arg == "abuse-report" => "abuse-report",
         [arg] if arg == "privacy-maintenance" => "privacy-maintenance",
+        [arg] if arg == "seed-bots" => "seed-bots",
         [arg, ..] if arg == "drain" => "drain",
         [arg, ..] if arg == "admin" => "admin",
         [arg] if arg == "--help" || arg == "-h" => {
             println!(
-                "server [migrate|check-config|reconcile|maintenance|telemetry-report|abuse-report|privacy-maintenance]\n  drain start|cancel|status|idle: audited deployment barrier\n  migrate: apply embedded database migrations\n  check-config: validate configuration/schema without starting workers\n  reconcile: read-only currency ledger check\n  maintenance: bounded cleanup, privacy, review signals and reconciliation\n  telemetry-report: read-only weekly aggregates, no guest tracking\n  admin role LOGIN ROLE REASON\n  admin reset-factor LOGIN confirm REASON\nOwner console actions are audited. No HTTP bootstrap exists."
+                "server [migrate|check-config|reconcile|maintenance|telemetry-report|abuse-report|privacy-maintenance|seed-bots]\n  seed-bots: prepare 40 managed accounts (controller: LOBBY_BOTS_ENABLED=true)\n  drain start|cancel|status|idle: audited deployment barrier\n  migrate: apply embedded database migrations\n  check-config: validate configuration/schema without starting workers\n  reconcile: read-only currency ledger check\n  maintenance: bounded cleanup, privacy, review signals and reconciliation\n  telemetry-report: read-only weekly aggregates, no guest tracking\n  admin role LOGIN ROLE REASON\n  admin reset-factor LOGIN confirm REASON\nOwner console actions are audited. No HTTP bootstrap exists."
             );
             return Ok(());
         }
@@ -49,10 +50,17 @@ fn main() -> anyhow::Result<()> {
                 server::operations::maintenance(&pool).await?;
                 pool.close().await;
                 Ok(())
+            } else if command == "seed-bots" {
+                let pool = db::connect_lazy(&config)?;
+                let report = server::bots::seed(&pool).await?;
+                println!("{}", serde_json::to_string_pretty(&report)?);
+                pool.close().await;
+                Ok(())
             } else if command == "check-config" {
                 let pool = db::connect_lazy(&config)?;
                 db::ping(&pool).await?;
                 server::auth::AuthConfig::from_lookup(|key| std::env::var(key).ok())?;
+                server::bots::Settings::from_env()?;
                 println!("Configuration and schema verified; no workers started.");
                 pool.close().await;
                 Ok(())
@@ -116,6 +124,8 @@ async fn run(config: Config) -> anyhow::Result<()> {
     let auth = server::auth::Auth::from_config(auth_config)?;
     let state = gateway::AppState::new(db.clone(), auth, server::online::Settings::from_env()?);
     let online = state.online.clone();
+    let population = server::bots::Settings::from_env()?
+        .map(|settings| server::bots::Population::spawn(db.clone(), online.hub.clone(), settings));
     // Optional private listener; never proxied by the public Caddy routes.
     let metrics = if let Ok(address) = std::env::var("OPS_LISTEN_ADDR") {
         let address: std::net::SocketAddr = address.parse().context("invalid OPS_LISTEN_ADDR")?;
@@ -146,6 +156,9 @@ async fn run(config: Config) -> anyhow::Result<()> {
     )
     .with_graceful_shutdown(async move {
         shutdown_signal().await;
+        if let Some(population) = population {
+            population.shutdown().await;
+        }
         online.hub.shutdown().await;
     })
     .await

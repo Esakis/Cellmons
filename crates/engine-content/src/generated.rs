@@ -1,6 +1,6 @@
 // Plik wygenerowany przez `cargo run -p content-compiler -- build` z katalogu `content/`.
 // Nie edytuj go ręcznie: zmiany wprowadzaj w plikach treści.
-// content_version: 2fe5309b47546cda1df29067283d34e881f6c61e58be132e127cc5dfb8225701
+// content_version: 909e54348b63f8c150107421a5e24c3aeaafac694eedf6ab82d97f7efa99102b
 
 #![allow(unused_imports)]
 
@@ -14,8 +14,8 @@ use crate::{AvatarDef, AvatarRarity, CardMeta, CardRarity, Growth, PathDef, Star
 
 /// Wersja treści (`content_version`).
 pub const CONTENT_VERSION: [u8; 32] = [
-    47, 229, 48, 155, 71, 84, 108, 218, 29, 242, 144, 103, 40, 61, 52, 232, 129, 246, 198, 30, 88,
-    190, 19, 46, 18, 124, 197, 223, 184, 34, 87, 1,
+    144, 158, 84, 52, 139, 99, 248, 193, 80, 16, 116, 33, 165, 226, 76, 58, 234, 175, 172, 105, 78,
+    237, 246, 171, 130, 217, 127, 126, 250, 153, 16, 43,
 ];
 
 /// Zasady z `content/rules.toml`.
@@ -11185,6 +11185,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 1,
         key: "avatar.dune_wanderer",
+        playable: true,
         rarity: AvatarRarity::Common,
         starter_for: Some(School::Combat),
         base: Stats {
@@ -11431,6 +11432,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 2,
         key: "avatar.dawn_warden",
+        playable: true,
         rarity: AvatarRarity::Common,
         starter_for: Some(School::Divine),
         base: Stats {
@@ -11677,6 +11679,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 3,
         key: "avatar.ember_drake",
+        playable: true,
         rarity: AvatarRarity::Common,
         starter_for: Some(School::Element),
         base: Stats {
@@ -11923,6 +11926,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 4,
         key: "avatar.star_adept",
+        playable: true,
         rarity: AvatarRarity::Common,
         starter_for: Some(School::Arcane),
         base: Stats {
@@ -12169,6 +12173,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 5,
         key: "avatar.ash_widow",
+        playable: true,
         rarity: AvatarRarity::Common,
         starter_for: Some(School::Necro),
         base: Stats {
@@ -12415,6 +12420,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 6,
         key: "avatar.cogwright",
+        playable: false,
         rarity: AvatarRarity::Common,
         starter_for: Some(School::Tech),
         base: Stats {
@@ -12661,6 +12667,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 7,
         key: "avatar.storm_surveyor",
+        playable: false,
         rarity: AvatarRarity::Common,
         starter_for: None,
         base: Stats {
@@ -12907,6 +12914,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 8,
         key: "avatar.stoneguard",
+        playable: false,
         rarity: AvatarRarity::Common,
         starter_for: None,
         base: Stats {
@@ -13153,6 +13161,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 9,
         key: "avatar.tide_oracle",
+        playable: false,
         rarity: AvatarRarity::Common,
         starter_for: None,
         base: Stats {
@@ -13399,6 +13408,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 10,
         key: "avatar.venom_scout",
+        playable: false,
         rarity: AvatarRarity::Common,
         starter_for: None,
         base: Stats {
@@ -13645,15 +13655,16 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 11,
         key: "avatar.iron_reaver",
+        playable: true,
         rarity: AvatarRarity::Uncommon,
         starter_for: None,
         base: Stats {
-            phys_atk: 6,
+            phys_atk: 5,
             phys_def: 0,
-            mag_atk: 3,
-            mag_def: 0,
-            hp_max: 45,
-            stamina_max: 25,
+            mag_atk: 1,
+            mag_def: 3,
+            hp_max: 40,
+            stamina_max: 30,
         },
         schools: Schools([1, 0, 0, 0, 0, 0]),
         growth: &[
@@ -13891,6 +13902,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 12,
         key: "avatar.rift_duelist",
+        playable: false,
         rarity: AvatarRarity::Uncommon,
         starter_for: None,
         base: Stats {
@@ -14137,15 +14149,16 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 13,
         key: "avatar.root_sage",
+        playable: true,
         rarity: AvatarRarity::Uncommon,
         starter_for: None,
         base: Stats {
-            phys_atk: 4,
-            phys_def: 2,
-            mag_atk: 2,
-            mag_def: 1,
-            hp_max: 40,
-            stamina_max: 30,
+            phys_atk: 3,
+            phys_def: 1,
+            mag_atk: 3,
+            mag_def: 2,
+            hp_max: 45,
+            stamina_max: 25,
         },
         schools: Schools([1, 0, 1, 0, 0, 0]),
         growth: &[
@@ -14383,6 +14396,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 14,
         key: "avatar.tideform",
+        playable: false,
         rarity: AvatarRarity::Uncommon,
         starter_for: None,
         base: Stats {
@@ -14629,6 +14643,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 15,
         key: "avatar.silkblade",
+        playable: false,
         rarity: AvatarRarity::Uncommon,
         starter_for: None,
         base: Stats {
@@ -14875,6 +14890,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 16,
         key: "avatar.bone_sentinel",
+        playable: false,
         rarity: AvatarRarity::Uncommon,
         starter_for: None,
         base: Stats {
@@ -15121,6 +15137,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 17,
         key: "avatar.veil_agent",
+        playable: false,
         rarity: AvatarRarity::Uncommon,
         starter_for: None,
         base: Stats {
@@ -15367,6 +15384,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 18,
         key: "avatar.glass_alchemist",
+        playable: false,
         rarity: AvatarRarity::Rare,
         starter_for: None,
         base: Stats {
@@ -15613,6 +15631,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 19,
         key: "avatar.dusk_stalker",
+        playable: false,
         rarity: AvatarRarity::Rare,
         starter_for: None,
         base: Stats {
@@ -15859,6 +15878,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 20,
         key: "avatar.dawn_lancer",
+        playable: false,
         rarity: AvatarRarity::Rare,
         starter_for: None,
         base: Stats {
@@ -16105,6 +16125,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 21,
         key: "avatar.aether_seer",
+        playable: false,
         rarity: AvatarRarity::Rare,
         starter_for: None,
         base: Stats {
@@ -16351,6 +16372,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 22,
         key: "avatar.jade_vanguard",
+        playable: false,
         rarity: AvatarRarity::Rare,
         starter_for: None,
         base: Stats {
@@ -16597,6 +16619,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 23,
         key: "avatar.cinder_knight",
+        playable: false,
         rarity: AvatarRarity::Junkyard,
         starter_for: None,
         base: Stats {
@@ -16854,6 +16877,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 24,
         key: "avatar.copper_distiller",
+        playable: false,
         rarity: AvatarRarity::Junkyard,
         starter_for: None,
         base: Stats {
@@ -17111,6 +17135,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 25,
         key: "avatar.ruin_keeper",
+        playable: false,
         rarity: AvatarRarity::Junkyard,
         starter_for: None,
         base: Stats {
@@ -17368,6 +17393,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 26,
         key: "avatar.shade_war",
+        playable: false,
         rarity: AvatarRarity::Shade,
         starter_for: None,
         base: Stats {
@@ -17634,6 +17660,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 27,
         key: "avatar.shade_truth",
+        playable: false,
         rarity: AvatarRarity::Shade,
         starter_for: None,
         base: Stats {
@@ -17900,6 +17927,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 28,
         key: "avatar.shade_elements",
+        playable: false,
         rarity: AvatarRarity::Shade,
         starter_for: None,
         base: Stats {
@@ -18166,6 +18194,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 29,
         key: "avatar.shade_time",
+        playable: false,
         rarity: AvatarRarity::Shade,
         starter_for: None,
         base: Stats {
@@ -18432,6 +18461,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 30,
         key: "avatar.shade_death",
+        playable: false,
         rarity: AvatarRarity::Shade,
         starter_for: None,
         base: Stats {
@@ -18698,6 +18728,7 @@ pub static AVATARS: &[AvatarDef] = &[
     AvatarDef {
         id: 31,
         key: "avatar.shade_genius",
+        playable: false,
         rarity: AvatarRarity::Shade,
         starter_for: None,
         base: Stats {
@@ -18961,6 +18992,253 @@ pub static AVATARS: &[AvatarDef] = &[
             (20, 2),
         ],
     },
+    AvatarDef {
+        id: 32,
+        key: "avatar.vampire",
+        playable: true,
+        rarity: AvatarRarity::Common,
+        starter_for: None,
+        base: Stats {
+            phys_atk: 4,
+            phys_def: 1,
+            mag_atk: 2,
+            mag_def: 2,
+            hp_max: 30,
+            stamina_max: 35,
+        },
+        schools: Schools([1, 0, 0, 0, 1, 0]),
+        growth: &[
+            Growth {
+                level: 2,
+                delta: Stats {
+                    phys_atk: 0,
+                    phys_def: 0,
+                    mag_atk: 0,
+                    mag_def: 0,
+                    hp_max: 3,
+                    stamina_max: 3,
+                },
+                schools: None,
+            },
+            Growth {
+                level: 3,
+                delta: Stats {
+                    phys_atk: 1,
+                    phys_def: 0,
+                    mag_atk: 0,
+                    mag_def: 0,
+                    hp_max: 4,
+                    stamina_max: 4,
+                },
+                schools: None,
+            },
+            Growth {
+                level: 4,
+                delta: Stats {
+                    phys_atk: 0,
+                    phys_def: 1,
+                    mag_atk: 0,
+                    mag_def: 0,
+                    hp_max: 4,
+                    stamina_max: 4,
+                },
+                schools: None,
+            },
+            Growth {
+                level: 5,
+                delta: Stats {
+                    phys_atk: 0,
+                    phys_def: 0,
+                    mag_atk: 1,
+                    mag_def: 0,
+                    hp_max: 3,
+                    stamina_max: 3,
+                },
+                schools: Some(Schools([1, 0, 0, 0, 2, 0])),
+            },
+            Growth {
+                level: 6,
+                delta: Stats {
+                    phys_atk: 0,
+                    phys_def: 0,
+                    mag_atk: 0,
+                    mag_def: 1,
+                    hp_max: 4,
+                    stamina_max: 4,
+                },
+                schools: None,
+            },
+            Growth {
+                level: 7,
+                delta: Stats {
+                    phys_atk: 1,
+                    phys_def: 0,
+                    mag_atk: 0,
+                    mag_def: 0,
+                    hp_max: 4,
+                    stamina_max: 4,
+                },
+                schools: None,
+            },
+            Growth {
+                level: 8,
+                delta: Stats {
+                    phys_atk: 0,
+                    phys_def: 1,
+                    mag_atk: 0,
+                    mag_def: 0,
+                    hp_max: 3,
+                    stamina_max: 3,
+                },
+                schools: None,
+            },
+            Growth {
+                level: 9,
+                delta: Stats {
+                    phys_atk: 0,
+                    phys_def: 0,
+                    mag_atk: 1,
+                    mag_def: 0,
+                    hp_max: 4,
+                    stamina_max: 4,
+                },
+                schools: None,
+            },
+            Growth {
+                level: 10,
+                delta: Stats {
+                    phys_atk: 1,
+                    phys_def: 0,
+                    mag_atk: 0,
+                    mag_def: 0,
+                    hp_max: 4,
+                    stamina_max: 4,
+                },
+                schools: Some(Schools([2, 0, 0, 0, 2, 0])),
+            },
+            Growth {
+                level: 11,
+                delta: Stats {
+                    phys_atk: 0,
+                    phys_def: 0,
+                    mag_atk: 0,
+                    mag_def: 0,
+                    hp_max: 3,
+                    stamina_max: 3,
+                },
+                schools: None,
+            },
+            Growth {
+                level: 12,
+                delta: Stats {
+                    phys_atk: 0,
+                    phys_def: 1,
+                    mag_atk: 0,
+                    mag_def: 0,
+                    hp_max: 4,
+                    stamina_max: 4,
+                },
+                schools: None,
+            },
+            Growth {
+                level: 13,
+                delta: Stats {
+                    phys_atk: 0,
+                    phys_def: 0,
+                    mag_atk: 1,
+                    mag_def: 0,
+                    hp_max: 4,
+                    stamina_max: 4,
+                },
+                schools: None,
+            },
+            Growth {
+                level: 14,
+                delta: Stats {
+                    phys_atk: 0,
+                    phys_def: 0,
+                    mag_atk: 0,
+                    mag_def: 1,
+                    hp_max: 3,
+                    stamina_max: 3,
+                },
+                schools: None,
+            },
+            Growth {
+                level: 15,
+                delta: Stats {
+                    phys_atk: 1,
+                    phys_def: 0,
+                    mag_atk: 0,
+                    mag_def: 0,
+                    hp_max: 4,
+                    stamina_max: 4,
+                },
+                schools: Some(Schools([2, 0, 0, 0, 3, 0])),
+            },
+            Growth {
+                level: 16,
+                delta: Stats {
+                    phys_atk: 0,
+                    phys_def: 1,
+                    mag_atk: 0,
+                    mag_def: 0,
+                    hp_max: 4,
+                    stamina_max: 4,
+                },
+                schools: None,
+            },
+            Growth {
+                level: 17,
+                delta: Stats {
+                    phys_atk: 0,
+                    phys_def: 0,
+                    mag_atk: 1,
+                    mag_def: 0,
+                    hp_max: 3,
+                    stamina_max: 3,
+                },
+                schools: None,
+            },
+            Growth {
+                level: 18,
+                delta: Stats {
+                    phys_atk: 1,
+                    phys_def: 0,
+                    mag_atk: 0,
+                    mag_def: 0,
+                    hp_max: 4,
+                    stamina_max: 4,
+                },
+                schools: None,
+            },
+            Growth {
+                level: 19,
+                delta: Stats {
+                    phys_atk: 0,
+                    phys_def: 1,
+                    mag_atk: 0,
+                    mag_def: 0,
+                    hp_max: 4,
+                    stamina_max: 4,
+                },
+                schools: Some(Schools([3, 0, 0, 0, 3, 0])),
+            },
+            Growth {
+                level: 20,
+                delta: Stats {
+                    phys_atk: 0,
+                    phys_def: 0,
+                    mag_atk: 0,
+                    mag_def: 1,
+                    hp_max: 4,
+                    stamina_max: 4,
+                },
+                schools: None,
+            },
+        ],
+        dev_points: &[(5, 1), (10, 2), (15, 1), (20, 2)],
+    },
 ];
 
 /// Reincarnation profiles, excluded from collectible templates.
@@ -18971,6 +19249,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1002,
             key: "avatar.dune_wanderer_path_0",
+            playable: false,
             rarity: AvatarRarity::Common,
             starter_for: None,
             base: Stats {
@@ -19226,6 +19505,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1003,
             key: "avatar.dune_wanderer_path_1",
+            playable: false,
             rarity: AvatarRarity::Common,
             starter_for: None,
             base: Stats {
@@ -19481,6 +19761,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1004,
             key: "avatar.dawn_warden_path_0",
+            playable: false,
             rarity: AvatarRarity::Common,
             starter_for: None,
             base: Stats {
@@ -19736,6 +20017,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1005,
             key: "avatar.dawn_warden_path_1",
+            playable: false,
             rarity: AvatarRarity::Common,
             starter_for: None,
             base: Stats {
@@ -19991,6 +20273,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1006,
             key: "avatar.ember_drake_path_0",
+            playable: false,
             rarity: AvatarRarity::Common,
             starter_for: None,
             base: Stats {
@@ -20246,6 +20529,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1007,
             key: "avatar.ember_drake_path_1",
+            playable: false,
             rarity: AvatarRarity::Common,
             starter_for: None,
             base: Stats {
@@ -20501,6 +20785,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1008,
             key: "avatar.star_adept_path_0",
+            playable: false,
             rarity: AvatarRarity::Common,
             starter_for: None,
             base: Stats {
@@ -20756,6 +21041,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1009,
             key: "avatar.star_adept_path_1",
+            playable: false,
             rarity: AvatarRarity::Common,
             starter_for: None,
             base: Stats {
@@ -21011,6 +21297,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1010,
             key: "avatar.ash_widow_path_0",
+            playable: false,
             rarity: AvatarRarity::Common,
             starter_for: None,
             base: Stats {
@@ -21266,6 +21553,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1011,
             key: "avatar.ash_widow_path_1",
+            playable: false,
             rarity: AvatarRarity::Common,
             starter_for: None,
             base: Stats {
@@ -21521,6 +21809,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1012,
             key: "avatar.cogwright_path_0",
+            playable: false,
             rarity: AvatarRarity::Common,
             starter_for: None,
             base: Stats {
@@ -21776,6 +22065,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1013,
             key: "avatar.cogwright_path_1",
+            playable: false,
             rarity: AvatarRarity::Common,
             starter_for: None,
             base: Stats {
@@ -22031,6 +22321,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1014,
             key: "avatar.storm_surveyor_path_0",
+            playable: false,
             rarity: AvatarRarity::Common,
             starter_for: None,
             base: Stats {
@@ -22286,6 +22577,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1015,
             key: "avatar.storm_surveyor_path_1",
+            playable: false,
             rarity: AvatarRarity::Common,
             starter_for: None,
             base: Stats {
@@ -22541,6 +22833,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1016,
             key: "avatar.stoneguard_path_0",
+            playable: false,
             rarity: AvatarRarity::Common,
             starter_for: None,
             base: Stats {
@@ -22796,6 +23089,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1017,
             key: "avatar.stoneguard_path_1",
+            playable: false,
             rarity: AvatarRarity::Common,
             starter_for: None,
             base: Stats {
@@ -23051,6 +23345,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1018,
             key: "avatar.tide_oracle_path_0",
+            playable: false,
             rarity: AvatarRarity::Common,
             starter_for: None,
             base: Stats {
@@ -23306,6 +23601,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1019,
             key: "avatar.tide_oracle_path_1",
+            playable: false,
             rarity: AvatarRarity::Common,
             starter_for: None,
             base: Stats {
@@ -23561,6 +23857,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1020,
             key: "avatar.venom_scout_path_0",
+            playable: false,
             rarity: AvatarRarity::Common,
             starter_for: None,
             base: Stats {
@@ -23816,6 +24113,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1021,
             key: "avatar.venom_scout_path_1",
+            playable: false,
             rarity: AvatarRarity::Common,
             starter_for: None,
             base: Stats {
@@ -24071,6 +24369,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1022,
             key: "avatar.iron_reaver_path_0",
+            playable: false,
             rarity: AvatarRarity::Uncommon,
             starter_for: None,
             base: Stats {
@@ -24326,6 +24625,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1023,
             key: "avatar.iron_reaver_path_1",
+            playable: false,
             rarity: AvatarRarity::Uncommon,
             starter_for: None,
             base: Stats {
@@ -24581,6 +24881,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1024,
             key: "avatar.rift_duelist_path_0",
+            playable: false,
             rarity: AvatarRarity::Uncommon,
             starter_for: None,
             base: Stats {
@@ -24836,6 +25137,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1025,
             key: "avatar.rift_duelist_path_1",
+            playable: false,
             rarity: AvatarRarity::Uncommon,
             starter_for: None,
             base: Stats {
@@ -25091,6 +25393,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1026,
             key: "avatar.root_sage_path_0",
+            playable: false,
             rarity: AvatarRarity::Uncommon,
             starter_for: None,
             base: Stats {
@@ -25346,6 +25649,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1027,
             key: "avatar.root_sage_path_1",
+            playable: false,
             rarity: AvatarRarity::Uncommon,
             starter_for: None,
             base: Stats {
@@ -25601,6 +25905,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1028,
             key: "avatar.tideform_path_0",
+            playable: false,
             rarity: AvatarRarity::Uncommon,
             starter_for: None,
             base: Stats {
@@ -25856,6 +26161,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1029,
             key: "avatar.tideform_path_1",
+            playable: false,
             rarity: AvatarRarity::Uncommon,
             starter_for: None,
             base: Stats {
@@ -26111,6 +26417,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1030,
             key: "avatar.silkblade_path_0",
+            playable: false,
             rarity: AvatarRarity::Uncommon,
             starter_for: None,
             base: Stats {
@@ -26366,6 +26673,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1031,
             key: "avatar.silkblade_path_1",
+            playable: false,
             rarity: AvatarRarity::Uncommon,
             starter_for: None,
             base: Stats {
@@ -26621,6 +26929,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1032,
             key: "avatar.bone_sentinel_path_0",
+            playable: false,
             rarity: AvatarRarity::Uncommon,
             starter_for: None,
             base: Stats {
@@ -26876,6 +27185,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1033,
             key: "avatar.bone_sentinel_path_1",
+            playable: false,
             rarity: AvatarRarity::Uncommon,
             starter_for: None,
             base: Stats {
@@ -27131,6 +27441,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1034,
             key: "avatar.veil_agent_path_0",
+            playable: false,
             rarity: AvatarRarity::Uncommon,
             starter_for: None,
             base: Stats {
@@ -27386,6 +27697,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1035,
             key: "avatar.veil_agent_path_1",
+            playable: false,
             rarity: AvatarRarity::Uncommon,
             starter_for: None,
             base: Stats {
@@ -27641,6 +27953,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1036,
             key: "avatar.glass_alchemist_path_0",
+            playable: false,
             rarity: AvatarRarity::Rare,
             starter_for: None,
             base: Stats {
@@ -27896,6 +28209,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1037,
             key: "avatar.glass_alchemist_path_1",
+            playable: false,
             rarity: AvatarRarity::Rare,
             starter_for: None,
             base: Stats {
@@ -28151,6 +28465,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1038,
             key: "avatar.dusk_stalker_path_0",
+            playable: false,
             rarity: AvatarRarity::Rare,
             starter_for: None,
             base: Stats {
@@ -28406,6 +28721,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1039,
             key: "avatar.dusk_stalker_path_1",
+            playable: false,
             rarity: AvatarRarity::Rare,
             starter_for: None,
             base: Stats {
@@ -28661,6 +28977,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1040,
             key: "avatar.dawn_lancer_path_0",
+            playable: false,
             rarity: AvatarRarity::Rare,
             starter_for: None,
             base: Stats {
@@ -28916,6 +29233,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1041,
             key: "avatar.dawn_lancer_path_1",
+            playable: false,
             rarity: AvatarRarity::Rare,
             starter_for: None,
             base: Stats {
@@ -29171,6 +29489,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1042,
             key: "avatar.aether_seer_path_0",
+            playable: false,
             rarity: AvatarRarity::Rare,
             starter_for: None,
             base: Stats {
@@ -29426,6 +29745,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1043,
             key: "avatar.aether_seer_path_1",
+            playable: false,
             rarity: AvatarRarity::Rare,
             starter_for: None,
             base: Stats {
@@ -29681,6 +30001,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1044,
             key: "avatar.jade_vanguard_path_0",
+            playable: false,
             rarity: AvatarRarity::Rare,
             starter_for: None,
             base: Stats {
@@ -29936,6 +30257,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1045,
             key: "avatar.jade_vanguard_path_1",
+            playable: false,
             rarity: AvatarRarity::Rare,
             starter_for: None,
             base: Stats {
@@ -30191,6 +30513,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1046,
             key: "avatar.cinder_knight_path_0",
+            playable: false,
             rarity: AvatarRarity::Junkyard,
             starter_for: None,
             base: Stats {
@@ -30457,6 +30780,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1047,
             key: "avatar.cinder_knight_path_1",
+            playable: false,
             rarity: AvatarRarity::Junkyard,
             starter_for: None,
             base: Stats {
@@ -30723,6 +31047,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1048,
             key: "avatar.copper_distiller_path_0",
+            playable: false,
             rarity: AvatarRarity::Junkyard,
             starter_for: None,
             base: Stats {
@@ -30989,6 +31314,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1049,
             key: "avatar.copper_distiller_path_1",
+            playable: false,
             rarity: AvatarRarity::Junkyard,
             starter_for: None,
             base: Stats {
@@ -31255,6 +31581,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1050,
             key: "avatar.ruin_keeper_path_0",
+            playable: false,
             rarity: AvatarRarity::Junkyard,
             starter_for: None,
             base: Stats {
@@ -31521,6 +31848,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1051,
             key: "avatar.ruin_keeper_path_1",
+            playable: false,
             rarity: AvatarRarity::Junkyard,
             starter_for: None,
             base: Stats {
@@ -31787,6 +32115,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1052,
             key: "avatar.shade_war_path_0",
+            playable: false,
             rarity: AvatarRarity::Shade,
             starter_for: None,
             base: Stats {
@@ -32062,6 +32391,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1053,
             key: "avatar.shade_war_path_1",
+            playable: false,
             rarity: AvatarRarity::Shade,
             starter_for: None,
             base: Stats {
@@ -32337,6 +32667,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1054,
             key: "avatar.shade_truth_path_0",
+            playable: false,
             rarity: AvatarRarity::Shade,
             starter_for: None,
             base: Stats {
@@ -32612,6 +32943,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1055,
             key: "avatar.shade_truth_path_1",
+            playable: false,
             rarity: AvatarRarity::Shade,
             starter_for: None,
             base: Stats {
@@ -32887,6 +33219,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1056,
             key: "avatar.shade_elements_path_0",
+            playable: false,
             rarity: AvatarRarity::Shade,
             starter_for: None,
             base: Stats {
@@ -33162,6 +33495,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1057,
             key: "avatar.shade_elements_path_1",
+            playable: false,
             rarity: AvatarRarity::Shade,
             starter_for: None,
             base: Stats {
@@ -33437,6 +33771,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1058,
             key: "avatar.shade_time_path_0",
+            playable: false,
             rarity: AvatarRarity::Shade,
             starter_for: None,
             base: Stats {
@@ -33712,6 +34047,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1059,
             key: "avatar.shade_time_path_1",
+            playable: false,
             rarity: AvatarRarity::Shade,
             starter_for: None,
             base: Stats {
@@ -33987,6 +34323,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1060,
             key: "avatar.shade_death_path_0",
+            playable: false,
             rarity: AvatarRarity::Shade,
             starter_for: None,
             base: Stats {
@@ -34262,6 +34599,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1061,
             key: "avatar.shade_death_path_1",
+            playable: false,
             rarity: AvatarRarity::Shade,
             starter_for: None,
             base: Stats {
@@ -34537,6 +34875,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1062,
             key: "avatar.shade_genius_path_0",
+            playable: false,
             rarity: AvatarRarity::Shade,
             starter_for: None,
             base: Stats {
@@ -34812,6 +35151,7 @@ pub static PATHS: &[PathDef] = &[
         avatar: AvatarDef {
             id: 1063,
             key: "avatar.shade_genius_path_1",
+            playable: false,
             rarity: AvatarRarity::Shade,
             starter_for: None,
             base: Stats {
@@ -35081,6 +35421,518 @@ pub static PATHS: &[PathDef] = &[
         ],
         gifts: [141, 162],
     },
+    PathDef {
+        base_avatar: 32,
+        variant: 0,
+        avatar: AvatarDef {
+            id: 1064,
+            key: "avatar.vampire_path_0",
+            playable: false,
+            rarity: AvatarRarity::Common,
+            starter_for: None,
+            base: Stats {
+                phys_atk: 5,
+                phys_def: 1,
+                mag_atk: 2,
+                mag_def: 1,
+                hp_max: 35,
+                stamina_max: 30,
+            },
+            schools: Schools([1, 0, 0, 0, 1, 0]),
+            growth: &[
+                Growth {
+                    level: 2,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 0,
+                        mag_atk: 0,
+                        mag_def: 0,
+                        hp_max: 3,
+                        stamina_max: 3,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 3,
+                    delta: Stats {
+                        phys_atk: 1,
+                        phys_def: 0,
+                        mag_atk: 0,
+                        mag_def: 0,
+                        hp_max: 4,
+                        stamina_max: 4,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 4,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 1,
+                        mag_atk: 0,
+                        mag_def: 0,
+                        hp_max: 4,
+                        stamina_max: 4,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 5,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 0,
+                        mag_atk: 1,
+                        mag_def: 0,
+                        hp_max: 3,
+                        stamina_max: 3,
+                    },
+                    schools: Some(Schools([1, 0, 0, 0, 2, 0])),
+                },
+                Growth {
+                    level: 6,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 0,
+                        mag_atk: 0,
+                        mag_def: 1,
+                        hp_max: 4,
+                        stamina_max: 4,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 7,
+                    delta: Stats {
+                        phys_atk: 1,
+                        phys_def: 0,
+                        mag_atk: 0,
+                        mag_def: 0,
+                        hp_max: 4,
+                        stamina_max: 4,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 8,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 1,
+                        mag_atk: 0,
+                        mag_def: 0,
+                        hp_max: 3,
+                        stamina_max: 3,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 9,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 0,
+                        mag_atk: 1,
+                        mag_def: 0,
+                        hp_max: 4,
+                        stamina_max: 4,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 10,
+                    delta: Stats {
+                        phys_atk: 1,
+                        phys_def: 0,
+                        mag_atk: 0,
+                        mag_def: 0,
+                        hp_max: 4,
+                        stamina_max: 4,
+                    },
+                    schools: Some(Schools([2, 0, 0, 0, 2, 0])),
+                },
+                Growth {
+                    level: 11,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 0,
+                        mag_atk: 0,
+                        mag_def: 0,
+                        hp_max: 3,
+                        stamina_max: 3,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 12,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 1,
+                        mag_atk: 0,
+                        mag_def: 0,
+                        hp_max: 4,
+                        stamina_max: 4,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 13,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 0,
+                        mag_atk: 1,
+                        mag_def: 0,
+                        hp_max: 4,
+                        stamina_max: 4,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 14,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 0,
+                        mag_atk: 0,
+                        mag_def: 1,
+                        hp_max: 3,
+                        stamina_max: 3,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 15,
+                    delta: Stats {
+                        phys_atk: 1,
+                        phys_def: 0,
+                        mag_atk: 0,
+                        mag_def: 0,
+                        hp_max: 4,
+                        stamina_max: 4,
+                    },
+                    schools: Some(Schools([2, 0, 0, 0, 3, 0])),
+                },
+                Growth {
+                    level: 16,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 1,
+                        mag_atk: 0,
+                        mag_def: 0,
+                        hp_max: 4,
+                        stamina_max: 4,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 17,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 0,
+                        mag_atk: 1,
+                        mag_def: 0,
+                        hp_max: 3,
+                        stamina_max: 3,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 18,
+                    delta: Stats {
+                        phys_atk: 1,
+                        phys_def: 0,
+                        mag_atk: 0,
+                        mag_def: 0,
+                        hp_max: 4,
+                        stamina_max: 4,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 19,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 1,
+                        mag_atk: 0,
+                        mag_def: 0,
+                        hp_max: 4,
+                        stamina_max: 4,
+                    },
+                    schools: Some(Schools([3, 0, 0, 0, 3, 0])),
+                },
+                Growth {
+                    level: 20,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 0,
+                        mag_atk: 0,
+                        mag_def: 1,
+                        hp_max: 4,
+                        stamina_max: 4,
+                    },
+                    schools: None,
+                },
+            ],
+            dev_points: &[(5, 1), (10, 2), (15, 1), (20, 2)],
+        },
+        specializations: [
+            engine::Specialization::School(School::Combat),
+            engine::Specialization::School(School::Necro),
+        ],
+        gifts: [160, 158],
+    },
+    PathDef {
+        base_avatar: 32,
+        variant: 1,
+        avatar: AvatarDef {
+            id: 1065,
+            key: "avatar.vampire_path_1",
+            playable: false,
+            rarity: AvatarRarity::Common,
+            starter_for: None,
+            base: Stats {
+                phys_atk: 3,
+                phys_def: 1,
+                mag_atk: 4,
+                mag_def: 1,
+                hp_max: 25,
+                stamina_max: 40,
+            },
+            schools: Schools([1, 0, 0, 0, 1, 0]),
+            growth: &[
+                Growth {
+                    level: 2,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 0,
+                        mag_atk: 0,
+                        mag_def: 0,
+                        hp_max: 3,
+                        stamina_max: 3,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 3,
+                    delta: Stats {
+                        phys_atk: 1,
+                        phys_def: 0,
+                        mag_atk: 0,
+                        mag_def: 0,
+                        hp_max: 4,
+                        stamina_max: 4,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 4,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 1,
+                        mag_atk: 0,
+                        mag_def: 0,
+                        hp_max: 4,
+                        stamina_max: 4,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 5,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 0,
+                        mag_atk: 1,
+                        mag_def: 0,
+                        hp_max: 3,
+                        stamina_max: 3,
+                    },
+                    schools: Some(Schools([1, 0, 0, 0, 2, 0])),
+                },
+                Growth {
+                    level: 6,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 0,
+                        mag_atk: 0,
+                        mag_def: 1,
+                        hp_max: 4,
+                        stamina_max: 4,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 7,
+                    delta: Stats {
+                        phys_atk: 1,
+                        phys_def: 0,
+                        mag_atk: 0,
+                        mag_def: 0,
+                        hp_max: 4,
+                        stamina_max: 4,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 8,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 1,
+                        mag_atk: 0,
+                        mag_def: 0,
+                        hp_max: 3,
+                        stamina_max: 3,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 9,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 0,
+                        mag_atk: 1,
+                        mag_def: 0,
+                        hp_max: 4,
+                        stamina_max: 4,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 10,
+                    delta: Stats {
+                        phys_atk: 1,
+                        phys_def: 0,
+                        mag_atk: 0,
+                        mag_def: 0,
+                        hp_max: 4,
+                        stamina_max: 4,
+                    },
+                    schools: Some(Schools([2, 0, 0, 0, 2, 0])),
+                },
+                Growth {
+                    level: 11,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 0,
+                        mag_atk: 0,
+                        mag_def: 0,
+                        hp_max: 3,
+                        stamina_max: 3,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 12,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 1,
+                        mag_atk: 0,
+                        mag_def: 0,
+                        hp_max: 4,
+                        stamina_max: 4,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 13,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 0,
+                        mag_atk: 1,
+                        mag_def: 0,
+                        hp_max: 4,
+                        stamina_max: 4,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 14,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 0,
+                        mag_atk: 0,
+                        mag_def: 1,
+                        hp_max: 3,
+                        stamina_max: 3,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 15,
+                    delta: Stats {
+                        phys_atk: 1,
+                        phys_def: 0,
+                        mag_atk: 0,
+                        mag_def: 0,
+                        hp_max: 4,
+                        stamina_max: 4,
+                    },
+                    schools: Some(Schools([2, 0, 0, 0, 3, 0])),
+                },
+                Growth {
+                    level: 16,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 1,
+                        mag_atk: 0,
+                        mag_def: 0,
+                        hp_max: 4,
+                        stamina_max: 4,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 17,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 0,
+                        mag_atk: 1,
+                        mag_def: 0,
+                        hp_max: 3,
+                        stamina_max: 3,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 18,
+                    delta: Stats {
+                        phys_atk: 1,
+                        phys_def: 0,
+                        mag_atk: 0,
+                        mag_def: 0,
+                        hp_max: 4,
+                        stamina_max: 4,
+                    },
+                    schools: None,
+                },
+                Growth {
+                    level: 19,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 1,
+                        mag_atk: 0,
+                        mag_def: 0,
+                        hp_max: 4,
+                        stamina_max: 4,
+                    },
+                    schools: Some(Schools([3, 0, 0, 0, 3, 0])),
+                },
+                Growth {
+                    level: 20,
+                    delta: Stats {
+                        phys_atk: 0,
+                        phys_def: 0,
+                        mag_atk: 0,
+                        mag_def: 1,
+                        hp_max: 4,
+                        stamina_max: 4,
+                    },
+                    schools: None,
+                },
+            ],
+            dev_points: &[(5, 1), (10, 2), (15, 1), (20, 2)],
+        },
+        specializations: [
+            engine::Specialization::School(School::Necro),
+            engine::Specialization::Concentration,
+        ],
+        gifts: [160, 51],
+    },
 ];
 
 /// Zestawy startowe w kolejności szkół.
@@ -35208,6 +36060,66 @@ pub static STARTERS: &[StarterDef] = &[
         ],
         deck: &[
             60, 60, 60, 62, 62, 62, 62, 63, 63, 63, 63, 64, 65, 65, 65, 65, 66, 66, 66, 66,
+        ],
+    },
+    StarterDef {
+        school: School::Combat,
+        avatar: 11,
+        cards: &[
+            (1, 4),
+            (2, 4),
+            (3, 4),
+            (4, 4),
+            (5, 4),
+            (6, 4),
+            (7, 2),
+            (8, 2),
+            (9, 2),
+            (10, 3),
+            (11, 2),
+            (12, 2),
+            (13, 2),
+            (14, 1),
+        ],
+        deck: &[1, 1, 1, 1, 3, 3, 3, 4, 4, 4, 6, 6, 6, 6, 7, 7, 8, 8, 13, 13],
+    },
+    StarterDef {
+        school: School::Element,
+        avatar: 13,
+        cards: &[
+            (25, 2),
+            (26, 2),
+            (27, 4),
+            (28, 4),
+            (29, 2),
+            (30, 2),
+            (31, 4),
+            (32, 4),
+            (33, 4),
+            (34, 4),
+            (35, 4),
+            (36, 4),
+        ],
+        deck: &[
+            27, 27, 27, 27, 28, 28, 28, 28, 31, 31, 31, 31, 34, 34, 34, 34, 35, 35, 35, 35,
+        ],
+    },
+    StarterDef {
+        school: School::Necro,
+        avatar: 32,
+        cards: &[
+            (1, 4),
+            (51, 4),
+            (52, 4),
+            (55, 4),
+            (56, 4),
+            (57, 4),
+            (59, 4),
+            (160, 4),
+            (215, 4),
+        ],
+        deck: &[
+            1, 1, 1, 1, 51, 51, 51, 56, 56, 56, 57, 57, 57, 59, 59, 59, 215, 215, 215, 215,
         ],
     },
 ];

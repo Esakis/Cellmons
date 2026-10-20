@@ -105,6 +105,9 @@ pub struct GrowthSrc {
 pub struct AvatarSrc {
     pub id: u16,
     pub key: String,
+    /// Explicit release switch for collectible templates. Paths inherit the base switch.
+    #[serde(default)]
+    pub playable: bool,
     /// Szablon referencyjny z `docs/dane/postacie.csv`; tylko dla projektanta.
     #[serde(rename = "ref", default, skip_serializing)]
     pub reference: Option<String>,

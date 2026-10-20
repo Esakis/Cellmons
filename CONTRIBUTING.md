@@ -93,6 +93,37 @@ API Androida wymaga `client=android` przy logowaniu i `X-Native-Version: 1.0.0`;
 
 `run.bat` przekazuje także WebSocket `/ws` przez Vite. Po rejestracji i zalogowaniu wybierz „Lobby”, a potem pomieszczenie. Gość nie otwiera WebSocket. Limity połączeń konfiguruje `.env.example`.
 
+### Konta sterowane przez serwer
+
+Po migracji `cargo run -p server --locked -- seed-bots` przygotowuje 40 trwałych kont z
+`crates/server/src/bots/roster.toml`. Ponowienie zachowuje postęp i ustawienie `enabled`.
+Jeśli aktywna klasa została wycofana z wydania, tworzy zatwierdzonego zastępcę z tym
+samym poziomem i PD; stara postać i historia pozostają. Konflikt nicku z innym kontem wycofuje całą operację.
+Hasła są losowe i nie są przechowywane w postaci jawnej ani wypisywane. Nie wysyłamy poczty
+do technicznych adresów tych kont podczas tworzenia.
+
+Ustaw `LOBBY_BOTS_ENABLED=true` w `.env` i uruchom serwer. Sterownik tworzy brakujące
+konta, łączy je z lobby, przyjmuje wyzwania na arenie i okresowo zmienia miejsca części
+postaci. Większość pozostaje na arenie. Zwykłe profile mają nick, postać, poziom i historię;
+wewnętrzne `bot_accounts` nie jest polem protokołu klienta.
+
+`LOBBY_BOTS_ENABLED=false` i restart wyłączają całą grupę bez usuwania danych.
+Pojedyncze konto można wyłączyć przez `UPDATE bot_accounts SET enabled=false WHERE roster_key='astar'`;
+działający sterownik sprawdza to co 30 sekund. `true` włącza je ponownie.
+Blokada PostgreSQL pozwala działać jednemu sterownikowi na bazę; konta są obecne
+w hubie tego procesu, zgodnie z obecną architekturą jednego serwera lobby.
+
+Walki gracza z takim kontem korzystają z normalnych zasad areny i jej limitów nagród.
+Pojedynki samych kont sterowanych przez serwer używają prawdziwego silnika, ale mają
+rodzaj `training`, bez PD, Dukatów i zmian rankingu. Konta nie zapisują się automatycznie
+do turniejów i nie generują wiadomości na czacie.
+
+Testy: `cargo test -p server --test online bots:: -- --ignored --test-threads=1`
+na lokalnym PostgreSQL. Sprawdzają ponowienie tworzenia, konflikt nazwy, pełną walkę
+przez WebSocket, restart, wyłączanie, blokadę drugiego sterownika i autonomiczny pojedynek.
+
+### Testy przegl?darkowe z backendem
+
 `pnpm --filter e2e test` wymaga teraz lokalnego PostgreSQL z prawem `CREATEDB`. Domyślnie używa deweloperskiego klastra na 5433; opcjonalnie podaj `E2E_DATABASE_URL` (tylko loopback). Nie czyta aplikacyjnego `.env` ani `DATABASE_URL`. Playwright uruchamia przykład `browser_fixture`, który tworzy własną bazę `game_e2e_<uuid>`, stosuje migracje i przechwytuje pocztę w RAM. Backend słucha na 18092, preview na 4173. Teardown zamyka WebSocket, usuwa wyłącznie wygenerowaną bazę i czeka na zakończenie sprzątania. Zwykły serwer nie zawiera testowego endpointu `__shutdown`. Testy „rejestracja → lobby” i dwóch klientów korzystają z prawdziwego backendu, bez mocków. Pozostałe formularze nadal mają osobne testy kontraktu API.
 
 ## 3. Gałęzie, commity i PR

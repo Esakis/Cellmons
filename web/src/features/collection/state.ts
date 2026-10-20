@@ -1,5 +1,5 @@
 import { accountEpoch } from '../../app/account';
-import { avatars, cards, content } from '../../app/content';
+import { avatars, cards, content, playableAvatars } from '../../app/content';
 
 export type AvatarState = {
   id: string;
@@ -24,12 +24,24 @@ export type AvatarState = {
 };
 export type Snapshot = {
   content_version: string;
+  recruitment?: RecruitmentState;
   templates: number[];
   avatars: AvatarState[];
   collection: { card_id: number; qty: number }[];
   presets: { id: string; name: string; cards: number[]; revision: number }[];
 };
+export type RecruitmentState = {
+  level: number;
+  available: number[];
+  milestones: {
+    level: number;
+    claimed: boolean;
+    template_id: number | null;
+    avatar_id: string | null;
+  }[];
+};
 export type Mutation =
+  | { action: 'recruit'; level: number; template_id: number | null }
   | {
       action: 'reincarnate';
       id: string;
@@ -76,7 +88,12 @@ function freshAvatar(id: string, template: number, slot: number): AvatarState {
     schools: ['combat', 'divine', 'element', 'arcane', 'necro', 'tech'].map(
       (s) => (definition.schools as Record<string, number | undefined>)[s] ?? 0,
     ),
-    deck: [],
+    deck: Object.entries(
+      content.starters.find((s) => s.avatar === definition.key)?.deck ?? {},
+    ).flatMap(([key, count]) => {
+      const card = content.cards.find((c) => c.key === key);
+      return card ? Array<number>(count).fill(card.id) : [];
+    }),
     deck_revision: 0,
   };
 }
@@ -85,7 +102,7 @@ export function guestState(): Snapshot {
     epoch = accountEpoch();
     guest = {
       content_version: content.version,
-      templates: content.avatars.filter((a) => a.rarity !== 'shade').map((a) => a.id),
+      templates: playableAvatars.map((a) => a.id),
       avatars: [freshAvatar(crypto.randomUUID(), content.avatars[0]?.id ?? 1, 0)],
       collection: content.cards.map((c) => ({ card_id: c.id, qty: 4 })),
       presets: [],
@@ -120,6 +137,8 @@ export function guestMutation(mutation: Mutation): Snapshot {
     return [...ids];
   };
   switch (mutation.action) {
+    case 'recruit':
+      throw new Error('NOT_READY');
     case 'reincarnate':
     case 'shade':
       // Training grants no XP; the local guest collection never reaches the threshold.

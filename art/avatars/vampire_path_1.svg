@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Wampir">
+<title>Wampir</title>
+<defs>
+<radialGradient id="night"><stop stop-color="#81334a"/><stop offset="1" stop-color="#150e25"/></radialGradient>
+<linearGradient id="cloak" x2="1" y2="1"><stop stop-color="#7d1835"/><stop offset="1" stop-color="#230f25"/></linearGradient>
+<linearGradient id="skin" x2="1" y2="1"><stop stop-color="#f0dfd6"/><stop offset="1" stop-color="#9f859a"/></linearGradient>
+<clipPath id="frame"><circle cx="100" cy="100" r="94"/></clipPath>
+</defs>
+<circle cx="100" cy="100" r="97" fill="#120c20" stroke="#b39768" stroke-width="3"/>
+<g clip-path="url(#frame)">
+<path d="M0 0H200V200H0Z" fill="url(#night)"/>
+<circle cx="141" cy="47" r="30" fill="#e3caa7" opacity=".65"/>
+<path d="M129 17A29 29 0 0 0 156 72A30 30 0 0 1 129 17" fill="#674255"/>
+<path d="M10 150V73L25 58 40 73V150M159 157V87L176 66 190 87V157" fill="#110d21" opacity=".7"/>
+<path d="M26 203Q30 144 72 130L100 144 128 130Q171 144 176 203" fill="url(#cloak)" stroke="#b96a70" stroke-width="2"/>
+<path d="M82 119H118V151L100 172 81 151Z" fill="url(#skin)"/>
+<path d="M73 68Q69 35 100 34 132 36 128 70L124 107 111 128 100 134 86 126 74 105Z" fill="url(#skin)" stroke="#6c485b" stroke-width="2"/>
+<path d="M70 88Q56 38 88 27 119 15 137 49L130 94 120 58 106 46 99 58 83 48Z" fill="#171222"/>
+<path d="M76 76L92 79M108 79L124 75" fill="none" stroke="#2b1726" stroke-width="4"/>
+<path d="M78 83L91 85M109 85L122 82" stroke="#f05a61" stroke-width="3"/>
+<path d="M98 86L94 104 103 106" fill="none" stroke="#927184" stroke-width="2"/>
+<path d="M88 113Q100 119 113 112" fill="none" stroke="#762e46" stroke-width="3"/>
+<path d="M89 112L92 121 95 114M106 114L110 121 113 112" fill="#fff4df"/>
+<path d="M77 143L48 101 56 156 93 191M123 143L151 101 145 156 106 191" fill="#351027" stroke="#c47a7c" stroke-width="2"/>
+<path d="M83 152L100 167 118 151 112 197H88Z" fill="#ece0d1"/>
+<path d="M95 166H105L109 198H91Z" fill="#4c172d"/>
+<path d="M100 150L107 157 100 166 93 157Z" fill="#c4314b" stroke="#ddb989" stroke-width="2"/>
+</g>
+<circle cx="100" cy="100" r="94" fill="none" stroke="#c3a47e" stroke-width="1"/>
+<g fill="#753b33" stroke="#d4b18a" stroke-width="3"><path d="M132 136L160 125 188 136V165Q178 185 160 193 141 183 132 165Z"/><g transform="translate(160 159) scale(.7)" fill="#d4b18a" stroke-width="2" style="--shade-detail:#753b33"><path d="M-4 17V-10L0-23 4-10V17M-13 11H13M0 12V25"/></g></g><path d="M61 25L75 12 91 27 108 10 127 26 140 14" fill="none" stroke="#d4b18a" stroke-width="3"/><path d="M11 25V11H28M172 11H189V25M11 172V189H28" fill="none" stroke="#d4b18a" stroke-width="3"/></svg>

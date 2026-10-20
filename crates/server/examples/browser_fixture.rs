@@ -117,6 +117,17 @@ async fn run(options: PgConnectOptions) -> anyhow::Result<()> {
             ),
         ));
         // Progress fixture lives only in this loopback example and its disposable database.
+        let journey_db = db.clone();
+        let app = app.merge(Router::new().route("/__journey", post(move |Json(input): Json<serde_json::Value>| {
+            let db = journey_db.clone();
+            async move {
+                let login = input["login"].as_str().ok_or(axum::http::StatusCode::BAD_REQUEST)?;
+                let xp = input["xp"].as_i64().filter(|xp| (0..=42000).contains(xp)).ok_or(axum::http::StatusCode::BAD_REQUEST)?;
+                sqlx::query("UPDATE users SET account_xp=$2,tutorial_step=3 WHERE login=$1::citext")
+                    .bind(login).bind(xp).execute(&db).await.map_err(|_| axum::http::StatusCode::SERVICE_UNAVAILABLE)?;
+                Ok::<_, axum::http::StatusCode>(axum::http::StatusCode::NO_CONTENT)
+            }
+        })));
         let progression_db = db.clone();
         let app = app.merge(Router::new().route("/__advance", post(move |Json(input): Json<Advance>| {
             let db = progression_db.clone();

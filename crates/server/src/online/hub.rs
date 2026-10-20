@@ -838,6 +838,7 @@ impl State {
         }
     }
     async fn room_access(&self, user: Uuid, name: &str) -> Result<Option<HashSet<String>>> {
+        crate::journey::require(&self.db, user, name).await?;
         if name == "expedition" {
             let users:Vec<Uuid>=sqlx::query_scalar("SELECT l.user_id FROM activity_locks l JOIN expeditions e ON e.id=l.owner_id AND e.user_id=l.user_id JOIN users u ON u.id=l.user_id WHERE l.kind='expedition' AND e.status='active' AND u.status='active' AND u.email_verified_at IS NOT NULL").fetch_all(&self.db).await?;
             if !users.contains(&user) {
@@ -846,7 +847,7 @@ impl State {
             return Ok(Some(users.into_iter().map(|id| id.to_string()).collect()));
         }
         if [
-            "arena", "training", "castle", "portal", "bazaar", "shop", "tower",
+            "square", "arena", "training", "castle", "portal", "bazaar", "shop", "tower",
         ]
         .contains(&name)
         {
@@ -981,8 +982,11 @@ impl State {
                     return Err(Error("INVALID_MESSAGE"));
                 }
                 let (ignored, invited) = repo::relationship(&self.db, user, other).await?;
-                if ignored || (!self.players[&user].info.verified && !invited) {
+                if ignored {
                     return Err(Error("FORBIDDEN"));
+                }
+                if !self.players[&user].info.verified && !invited {
+                    return Err(Error("PRIVATE_REQUIRES_VERIFICATION"));
                 }
                 repo::send_mail(&self.db, user, other, &text).await?;
                 Ok(ok())
@@ -1243,8 +1247,11 @@ impl State {
                     return Err(Error("NOT_FOUND"));
                 }
                 let (ignored, invited) = repo::relationship(&self.db, user, other).await?;
-                if ignored || (!self.players[&user].info.verified && !invited) {
+                if ignored {
                     return Err(Error("FORBIDDEN"));
+                }
+                if !self.players[&user].info.verified && !invited {
+                    return Err(Error("PRIVATE_REQUIRES_VERIFICATION"));
                 }
                 message.to = other.to_string();
                 message.room.clear();
@@ -1420,7 +1427,7 @@ impl State {
         engine::new_duel(&setup, &engine_content::content()).map_err(|_| Error("INVALID_DECK"))?;
         let duel = Uuid::now_v7();
         let runtime = if self.settings.run_duels {
-            let seats = [
+            let mut seats = [
                 Seat::player(
                     first.user,
                     first.avatar,
@@ -1434,7 +1441,10 @@ impl State {
                     &self.players[&to].info,
                 ),
             ];
-            let record = Record::new(duel, "arena", seats, seed, &self.settings.duels)?;
+            let exhibition = crate::bots::configure_seats(&mut tx, &mut seats).await?;
+            // Autonomous exhibitions do not mint rewards or manufacture ranked results.
+            let kind = if exhibition { "training" } else { "arena" };
+            let record = Record::new(duel, kind, seats, seed, &self.settings.duels)?;
             duel::journal::create(
                 &mut tx,
                 &record,
@@ -1567,7 +1577,7 @@ async fn duel_request(db: PgPool, manager: Manager, user: Uuid, body: Client) ->
 
 fn public_room(name: &str) -> bool {
     [
-        "arena", "training", "castle", "portal", "bazaar", "shop", "tower",
+        "square", "arena", "training", "castle", "portal", "bazaar", "shop", "tower",
     ]
     .contains(&name)
 }

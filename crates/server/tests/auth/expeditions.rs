@@ -14,6 +14,10 @@ async fn expedition_http_rejects_guests_unverified_foreign_avatars_and_private_p
         StatusCode::UNAUTHORIZED
     );
     f.register().await;
+    sqlx::query("UPDATE users SET account_xp=450,tutorial_step=3")
+        .execute(&pool)
+        .await
+        .unwrap();
     let session = cookie(&f.login(false).await);
     let avatar: Uuid = sqlx::query_scalar("SELECT id FROM avatars WHERE is_active")
         .fetch_one(&pool)

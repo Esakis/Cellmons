@@ -37,6 +37,7 @@ export function offlinePlugin(): Plugin {
       }
       const onlineKeys = [
         'src/features/lobby/Lobby.tsx',
+        'src/features/lobby/JourneyGate.tsx',
         'src/features/lobby/OnlineDuel.tsx',
         'src/features/lobby/OnlineRecords.tsx',
         'src/features/lobby/Trade.tsx',
@@ -55,6 +56,7 @@ export function offlinePlugin(): Plugin {
         'src/app/pathArt.ts',
         'src/app/pathCatalog.ts',
         'src/features/collection/Progression.tsx',
+        'src/features/collection/Recruitment.tsx',
       ];
       const offline = new Set<string>();
       for (const [key, entry] of Object.entries(manifest)) {

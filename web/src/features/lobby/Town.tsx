@@ -1,9 +1,11 @@
 import { A, useNavigate } from '@solidjs/router';
-import { createSignal, For, type JSX, onMount, Show } from 'solid-js';
+import { createSignal, For, Show } from 'solid-js';
+import { Dynamic } from 'solid-js/web';
 import { icon } from '../../app/content';
 import { onlineIcon } from '../../app/onlineIcons';
 import layout from '../../generated/town.json';
 import { t } from '../../i18n';
+import { canEnter, type Journey, requiredLevel } from './journey';
 
 // The lobby map is one painting of the town (art/paintings/scenes/town.avif). Its clickable
 // buildings are already lit in the picture (art/paintings/town.json holds their outlines), so a
@@ -53,6 +55,7 @@ function outline(shape: number[][]) {
 
 export function Town(props: {
   connected: boolean;
+  journey: Journey | undefined;
   /** The player's clan, or '' without one: the clan hall then leads to the clan list. */
   clan: string;
   /** A place where something waits for the player (a challenge), or ''. */
@@ -61,26 +64,42 @@ export function Town(props: {
 }) {
   const navigate = useNavigate();
   const [hot, setHot] = createSignal('');
-  let view: HTMLDivElement | undefined;
-  // Phones pan the town sideways: start in the middle, at the castle, the portal and the arena.
-  onMount(() => {
-    if (view) view.scrollLeft = (view.scrollWidth - view.clientWidth) / 2;
-  });
+  const locked = (id: string) => !canEnter(props.journey, id);
+  const waiting = (id: string) =>
+    props.alert === id || (id === 'library' && (props.journey?.recruits ?? 0) > 0);
+  const visible = () =>
+    layout.places.filter(
+      (p) =>
+        (props.journey?.tutorial_step ?? 0) >= 3 || ['training', 'library', 'arena'].includes(p.id),
+    );
   const link = (id: string) =>
-    id === 'library' ? '/collection' : id === 'clan' && !props.clan ? '/clans' : '';
+    locked(id)
+      ? ''
+      : id === 'library'
+        ? '/collection'
+        : id === 'clan' && !props.clan
+          ? '/clans'
+          : '';
   function go(id: string) {
+    if (locked(id)) return;
     if (link(id)) navigate(link(id));
     else if (props.connected) props.enter(id === 'clan' ? `clan:${props.clan}` : id);
   }
   const hint = (id: string) =>
-    t(id === 'clan' && !props.clan ? 'lobby-room-clan-join' : `lobby-room-${id}-hint`);
+    t(
+      id === 'library' && waiting(id)
+        ? 'lobby-recruit-ready'
+        : id === 'clan' && !props.clan
+          ? 'lobby-room-clan-join'
+          : `lobby-room-${id}-hint`,
+    );
   return (
     <section class="town" aria-labelledby="town-title">
       <h2 id="town-title" class="visually-hidden">
         {t('lobby-tab-map')}
       </h2>
-      <div class="town-view" ref={view}>
-        <div class="town-canvas">
+      <div class="town-view">
+        <div class="town-canvas" style={{ '--town-w': width, '--town-h': height }}>
           <img src={painting} alt="" width={width} height={height} />
           <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" aria-hidden="true">
             <defs>
@@ -93,11 +112,15 @@ export function Town(props: {
                 </feMerge>
               </filter>
             </defs>
-            <For each={layout.places}>
+            <For each={visible()}>
               {(p) => (
                 <polygon
                   class="town-edge"
-                  classList={{ hot: hot() === p.id, alert: props.alert === p.id }}
+                  classList={{
+                    hot: hot() === p.id,
+                    alert: waiting(p.id),
+                    locked: locked(p.id),
+                  }}
                   points={points(p.shape)}
                   filter="url(#town-glow)"
                 />
@@ -106,81 +129,63 @@ export function Town(props: {
           </svg>
           {/* The building itself, for the pointer (it brightens what is under it); keyboards and
               screen readers use its plaque. */}
-          <For each={layout.places}>
+          <For each={visible()}>
             {(p) => (
               <button
                 type="button"
                 class="town-shape"
-                classList={{ hot: hot() === p.id }}
+                classList={{ hot: hot() === p.id, locked: locked(p.id) }}
                 tabIndex={-1}
                 aria-hidden="true"
                 style={outline(p.shape)}
-                disabled={!link(p.id) && !props.connected}
+                disabled={locked(p.id) || (!link(p.id) && !props.connected)}
                 onClick={() => go(p.id)}
                 onPointerEnter={() => setHot(p.id)}
                 onPointerLeave={() => setHot('')}
               />
             )}
           </For>
-          <For each={layout.places}>
-            {(p) => {
-              const content = (): JSX.Element => (
-                <>
-                  <span class="medal">
-                    <img src={placeIcon(p.id)} alt="" width="20" height="20" />
-                  </span>
-                  <span>
-                    {t(`lobby-room-${p.id}`)}
-                    <small class="town-hint" id={`town-hint-${p.id}`} aria-hidden="true">
-                      {hint(p.id)}
+          <For each={visible()}>
+            {(p) => (
+              // The library and the clan list are pages; the other buildings are lobby rooms.
+              <Dynamic
+                component={link(p.id) ? A : 'button'}
+                type={link(p.id) ? undefined : 'button'}
+                href={link(p.id) || undefined}
+                disabled={locked(p.id) || (!link(p.id) && !props.connected)}
+                class="town-place plaque"
+                classList={{ hot: hot() === p.id, locked: locked(p.id) }}
+                style={{ '--place-x': `${p.at[0]}%`, '--place-y': `${p.at[1]}%` }}
+                aria-describedby={`town-hint-${p.id}`}
+                onClick={() => link(p.id) || go(p.id)}
+                onPointerEnter={() => setHot(p.id)}
+                onPointerLeave={() => setHot('')}
+                onFocus={() => setHot(p.id)}
+                onBlur={() => setHot('')}
+              >
+                <span class="medal">
+                  <img src={placeIcon(p.id)} alt="" width="20" height="20" />
+                </span>
+                <span>
+                  {t(`lobby-room-${p.id}`)}
+                  <Show when={locked(p.id)}>
+                    <small class="town-lock">
+                      {t('lobby-location-locked-short', {
+                        level: requiredLevel(props.journey, p.id),
+                      })}
                     </small>
-                  </span>
-                  <Show when={props.alert === p.id}>
-                    <b class="town-badge" aria-hidden="true">
-                      !
-                    </b>
                   </Show>
-                </>
-              );
-              const events = {
-                onPointerEnter: () => setHot(p.id),
-                onPointerLeave: () => setHot(''),
-                onFocus: () => setHot(p.id),
-                onBlur: () => setHot(''),
-              };
-              return (
-                <Show
-                  when={link(p.id)}
-                  fallback={
-                    <button
-                      type="button"
-                      class="town-place plaque"
-                      classList={{ hot: hot() === p.id }}
-                      style={{ left: `${p.at[0]}%`, top: `${p.at[1]}%` }}
-                      aria-describedby={`town-hint-${p.id}`}
-                      disabled={!props.connected}
-                      onClick={() => go(p.id)}
-                      {...events}
-                    >
-                      {content()}
-                    </button>
-                  }
-                >
-                  {(href) => (
-                    <A
-                      class="town-place plaque"
-                      classList={{ hot: hot() === p.id }}
-                      style={{ left: `${p.at[0]}%`, top: `${p.at[1]}%` }}
-                      aria-describedby={`town-hint-${p.id}`}
-                      href={href()}
-                      {...events}
-                    >
-                      {content()}
-                    </A>
-                  )}
+                  <small class="town-hint" id={`town-hint-${p.id}`} aria-hidden="true">
+                    {hint(p.id)}
+                  </small>
+                </span>
+                <Show when={waiting(p.id)}>
+                  <b class="town-badge" aria-hidden="true">
+                    !
+                  </b>
                 </Show>
-              );
-            }}
+              </Dynamic>
+            )}
           </For>
         </div>
       </div>

@@ -10,8 +10,8 @@ auth-login-name = Login (3–20 liter, cyfr, _ lub -)
 auth-email = E-mail
 auth-password = Hasło
 auth-password-hint = Od 10 do 128 znaków. Unikaj popularnych haseł.
-auth-school = Szkoła startowa
-auth-school-hint = Otrzymasz postać i zestaw kart tej szkoły. Wybór jest stały.
+auth-school = Pierwsza postać
+auth-school-hint = Wybierz Maga, Wojownika albo Kapłana. Otrzymasz jedną postać, jej pakiet kart i gotową talię 20 kart. Kolejne postacie zdobędziesz w grze.
 auth-token = Kod z linku e-mail
 auth-submit-login = Zaloguj się
 auth-submit-register = Utwórz konto
@@ -54,3 +54,5 @@ privacy-title = Dane i usunięcie konta
 auth-agreement = Akceptuję regulamin. Mam co najmniej 16 lat albo wymaganą zgodę opiekuna.
 auth-error-LEGAL_VERSION = Dokumenty zmieniły się. Odśwież aplikację i przeczytaj regulamin przed rejestracją.
 auth-error-LEGAL_REQUIRED = Potwierdź regulamin i wymaganie dotyczące wieku.
+
+auth-error-AVATAR_LOCKED = Ta postać jest zablokowana w tej wersji gry. Wybierz dostępną klasę.

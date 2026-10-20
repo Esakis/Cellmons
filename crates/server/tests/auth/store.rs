@@ -17,7 +17,7 @@ async fn discard(pool: &PgPool, user: Uuid, key: Uuid, qty: u32) -> server::stor
 
 #[sqlx::test(migrator = "server::db::MIGRATOR")]
 #[ignore = "requires PostgreSQL; check.bat runs this suite"]
-async fn f9_junkyard_thresholds_unique_characters_retry_and_deck_pruning(pool: PgPool) {
+async fn f9_junkyard_locked_classes_pay_cash_once_and_prune_decks(pool: PgPool) {
     let f = Fixture::new(pool.clone());
     f.register().await;
     let user = sqlx::query_scalar::<_, Uuid>("SELECT id FROM users")
@@ -43,11 +43,11 @@ async fn f9_junkyard_thresholds_unique_characters_retry_and_deck_pruning(pool: P
             .iter()
             .all(|r| r.points == "2995" && r.unlocked == results[0].unlocked)
     );
-    assert_eq!(results[0].unlocked.len(), 2);
+    assert!(results[0].unlocked.is_empty());
+    assert_eq!(results[0].ducats, "80");
     let third = discard(&pool, user, Uuid::now_v7(), 1).await;
-    assert_eq!(third.unlocked.len(), 1);
-    assert!(!results[0].unlocked.contains(&third.unlocked[0]));
-    assert_eq!(third.ducats, "0");
+    assert!(third.unlocked.is_empty());
+    assert_eq!(third.ducats, "40");
     let cash = discard(&pool, user, Uuid::now_v7(), 200).await;
     assert!(cash.unlocked.is_empty());
     assert_eq!(cash.ducats, "40");
@@ -57,7 +57,7 @@ async fn f9_junkyard_thresholds_unique_characters_retry_and_deck_pruning(pool: P
             .fetch_one(&pool)
             .await
             .unwrap(),
-        80
+        200
     );
     let progress = sqlx::query_as::<_, (i64, i64)>(
         "SELECT points,rewards_granted FROM junkyard WHERE user_id=$1",
@@ -244,6 +244,10 @@ async fn f9_purchase_and_open_retry_storm_does_not_duplicate_currency_or_cards(p
 async fn f9_store_quote_ownership_hidden_contents_and_insufficient_funds(pool: PgPool) {
     let f = Fixture::new(pool.clone());
     f.register().await;
+    sqlx::query("UPDATE users SET account_xp=1000,tutorial_step=3")
+        .execute(&pool)
+        .await
+        .unwrap();
     let token = cookie(&f.login(false).await);
     let inventory = f
         .call("GET", "/api/store", Value::Null, &[("cookie", &token)])
@@ -270,8 +274,12 @@ async fn f9_store_quote_ownership_hidden_contents_and_insufficient_funds(pool: P
     assert!(inventory.body["boosters"][0].get("seed").is_none());
     let denied=f.call("POST","/api/store",json!({"key":Uuid::now_v7(),"operation":{"action":"buy","kind":"bronze","quote":quote}}),&[("cookie",&token)]).await;
     assert_eq!(denied.body["error"], "INSUFFICIENT_FUNDS");
-    let second=f.call("POST","/api/auth/register",json!({"login":"SecondUser","email":"second@example.test","password":PASSWORD,"school":"tech","terms_version":"2026-10-16","age_confirmed":true}),&[]).await;
+    let second=f.call("POST","/api/auth/register",json!({"login":"SecondUser","email":"second@example.test","password":PASSWORD,"school":"combat","terms_version":"2026-10-16","age_confirmed":true}),&[]).await;
     assert_eq!(second.status, StatusCode::CREATED);
+    sqlx::query("UPDATE users SET account_xp=1000,tutorial_step=3")
+        .execute(&pool)
+        .await
+        .unwrap();
     let login = f
         .call(
             "POST",

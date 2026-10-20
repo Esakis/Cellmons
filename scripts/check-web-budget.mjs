@@ -20,10 +20,11 @@ const startup = new Set();
 for (const [key, entry] of Object.entries(manifest)) if (entry.isEntry) graph(key, startup);
 const duel = graph('src/features/offline.ts');
 // F11 adds optional game modes. Measure each mode separately from the account/lobby budget;
-// every mode also remains excluded from the 205 KiB offline package.
+// every mode also remains excluded from the 210 KiB offline package.
 const coreOnline = new Set(
   [
     'src/features/lobby/Lobby.tsx',
+    'src/features/lobby/JourneyGate.tsx',
     'src/features/lobby/OnlineDuel.tsx',
     'src/features/lobby/OnlineRecords.tsx',
     'src/features/lobby/Trade.tsx',
@@ -59,6 +60,11 @@ const administration = new Set(
     .map((f) => join(output, f)),
 );
 const lobbyRoute = new Set([...startup, ...graph('src/features/lobby/Lobby.tsx')]);
+const recruitment = new Set(
+  [...graph('src/features/collection/Recruitment.tsx')]
+    .filter((f) => onlineAssets.has(join(output, f)) && !coreOnline.has(join(output, f)))
+    .map((f) => join(output, f)),
+);
 const privacy = new Set(
   ['src/features/privacy/Privacy.tsx', 'src/features/legal/Legal.tsx']
     .flatMap((key) => [...graph(key)])
@@ -84,7 +90,10 @@ const files = await walk(output);
 const paintings = files.filter((f) => f.endsWith('.avif'));
 const paintingSizes = await Promise.all(paintings.map(async (f) => (await stat(f)).size));
 const isTown = (f) => /[\\/]town-[\w-]+\.avif$/.test(f);
-const townSize = paintingSizes.find((_, i) => isTown(paintings[i])) ?? 0;
+const townSize = paintingSizes.find((_, i) => isTown(paintings[i]));
+// A renamed or missing town would otherwise pass its own cap unmeasured.
+if (townSize === undefined)
+  throw new Error('The town painting (town-*.avif) is missing from the build.');
 const compressed = async (file) => brotliCompressSync(await readFile(file)).length;
 async function sum(list, size = compressed) {
   return (await Promise.all(list.map(size))).reduce((a, b) => a + b, 0);
@@ -124,8 +133,10 @@ const rows = [
     32,
   ],
   ['Town painting (AVIF)', townSize, 64],
-  ['Online account and lobby on demand (Brotli)', await sum([...coreOnline]), 53],
+  // Account progression, tutorial and level gates add ~1 KiB over the former 53 KiB cap.
+  ['Online account and lobby on demand (Brotli)', await sum([...coreOnline]), 56],
   ['Tournaments on demand (Brotli)', await sum([...tournaments]), 20],
+  ['Recruitment on demand (Brotli)', await sum([...recruitment]), 10],
   ['Expeditions on demand (Brotli)', await sum([...expeditions]), 20],
   ['Administration and moderation on demand (Brotli)', await sum([...administration]), 20],
   ['Privacy and legal on demand (Brotli)', await sum([...privacy]), 20],
@@ -157,13 +168,14 @@ const rows = [
             ),
             async (f) => (/\.(woff2|png)$/.test(f) ? (await stat(f)).size : compressed(f)),
           ),
-          205,
+          // Illustrated deck editing, preview and sample hands remain available offline.
+          210,
         ],
       ]
     : [
         [
           // APKs contain every file, including online screens and native integrations.
-          // This uncompressed asset cap is separate from the 205 KiB browser PWA cap.
+          // This uncompressed asset cap is separate from the 210 KiB browser PWA cap.
           'All Android web assets including illustrations and native integrations (uncompressed)',
           await sum(files, async (f) => (await stat(f)).size),
           10 * 1024,

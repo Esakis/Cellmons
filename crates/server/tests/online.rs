@@ -17,10 +17,14 @@ use tokio_tungstenite::{
     tungstenite::{Message, client::IntoClientRequest as _},
 };
 use uuid::Uuid;
+#[path = "online/bots.rs"]
+mod bots;
 #[path = "online/clans.rs"]
 mod clans;
 #[path = "online/expeditions.rs"]
 mod expeditions;
+#[path = "online/journey.rs"]
+mod journey;
 #[path = "online/tournaments.rs"]
 mod tournaments;
 
@@ -36,6 +40,12 @@ async fn player(db: &PgPool, index: usize, verified: bool) -> Player {
     let token = format!("{}{index:032x}", id.simple());
     let hash = Sha256::digest(token.as_bytes()).to_vec();
     sqlx::query("INSERT INTO users(id,login,email,password_hash,start_school,email_verified_at) VALUES ($1,$2,$3,'$argon2id$v=19$m=19456,t=2,p=1$fixture$fixture','combat',CASE WHEN $4 THEN now() ELSE NULL END)").bind(id).bind(&login).bind(email).bind(verified).execute(db).await.unwrap();
+    // General online fixtures represent established accounts; journey tests reset this explicitly.
+    sqlx::query("UPDATE users SET account_xp=42000,tutorial_step=3 WHERE id=$1")
+        .bind(id)
+        .execute(db)
+        .await
+        .unwrap();
     sqlx::query("INSERT INTO sessions(id_hash,kind,user_id,expires_at) VALUES ($1,'web',$2,now()+interval '1 day')").bind(hash).bind(id).execute(db).await.unwrap();
     let avatar = Uuid::now_v7();
     sqlx::query("INSERT INTO unlocked_templates(user_id,template_id,source) VALUES ($1,1,'start')")
@@ -367,7 +377,7 @@ async fn r_knt_02_unverified_private_chat_requires_recipient_friend_and_mail_is_
             text: "private greeting".into(),
         })
     };
-    assert_error(one.call(private()).await, "FORBIDDEN");
+    assert_error(one.call(private()).await, "PRIVATE_REQUIRES_VERIFICATION");
     assert!(matches!(
         two.call(Client::FriendAdd(target(&a.login))).await,
         Body::SocialSnapshot(_)

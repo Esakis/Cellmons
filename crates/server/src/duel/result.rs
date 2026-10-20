@@ -259,6 +259,20 @@ pub async fn settle(
     let second = record.seats[1].user;
     let second_avatar = record.seats[1].avatar;
     let rounds = record.moves.len() as i16;
+    if !["forfeit", "disconnect", "timeout"].contains(&reason.as_str()) {
+        for (index, seat) in record.seats.iter().enumerate() {
+            if let Some(user) = seat.user {
+                crate::journey::award(
+                    &mut tx,
+                    user,
+                    record.kind == "training",
+                    winner == index as i16 + 1,
+                    record.moves.len(),
+                )
+                .await?;
+            }
+        }
+    }
     sqlx::query!("INSERT INTO matches(id,kind,first_user,second_user,first_avatar,second_avatar,winner,reason,rounds,first_rating_delta,second_rating_delta,first_xp,second_xp,first_rating_new,second_rating_new,first_unlock,second_unlock,first_ducats,second_ducats) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)",record.id,record.kind,first,second,first_avatar,second_avatar,winner,reason,rounds,reward.delta[0],reward.delta[1],reward.xp[0] as i32,reward.xp[1] as i32,reward.rating[0],reward.rating[1],reward.unlock[0].map(i32::from),reward.unlock[1].map(i32::from),reward.ducats[0] as i32,reward.ducats[1] as i32).execute(&mut *tx).await?;
     if rated {
         for (i, seat) in record.seats.iter().enumerate() {

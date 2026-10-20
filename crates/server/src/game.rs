@@ -17,6 +17,7 @@ use uuid::Uuid;
 #[derive(Serialize)]
 pub struct Snapshot {
     pub content_version: String,
+    pub recruitment: crate::recruitment::Snapshot,
     pub templates: Vec<i32>,
     pub avatars: Vec<Avatar>,
     pub collection: Vec<Stack>,
@@ -60,6 +61,10 @@ pub struct Preset {
 #[derive(Deserialize)]
 #[serde(tag = "action", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Mutation {
+    Recruit {
+        level: u8,
+        template_id: Option<u16>,
+    },
     Reincarnate {
         id: Uuid,
         revision: i32,
@@ -115,11 +120,23 @@ pub(crate) fn response(error: Error) -> HttpError {
         "UNAUTHENTICATED" | "STEP_UP_REQUIRED" | "INVALID_OTP" | "INVALID_CREDENTIALS" => {
             StatusCode::UNAUTHORIZED
         }
-        "FORBIDDEN" | "TOTP_SETUP_REQUIRED" => StatusCode::FORBIDDEN,
+        "FORBIDDEN" | "LEVEL_REQUIRED" | "TOTP_SETUP_REQUIRED" => StatusCode::FORBIDDEN,
         "NOT_FOUND" => StatusCode::NOT_FOUND,
-        "BUSY" | "CONFLICT" | "PRICE_CHANGED" | "SLOTS_FULL" | "ACTIVE_AVATAR" | "PRESETS_FULL"
-        | "ALREADY_MEMBER" | "MASTER_REQUIRED" | "NAME_TAKEN" | "CLAN_FULL"
-        | "APPLICATION_LIMIT" | "INELIGIBLE" | "FULL" | "LIMIT" => StatusCode::CONFLICT,
+        "BUSY"
+        | "CONFLICT"
+        | "PRICE_CHANGED"
+        | "SLOTS_FULL"
+        | "ACTIVE_AVATAR"
+        | "PRESETS_FULL"
+        | "ALREADY_MEMBER"
+        | "MASTER_REQUIRED"
+        | "NAME_TAKEN"
+        | "CLAN_FULL"
+        | "APPLICATION_LIMIT"
+        | "INELIGIBLE"
+        | "FULL"
+        | "LIMIT"
+        | "RECRUIT_UNAVAILABLE" => StatusCode::CONFLICT,
         "INTERNAL" | "TIMEOUT" | "UNAVAILABLE" => StatusCode::SERVICE_UNAVAILABLE,
         _ => StatusCode::BAD_REQUEST,
     };
@@ -166,12 +183,13 @@ pub async fn post(
         .map_err(response)
 }
 pub async fn load(connection: &mut PgConnection, user: Uuid) -> Result<Snapshot> {
-    let templates = sqlx::query_scalar!(
+    let mut templates = sqlx::query_scalar!(
         "SELECT template_id FROM unlocked_templates WHERE user_id=$1 ORDER BY template_id",
         user
     )
     .fetch_all(&mut *connection)
     .await?;
+    templates.retain(|id| u16::try_from(*id).is_ok_and(engine_content::is_playable));
     let rows=sqlx::query!("SELECT a.id,a.slot,a.template_id,a.path_id,a.specialization,a.gift_id,a.is_shade,a.shade_school,a.level,a.xp,a.tier,a.is_active,a.revision,a.dev_points_unspent,a.dp_phys_atk,a.dp_phys_def,a.dp_mag_atk,a.dp_mag_def,a.dp_hp,a.dp_stamina,COALESCE(d.cards,'{}'::smallint[]) AS \"cards!\",COALESCE(d.revision,0) AS \"deck_revision!\" FROM avatars a LEFT JOIN decks d ON d.avatar_id=a.id WHERE a.user_id=$1 AND a.deleted_at IS NULL ORDER BY a.slot",user).fetch_all(&mut *connection).await?;
     let mut avatars = Vec::new();
     for a in rows {
@@ -229,10 +247,12 @@ pub async fn load(connection: &mut PgConnection, user: Uuid) -> Result<Snapshot>
         "SELECT id,name,cards,revision FROM deck_presets WHERE user_id=$1 ORDER BY name,id",
         user
     )
-    .fetch_all(connection)
+    .fetch_all(&mut *connection)
     .await?;
+    let recruitment = crate::recruitment::load(connection, user, &templates).await?;
     Ok(Snapshot {
         content_version: crate::auth::crypto::hex(&engine_content::CONTENT_VERSION),
+        recruitment,
         templates,
         avatars,
         collection,
@@ -251,6 +271,9 @@ pub async fn mutate(db: &PgPool, user: Uuid, mutation: Mutation) -> Result<Snaps
     crate::activity::ensure_idle(&mut tx, user).await?;
     let mut snapshot = load(&mut tx, user).await?;
     match mutation {
+        Mutation::Recruit { level, template_id } => {
+            crate::recruitment::claim(&mut tx, user, &snapshot, level, template_id).await?
+        }
         Mutation::Reincarnate {
             id,
             revision,
@@ -266,6 +289,12 @@ pub async fn mutate(db: &PgPool, user: Uuid, mutation: Mutation) -> Result<Snaps
             school,
         } => crate::progression::create_shade(&mut tx, user, id, revision, new_id, &school).await?,
         Mutation::Create { id, template_id } => {
+            if !engine_content::AVATARS.iter().any(|a| a.id == template_id) {
+                return Err(Error("NOT_FOUND"));
+            }
+            if !engine_content::is_playable(template_id) {
+                return Err(Error("AVATAR_LOCKED"));
+            }
             if !snapshot.templates.contains(&i32::from(template_id))
                 || !engine_content::AVATARS
                     .iter()
@@ -278,17 +307,12 @@ pub async fn mutate(db: &PgPool, user: Uuid, mutation: Mutation) -> Result<Snaps
                     return Err(Error("CONFLICT"));
                 }
             } else {
-                let slot = (0..10)
-                    .find(|slot| snapshot.avatars.iter().all(|a| a.slot != *slot))
-                    .ok_or(Error("SLOTS_FULL"))?;
-                sqlx::query!("INSERT INTO avatars(id,user_id,slot,template_id,is_active) VALUES ($1,$2,$3,$4,$5)",id,user,slot,i32::from(template_id),snapshot.avatars.is_empty()).execute(&mut *tx).await?;
-                sqlx::query!("INSERT INTO decks(avatar_id) VALUES ($1)", id)
-                    .execute(&mut *tx)
-                    .await?;
+                create_avatar(&mut tx, user, &snapshot, id, template_id).await?;
             }
         }
         Mutation::Activate { id } => {
             let avatar = find(&snapshot, id)?;
+            ensure_playable(avatar.template_id)?;
             if !avatar.active {
                 sqlx::query!("UPDATE avatars SET is_active=false,revision=revision+1 WHERE user_id=$1 AND is_active",user).execute(&mut *tx).await?;
                 sqlx::query!("UPDATE avatars SET is_active=true,revision=revision+1 WHERE id=$1 AND user_id=$2 AND deleted_at IS NULL",id,user).execute(&mut *tx).await?;
@@ -308,6 +332,7 @@ pub async fn mutate(db: &PgPool, user: Uuid, mutation: Mutation) -> Result<Snaps
             points,
         } => {
             let avatar = find(&snapshot, id)?;
+            ensure_playable(avatar.template_id)?;
             version(avatar.revision, revision)?;
             let sum: u32 = points.map(u32::from).iter().sum();
             if sum == 0 || sum > avatar.unspent as u32 {
@@ -326,7 +351,9 @@ pub async fn mutate(db: &PgPool, user: Uuid, mutation: Mutation) -> Result<Snaps
             revision,
             cards,
         } => {
-            version(find(&snapshot, id)?.deck_revision, revision)?;
+            let avatar = find(&snapshot, id)?;
+            ensure_playable(avatar.template_id)?;
+            version(avatar.deck_revision, revision)?;
             let cards = validate_deck(&cards, &snapshot.collection)?;
             sqlx::query!("INSERT INTO decks(avatar_id,cards,revision) VALUES ($1,$2,1) ON CONFLICT(avatar_id) DO UPDATE SET cards=$2,revision=decks.revision+1,updated_at=now()",id,&cards).execute(&mut *tx).await?;
         }
@@ -390,6 +417,84 @@ pub async fn mutate(db: &PgPool, user: Uuid, mutation: Mutation) -> Result<Snaps
     snapshot = load(&mut tx, user).await?;
     tx.commit().await?;
     Ok(snapshot)
+}
+
+pub(crate) async fn create_avatar(
+    tx: &mut PgConnection,
+    user: Uuid,
+    snapshot: &Snapshot,
+    id: Uuid,
+    template: u16,
+) -> Result<()> {
+    let slot = (0..10)
+        .find(|slot| snapshot.avatars.iter().all(|a| a.slot != *slot))
+        .ok_or(Error("SLOTS_FULL"))?;
+    sqlx::query!(
+        "INSERT INTO avatars(id,user_id,slot,template_id,is_active) VALUES ($1,$2,$3,$4,$5)",
+        id,
+        user,
+        slot,
+        i32::from(template),
+        snapshot.avatars.is_empty()
+    )
+    .execute(&mut *tx)
+    .await?;
+    sqlx::query!("INSERT INTO decks(avatar_id) VALUES ($1)", id)
+        .execute(&mut *tx)
+        .await?;
+    grant_starter(tx, user, id, template).await
+}
+
+pub(crate) fn ensure_playable(template: i32) -> Result<()> {
+    if u16::try_from(template).is_ok_and(engine_content::is_playable) {
+        Ok(())
+    } else {
+        Err(Error("AVATAR_LOCKED"))
+    }
+}
+
+/// The owner row is locked by the caller; receipts prevent delete/create pack farming.
+async fn grant_starter(
+    tx: &mut PgConnection,
+    user: Uuid,
+    avatar: Uuid,
+    template: u16,
+) -> Result<()> {
+    let starter = engine_content::starter(template).ok_or(Error("CONTENT_MISMATCH"))?;
+    let claimed = sqlx::query(
+        "INSERT INTO starter_claims(user_id,template_id) VALUES($1,$2) ON CONFLICT DO NOTHING",
+    )
+    .bind(user)
+    .bind(i32::from(template))
+    .execute(&mut *tx)
+    .await?
+    .rows_affected()
+        == 1;
+    if claimed {
+        for &(id, count) in starter.cards {
+            sqlx::query("INSERT INTO collection(user_id,card_id,qty) VALUES($1,$2,$3) ON CONFLICT(user_id,card_id) DO UPDATE SET qty=least(collection.qty::bigint+EXCLUDED.qty,2147483647)::integer")
+                .bind(user).bind(id as i16).bind(i32::from(count)).execute(&mut *tx).await?;
+        }
+    }
+    let mut deck = Vec::new();
+    for id in starter.deck {
+        let qty: i32 =
+            sqlx::query_scalar("SELECT qty FROM collection WHERE user_id=$1 AND card_id=$2")
+                .bind(user)
+                .bind(*id as i16)
+                .fetch_optional(&mut *tx)
+                .await?
+                .unwrap_or(0);
+        if deck.iter().filter(|card| **card == *id as i16).count() < qty as usize {
+            deck.push(*id as i16);
+        }
+    }
+    sqlx::query("UPDATE decks SET cards=$2,revision=revision+1 WHERE avatar_id=$1")
+        .bind(avatar)
+        .bind(deck)
+        .execute(tx)
+        .await?;
+    Ok(())
 }
 fn find(snapshot: &Snapshot, id: Uuid) -> Result<&Avatar> {
     snapshot

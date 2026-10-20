@@ -341,6 +341,7 @@ pub async fn prepare_player(
     if a.id.to_string() != expected {
         return Err(Error("CONFLICT"));
     }
+    crate::game::ensure_playable(a.template_id)?;
     let definition = engine_content::avatar(
         u16::try_from(a.path_id.unwrap_or(a.template_id)).map_err(|_| Error("CONTENT_MISMATCH"))?,
     )

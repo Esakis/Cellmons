@@ -246,11 +246,19 @@ def main() -> None:
             sys.exit(f"Nieznane klucze: {', '.join(unknown)}")
         total = 0
         for key in keys:
+            kind, name = key.split(".", 1)
+            target = OUTPUT / folder(kind) / f"{name}.avif"
+            previous = target.read_bytes() if target.exists() else None
             path = render(key, entries[key])
             total += path.stat().st_size
-            score = readability(path) if key.startswith("card.") else None
+            score = readability(path) if kind == "card" else None
             if score is not None and score < MIN_READABILITY:
                 busy.append(key)
+                # A rejected picture never replaces the card's previous one.
+                if previous is None:
+                    path.unlink()
+                else:
+                    path.write_bytes(previous)
             note = f"  czytelność {score:4.1f}" if score is not None else ""
             print(f"{key:30} {path.stat().st_size / 1024:5.1f} KiB{note}")
         print(f"Razem {len(keys)} plików, {total / 1024:.0f} KiB")

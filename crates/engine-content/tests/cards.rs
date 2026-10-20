@@ -1331,5 +1331,5 @@ fn starter_decks_are_playable_from_level_one() {
             starter.school
         );
     }
-    assert_eq!(STARTERS.len(), 6);
+    assert_eq!(STARTERS.len(), 9);
 }

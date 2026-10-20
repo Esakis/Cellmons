@@ -18,6 +18,7 @@ import {
   content,
   fluentKey,
   icon,
+  isPlayableAvatar,
   portrait,
 } from '../../app/content';
 import { readPreference, writePreference } from '../../app/preferences';
@@ -553,7 +554,7 @@ function CardDetails(props: { card: Card }) {
 
 export function Duel() {
   const [params] = useSearchParams();
-  const avatarId = () => (avatars.has(Number(params.avatar)) ? Number(params.avatar) : 1);
+  const avatarId = () => (isPlayableAvatar(Number(params.avatar)) ? Number(params.avatar) : 1);
   const profile = () => (profiles.includes(String(params.bot)) ? String(params.bot) : 'novice');
   const demo = () => params.demo === '1';
   const [view, setView] = createSignal<TrainingView>();

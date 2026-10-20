@@ -137,6 +137,9 @@ pub async fn get(
     let session = crate::auth::security::session(&state, &headers)
         .await
         .map_err(crate::game::HttpError)?;
+    crate::journey::require(&state.db, session.user, "portal")
+        .await
+        .map_err(crate::game::response)?;
     state
         .auth
         .limit("expedition-read", &session.user.to_string(), 60, 60)
@@ -167,6 +170,9 @@ pub async fn post(
     let session = crate::auth::security::session(&state, &headers)
         .await
         .map_err(crate::game::HttpError)?;
+    crate::journey::require(&state.db, session.user, "portal")
+        .await
+        .map_err(crate::game::response)?;
     state
         .auth
         .limit("expedition-write", &session.user.to_string(), 30, 60)

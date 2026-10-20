@@ -37,6 +37,7 @@ impl<'a> Matchup<'a> {
                 .collect(),
             None => engine_content::STARTERS
                 .iter()
+                .filter(|starter| engine_content::is_playable(starter.avatar))
                 .map(|starter| starter.avatar)
                 .collect(),
         };

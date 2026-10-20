@@ -181,9 +181,10 @@ fn raw(compiled: &Compiled) -> String {
 fn avatar_def(avatar: &CompiledAvatar) -> String {
     let growth: Vec<String> = avatar.growth.iter().map(growth).collect();
     format!(
-        "AvatarDef {{ id: {}, key: {:?}, rarity: AvatarRarity::{:?}, starter_for: {}, base: {}, schools: {}, growth: &[{}], dev_points: &{:?} }},\n",
+        "AvatarDef {{ id: {}, key: {:?}, playable: {}, rarity: AvatarRarity::{:?}, starter_for: {}, base: {}, schools: {}, growth: &[{}], dev_points: &{:?} }},\n",
         avatar.src.id,
         avatar.src.key,
+        avatar.src.playable,
         avatar.src.rarity,
         avatar
             .src

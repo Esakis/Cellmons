@@ -33,6 +33,8 @@ pub struct Register {
     email: String,
     password: String,
     school: String,
+    #[serde(default)]
+    template_id: Option<u16>,
     terms_version: String,
     age_confirmed: bool,
     #[serde(default)]
@@ -212,10 +214,14 @@ pub async fn register(
         .iter()
         .position(|school| *school == input.school)
         .ok_or_else(Error::bad)?;
-    let starter = engine_content::STARTERS
-        .iter()
-        .find(|starter| starter.school == engine::SCHOOLS[index])
-        .expect("compiled starters");
+    let starter = match input.template_id {
+        Some(id) => engine_content::starter(id).filter(|s| s.school == engine::SCHOOLS[index]),
+        None => engine_content::STARTERS
+            .iter()
+            .find(|s| s.school == engine::SCHOOLS[index]),
+    }
+    .filter(|s| engine_content::is_playable(s.avatar) && [1, 2, 4].contains(&s.avatar))
+    .ok_or(Error(StatusCode::BAD_REQUEST, "AVATAR_LOCKED", 0))?;
     captcha(
         &state,
         input.captcha_token.as_deref(),
@@ -251,6 +257,11 @@ pub async fn register(
     )
     .execute(&mut *tx)
     .await?;
+    sqlx::query("INSERT INTO starter_claims(user_id,template_id) VALUES($1,$2)")
+        .bind(user)
+        .bind(template)
+        .execute(&mut *tx)
+        .await?;
     for (card, qty) in starter.cards {
         let card = *card as i16;
         let qty = i32::from(*qty);

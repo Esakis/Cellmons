@@ -300,7 +300,7 @@ export function Store() {
             gold: rarityPoints.gold,
             threshold: junkyard.reward_threshold,
             fallback: junkyard.fallback_ducats,
-            characters: content.avatars.filter((a) => a.rarity === 'junkyard').length,
+            characters: content.avatars.filter((a) => a.playable && a.rarity === 'junkyard').length,
           })}
         </p>
         <p>{t('store-total-points', { value: inventory()?.junkyard_points ?? '0' })}</p>

@@ -11,6 +11,9 @@ const AccountPage = lazy(() =>
   import('../features/account/Account').then((module) => ({ default: module.AccountPage })),
 );
 const Lobby = lazy(() => import('../features/lobby/Lobby').then((m) => ({ default: m.Lobby })));
+const JourneyGate = lazy(() =>
+  import('../features/lobby/JourneyGate').then((m) => ({ default: m.JourneyGate })),
+);
 const CollectionPage = lazy(() =>
   import('../features/offline').then((m) => ({ default: m.Collection })),
 );
@@ -61,11 +64,15 @@ function OnlineRoute(props: {
                   </Show>
                 }
               >
-                <Clans />
+                <JourneyGate place="clan">
+                  <Clans />
+                </JourneyGate>
               </Show>
             }
           >
-            <Store />
+            <JourneyGate place="shop">
+              <Store />
+            </JourneyGate>
           </Show>
         }
       >

@@ -203,6 +203,9 @@ pub async fn get(
     let session = crate::auth::security::session(&state, &headers)
         .await
         .map_err(crate::game::HttpError)?;
+    crate::journey::require(&state.db, session.user, "clan")
+        .await
+        .map_err(crate::game::response)?;
     state
         .auth
         .limit("clan-read", &session.user.to_string(), 60, 60)

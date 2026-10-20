@@ -24,6 +24,9 @@
   margin: 14px 0;
   line-height: 1.15;
 }
+.hero > div:first-child {
+  min-width: 0;
+}
 .intro {
   max-width: 610px;
   color: var(--color-text-muted);
@@ -280,13 +283,23 @@
     padding: 20px 16px;
   }
   .hero {
-    padding: 6px 0 26px;
+    padding: 24px 18px;
+    justify-content: center;
+    text-align: center;
   }
   .sigil {
     display: none;
   }
   .hero h1 {
-    font-size: 2.4rem;
+    font-size: clamp(1.65rem, 7.5vw, 2.4rem);
+    line-height: 1.25;
+    text-wrap: balance;
+    overflow-wrap: break-word;
+  }
+  .hero .intro {
+    font-size: 0.875rem;
+    line-height: 1.65;
+    text-wrap: pretty;
   }
   .setupGrid {
     grid-template-columns: 1fr;
@@ -300,7 +313,7 @@
   }
   .avatarPortrait {
     height: 82px;
-    width: 82px;
+    width: min(100%, 82px);
     margin-bottom: 9px;
   }
   .avatarChoice .choiceStats {
@@ -310,8 +323,8 @@
     gap: 8px;
   }
   .sectionHeading {
-    flex-direction: row;
-    align-items: center;
+    flex-wrap: wrap;
+    align-items: flex-start;
   }
   .guide {
     grid-template-columns: 1fr;

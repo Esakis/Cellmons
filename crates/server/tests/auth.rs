@@ -135,9 +135,9 @@ async fn r_knt_01_registration_provisions_the_compiled_starter_atomically(pool: 
     assert!(row.0.starts_with("$argon2id$v=19$m=19456,t=2,p=1$"));
     assert_eq!((row.1, row.2, row.3, row.4), (1, 40, 20, 1000));
     assert_eq!(f.mail.lock().unwrap().len(), 1);
-    let duplicate=f.call("POST","/api/auth/register",json!({"login":"playerone","email":"other@example.test","password":PASSWORD,"school":"tech","terms_version":"2026-10-16","age_confirmed":true}), &[]).await;
+    let duplicate=f.call("POST","/api/auth/register",json!({"login":"playerone","email":"other@example.test","password":PASSWORD,"school":"combat","terms_version":"2026-10-16","age_confirmed":true}), &[]).await;
     assert_eq!(duplicate.status, StatusCode::CONFLICT);
-    let invalid=f.call("POST","/api/auth/register",json!({"login":"Second","email":"two@example.test","password":"password123","school":"tech","terms_version":"2026-10-16","age_confirmed":true}), &[]).await;
+    let invalid=f.call("POST","/api/auth/register",json!({"login":"Second","email":"two@example.test","password":"password123","school":"combat","terms_version":"2026-10-16","age_confirmed":true}), &[]).await;
     assert_eq!(invalid.status, StatusCode::BAD_REQUEST);
     let count: i64 = sqlx::query_scalar("SELECT count(*) FROM users")
         .fetch_one(&pool)
@@ -610,11 +610,8 @@ async fn session_list_and_revocation_are_account_scoped(pool: PgPool) {
 
 #[sqlx::test(migrator = "server::db::MIGRATOR")]
 #[ignore = "requires PostgreSQL; check.bat runs this suite"]
-async fn r_knt_01_all_six_schools_receive_their_exact_starter(pool: PgPool) {
-    for (index, school) in ["combat", "divine", "element", "arcane", "necro", "tech"]
-        .iter()
-        .enumerate()
-    {
+async fn r_knt_01_legacy_school_selection_receives_released_starters(pool: PgPool) {
+    for (index, school) in ["combat", "divine", "arcane"].iter().enumerate() {
         let f = Fixture::new(pool.clone());
         let login = format!("Player{index}");
         let reply=f.call("POST","/api/auth/register",json!({"login":login,"email":format!("player{index}@example.test"),"password":PASSWORD,"school":school,"terms_version":"2026-10-16","age_confirmed":true}),&[]).await;
@@ -630,7 +627,10 @@ async fn r_knt_01_all_six_schools_receive_their_exact_starter(pool: PgPool) {
                 .fetch_all(&pool)
                 .await
                 .unwrap();
-        let starter = &engine_content::STARTERS[index];
+        let starter = engine_content::STARTERS
+            .iter()
+            .find(|starter| server::progression::school_name(starter.school) == *school)
+            .unwrap();
         let mut expected: Vec<_> = starter
             .cards
             .iter()
@@ -784,7 +784,7 @@ async fn production_cookie_is_host_scoped_and_other_accounts_cannot_revoke_sessi
         .await;
     let id = list.body["sessions"][0]["id"].as_str().unwrap();
     let other = Fixture::new(pool.clone());
-    assert_eq!(other.call("POST","/api/auth/register",json!({"login":"PlayerTwo","email":"two@example.test","password":PASSWORD,"school":"tech","terms_version":"2026-10-16","age_confirmed":true}),&[]).await.status,StatusCode::CREATED);
+    assert_eq!(other.call("POST","/api/auth/register",json!({"login":"PlayerTwo","email":"two@example.test","password":PASSWORD,"school":"combat","terms_version":"2026-10-16","age_confirmed":true}),&[]).await.status,StatusCode::CREATED);
     let other_login = other
         .call(
             "POST",
@@ -827,8 +827,14 @@ mod store;
 mod clans;
 #[path = "auth/expeditions.rs"]
 mod expeditions;
+#[path = "auth/journey.rs"]
+mod journey;
 #[path = "auth/progression.rs"]
 mod progression;
+#[path = "auth/release_roster.rs"]
+mod release_roster;
+#[path = "auth/recruitment.rs"]
+mod recruitment;
 #[path = "auth/tournaments.rs"]
 mod tournaments;
 

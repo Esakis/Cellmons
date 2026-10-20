@@ -83,6 +83,14 @@ pub async fn export(
                 "SELECT to_jsonb(t)::text FROM unlocked_templates t WHERE user_id=$1 ORDER BY template_id"
             );
             section!(
+                "account_progress",
+                "SELECT json_build_object('xp',account_xp,'tutorial_step',tutorial_step)::text FROM users WHERE id=$1"
+            );
+            section!(
+                "recruitment_rewards",
+                "SELECT to_jsonb(r)::text FROM recruitment_claims r WHERE user_id=$1 ORDER BY milestone"
+            );
+            section!(
                 "collection",
                 "SELECT to_jsonb(c)::text FROM collection c WHERE user_id=$1 ORDER BY card_id"
             );

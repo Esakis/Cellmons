@@ -128,10 +128,11 @@ growth = [
 
 [[avatar]]
 id = 11
+playable = true
 key = "avatar.iron_reaver"
 ref = "Masakrator"
 rarity = "uncommon"
-base = { phys_atk = 6, phys_def = 0, mag_atk = 3, mag_def = 0, hp = 45, stamina = 25 }
+base = { phys_atk = 5, phys_def = 0, mag_atk = 1, mag_def = 3, hp = 40, stamina = 30 }
 schools = { combat = 1 }
 dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
 # Growth from docs/dane/rozwoj_postaci.csv, complete numeric levels 2–20.
@@ -190,10 +191,11 @@ growth = [
 
 [[avatar]]
 id = 13
+playable = true
 key = "avatar.root_sage"
 ref = "Sokrates"
 rarity = "uncommon"
-base = { phys_atk = 4, phys_def = 2, mag_atk = 2, mag_def = 1, hp = 40, stamina = 30 }
+base = { phys_atk = 3, phys_def = 1, mag_atk = 3, mag_def = 2, hp = 45, stamina = 25 }
 schools = { combat = 1, element = 1 }
 dev_points = { 5 = 1, 10 = 2, 15 = 1, 20 = 2 }
 # Generator Z-GRW: --weights 30,30,25,15 --combat 17 --stamina 70 --hp 70 --school 5:combat=2 --school 10:element=2 --school 15:combat=3 --school 19:element=3
