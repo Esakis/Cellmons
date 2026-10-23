@@ -172,11 +172,12 @@ img[src$=".avif"] {
     0 0 0 1px #000,
     0 10px 22px rgb(0 0 0 / 0.55);
 }
+/* A low strip of the painting: the place stays recognisable and its content starts on the first screen. */
 .scene img {
   display: block;
   width: 100%;
-  height: auto;
-  aspect-ratio: 21 / 8;
+  height: clamp(7rem, 20vh, 11rem);
+  object-fit: cover;
   object-position: 50% 45%;
 }
 .plaque {
@@ -239,7 +240,7 @@ img[src$=".avif"] {
 }
 @media (max-width: 760px) {
   .scene img {
-    aspect-ratio: 16 / 9;
+    height: clamp(5.5rem, 14vh, 7.5rem);
   }
   .scene .plaque {
     margin-top: -1.15rem;

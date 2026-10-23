@@ -5,7 +5,7 @@ import type {
   MatchReplayData,
   RankingSnapshot,
 } from '../../generated/proto/game/v1/online_duel_pb';
-import { t } from '../../i18n';
+import { playerName, t } from '../../i18n';
 import type { ClientBody, ServerBody } from '../../net/client';
 
 const OnlineDuel = lazy(() => import('./OnlineDuel').then((m) => ({ default: m.OnlineDuel })));
@@ -73,9 +73,9 @@ export function OnlineRecords(props: {
             {(p) => (
               <li>
                 <button type="button" class="quiet" onClick={() => props.select(p)}>
-                  {p.login}
+                  {playerName(p.login)}
                 </button>{' '}
-                · {p.rating} RP · {t('lobby-level', { level: p.level })}
+                · {t('online-rating', { value: p.rating })} · {t('lobby-level', { level: p.level })}
               </li>
             )}
           </For>
@@ -87,25 +87,27 @@ export function OnlineRecords(props: {
         </Show>
       </Show>
       <Show when={props.mode === 'history'}>
-        <For each={history()?.matches} fallback={<p>{t('lobby-empty')}</p>}>
+        <For each={history()?.matches} fallback={<p>{t('online-history-empty')}</p>}>
           {(m) => (
             <article class="online-match">
               <p>
                 <time>{new Date(Number(m.atMs)).toLocaleString()}</time> ·{' '}
                 {t(
                   m.kind === 'training'
-                    ? 'training'
+                    ? 'lobby-room-training'
                     : m.kind === 'ranked'
                       ? 'lobby-room-ranked'
                       : 'lobby-room-arena',
                 )}
               </p>
               <strong>
-                {m.first} / {m.second}
+                {playerName(m.first)} / {playerName(m.second)}
               </strong>
               <p>
-                {m.winner === 0 ? t('online-draw') : m.winner === 1 ? m.first : m.second} ·{' '}
-                {t(`online-reason-${m.reason}`)}
+                {m.winner === 0
+                  ? t('online-draw')
+                  : playerName(m.winner === 1 ? m.first : m.second)}{' '}
+                · {t(`online-reason-${m.reason}`)}
               </p>
               <button type="button" onClick={() => void watch(m.id)}>
                 {t('online-replay')}

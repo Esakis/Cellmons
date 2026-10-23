@@ -54,11 +54,53 @@
   border-radius: 999px;
   font-size: 0.75rem;
 }
+/* Challenge filter and AFK: a small menu at the end of the bar (Lobby.tsx). */
+.lobby-hud-menu {
+  position: relative;
+  margin-left: auto;
+}
+.lobby-hud-menu + .lobby-connection {
+  margin-left: 0;
+}
+.lobby-hud-menu > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 0.8rem;
+}
+.lobby-hud-menu > summary::-webkit-details-marker {
+  display: none;
+}
+.lobby-hud-menu > div {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 20;
+  display: grid;
+  gap: 0.6rem;
+  min-width: 240px;
+  padding: 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--panel-bg);
+  box-shadow: var(--panel-shadow);
+}
+.lobby-xp {
+  width: 9rem;
+  max-width: 100%;
+  height: 6px;
+  accent-color: var(--gold);
+}
 .lobby-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 300px;
   gap: 1.2rem;
   margin-top: 1.25rem;
+}
+.lobby-layout-wide {
+  grid-template-columns: minmax(0, 1fr);
 }
 .lobby-main,
 .lobby-sidebar {
@@ -75,23 +117,24 @@
   border-color: var(--gold);
   color: var(--gold);
 }
-/* The lobby's own menu: plaques with the icon above the name. */
+/* The lobby's own menu: a slim bar of plaques, the icon beside the name. */
 .lobby-menu {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 .lobby-menu button {
-  flex-direction: column;
-  gap: 0.3rem;
-  padding: 0.5rem 0.2rem;
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
+  flex-direction: row;
+  gap: 0.4rem;
+  min-height: 40px;
+  padding: 0.3rem 0.4rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
   line-height: 1.2;
 }
 .lobby-menu .icon {
-  width: 1.6rem;
-  height: 1.6rem;
+  width: 1.15rem;
+  height: 1.15rem;
   margin: 0;
 }
 .lobby-menu [aria-pressed="true"] {
@@ -102,11 +145,12 @@
 .lobby-value {
   white-space: nowrap;
 }
-/* One map, including its buildings and labels, fits both available dimensions. */
+/* One map, including its buildings and labels, fits both available dimensions; it starts at
+   the top of the space, so no gap opens above it on a tall phone. */
 .town {
   container-type: size;
   display: grid;
-  place-items: center;
+  place-items: start center;
   flex: 1;
   min-height: 0;
 }
@@ -190,6 +234,8 @@
   margin-inline-start: 12px;
 }
 .lobby-account-level {
+  display: grid;
+  gap: 3px;
   color: var(--accent);
   font-size: 0.75rem;
 }
@@ -296,30 +342,6 @@
   background: #a62716;
   box-shadow: 0 0 0 1.5px #000;
 }
-/* Inside a building: its painting with the way back to the map, then the other places. */
-.lobby-travel {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.4rem;
-  margin-bottom: 1rem;
-}
-.lobby-travel button {
-  min-height: 40px;
-  padding: 0.3rem 0.8rem 0.3rem 0.45rem;
-  border-radius: 22px;
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
-}
-.lobby-travel .icon {
-  width: 1.4rem;
-  height: 1.4rem;
-  margin-right: 0.1rem;
-}
-.lobby-travel [aria-current] {
-  border-color: var(--gold-bright);
-  box-shadow: 0 0 12px rgb(224 198 142 / 0.45);
-}
 .lobby-enter {
   margin-bottom: 1rem;
 }
@@ -344,6 +366,16 @@
   margin: 1rem 0;
   padding: 0.5rem 0;
   font-size: 0.9rem;
+}
+/* An empty room is one line, not a large empty box (the text is in data-empty). */
+.lobby-log:empty {
+  height: auto;
+  padding: 0.75rem 0;
+}
+.lobby-log:empty::before {
+  content: attr(data-empty);
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
 }
 .lobby-log p {
   margin: 0.5rem 0;
@@ -379,18 +411,36 @@
   max-height: 350px;
   overflow: auto;
 }
+.lobby-player-list li {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--color-border);
+}
 .lobby-player-list button {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   justify-items: start;
+  flex: 1;
+  min-width: 0;
   gap: 0.15rem 0.75rem;
   width: 100%;
   border: 0;
-  border-bottom: 1px solid var(--color-border);
   border-radius: 0;
   background: transparent;
   text-align: left;
   padding: 0.6rem;
+}
+/* The room's action next to each player: a challenge in the arenas, a trade in the bazaar. */
+.lobby-player-list .lobby-row-action {
+  display: inline-flex;
+  flex: none;
+  width: auto;
+  margin-right: 0.5rem;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  background: var(--surface-raised);
+  color: var(--gold);
 }
 .lobby-player-list .portrait {
   grid-row: span 3;
@@ -498,8 +548,21 @@ body:has(.lobby-map-mode) #main {
   flex-shrink: 0;
   margin-bottom: 8px;
 }
-.lobby-map-mode .lobby-chat,
 .lobby-map-mode > .lobby-hint {
+  display: none;
+}
+/* A duel takes the whole page: of the player's bar only a connection problem stays visible. */
+.lobby-duel-mode {
+  padding-top: 0.5rem;
+}
+.lobby-duel-mode .lobby-hud {
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
+.lobby-duel-mode .lobby-hud > :not(.lobby-connection, h1),
+.lobby-duel-mode .lobby-hint,
+.lobby-duel-mode .lobby-layout {
   display: none;
 }
 @media (max-width: 760px) {
@@ -515,8 +578,10 @@ body:has(.lobby-map-mode) #main {
     gap: 0.35rem;
   }
   .lobby-menu button {
-    min-height: 48px;
-    padding: 0.35rem 0.1rem;
+    flex-direction: column;
+    gap: 2px;
+    min-height: 44px;
+    padding: 0.25rem 0.1rem;
     min-width: 0;
     font-family: inherit;
     font-size: 0.6rem;
@@ -525,8 +590,8 @@ body:has(.lobby-map-mode) #main {
     overflow-wrap: normal;
   }
   .lobby-menu .icon {
-    width: 1.3rem;
-    height: 1.3rem;
+    width: 1.1rem;
+    height: 1.1rem;
   }
   /* A slim player's bar: the select keeps its name for screen readers. */
   .lobby-hud {
@@ -539,9 +604,6 @@ body:has(.lobby-map-mode) #main {
   }
   .lobby-hud strong {
     font-size: 0.85rem;
-  }
-  .lobby-hud-label {
-    display: none;
   }
   .lobby-hud select,
   .lobby-hud button {
@@ -567,20 +629,24 @@ body:has(.lobby-map-mode) #main {
     margin-bottom: 8px;
   }
   .lobby-map-mode .lobby-sidebar,
-  .lobby-map-mode .lobby-chat,
-  .lobby-map-mode > .lobby-hint,
-  .lobby-map-mode .lobby-hud > label,
-  .lobby-map-mode .lobby-hud > button {
+  .lobby-map-mode > .lobby-hint {
     display: none;
   }
+  /* Portrait | login over the account level | a connection problem | the options menu. */
   .lobby-map-mode .lobby-connection {
     font-size: 0.65rem;
-    grid-row: 1;
+    grid-row: 1 / 3;
     grid-column: 3;
+    align-self: center;
+  }
+  .lobby-map-mode .lobby-hud-menu {
+    grid-row: 1 / 3;
+    grid-column: 4;
+    align-self: center;
   }
   .lobby-map-mode .lobby-hud {
     display: grid;
-    grid-template-columns: 36px minmax(0, 1fr) auto;
+    grid-template-columns: 36px minmax(0, 1fr) auto auto;
     gap: 4px 6px;
   }
   .lobby-map-mode .lobby-hud .portrait {
@@ -595,13 +661,8 @@ body:has(.lobby-map-mode) #main {
     overflow-wrap: anywhere;
     letter-spacing: 0;
   }
-  .lobby-map-mode .lobby-hud > span:not(.lobby-account-level) {
-    grid-column: 2;
-    grid-row: 2;
-    font-size: 0.75rem;
-  }
   .lobby-map-mode .lobby-account-level {
-    grid-column: 3;
+    grid-column: 2;
     grid-row: 2;
     font-size: 0.65rem;
   }
@@ -678,9 +739,7 @@ body:has(.lobby-map-mode) #main {
     display: contents;
   }
   .lobby-map-mode .lobby-sidebar,
-  .lobby-map-mode .lobby-hud > label,
-  .lobby-map-mode .lobby-hud > button,
-  .lobby-map-mode .lobby-hud > span:not(.lobby-account-level),
+  .lobby-map-mode .lobby-hud-menu,
   .lobby-map-mode .lobby-connection {
     display: none;
   }
@@ -888,4 +947,24 @@ body:has(.lobby-map-mode) #main {
 .trade-stacks input {
   width: 5rem;
   min-height: 44px;
+}
+/* The first steps in one row: the task on the left, its button on the right. */
+.lobby-journey:has(button) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 16px;
+}
+.lobby-journey:has(button) > :not(button) {
+  grid-column: 1;
+}
+.lobby-journey:has(button) > button {
+  grid-column: 2;
+  grid-row: 1 / 4;
+}
+.lobby-journey:has(button) p {
+  margin: 0;
+}
+.lobby-journey:has(button) > a {
+  margin: 4px 0 0;
 }

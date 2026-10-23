@@ -126,14 +126,18 @@ export function Expeditions(props: {
   return (
     <section class="expeditions" data-testid="expeditions">
       <h2>{t('exp-title')}</h2>
-      <p>{t('exp-help')}</p>
-      <p>
-        {t('exp-rewards', {
-          avatar: percent(data()?.avatar_chance_bps ?? 4000),
-          card: percent(data()?.card_chance_bps ?? 300),
-          ducats: percent(data()?.ducats_chance_bps ?? 100),
-        })}
-      </p>
+      {/* The difficulty list below says what a run offers; the full rules wait behind one line. */}
+      <details>
+        <summary>{t('exp-rules')}</summary>
+        <p>{t('exp-help')}</p>
+        <p>
+          {t('exp-rewards', {
+            avatar: percent(data()?.avatar_chance_bps ?? 4000),
+            card: percent(data()?.card_chance_bps ?? 300),
+            ducats: percent(data()?.ducats_chance_bps ?? 100),
+          })}
+        </p>
+      </details>
       <Show when={!props.verified}>
         <p>{t('exp-verify')}</p>
       </Show>
@@ -149,9 +153,12 @@ export function Expeditions(props: {
           </p>
         )}
       </Show>
-      <button type="button" disabled={loading()} onClick={() => void load()}>
-        {t('refresh')}
-      </button>
+      {/* The panel refreshes itself; a manual refresh helps only after an error. */}
+      <Show when={error()}>
+        <button type="button" disabled={loading()} onClick={() => void load()}>
+          {t('refresh')}
+        </button>
+      </Show>
       <Show when={run()?.status !== 'active'}>
         <fieldset disabled={busy() || !props.verified || !props.avatar}>
           <legend>{t('exp-difficulty')}</legend>
@@ -180,6 +187,7 @@ export function Expeditions(props: {
           </For>
           <button
             type="button"
+            class="primary"
             onClick={() =>
               void mutate({
                 action: 'start',

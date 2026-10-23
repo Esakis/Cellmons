@@ -1,10 +1,13 @@
 import { expect, type Page } from '@playwright/test';
 import { accessible } from './accessibility';
+import { chooseLanguage } from './language';
 
 export async function recruitment(page: Page, project: string) {
   await page.locator('header nav').getByRole('link', { name: 'Collection', exact: true }).click();
   const panel = page.locator('.recruitment');
   await expect(panel).toContainText('Ready to claim: 7');
+  // The panel starts closed; its summary shows how many rewards wait.
+  await panel.locator('summary').first().click();
   await expect(panel.locator('.recruit-milestones li')).toHaveCount(7);
   await expect(
     panel.getByRole('button', { name: 'Meet character: Warrior', exact: true }),
@@ -46,13 +49,13 @@ export async function recruitment(page: Page, project: string) {
   await expect(panel.locator('.recruit-milestones li').first()).toContainText('Mage');
   if (project.startsWith('mobile')) {
     await page.setViewportSize({ width: 320, height: 640 });
-    await page.locator('header select').selectOption('pl');
+    await chooseLanguage(page, 'pl');
     await expect(panel).toContainText('Do odebrania: 6');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
       true,
     );
     await panel.screenshot({ path: '../target/recruitment-pl-320.png' });
-    await page.locator('header select').selectOption('en');
+    await chooseLanguage(page, 'en');
     await page.setViewportSize({ width: 393, height: 727 });
   }
   await accessible(page);

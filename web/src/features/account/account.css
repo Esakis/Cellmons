@@ -15,6 +15,12 @@
 .account-tabs {
   margin: 24px 0;
 }
+/* The selected tab names the form below it. */
+.account-tabs [aria-pressed="true"] {
+  border-color: var(--gold);
+  color: var(--gold);
+  box-shadow: inset 0 -2px 0 var(--gold);
+}
 .account-form {
   display: grid;
   gap: 18px;
@@ -35,6 +41,9 @@
 .account-form small,
 .account-guest p {
   color: var(--color-text-muted);
+}
+.account-page details {
+  margin-top: 28px;
 }
 .account-guest {
   margin-top: 36px;

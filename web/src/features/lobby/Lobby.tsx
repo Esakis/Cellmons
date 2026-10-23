@@ -24,7 +24,7 @@ import type {
   PublicPlayer,
   SocialSnapshot,
 } from '../../generated/proto/game/v1/lobby_pb';
-import { hasTranslation, t } from '../../i18n';
+import { hasTranslation, playerName, t } from '../../i18n';
 import { type ClientBody, OnlineClient, type ServerBody, type Status } from '../../net/client';
 import { parseCommand } from '../../net/commands';
 import './translations';
@@ -32,7 +32,7 @@ import '../online.css';
 import type { DuelEnd, DuelSnapshot } from '../../generated/proto/game/v1/online_duel_pb';
 import type { TradeSnapshot } from '../../generated/proto/game/v1/trade_pb';
 import { canEnter, type Journey, requiredLevel } from './journey';
-import { placeIcon, Town } from './Town';
+import { Town } from './Town';
 
 const OnlineDuel = lazy(() => import('./OnlineDuel').then((m) => ({ default: m.OnlineDuel })));
 const OnlineRecords = lazy(() =>
@@ -40,7 +40,9 @@ const OnlineRecords = lazy(() =>
 );
 const Trade = lazy(() => import('./Trade').then((m) => ({ default: m.Trade })));
 
-const rooms = ['arena', 'ranked', 'training', 'castle', 'portal', 'bazaar', 'shop', 'tower'];
+const chatPlaces = ['arena', 'ranked', 'bazaar', 'portal', 'expedition', 'clan'];
+// Rooms whose action (a challenge, a trade) starts from another player.
+const actionPlaces = ['arena', 'ranked', 'bazaar'];
 // Every clan room shares one place: its name, description and painting (art/paintings/scenes);
 // outside the rooms the player looks at the town (Town.tsx).
 const place = (room: string) => (room.startsWith('clan:') ? 'clan' : room);
@@ -348,7 +350,8 @@ export function Lobby() {
       const command = parseCommand(submitted, lastPrivate);
       let result: ServerBody | undefined;
       if (command.kind === 'help') {
-        setHelp(true);
+        // Typing /help again hides the commands.
+        setHelp((shown) => !shown);
         setText('');
         return;
       }
@@ -437,12 +440,121 @@ export function Lobby() {
   const challenged = () =>
     offers().some((offer) => offer.to?.id === me()?.id && Number(offer.expiresAtMs) > now());
   const inRoom = () => tab() === 'map' && inside() && Boolean(room());
+  const byLevel = () => [...bots()].sort((a, b) => a.level - b.level);
+  // Places where players talk; elsewhere the chat would only be an empty box.
+  const showChat = () => tab() === 'chat' || (inRoom() && chatPlaces.includes(place(room())));
+  // The side column only when it has something: the square's players, a profile or a challenge.
+  const sidebar = () => tab() === 'chat' || Boolean(selected()) || offers().length > 0;
+  // In an arena or the bazaar each row also starts its action; the profile keeps the rest.
+  const playerList = (action?: 'challenge' | 'trade') => (
+    <div class="lobby-panel">
+      <div class="lobby-chat-heading">
+        <h2>{t('lobby-players', { count: players().length })}</h2>
+        <Show when={players().length >= 10}>
+          <select
+            aria-label={t('lobby-sort')}
+            value={sort()}
+            onChange={(e) => setSort(e.currentTarget.value)}
+          >
+            <option value="login">{t('lobby-name')}</option>
+            <option value="rating">{t('lobby-tab-ranking')}</option>
+            <option value="level">{t('lobby-level-label')}</option>
+          </select>
+        </Show>
+      </div>
+      <ul class="lobby-player-list">
+        <For each={sorted()}>
+          {(p) => (
+            <li>
+              <button
+                type="button"
+                onClick={() =>
+                  void send({
+                    case: 'whoIs',
+                    value: { $typeName: 'game.v1.PlayerTarget', player: p.login },
+                  })
+                }
+              >
+                <Portrait player={p} />
+                <span>
+                  {playerName(p.login)} {p.mentor ? ` · ${t('lobby-mentor')}` : ''}{' '}
+                  <Show when={p.afk}>
+                    <img
+                      class="icon"
+                      src={onlineIcon('afk')}
+                      alt={t('lobby-afk')}
+                      title={t('lobby-afk')}
+                    />
+                  </Show>
+                  <Show when={p.busy}>
+                    <img
+                      class="icon"
+                      src={icon('school-combat')}
+                      alt={t('lobby-busy')}
+                      title={t('lobby-busy')}
+                    />
+                  </Show>
+                </span>
+                <small>
+                  <Standing player={p} />
+                </small>
+                <small>
+                  {t(`lobby-${p.title}`)} ·{' '}
+                  {avatars.get(p.pathId || p.templateId)
+                    ? t(`${avatars.get(p.pathId || p.templateId)?.key.replace('.', '-')}-name`)
+                    : '—'}
+                </small>
+              </button>
+              <Show when={action && p.id !== me()?.id}>
+                <button
+                  type="button"
+                  class="lobby-row-action"
+                  aria-label={t(
+                    action === 'trade' ? 'lobby-trade-player' : 'lobby-challenge-player',
+                    {
+                      login: playerName(p.login),
+                    },
+                  )}
+                  disabled={
+                    !connected() ||
+                    p.busy ||
+                    p.afk ||
+                    Boolean(me()?.busy) ||
+                    (action === 'trade' && (!p.verified || !me()?.verified))
+                  }
+                  onClick={() =>
+                    void send(
+                      action === 'trade'
+                        ? {
+                            case: 'tradeInvite',
+                            value: { $typeName: 'game.v1.TradeInvite', target: p.login },
+                          }
+                        : {
+                            case: 'challengeSend',
+                            value: { $typeName: 'game.v1.ChallengeSend', target: p.login },
+                          },
+                    )
+                  }
+                >
+                  {t(action === 'trade' ? 'trade-title' : 'lobby-challenge-short')}
+                </button>
+              </Show>
+            </li>
+          )}
+        </For>
+      </ul>
+    </div>
+  );
   return (
     <section
       class="lobby-page"
-      classList={{ 'lobby-map-mode': tab() === 'map' && !inside() && !duel() && !trade() }}
+      classList={{
+        'lobby-map-mode': tab() === 'map' && !inside() && !duel() && !trade(),
+        // A duel takes the whole page; the lobby comes back after "Close" (lobby.css).
+        'lobby-duel-mode': Boolean(duel()),
+      }}
     >
-      {/* The player's bar, as in mobile games: portrait, level and rating, challenge settings. */}
+      {/* The player's bar, as in mobile games: portrait, account level and a small options menu. */}
       <div class="lobby-hud">
         <h1 class="visually-hidden">{t('lobby')}</h1>
         <Show when={me()}>
@@ -450,59 +562,82 @@ export function Lobby() {
             <>
               <Portrait player={self()} />
               <strong>{self().login}</strong>
-              <span>
-                <Standing player={self()} />
-              </span>
+              {/* The account level with its progress; ranking and avatar level are in the player list. */}
               <Show when={journey()}>
                 {(progress) => (
                   <span class="lobby-account-level">
                     {t('lobby-account-level', { level: progress().level })}
+                    <Show when={progress().next_xp}>
+                      {(next) => (
+                        <progress
+                          class="lobby-xp"
+                          max={next()}
+                          value={progress().xp}
+                          aria-label={t('lobby-account-progress', {
+                            xp: progress().xp,
+                            next: next(),
+                          })}
+                          title={t('lobby-account-progress', { xp: progress().xp, next: next() })}
+                        />
+                      )}
+                    </Show>
                   </span>
                 )}
               </Show>
-              <label>
-                <span class="lobby-hud-label">{t('lobby-challenges')}</span>
-                <select
-                  aria-label={t('lobby-challenges')}
-                  value={self().challengeFilter}
-                  disabled={!connected()}
-                  onChange={async (e) => {
-                    const filter = e.currentTarget.value;
-                    if (
-                      await send({
-                        case: 'setChallengeFilter',
-                        value: { $typeName: 'game.v1.SetChallengeFilter', filter },
-                      })
-                    )
-                      setMe((p) => (p ? { ...p, challengeFilter: filter } : p));
-                  }}
-                >
-                  <option value="all">{t('lobby-all')}</option>
-                  <option value="level_pm2">±2 {t('lobby-level-label')}</option>
-                  <option value="none">{t('lobby-none')}</option>
-                </select>
-              </label>
-              <button
-                type="button"
-                disabled={!connected()}
-                aria-pressed={self().afk}
-                onClick={async () => {
-                  if (
-                    await send({
-                      case: 'setAfk',
-                      value: { $typeName: 'game.v1.SetAfk', afk: !self().afk },
-                    })
-                  )
-                    setMe((p) => (p ? { ...p, afk: !p.afk } : p));
-                }}
-              >
-                <img class="icon" src={onlineIcon('afk')} alt="" />
-                AFK
-              </button>
+              {/* Rarely changed settings wait in a small menu instead of the bar itself. */}
+              <details class="lobby-hud-menu">
+                <summary>{t('lobby-options')}</summary>
+                <div>
+                  <label>
+                    {t('lobby-challenges')}
+                    <select
+                      value={self().challengeFilter}
+                      disabled={!connected()}
+                      onChange={async (e) => {
+                        const filter = e.currentTarget.value;
+                        if (
+                          await send({
+                            case: 'setChallengeFilter',
+                            value: { $typeName: 'game.v1.SetChallengeFilter', filter },
+                          })
+                        )
+                          setMe((p) => (p ? { ...p, challengeFilter: filter } : p));
+                      }}
+                    >
+                      <option value="all">{t('lobby-all')}</option>
+                      <option value="level_pm2">±2 {t('lobby-level-label')}</option>
+                      <option value="none">{t('lobby-none')}</option>
+                    </select>
+                  </label>
+                  <button
+                    type="button"
+                    disabled={!connected()}
+                    aria-pressed={self().afk}
+                    onClick={async () => {
+                      if (
+                        await send({
+                          case: 'setAfk',
+                          value: { $typeName: 'game.v1.SetAfk', afk: !self().afk },
+                        })
+                      )
+                        setMe((p) => (p ? { ...p, afk: !p.afk } : p));
+                    }}
+                  >
+                    <img class="icon" src={onlineIcon('afk')} alt="" />
+                    {t('lobby-afk')}
+                  </button>
+                </div>
+              </details>
             </>
           )}
         </Show>
-        <p class="lobby-connection" role="status" data-testid="connection-status">
+        {/* Shown only when something is wrong; screen readers still hear "Connected". */}
+        <p
+          class="lobby-connection"
+          classList={{ 'visually-hidden': connected() }}
+          role="status"
+          data-testid="connection-status"
+        >
           {t(`lobby-status-${status()}`)}
         </p>
       </div>
@@ -558,7 +693,7 @@ export function Lobby() {
             <Show when={!self().verified}>
               <p class="lobby-hint">{t('lobby-unverified')}</p>
             </Show>
-            <div class="lobby-layout">
+            <div class="lobby-layout" classList={{ 'lobby-layout-wide': !sidebar() }}>
               <div class="lobby-main">
                 <nav class="lobby-tabs lobby-menu" aria-label={t('lobby')}>
                   <For each={['map', 'chat', 'social', 'mail', 'ranking', 'history'] as const}>
@@ -584,51 +719,38 @@ export function Lobby() {
                   </For>
                 </nav>
                 <Show when={tab() === 'map'}>
-                  <Show when={!inRoom() && journey()}>
+                  {/* The first steps only; later the account's progress is the bar in the player's bar. */}
+                  <Show when={!inRoom() && (journey()?.tutorial_step ?? 3) < 3 && journey()}>
                     {(progress) => (
                       <div class="lobby-journey">
+                        <strong>
+                          {t('lobby-tutorial-step', { step: progress().tutorial_step + 1 })}
+                        </strong>
+                        <p>{t(`lobby-tutorial-${progress().tutorial_step}`)}</p>
                         <Show
-                          when={progress().tutorial_step < 3}
+                          when={progress().tutorial_step < 2}
                           fallback={
-                            <p>
-                              {progress().next_xp === null
-                                ? t('lobby-account-complete')
-                                : t('lobby-account-progress', {
-                                    xp: progress().xp,
-                                    next: progress().next_xp ?? progress().xp,
-                                  })}
-                            </p>
-                          }
-                        >
-                          <strong>
-                            {t('lobby-tutorial-step', { step: progress().tutorial_step + 1 })}
-                          </strong>
-                          <p>{t(`lobby-tutorial-${progress().tutorial_step}`)}</p>
-                          <Show
-                            when={progress().tutorial_step < 2}
-                            fallback={
-                              <button
-                                type="button"
-                                class="primary"
-                                disabled={!connected()}
-                                onClick={() => enter('training')}
-                              >
-                                {t('lobby-tutorial-train')}
-                              </button>
-                            }
-                          >
                             <button
                               type="button"
                               class="primary"
-                              disabled={tutorialBusy()}
-                              onClick={() => void advanceTutorial()}
+                              disabled={!connected()}
+                              onClick={() => enter('training')}
                             >
-                              {t('lobby-tutorial-next')}
+                              {t('lobby-tutorial-train')}
                             </button>
-                          </Show>
-                          <Show when={progress().tutorial_step === 1}>
-                            <A href="/collection">{t('lobby-tutorial-deck')}</A>
-                          </Show>
+                          }
+                        >
+                          <button
+                            type="button"
+                            class="primary"
+                            disabled={tutorialBusy()}
+                            onClick={() => void advanceTutorial()}
+                          >
+                            {t('lobby-tutorial-next')}
+                          </button>
+                        </Show>
+                        <Show when={progress().tutorial_step === 1}>
+                          <A href="/collection">{t('lobby-tutorial-deck')}</A>
                         </Show>
                       </div>
                     )}
@@ -645,27 +767,11 @@ export function Lobby() {
                       />
                     }
                   >
-                    {/* Inside a building: its painting, the way back and a quick way to the others. */}
+                    {/* Inside a building: its painting and the way back to the map (the only way out). */}
                     <Scene src={scene(room())} about={t(`lobby-room-${place(room())}-about`)}>
                       <h2 class="plaque">{t(`lobby-room-${place(room())}`)}</h2>
                       <BackToMap onClick={() => setInside(false)} />
                     </Scene>
-                    <nav class="lobby-travel" aria-label={t('lobby-travel')}>
-                      <For each={self().clanId ? [...rooms, `clan:${self().clanId}`] : rooms}>
-                        {(name) => (
-                          <button
-                            type="button"
-                            class="plaque"
-                            aria-current={room() === name ? 'location' : undefined}
-                            disabled={!connected() || !canEnter(journey(), name)}
-                            onClick={() => enter(name)}
-                          >
-                            <img class="icon" src={placeIcon(place(name))} alt="" />
-                            {t(`lobby-room-${place(name)}`)}
-                          </button>
-                        )}
-                      </For>
-                    </nav>
                   </Show>
                 </Show>
                 <Show when={tab() === 'ranking'}>
@@ -673,11 +779,6 @@ export function Lobby() {
                 </Show>
                 <Show when={tab() === 'history'}>
                   <OnlineRecords mode="history" send={send} select={setSelected} />
-                </Show>
-                <Show when={inRoom() && room() === 'shop'}>
-                  <A class="button primary lobby-enter" href="/store">
-                    {t('store')}
-                  </A>
                 </Show>
                 <Show when={inRoom() && room() === 'castle'}>
                   <div hidden={Boolean(duel() || trade())}>
@@ -689,7 +790,8 @@ export function Lobby() {
                     />
                   </div>
                 </Show>
-                <Show when={inRoom() && (room() === 'tower' || self().clanId)}>
+                {/* From the clan hall to the clan's page (roster, applications, profile). */}
+                <Show when={inRoom() && place(room()) === 'clan'}>
                   <A class="button secondary lobby-enter" href="/clans">
                     {t('clans')}
                   </A>
@@ -707,21 +809,17 @@ export function Lobby() {
                     />
                   </div>
                 </Show>
+                {/* The room's painting already says what training is; the bots load on entry. */}
                 <Show when={inRoom() && room() === 'training'}>
                   <section class="lobby-panel">
                     <h2>{t('online-bots')}</h2>
-                    <p>{t('online-training-help')}</p>
-                    <button
-                      type="button"
-                      disabled={!connected()}
-                      onClick={() =>
-                        void send({ case: 'trainingBots', value: { $typeName: 'game.v1.Empty' } })
-                      }
-                    >
-                      {t('refresh')}
-                    </button>
                     <div class="online-bots">
-                      <For each={(journey()?.tutorial_step ?? 3) < 3 ? bots().slice(0, 1) : bots()}>
+                      <For
+                        each={byLevel().slice(
+                          0,
+                          (journey()?.tutorial_step ?? 3) < 3 ? 1 : undefined,
+                        )}
+                      >
                         {(bot) => (
                           <button
                             type="button"
@@ -734,12 +832,16 @@ export function Lobby() {
                             }
                           >
                             <Portrait player={bot} />
-                            {bot.login}
+                            {playerName(bot.login)}
                           </button>
                         )}
                       </For>
                     </div>
                   </section>
+                </Show>
+                {/* In the arenas and the bazaar the other players are the content: who to fight or trade with. */}
+                <Show when={inRoom() && actionPlaces.includes(room())}>
+                  {playerList(room() === 'bazaar' ? 'trade' : 'challenge')}
                 </Show>
                 <Show when={tab() === 'social'}>
                   <div class="lobby-panel">
@@ -855,363 +957,308 @@ export function Lobby() {
                     </form>
                   </div>
                 </Show>
-                <section class="lobby-chat" classList={{ 'lobby-chat-active': tab() === 'chat' }}>
-                  <Notices bulletin />
-                  <Show when={roomMotd()}>
-                    <p class="lobby-notice">{roomMotd()}</p>
-                  </Show>
-                  <div class="lobby-chat-heading">
-                    <h2>
-                      {t('lobby-chat')} · {t(`lobby-room-${place(room() || 'square')}`)}
-                    </h2>
-                    <label>
-                      {t('lobby-chat-filter')}
-                      <select
-                        disabled={!connected()}
-                        onChange={(e) =>
-                          void send({
-                            case: 'setChatFilter',
-                            value: {
-                              $typeName: 'game.v1.SetChatFilter',
-                              filter: e.currentTarget.value,
-                            },
-                          })
-                        }
-                      >
-                        <option value="all">{t('lobby-all')}</option>
-                        <option value="clan_private">{t('lobby-clan-private')}</option>
-                        <option value="private">{t('lobby-private')}</option>
-                      </select>
-                    </label>
-                  </div>
-                  <div
-                    ref={chatLog}
-                    class="lobby-log"
-                    role="log"
-                    aria-label={t('lobby-messages')}
-                    aria-live="polite"
-                  >
-                    <For each={messages()}>
-                      {(m) => (
-                        <p classList={{ private: m.channel === 'private' }}>
-                          <time>{time(m.atMs)}</time>{' '}
-                          <button
-                            class="quiet"
-                            type="button"
-                            onClick={() =>
-                              void send({
-                                case: 'whoIs',
-                                value: { $typeName: 'game.v1.PlayerTarget', player: m.fromLogin },
-                              })
-                            }
-                          >
-                            {m.fromLogin}
-                          </button>
-                          <Show when={m.channel !== 'room'}>
-                            <small> [{t(`lobby-channel-${m.channel}`)}]</small>
-                          </Show>
-                          : <span>{m.text}</span>
-                          <button
-                            type="button"
-                            class="quiet"
-                            aria-label={t('lobby-report-message', { login: m.fromLogin })}
-                            onClick={() =>
-                              setReport({
-                                kind: 'chat',
-                                target: m.id,
-                                label: `${m.fromLogin}: ${m.text}`,
-                              })
-                            }
-                          >
-                            {t('lobby-report')}
-                          </button>
-                        </p>
-                      )}
-                    </For>
-                  </div>
-                  <form class="lobby-chat-form" onSubmit={(e) => void chat(e)}>
-                    <input
-                      aria-label={t('lobby-message')}
-                      value={text()}
-                      onInput={(e) => setText(e.currentTarget.value)}
-                      maxLength={330}
-                      disabled={!connected() || !room()}
-                      enterkeyhint="send"
-                      placeholder={t('lobby-chat-placeholder')}
-                    />
-                    <button
-                      type="submit"
-                      class="primary"
-                      disabled={!connected() || !room() || chatBusy() || !text().trim()}
-                    >
-                      {t('lobby-send')}
-                    </button>
-                    <button type="button" aria-expanded={help()} onClick={() => setHelp(!help())}>
-                      /help
-                    </button>
-                  </form>
-                  <Show when={help()}>
-                    <p class="lobby-help">{t('lobby-help')}</p>
-                  </Show>
-                </section>
-              </div>
-              <aside class="lobby-sidebar">
-                <div class="lobby-panel">
-                  <div class="lobby-chat-heading">
-                    <h2>{t('lobby-players', { count: players().length })}</h2>
-                    <select
-                      aria-label={t('lobby-sort')}
-                      value={sort()}
-                      onChange={(e) => setSort(e.currentTarget.value)}
-                    >
-                      <option value="login">{t('lobby-name')}</option>
-                      <option value="rating">RP</option>
-                      <option value="level">{t('lobby-level-label')}</option>
-                    </select>
-                  </div>
-                  <ul class="lobby-player-list">
-                    <For each={sorted()}>
-                      {(p) => (
-                        <li>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              void send({
-                                case: 'whoIs',
-                                value: { $typeName: 'game.v1.PlayerTarget', player: p.login },
-                              })
-                            }
-                          >
-                            <Portrait player={p} />
-                            <span>
-                              {p.login} {p.mentor ? ` · ${t('lobby-mentor')}` : ''}{' '}
-                              <Show when={p.afk}>
-                                <img
-                                  class="icon"
-                                  src={onlineIcon('afk')}
-                                  alt={t('lobby-afk')}
-                                  title={t('lobby-afk')}
-                                />
-                              </Show>
-                              <Show when={p.busy}>
-                                <img
-                                  class="icon"
-                                  src={icon('school-combat')}
-                                  alt={t('lobby-busy')}
-                                  title={t('lobby-busy')}
-                                />
-                              </Show>
-                            </span>
-                            <small>
-                              <Standing player={p} />
-                            </small>
-                            <small>
-                              {t(`lobby-${p.title}`)} ·{' '}
-                              {avatars.get(p.pathId || p.templateId)
-                                ? t(
-                                    `${avatars.get(p.pathId || p.templateId)?.key.replace('.', '-')}-name`,
-                                  )
-                                : '—'}
-                            </small>
-                          </button>
-                        </li>
-                      )}
-                    </For>
-                  </ul>
-                </div>
-                <Show when={selected()} keyed>
-                  {(p) => (
-                    <div class="lobby-panel lobby-profile">
-                      <button
-                        class="lobby-close"
-                        type="button"
-                        aria-label={t('lobby-close')}
-                        onClick={() => setSelected(undefined)}
-                      >
-                        ×
-                      </button>
-                      <Show when={avatars.get(p.pathId || p.templateId)}>
-                        {(avatar) => (
-                          <img width="80" height="80" alt="" src={portrait(avatar().key)} />
-                        )}
-                      </Show>
-                      <h2>{p.login}</h2>
-                      <Show when={p.mentor}>
-                        <p>{t('lobby-mentor')}</p>
-                      </Show>
-                      <Show when={p.id !== self().id}>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setReport({ kind: 'player', target: p.id, label: p.login })
-                          }
-                        >
-                          {t('lobby-report')}
-                        </button>
-                      </Show>
-                      <p>
-                        <Standing player={p} /> · #{p.rank || '—'}
-                      </p>
-                      <Show when={p.title}>
-                        <p>{t(`lobby-${p.title}`)}</p>
-                      </Show>
-                      <Show when={p.clanName}>
-                        <p>{p.clanName}</p>
-                      </Show>
-                      <p>{p.description}</p>
-                      <Stats values={p.stats} />
-                      <Show when={p.id !== self().id}>
-                        <div class="lobby-actions">
-                          <button
-                            type="button"
-                            disabled={
-                              !connected() ||
-                              !['arena', 'ranked'].includes(room()) ||
-                              p.busy ||
-                              self().busy ||
-                              p.afk
-                            }
-                            onClick={() =>
-                              void send({
-                                case: 'challengeSend',
-                                value: { $typeName: 'game.v1.ChallengeSend', target: p.login },
-                              })
-                            }
-                          >
-                            {t('lobby-challenge')}
-                          </button>
-                          <button
-                            type="button"
+                <Show when={showChat()}>
+                  <section class="lobby-chat" classList={{ 'lobby-chat-active': tab() === 'chat' }}>
+                    <Notices bulletin />
+                    <Show when={roomMotd()}>
+                      <p class="lobby-notice">{roomMotd()}</p>
+                    </Show>
+                    <div class="lobby-chat-heading">
+                      <h2>
+                        {t('lobby-chat')} · {t(`lobby-room-${place(room() || 'square')}`)}
+                      </h2>
+                      <Show when={tab() === 'chat'}>
+                        <label>
+                          {t('lobby-chat-filter')}
+                          <select
                             disabled={!connected()}
-                            onClick={() => {
-                              setText(`/t ${p.login}, `);
-                            }}
-                          >
-                            {t('lobby-private')}
-                          </button>
-                          <button
-                            type="button"
-                            disabled={
-                              !connected() ||
-                              room() !== 'bazaar' ||
-                              !p.verified ||
-                              !self().verified ||
-                              p.busy ||
-                              self().busy ||
-                              p.afk
-                            }
-                            onClick={() =>
+                            onChange={(e) =>
                               void send({
-                                case: 'tradeInvite',
-                                value: { $typeName: 'game.v1.TradeInvite', target: p.login },
-                              })
-                            }
-                          >
-                            {t('trade-title')}
-                          </button>
-                          <button
-                            type="button"
-                            disabled={!connected()}
-                            onClick={() => void socialChange(p.login, false, true)}
-                          >
-                            {t('lobby-add-friend')}
-                          </button>
-                          <button
-                            type="button"
-                            disabled={!connected()}
-                            onClick={() => void socialChange(p.login, true, true)}
-                          >
-                            {t('lobby-ignore')}
-                          </button>
-                        </div>
-                      </Show>
-                    </div>
-                  )}
-                </Show>
-                <For each={offers()}>
-                  {(offer) => (
-                    <div class="lobby-panel lobby-offer">
-                      <h2>{t('lobby-challenge')}</h2>
-                      <p>
-                        {offer.from?.login} → {offer.to?.login}
-                      </p>
-                      <Show when={offer.from} keyed>
-                        {(p) => (
-                          <>
-                            <Show when={avatars.get(p.pathId || p.templateId)}>
-                              {(avatar) => (
-                                <img width="64" height="64" alt="" src={portrait(avatar().key)} />
-                              )}
-                            </Show>
-                            <p>
-                              <Standing player={p} /> · #{p.rank || '—'}
-                            </p>
-                            <p>
-                              {t(`lobby-${p.title}`)} {p.clanName}
-                            </p>
-                            <Stats values={p.stats} />
-                            <p>{p.description}</p>
-                          </>
-                        )}
-                      </Show>
-                      <p>{Math.max(0, Math.ceil((Number(offer.expiresAtMs) - now()) / 1000))} s</p>
-                      <Show
-                        when={offer.to?.id === self().id}
-                        fallback={
-                          <button
-                            type="button"
-                            disabled={!connected()}
-                            onClick={() =>
-                              void send({
-                                case: 'challengeCancel',
+                                case: 'setChatFilter',
                                 value: {
-                                  $typeName: 'game.v1.ChallengeCancel',
-                                  challengeId: offer.challengeId,
+                                  $typeName: 'game.v1.SetChatFilter',
+                                  filter: e.currentTarget.value,
                                 },
                               })
                             }
                           >
-                            {t('lobby-cancel')}
-                          </button>
-                        }
-                      >
-                        <button
-                          type="button"
-                          disabled={!connected() || Number(offer.expiresAtMs) <= now()}
-                          onClick={() =>
-                            void send({
-                              case: 'challengeRespond',
-                              value: {
-                                $typeName: 'game.v1.ChallengeRespond',
-                                challengeId: offer.challengeId,
-                                accept: true,
-                              },
-                            })
-                          }
-                        >
-                          {t('lobby-accept')}
-                        </button>{' '}
-                        <button
-                          type="button"
-                          disabled={!connected()}
-                          onClick={() =>
-                            void send({
-                              case: 'challengeRespond',
-                              value: {
-                                $typeName: 'game.v1.ChallengeRespond',
-                                challengeId: offer.challengeId,
-                                accept: false,
-                              },
-                            })
-                          }
-                        >
-                          {t('lobby-decline')}
-                        </button>
+                            <option value="all">{t('lobby-all')}</option>
+                            <option value="clan_private">{t('lobby-clan-private')}</option>
+                            <option value="private">{t('lobby-private')}</option>
+                          </select>
+                        </label>
                       </Show>
                     </div>
-                  )}
-                </For>
-              </aside>
+                    <div
+                      ref={chatLog}
+                      class="lobby-log"
+                      role="log"
+                      aria-label={t('lobby-messages')}
+                      aria-live="polite"
+                      data-empty={t('lobby-chat-empty')}
+                    >
+                      <For each={messages()}>
+                        {(m) => (
+                          <p classList={{ private: m.channel === 'private' }}>
+                            <time>{time(m.atMs)}</time>{' '}
+                            <button
+                              class="quiet"
+                              type="button"
+                              onClick={() =>
+                                void send({
+                                  case: 'whoIs',
+                                  value: { $typeName: 'game.v1.PlayerTarget', player: m.fromLogin },
+                                })
+                              }
+                            >
+                              {m.fromLogin}
+                            </button>
+                            <Show when={m.channel !== 'room'}>
+                              <small> [{t(`lobby-channel-${m.channel}`)}]</small>
+                            </Show>
+                            : <span>{m.text}</span>
+                            <button
+                              type="button"
+                              class="quiet"
+                              aria-label={t('lobby-report-message', { login: m.fromLogin })}
+                              onClick={() =>
+                                setReport({
+                                  kind: 'chat',
+                                  target: m.id,
+                                  label: `${m.fromLogin}: ${m.text}`,
+                                })
+                              }
+                            >
+                              {t('lobby-report')}
+                            </button>
+                          </p>
+                        )}
+                      </For>
+                    </div>
+                    <form class="lobby-chat-form" onSubmit={(e) => void chat(e)}>
+                      <input
+                        aria-label={t('lobby-message')}
+                        value={text()}
+                        onInput={(e) => setText(e.currentTarget.value)}
+                        maxLength={330}
+                        disabled={!connected() || !room()}
+                        enterkeyhint="send"
+                        placeholder={t('lobby-chat-placeholder')}
+                      />
+                      <button
+                        type="submit"
+                        class="primary"
+                        disabled={!connected() || !room() || chatBusy() || !text().trim()}
+                      >
+                        {t('lobby-send')}
+                      </button>
+                    </form>
+                    {/* Typing /help shows the commands (see chat()). */}
+                    <Show when={help()}>
+                      <p class="lobby-help">{t('lobby-help')}</p>
+                    </Show>
+                  </section>
+                </Show>
+              </div>
+              <Show when={sidebar()}>
+                <aside class="lobby-sidebar">
+                  <Show when={tab() === 'chat'}>{playerList()}</Show>
+                  <Show when={selected()} keyed>
+                    {(p) => (
+                      <div class="lobby-panel lobby-profile">
+                        <button
+                          class="lobby-close"
+                          type="button"
+                          aria-label={t('lobby-close')}
+                          onClick={() => setSelected(undefined)}
+                        >
+                          ×
+                        </button>
+                        <Show when={avatars.get(p.pathId || p.templateId)}>
+                          {(avatar) => (
+                            <img width="80" height="80" alt="" src={portrait(avatar().key)} />
+                          )}
+                        </Show>
+                        <h2>{playerName(p.login)}</h2>
+                        <Show when={p.mentor}>
+                          <p>{t('lobby-mentor')}</p>
+                        </Show>
+                        <Show when={p.id !== self().id}>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setReport({ kind: 'player', target: p.id, label: p.login })
+                            }
+                          >
+                            {t('lobby-report')}
+                          </button>
+                        </Show>
+                        <p>
+                          <Standing player={p} /> · #{p.rank || '—'}
+                        </p>
+                        <Show when={p.title}>
+                          <p>{t(`lobby-${p.title}`)}</p>
+                        </Show>
+                        <Show when={p.clanName}>
+                          <p>{p.clanName}</p>
+                        </Show>
+                        <p>{p.description}</p>
+                        <Stats values={p.stats} />
+                        <Show when={p.id !== self().id}>
+                          <div class="lobby-actions">
+                            <button
+                              type="button"
+                              disabled={
+                                !connected() ||
+                                !['arena', 'ranked'].includes(room()) ||
+                                p.busy ||
+                                self().busy ||
+                                p.afk
+                              }
+                              onClick={() =>
+                                void send({
+                                  case: 'challengeSend',
+                                  value: { $typeName: 'game.v1.ChallengeSend', target: p.login },
+                                })
+                              }
+                            >
+                              {t('lobby-challenge')}
+                            </button>
+                            <button
+                              type="button"
+                              disabled={!connected()}
+                              onClick={() => {
+                                setText(`/t ${p.login}, `);
+                              }}
+                            >
+                              {t('lobby-private')}
+                            </button>
+                            <button
+                              type="button"
+                              disabled={
+                                !connected() ||
+                                room() !== 'bazaar' ||
+                                !p.verified ||
+                                !self().verified ||
+                                p.busy ||
+                                self().busy ||
+                                p.afk
+                              }
+                              onClick={() =>
+                                void send({
+                                  case: 'tradeInvite',
+                                  value: { $typeName: 'game.v1.TradeInvite', target: p.login },
+                                })
+                              }
+                            >
+                              {t('trade-title')}
+                            </button>
+                            <button
+                              type="button"
+                              disabled={!connected()}
+                              onClick={() => void socialChange(p.login, false, true)}
+                            >
+                              {t('lobby-add-friend')}
+                            </button>
+                            <button
+                              type="button"
+                              disabled={!connected()}
+                              onClick={() => void socialChange(p.login, true, true)}
+                            >
+                              {t('lobby-ignore')}
+                            </button>
+                          </div>
+                        </Show>
+                      </div>
+                    )}
+                  </Show>
+                  <For each={offers()}>
+                    {(offer) => (
+                      <div class="lobby-panel lobby-offer">
+                        <h2>{t('lobby-challenge')}</h2>
+                        <p>
+                          {offer.from?.login} → {offer.to?.login}
+                        </p>
+                        <Show when={offer.from} keyed>
+                          {(p) => (
+                            <>
+                              <Show when={avatars.get(p.pathId || p.templateId)}>
+                                {(avatar) => (
+                                  <img width="64" height="64" alt="" src={portrait(avatar().key)} />
+                                )}
+                              </Show>
+                              <p>
+                                <Standing player={p} /> · #{p.rank || '—'}
+                              </p>
+                              <p>
+                                {t(`lobby-${p.title}`)} {p.clanName}
+                              </p>
+                              <Stats values={p.stats} />
+                              <p>{p.description}</p>
+                            </>
+                          )}
+                        </Show>
+                        <p>
+                          {Math.max(0, Math.ceil((Number(offer.expiresAtMs) - now()) / 1000))} s
+                        </p>
+                        <Show
+                          when={offer.to?.id === self().id}
+                          fallback={
+                            <button
+                              type="button"
+                              disabled={!connected()}
+                              onClick={() =>
+                                void send({
+                                  case: 'challengeCancel',
+                                  value: {
+                                    $typeName: 'game.v1.ChallengeCancel',
+                                    challengeId: offer.challengeId,
+                                  },
+                                })
+                              }
+                            >
+                              {t('lobby-cancel')}
+                            </button>
+                          }
+                        >
+                          <button
+                            type="button"
+                            disabled={!connected() || Number(offer.expiresAtMs) <= now()}
+                            onClick={() =>
+                              void send({
+                                case: 'challengeRespond',
+                                value: {
+                                  $typeName: 'game.v1.ChallengeRespond',
+                                  challengeId: offer.challengeId,
+                                  accept: true,
+                                },
+                              })
+                            }
+                          >
+                            {t('lobby-accept')}
+                          </button>{' '}
+                          <button
+                            type="button"
+                            disabled={!connected()}
+                            onClick={() =>
+                              void send({
+                                case: 'challengeRespond',
+                                value: {
+                                  $typeName: 'game.v1.ChallengeRespond',
+                                  challengeId: offer.challengeId,
+                                  accept: false,
+                                },
+                              })
+                            }
+                          >
+                            {t('lobby-decline')}
+                          </button>
+                        </Show>
+                      </div>
+                    )}
+                  </For>
+                </aside>
+              </Show>
             </div>
           </>
         )}

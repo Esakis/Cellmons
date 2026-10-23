@@ -36,15 +36,15 @@ export function Recruitment(props: {
       setPreview(undefined);
   }
   const className = (id: number) => t(fluentKey(avatars.get(id)?.key ?? ''));
+  // Closed by default: the gold count in the summary says when a reward waits (the deck comes first).
   return (
-    <details class="recruitment" open={ready().length > 0}>
+    <details class="recruitment">
       <summary>
         {t('recruit-title')} · {t('recruit-level', { level: props.state.level })}
         <Show when={ready().length}>
           <span class="recruit-ready">{t('recruit-ready', { count: ready().length })}</span>
         </Show>
       </summary>
-      <p>{t('recruit-intro')}</p>
       <details class="recruit-history">
         <summary>{t('recruit-milestones')}</summary>
         <ol class="recruit-milestones" aria-label={t('recruit-milestones')}>
@@ -144,7 +144,7 @@ export function Recruitment(props: {
                           {count} × {t(fluentKey(card.key))}
                         </strong>
                         <small>
-                          K {card.cost.focus} · W {card.cost.stamina}
+                          {t('focus')} {card.cost.focus} · {t('stamina')} {card.cost.stamina}
                         </small>
                         <p>{t(fluentKey(card.key, 'text'), cardArgs(card))}</p>
                       </div>

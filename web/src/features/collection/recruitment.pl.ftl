@@ -1,7 +1,6 @@
 recruit-title = Rekrutacja postaci
 recruit-level = Poziom konta { $level }
 recruit-ready = Do odebrania: { $count }
-recruit-intro = Rozwijaj konto i wybieraj kolejne klasy. Każda nagroda należy do Ciebie, nawet jeśli odbierzesz ją później.
 recruit-milestones = Nagrody za poziom konta
 recruit-pick = Wybierz nagrodę
 recruit-locked = Jeszcze zablokowane

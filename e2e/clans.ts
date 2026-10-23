@@ -5,6 +5,8 @@ export async function clans(a: Page, b: Page, alice: string, bob: string, projec
   await a.goto('/#/clans');
   await b.goto('/#/clans');
   const guild = `Guild ${alice}`;
+  // Founding waits in a closed section below the clan list.
+  await a.getByText('Found your own clan', { exact: true }).click();
   await a.getByLabel('Clan name', { exact: true }).fill(guild);
   await a.getByRole('button', { name: 'Create clan', exact: true }).click();
   const profileA = a.getByRole('region', { name: 'Clan profile', exact: true });
@@ -72,12 +74,12 @@ export async function clans(a: Page, b: Page, alice: string, bob: string, projec
   await b.getByRole('dialog').getByRole('button', { name: 'Confirm', exact: true }).click();
   await expect(profileB).toContainText('Members: 1');
   await a.getByRole('button', { name: 'Refresh', exact: true }).click();
-  await expect(a.getByRole('heading', { name: 'Create clan', exact: true })).toBeVisible();
+  await expect(a.getByText('Found your own clan', { exact: true })).toBeVisible();
   await expect(profileA).not.toContainText('Private meeting at dusk.');
   await expect(profileA.getByRole('heading', { name: 'Edit profile', exact: true })).toHaveCount(0);
   await profileB.getByRole('button', { name: 'Disband clan', exact: true }).click();
   await b.getByRole('dialog').getByRole('button', { name: 'Confirm', exact: true }).click();
-  await expect(b.getByRole('heading', { name: 'Create clan', exact: true })).toBeVisible();
+  await expect(b.getByText('Found your own clan', { exact: true })).toBeVisible();
   await a.getByRole('button', { name: 'Refresh', exact: true }).click();
   await expect(profileA).toHaveCount(0);
 }

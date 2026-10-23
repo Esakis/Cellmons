@@ -17,6 +17,7 @@ test('guest builds a RAM-only collection and tests its deck offline', async ({
   await page.locator('header nav').getByRole('link', { name: 'Collection', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Characters and collection' })).toBeVisible();
   await expect(page.locator('.collection-avatars button')).toHaveCount(1);
+  await page.getByText('More filters', { exact: true }).click();
   await page.getByLabel('School requirements met', { exact: true }).uncheck();
   await expect(page.locator('.collection-cards article')).toHaveCount(24);
   await page.getByRole('button', { name: 'Show more spells', exact: true }).click();

@@ -1,5 +1,6 @@
 import { expect, type Page } from '@playwright/test';
 import { accessible } from './accessibility';
+import { chooseLanguage } from './language';
 
 export async function advancement(page: Page, login: string, project: string) {
   const panel = page.locator('.advancement');
@@ -32,16 +33,19 @@ export async function advancement(page: Page, login: string, project: string) {
   expect(after.avatars.find((a: { template_id: number }) => a.template_id === 2).deck).toHaveLength(
     20,
   );
-  await expect(page.locator('.deck-library .mastery-badge').first()).toContainText('Mastery 1/5');
+  // A tile shows mastery only above the starting 1/5; the card preview always does.
+  await page.locator('.deck-library .deck-preview').first().click();
+  await expect(page.getByRole('dialog')).toContainText('Mastery 1/5');
+  await page.getByRole('dialog').getByRole('button', { name: 'Close', exact: true }).click();
   if (project.startsWith('mobile')) {
     await page.setViewportSize({ width: 320, height: 640 });
-    await page.locator('header select').selectOption('pl');
+    await chooseLanguage(page, 'pl');
     await expect(panel).toContainText('Opanowanie kart');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
       true,
     );
     await panel.screenshot({ path: '../target/advancement-pl-320.png' });
-    await page.locator('header select').selectOption('en');
+    await chooseLanguage(page, 'en');
     await page.setViewportSize({ width: 393, height: 727 });
   }
   await accessible(page);

@@ -34,14 +34,6 @@
     0 0 0 4px var(--gold),
     0 0 18px rgb(217 180 90 / 0.45);
 }
-.brand small {
-  display: block;
-  margin-top: 3px;
-  font-size: 0.5rem;
-  letter-spacing: 0.4em;
-  font-weight: 500;
-  color: var(--color-text-muted);
-}
 .header nav {
   display: flex;
   flex-wrap: wrap;
@@ -80,12 +72,6 @@
 .header nav a[aria-current="page"] img {
   opacity: 1;
   filter: var(--icon-filter) drop-shadow(0 0 6px rgb(224 198 142 / 0.7));
-}
-.header .language {
-  margin-left: auto;
-  width: auto;
-  font-size: 0.75rem;
-  background: transparent;
 }
 .footer {
   display: flex;
@@ -174,10 +160,6 @@
     width: 34px;
     height: 34px;
     font-size: 1.25rem;
-  }
-  .header .language {
-    padding-inline: 8px;
-    min-height: 44px;
   }
   .footer {
     padding: 20px 16px;

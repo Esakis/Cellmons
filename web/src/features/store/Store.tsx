@@ -41,6 +41,8 @@ const rarityPoints = {
   silver: junkyard.rarity_points[1] ?? 0,
   gold: junkyard.rarity_points[2] ?? 0,
 };
+const junkyardCharacters = () =>
+  content.avatars.filter((a) => a.playable && a.rarity === 'junkyard').length;
 export function Store() {
   const [inventory, setInventory] = createSignal<Inventory>();
   const [wallet, setWallet] = createSignal<Wallet>();
@@ -55,6 +57,8 @@ export function Store() {
   let disposed = false;
   let identity = '';
   const ready = () => account()?.kind === 'account';
+  const unopened = () => inventory()?.boosters.filter((b) => b.status === 'unopened') ?? [];
+  const opened = () => inventory()?.boosters.filter((b) => b.status === 'opened') ?? [];
   const selected = createMemo(() =>
     Object.entries(quantities())
       .filter(([, qty]) => qty > 0)
@@ -176,9 +180,17 @@ export function Store() {
             <img class="icon" src={onlineIcon('ducats')} alt="" />
             {t('store-balance', { value: wallet()?.balance ?? '—' })}
           </strong>
-          <button type="button" class="secondary" disabled={loading()} onClick={() => void load()}>
-            {t('refresh')}
-          </button>
+          {/* The store refreshes after every operation; a manual refresh helps only after an error. */}
+          <Show when={error()}>
+            <button
+              type="button"
+              class="secondary"
+              disabled={loading()}
+              onClick={() => void load()}
+            >
+              {t('refresh')}
+            </button>
+          </Show>
         </div>
         <Show when={error()}>
           <p role="alert">{error()}</p>
@@ -196,9 +208,7 @@ export function Store() {
         <Show when={receipt()}>
           {(result) => (
             <aside class="store-receipt" role="status">
-              <p>
-                {t('store-complete')} ({result().key})
-              </p>
+              <p>{t('store-complete')}</p>
               <Show when={result().ducats !== '0'}>
                 <p>{t('store-change', { value: result().ducats })}</p>
               </Show>
@@ -215,7 +225,6 @@ export function Store() {
           )}
         </Show>
         <h2>{t('store-packs')}</h2>
-        <p>{t('store-final')}</p>
         <div class="store-grid">
           <For each={inventory()?.offers}>
             {(offer) => (
@@ -234,11 +243,18 @@ export function Store() {
                     )}
                   </For>
                 </p>
-                <button type="button" class="secondary" onClick={() => setOdds(offer)}>
-                  {t('store-odds')}
+                {/* Short labels on the card; the full names stay for screen readers. */}
+                <button
+                  type="button"
+                  class="secondary"
+                  aria-label={t('store-odds')}
+                  onClick={() => setOdds(offer)}
+                >
+                  {t('store-odds-short')}
                 </button>{' '}
                 <button
                   type="button"
+                  aria-label={t('store-buy', { pack: t(`store-pack-${offer.id}`) })}
                   disabled={
                     loading() ||
                     !!pending() ||
@@ -247,118 +263,130 @@ export function Store() {
                   }
                   onClick={() => setConfirm({ action: 'buy', kind: offer.id, quote: offer.quote })}
                 >
-                  {t('store-buy', { pack: t(`store-pack-${offer.id}`) })}
+                  {t('store-buy-short')}
                 </button>
               </article>
             )}
           </For>
         </div>
-        <h2>{t('store-owned')}</h2>
-        <div class="store-grid">
-          <For each={inventory()?.boosters.filter((b) => b.status === 'unopened')}>
-            {(booster) => (
-              <article>
-                <h3>{t(`store-pack-${booster.kind}`)}</h3>
-                <small>{booster.id}</small>
-                <p>{t('store-price', { value: booster.price })}</p>
-                <button
-                  type="button"
-                  class="secondary"
-                  onClick={() => setOdds({ ...booster, quote: '', available: true })}
-                >
-                  {t('store-odds')}
-                </button>{' '}
-                <button
-                  type="button"
-                  disabled={loading() || !!pending()}
-                  onClick={() => begin({ action: 'open', id: booster.id })}
-                >
-                  {t('store-open')}
-                </button>
-              </article>
-            )}
-          </For>
-        </div>
-        <h2>{t('store-opened')}</h2>
-        <For each={inventory()?.boosters.filter((b) => b.status === 'opened')}>
-          {(booster) => (
-            <details>
-              <summary>
-                {t(`store-pack-${booster.kind}`)} · {booster.id}
-              </summary>
-              <ul>
-                <For each={booster.contents ?? []}>{(id) => <li>{cardName(id)}</li>}</For>
-              </ul>
-            </details>
-          )}
-        </For>
-        <h2>{t('store-junkyard')}</h2>
-        <p>
-          {t('store-junkyard-rules', {
-            bronze: rarityPoints.bronze,
-            silver: rarityPoints.silver,
-            gold: rarityPoints.gold,
-            threshold: junkyard.reward_threshold,
-            fallback: junkyard.fallback_ducats,
-            characters: content.avatars.filter((a) => a.playable && a.rarity === 'junkyard').length,
-          })}
-        </p>
-        <p>{t('store-total-points', { value: inventory()?.junkyard_points ?? '0' })}</p>
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            setConfirm({ action: 'discard', cards: selected() });
-          }}
-        >
-          <div class="store-stacks">
-            <For each={collection()?.collection.filter((row) => row.qty > 0)}>
-              {(row) => (
-                <label>
-                  <span>
-                    {cardName(row.card_id)} (×{row.qty})
-                  </span>
-                  <input
-                    type="number"
-                    inputmode="numeric"
-                    min="0"
-                    max={row.qty}
-                    step="1"
-                    value={quantities()[row.card_id] ?? 0}
+        {/* Packs the player owns appear only when there are some. */}
+        <Show when={unopened().length}>
+          <h2>{t('store-owned')}</h2>
+          <div class="store-grid">
+            <For each={unopened()}>
+              {(booster) => (
+                <article>
+                  <h3>{t(`store-pack-${booster.kind}`)}</h3>
+                  <p>{t('store-price', { value: booster.price })}</p>
+                  <button
+                    type="button"
+                    class="secondary"
+                    aria-label={t('store-odds')}
+                    onClick={() => setOdds({ ...booster, quote: '', available: true })}
+                  >
+                    {t('store-odds-short')}
+                  </button>{' '}
+                  <button
+                    type="button"
                     disabled={loading() || !!pending()}
-                    onInput={(event) => {
-                      const qty = Number(event.currentTarget.value);
-                      setQuantities((old) => ({
-                        ...old,
-                        [row.card_id]:
-                          Number.isInteger(qty) && qty >= 0 && qty <= row.qty ? qty : 0,
-                      }));
-                    }}
-                  />
-                </label>
+                    onClick={() => begin({ action: 'open', id: booster.id })}
+                  >
+                    {t('store-open')}
+                  </button>
+                </article>
               )}
             </For>
           </div>
-          <p>{t('store-selected-points', { value: points() })}</p>
-          <button
-            type="submit"
-            disabled={
-              !inventory()?.junkyard_available || !selected().length || loading() || !!pending()
-            }
-          >
-            {t('store-discard')}
-          </button>
-        </form>
-        <h2>{t('store-ledger')}</h2>
-        <ol class="store-ledger">
-          <For each={wallet()?.entries}>
-            {(entry) => (
-              <li>
-                <time>{new Date(entry.at_ms).toLocaleString(language())}</time>{' '}
-                <span>{t(`store-reason-${entry.reason}`)}</span> <strong>{entry.delta}</strong>
-              </li>
+        </Show>
+        <Show when={opened().length}>
+          <h2>{t('store-opened')}</h2>
+          <For each={opened()}>
+            {(booster) => (
+              <details>
+                <summary>{t(`store-pack-${booster.kind}`)}</summary>
+                <ul>
+                  <For each={booster.contents ?? []}>{(id) => <li>{cardName(id)}</li>}</For>
+                </ul>
+              </details>
             )}
           </For>
-        </ol>
+        </Show>
+        {/* Trading cards for points is occasional: it waits behind its name and current points. */}
+        <details class="store-section">
+          <summary>
+            {t('store-junkyard')} ·{' '}
+            {t('store-total-points', { value: inventory()?.junkyard_points ?? '0' })}
+          </summary>
+          <p>
+            {t('store-junkyard-rules', {
+              bronze: rarityPoints.bronze,
+              silver: rarityPoints.silver,
+              gold: rarityPoints.gold,
+              threshold: junkyard.reward_threshold,
+              fallback: junkyard.fallback_ducats,
+            })}
+          </p>
+          <Show when={junkyardCharacters()}>
+            <p>{t('store-junkyard-characters', { count: junkyardCharacters() })}</p>
+          </Show>
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              setConfirm({ action: 'discard', cards: selected() });
+            }}
+          >
+            <div class="store-stacks">
+              <For each={collection()?.collection.filter((row) => row.qty > 0)}>
+                {(row) => (
+                  <label>
+                    <span>
+                      {cardName(row.card_id)} (×{row.qty})
+                    </span>
+                    <input
+                      type="number"
+                      inputmode="numeric"
+                      min="0"
+                      max={row.qty}
+                      step="1"
+                      value={quantities()[row.card_id] ?? 0}
+                      disabled={loading() || !!pending()}
+                      onInput={(event) => {
+                        const qty = Number(event.currentTarget.value);
+                        setQuantities((old) => ({
+                          ...old,
+                          [row.card_id]:
+                            Number.isInteger(qty) && qty >= 0 && qty <= row.qty ? qty : 0,
+                        }));
+                      }}
+                    />
+                  </label>
+                )}
+              </For>
+            </div>
+            <p>{t('store-selected-points', { value: points() })}</p>
+            <button
+              type="submit"
+              disabled={
+                !inventory()?.junkyard_available || !selected().length || loading() || !!pending()
+              }
+            >
+              {t('store-discard')}
+            </button>
+          </form>
+        </details>
+        <details class="store-section">
+          <summary>{t('store-ledger')}</summary>
+          <ol class="store-ledger">
+            <For each={wallet()?.entries}>
+              {(entry) => (
+                <li>
+                  <time>{new Date(entry.at_ms).toLocaleString(language())}</time>{' '}
+                  <span>{t(`store-reason-${entry.reason}`)}</span> <strong>{entry.delta}</strong>
+                </li>
+              )}
+            </For>
+          </ol>
+        </details>
       </Show>
       <Show when={confirm()}>
         {(operation) => (

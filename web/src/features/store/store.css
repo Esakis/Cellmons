@@ -15,10 +15,23 @@
   gap: 1rem;
 }
 .store-grid article,
-.store-receipt {
+.store-receipt,
+.store-section {
   padding: 1rem;
   border: 1px solid var(--color-border);
   border-radius: 0.5rem;
+  background: var(--surface);
+}
+/* The junkyard and the wallet history wait behind their names (Store.tsx). */
+.store-section {
+  margin-top: 1rem;
+}
+.store-section > summary {
+  padding-block: 10px;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: var(--heading);
 }
 .store-page small {
   overflow-wrap: anywhere;

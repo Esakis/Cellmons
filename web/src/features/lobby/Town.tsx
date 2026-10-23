@@ -1,8 +1,6 @@
 import { A, useNavigate } from '@solidjs/router';
 import { createSignal, For, Show } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
-import { icon } from '../../app/content';
-import { onlineIcon } from '../../app/onlineIcons';
 import layout from '../../generated/town.json';
 import { t } from '../../i18n';
 import { canEnter, type Journey, requiredLevel } from './journey';
@@ -17,21 +15,6 @@ const [painting] = Object.values(
   }),
 );
 const [width, height] = layout.size as [number, number];
-const icons: Record<string, () => string | undefined> = {
-  tower: () => onlineIcon('tab-social'),
-  library: () => icon('nav-collection'),
-  castle: () => icon('nav-lobby'),
-  portal: () => icon('attack-mag'),
-  arena: () => icon('school-combat'),
-  ranked: () => icon('school-combat'),
-  clan: () => icon('stat-phys-def'),
-  training: () => icon('nav-training'),
-  bazaar: () => onlineIcon('ducats'),
-  shop: () => icon('nav-store'),
-  expedition: () => onlineIcon('tab-map'),
-};
-/** The icon of a place (a lobby room or the library); clan rooms share one. */
-export const placeIcon = (place: string) => icons[place]?.();
 const points = (shape: number[][]) =>
   shape.map(([x = 0, y = 0]) => `${(x * width) / 100},${(y * height) / 100}`).join(' ');
 // A building's box on the canvas and its outline inside the box, both in per cent.
@@ -67,14 +50,18 @@ export function Town(props: {
   const locked = (id: string) => !canEnter(props.journey, id);
   const waiting = (id: string) =>
     props.alert === id || (id === 'library' && (props.journey?.recruits ?? 0) > 0);
+  // The library, the shop and the tower are pages with their own painting and way back;
+  // the other buildings are lobby rooms.
   const link = (id: string) =>
     locked(id)
       ? ''
       : id === 'library'
         ? '/collection'
-        : id === 'clan' && !props.clan
-          ? '/clans'
-          : '';
+        : id === 'shop'
+          ? '/store'
+          : id === 'tower' || (id === 'clan' && !props.clan)
+            ? '/clans'
+            : '';
   function go(id: string) {
     if (locked(id)) return;
     if (link(id)) navigate(link(id));

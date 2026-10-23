@@ -12,8 +12,7 @@ import {
   signIn,
   signOut,
 } from '../../app/account';
-import { content, fluentKey, icon, startingAvatars } from '../../app/content';
-import { onlineIcon } from '../../app/onlineIcons';
+import { content, fluentKey, startingAvatars } from '../../app/content';
 import { Scene } from '../../components/Scene';
 import { version as legalVersion } from '../../generated/legal-version.json';
 import { addTranslations, hasTranslation, t } from '../../i18n';
@@ -110,10 +109,13 @@ export function AccountPage() {
   };
   const isGuest = () => account()?.kind === 'guest';
   let mounted = true;
+  let privacyPanel: HTMLDetailsElement | undefined;
   onCleanup(() => {
     mounted = false;
   });
   onMount(() => {
+    // Opened from the legal page: the data panel is last on the page, so bring it into view.
+    if (privacyOpen()) privacyPanel?.scrollIntoView({ block: 'start' });
     // Tokens stay in memory; remove them from the visible address/history before any request.
     if (query.has('token'))
       history.replaceState(
@@ -248,19 +250,6 @@ export function AccountPage() {
       <Scene src={painting}>
         <h1 class="plaque">{t('auth-account')}</h1>
       </Scene>
-      <Show when={!isGuest()}>
-        <details
-          open={privacyOpen()}
-          onToggle={(e) => {
-            if (e.currentTarget.open) setPrivacyOpen(true);
-          }}
-        >
-          <summary>{t('privacy-title')}</summary>
-          <Show when={privacyOpen()}>
-            <Privacy />
-          </Show>
-        </details>
-      </Show>
       <Show when={notice()}>
         <p role="status">{notice()}</p>
       </Show>
@@ -294,12 +283,6 @@ export function AccountPage() {
             <p>
               {user.email} · {t(user.email_verified ? 'auth-confirmed' : 'auth-unconfirmed')}
             </p>
-            <p>
-              <img class="icon" src={icon(`school-${user.start_school}`)} alt="" />
-              {t(`school-${user.start_school}-name`)} ·{' '}
-              <img class="icon" src={onlineIcon('level')} alt="" />
-              {t('auth-level', { level: user.avatar?.level ?? 1, xp: user.avatar?.xp ?? 0 })}
-            </p>
             <Show when={!user.email_verified}>
               <button
                 type="button"
@@ -317,31 +300,35 @@ export function AccountPage() {
             <button type="button" disabled={busy()} onClick={() => void perform(signOut)}>
               {t('auth-logout')}
             </button>
-            <h3>{t('auth-sessions')}</h3>
-            <ul class="account-sessions">
-              <For each={sessions()}>
-                {(session) => (
-                  <li>
-                    <span>
-                      {session.device} {session.current ? t('auth-current') : ''}
-                    </span>
-                    <button
-                      type="button"
-                      disabled={busy()}
-                      onClick={() =>
-                        void perform(async () => {
-                          await api(`/api/auth/sessions/${session.id}`, undefined, 'DELETE');
-                          if (session.current) forgetAccount();
-                          else setSessions((rows) => rows.filter((row) => row.id !== session.id));
-                        })
-                      }
-                    >
-                      {t('auth-revoke')}
-                    </button>
-                  </li>
-                )}
-              </For>
-            </ul>
+            {/* Other devices only: this session ends with "Sign out" above. */}
+            <Show when={sessions().length > 1}>
+              <h3>{t('auth-sessions')}</h3>
+              <ul class="account-sessions">
+                <For each={sessions()}>
+                  {(session) => (
+                    <li>
+                      <span>
+                        {session.device} {session.current ? t('auth-current') : ''}
+                      </span>
+                      <Show when={!session.current}>
+                        <button
+                          type="button"
+                          disabled={busy()}
+                          onClick={() =>
+                            void perform(async () => {
+                              await api(`/api/auth/sessions/${session.id}`, undefined, 'DELETE');
+                              setSessions((rows) => rows.filter((row) => row.id !== session.id));
+                            })
+                          }
+                        >
+                          {t('auth-revoke')}
+                        </button>
+                      </Show>
+                    </li>
+                  )}
+                </For>
+              </ul>
+            </Show>
           </div>
         )}
       </Show>
@@ -362,7 +349,10 @@ export function AccountPage() {
             {t('auth-register')}
           </button>
         </nav>
-        <h2>{t(`auth-mode-${mode()}`)}</h2>
+        {/* Signing in and registering are named by the selected tab; the other steps need a title. */}
+        <Show when={mode() !== 'login' && mode() !== 'register'}>
+          <h2>{t(`auth-mode-${mode()}`)}</h2>
+        </Show>
         <form class="account-form" onSubmit={(event) => void submit(event)}>
           <Show when={mode() === 'login'}>
             <label>
@@ -459,7 +449,7 @@ export function AccountPage() {
           </button>
         </Show>
       </Show>
-      <Show when={!isGuest()}>
+      <Show when={!isGuest() && !profile()}>
         <aside class="account-guest">
           <h2>{t('auth-no-account')}</h2>
           <p>{t('auth-guest-description')}</p>
@@ -474,6 +464,21 @@ export function AccountPage() {
             {t('auth-play-guest')}
           </button>
         </aside>
+      </Show>
+      {/* Data access and deletion: last on the page, also for people who cannot sign in. */}
+      <Show when={!isGuest()}>
+        <details
+          ref={privacyPanel}
+          open={privacyOpen()}
+          onToggle={(e) => {
+            if (e.currentTarget.open) setPrivacyOpen(true);
+          }}
+        >
+          <summary>{t('privacy-title')}</summary>
+          <Show when={privacyOpen()}>
+            <Privacy />
+          </Show>
+        </details>
       </Show>
     </section>
   );

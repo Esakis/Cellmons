@@ -60,3 +60,8 @@
   border: 1px solid var(--color-border);
   border-radius: 8px;
 }
+/* The rules behind one line: a comfortable touch target (WCAG 2.5.8). */
+.expeditions > details > summary {
+  padding-block: 10px;
+  cursor: pointer;
+}

@@ -11,9 +11,18 @@
 }
 .clan-layout {
   display: grid;
-  grid-template-columns: minmax(16rem, 1fr) minmax(0, 2fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
   align-items: start;
+}
+.clan-layout-split {
+  grid-template-columns: minmax(16rem, 1fr) minmax(0, 2fr);
+}
+details.clan-panel > summary {
+  padding-block: 10px;
+  cursor: pointer;
+  font-family: var(--font-display);
+  color: var(--heading);
 }
 .clan-panel {
   padding: 1rem;

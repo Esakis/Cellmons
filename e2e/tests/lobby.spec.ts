@@ -3,6 +3,7 @@ import { administration } from '../admin';
 import { advancement } from '../advancement';
 import { clans } from '../clans';
 import { expeditions } from '../expeditions';
+import { chooseLanguage } from '../language';
 import { privacy } from '../privacy';
 import { progression } from '../progression';
 import { recruitment } from '../recruitment';
@@ -103,7 +104,7 @@ async function register(page: Page, login: string, build = false) {
       expect(
         await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight + 1),
       ).toBe(true);
-      await page.locator('header select').selectOption('pl');
+      await chooseLanguage(page, 'pl');
       await expect(page.getByRole('button', { name: 'Mapa', exact: true })).toBeVisible();
       await page.screenshot({ path: `../target/phone-menu-pl-${size.width}.png`, fullPage: true });
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
@@ -112,7 +113,7 @@ async function register(page: Page, login: string, build = false) {
       expect(
         await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight + 1),
       ).toBe(true);
-      await page.locator('header select').selectOption('en');
+      await chooseLanguage(page, 'en');
     }
     await page.screenshot({ path: `../target/phone-menu-${login}.png`, fullPage: true });
   }
@@ -243,8 +244,8 @@ test('real registration, two-client chat, contacts, mail, challenges and reconne
       await duelB.getByRole('button', { name: 'Submit move', exact: true }).click();
     }
     await expect(duelA.locator('.online-result')).toContainText('Draw');
-    await expect(duelA.locator('.online-result')).toContainText('+80 PD');
-    await expect(duelB.locator('.online-result')).toContainText('+80 PD');
+    await expect(duelA.locator('.online-result')).toContainText('+80 XP');
+    await expect(duelB.locator('.online-result')).toContainText('+80 XP');
     await duelA.getByRole('button', { name: 'Close', exact: true }).click();
     await a.getByRole('button', { name: 'Match history', exact: true }).click();
     await expect(a.locator('.online-match').first()).toContainText(alice);
@@ -265,18 +266,18 @@ test('real registration, two-client chat, contacts, mail, challenges and reconne
     await replayPosition.press('Home');
     await expect(duelA.locator('details')).toHaveCount(0);
     await a.getByRole('button', { name: 'Map', exact: true }).click();
-    await a.getByRole('button', { name: 'Training', exact: true }).click();
+    await a.getByRole('button', { name: 'Sparring', exact: true }).click();
     await expect(a.locator('.online-bots button')).toHaveCount(8);
     await a.locator('.online-bots button').first().click();
     await expect(duelA).toContainText('Opponent ready');
     await duelA.getByRole('button', { name: 'Surrender', exact: true }).click();
     await a.getByRole('dialog').getByRole('button', { name: 'Surrender', exact: true }).click();
-    await expect(duelA.locator('.online-result')).toContainText('+0 PD');
+    await expect(duelA.locator('.online-result')).toContainText('+0 XP');
     await duelA.getByRole('button', { name: 'Close', exact: true }).click();
     await duelB.getByRole('button', { name: 'Close', exact: true }).click();
     // A lost purchase reply must be retried with the original key.
     await a.locator('header nav').getByRole('link', { name: 'Store', exact: true }).click();
-    await expect(a.getByTestId('wallet-balance')).toHaveText('Dukats: 40');
+    await expect(a.getByTestId('wallet-balance')).toHaveText('Ducats: 40');
     await a.getByRole('button', { name: 'Contents and odds', exact: true }).first().click();
     await expect(a.getByRole('dialog')).toContainText('with replacement');
     await a.getByRole('dialog').getByRole('button', { name: 'Close', exact: true }).click();
@@ -300,7 +301,7 @@ test('real registration, two-client chat, contacts, mail, challenges and reconne
     await expect(a.getByRole('alert')).toContainText('did not confirm');
     await a.getByRole('button', { name: 'Retry operation', exact: true }).click();
     await expect(a.locator('.store-receipt')).toContainText('Operation completed');
-    await expect(a.getByTestId('wallet-balance')).toHaveText('Dukats: 0');
+    await expect(a.getByTestId('wallet-balance')).toHaveText('Ducats: 0');
     expect(purchaseKeys).toHaveLength(2);
     expect(purchaseKeys[0]).toBe(purchaseKeys[1]);
     await expect(a.getByRole('button', { name: 'Open pack', exact: true })).toHaveCount(1);

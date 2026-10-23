@@ -7,9 +7,10 @@ import {
   type ParentProps,
   Show,
 } from 'solid-js';
-import { language, setLanguage, t } from '../i18n';
+import { language, t } from '../i18n';
 import { offlineStatus, updateApp, updateReady } from '../pwa';
 import styles from './App.module.css';
+import { account } from './account';
 import { icon } from './content';
 import { duelActive, placeBackdrop, theme, updatesBlocked } from './session';
 
@@ -61,13 +62,12 @@ export function Shell(props: ParentProps) {
         {t('skip-to-content')}
       </button>
       <header class={styles.header}>
-        <A class={styles.brand} href="/">
+        {/* A signed-in player's home is the town; everyone else starts at training. */}
+        <A class={styles.brand} href={account()?.kind === 'account' ? '/lobby' : '/'}>
           <span class={styles.brandIcon} aria-hidden="true">
             ✦
           </span>
-          <span>
-            Spellgambit <small>{t('brand-subtitle')}</small>
-          </span>
+          <span>Spellgambit</span>
         </A>
         {/* On phones this is the icon bar along the bottom edge, like in mobile games. */}
         <nav aria-label={t('app-title')}>
@@ -96,15 +96,6 @@ export function Shell(props: ParentProps) {
             {t('settings')}
           </A>
         </nav>
-        <select
-          class={styles.language}
-          aria-label={t('language')}
-          value={language()}
-          onChange={(event) => setLanguage(event.currentTarget.value)}
-        >
-          <option value="pl">PL</option>
-          <option value="en">EN</option>
-        </select>
       </header>
       <main id="main" tabIndex={-1}>
         <ErrorBoundary
@@ -127,7 +118,6 @@ export function Shell(props: ParentProps) {
       </main>
       <Show when={!duelActive()}>
         <footer class={styles.footer}>
-          <span>Spellgambit: Arcane Class</span>
           <A href="/legal">{t('legal')}</A>
           <span role="status" data-testid="offline-status">
             {t(

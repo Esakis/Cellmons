@@ -1,4 +1,5 @@
 exp-title = Expeditions
+exp-rules = Rules and rewards
 exp-help = Choose one of three opponents at each stage, then defeat the boss. Your avatar and deck are reserved for the run. Each fight starts with full HP and stamina. Defeat or a draw ends the run and loses the collected XP. Between fights you can withdraw for a share of that XP. Expeditions never affect rating.
 exp-rewards = Defeating the boss pays all collected XP and fixed Ducats, then rolls one exclusive bonus: { $avatar }% an unowned avatar of the stated rarity, { $card }% a card, { $ducats }% extra Ducats. If all eligible avatars are owned, that avatar roll gives no extra reward. Shade and junkyard classes are excluded.
 exp-verify = Verify your email to start expeditions and choose opponents.
@@ -11,7 +12,7 @@ exp-error-LEVEL_REQUIRED = Expeditions require account level 4; Ordeal requires 
 exp-rarity-common = common
 exp-rarity-uncommon = uncommon
 exp-rarity-rare = rare
-exp-offer = { $stages } stages including the boss · { $fixed } D guaranteed · possible { $rarity } avatar or { $random } extra D
+exp-offer = { $stages } stages including the boss · { $fixed } Ducats guaranteed · possible { $rarity } avatar or { $random } extra Ducats
 exp-start = Start expedition
 exp-opponent = Opponent
 exp-card = Card

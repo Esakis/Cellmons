@@ -1,6 +1,7 @@
 clan-refresh = Odśwież
 clan-own = Twój klan
 clan-create = Załóż klan
+clan-create-own = Załóż własny klan
 clan-create-level = Założenie klanu wymaga poziomu konta 15. Dołączyć możesz od poziomu 10.
 clan-error-LEVEL_REQUIRED = Założenie klanu wymaga poziomu konta 15.
 clan-founding-help = Klan zostanie założony po przyjęciu co najmniej { $min } członków, łącznie z mistrzem.

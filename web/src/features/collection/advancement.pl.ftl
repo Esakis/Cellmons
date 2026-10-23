@@ -1,6 +1,5 @@
 advancement-title = Kontrakty i opanowanie kart
 advancement-master-title = Tytuł kolekcji: Mistrz Spellgambit
-advancement-lock = Dostępne od poziomu konta { $level }.
 advancement-daily = Zadanie dzienne: ukończ 3 walki online — { $count }/3. Nagroda: 5 Dukatów. Nowy dzień o 00:00 UTC.
 advancement-daily-done = Nagroda odebrana automatycznie.
 contract-title = Kontrakt na postać
@@ -13,4 +12,3 @@ contract-active = Aktywny kontrakt
 contract-claim = Odbierz postać
 mastery-title = Opanowanie kart
 mastery-help = Od poziomu konta 7: karta w talii dostaje 1 PD za kwalifikującą walkę, a poprawnie zagrana dodatkowo 2. Wszystkie kopie mają wspólny postęp. Progi poziomów: 0 / 15 / 45 / 100 / 200 PD. Każdy awans daje jednorazowo 2 Dukaty i odznakę, bez zmiany obrażeń. Postęp znajdziesz na miniaturze i w podglądzie karty.
-mastery-locked = Opanowanie kart otwiera się na poziomie konta 7.

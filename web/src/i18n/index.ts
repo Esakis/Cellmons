@@ -37,6 +37,19 @@ export function t(key: string, args?: Record<string, FluentVariable>): string {
 }
 export const hasTranslation = (key: string) => bundles.en.hasMessage(key);
 
+// Bots come from the server as "[AI] Circle Adept 12" (the English profile name and the
+// level); players read the profile's name in their own language.
+const botProfiles = ['novice', 'apprentice', 'tactician', 'archmage'];
+export function playerName(login: string) {
+  const bot = /^\[AI\] (.+) (\d+)$/.exec(login);
+  if (!bot) return login;
+  const key = botProfiles.find((name) => {
+    const message = bundles.en.getMessage(name);
+    return message?.value && bundles.en.formatPattern(message.value) === bot[1];
+  });
+  return key ? t('bot-name', { name: t(key), level: Number(bot[2]) }) : login;
+}
+
 export function addTranslations(resources: { pl: string; en: string }) {
   for (const locale of ['pl', 'en'] as const) {
     const errors = bundles[locale].addResource(new FluentResource(resources[locale]));

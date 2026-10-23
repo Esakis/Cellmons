@@ -22,6 +22,7 @@ import { setTrainingPlayer } from '../../app/trainingPlayer';
 import { BackToMap } from '../../components/BackToMap';
 import { Modal } from '../../components/Modal';
 import { Scene } from '../../components/Scene';
+import { Stats } from '../../components/Stats';
 import { addTranslations, hasTranslation, t } from '../../i18n';
 import en from './en.ftl?raw';
 import pl from './pl.ftl?raw';
@@ -223,7 +224,15 @@ export function Collection() {
                   />
                 )}
               </Show>
-              <Show when={!guest() && snapshot().advancement && snapshot().recruitment}>
+              {/* Contracts open at account level 4; before that the panel would hold only locks. */}
+              <Show
+                when={
+                  !guest() &&
+                  (snapshot().recruitment?.level ?? 1) >= 4 &&
+                  snapshot().advancement &&
+                  snapshot().recruitment
+                }
+              >
                 {(recruitment) => (
                   <Show when={snapshot().advancement}>
                     {(state) => (
@@ -238,38 +247,7 @@ export function Collection() {
                   </Show>
                 )}
               </Show>
-              <fieldset disabled={loading()} class="collection-create">
-                <legend>{t('collection-create')}</legend>
-                <label>
-                  {t('collection-template')}{' '}
-                  <select
-                    aria-label={t('collection-template')}
-                    value={template() || snapshot().templates[0]}
-                    onChange={(e) => setTemplate(Number(e.currentTarget.value))}
-                  >
-                    <For each={snapshot().templates}>
-                      {(id) => (
-                        <option value={id}>{t(fluentKey(avatars.get(id)?.key ?? ''))}</option>
-                      )}
-                    </For>
-                  </select>
-                </label>
-                <button
-                  type="button"
-                  disabled={snapshot().avatars.length >= 10}
-                  onClick={() =>
-                    void mutate({
-                      action: 'create',
-                      id: crypto.randomUUID(),
-                      template_id: template() || snapshot().templates[0] || 1,
-                    })
-                  }
-                >
-                  {t('collection-create-button')}
-                </button>
-                <span>{snapshot().avatars.length} / 10</span>
-              </fieldset>
-              <div class="collection-layout">
+              <div class="collection-roster">
                 <aside class="collection-avatars" aria-label={t('collection-avatars')}>
                   <For each={snapshot().avatars}>
                     {(avatar) => (
@@ -299,32 +277,64 @@ export function Collection() {
                     )}
                   </For>
                 </aside>
-                <div class="collection-editor">
-                  <Show when={own()}>
-                    {(avatar) => (
-                      <>
-                        <div class="collection-heading">
-                          <h2>
-                            {t(
-                              fluentKey(
-                                avatars.get(avatar().path_id ?? avatar().template_id)?.key ?? '',
-                              ),
-                            )}
-                          </h2>
+                {/* A new character is an occasional step, so it waits after the list. */}
+                <fieldset disabled={loading()} class="collection-create">
+                  <legend>
+                    {t('collection-create')} · {snapshot().avatars.length} / 10
+                  </legend>
+                  <select
+                    aria-label={t('collection-template')}
+                    value={template() || snapshot().templates[0]}
+                    onChange={(e) => setTemplate(Number(e.currentTarget.value))}
+                  >
+                    <For each={snapshot().templates}>
+                      {(id) => (
+                        <option value={id}>{t(fluentKey(avatars.get(id)?.key ?? ''))}</option>
+                      )}
+                    </For>
+                  </select>
+                  <button
+                    type="button"
+                    disabled={snapshot().avatars.length >= 10}
+                    onClick={() =>
+                      void mutate({
+                        action: 'create',
+                        id: crypto.randomUUID(),
+                        template_id: template() || snapshot().templates[0] || 1,
+                      })
+                    }
+                  >
+                    {t('collection-create-button')}
+                  </button>
+                </fieldset>
+              </div>
+              <div class="collection-editor">
+                <Show when={own()}>
+                  {(avatar) => (
+                    <>
+                      <div class="collection-heading">
+                        <h2>
+                          {t(
+                            fluentKey(
+                              avatars.get(avatar().path_id ?? avatar().template_id)?.key ?? '',
+                            ),
+                          )}
+                        </h2>
+                        {/* The active character can be neither activated nor deleted: a badge says so. */}
+                        <Show
+                          when={!avatar().active}
+                          fallback={<span class="collection-active">{t('collection-active')}</span>}
+                        >
                           <button
                             type="button"
-                            disabled={
-                              loading() ||
-                              avatar().active ||
-                              !isPlayableAvatar(avatar().template_id)
-                            }
+                            disabled={loading() || !isPlayableAvatar(avatar().template_id)}
                             onClick={() => void mutate({ action: 'activate', id: avatar().id })}
                           >
-                            {t(avatar().active ? 'collection-active' : 'collection-activate')}
+                            {t('collection-activate')}
                           </button>
                           <button
                             type="button"
-                            disabled={loading() || avatar().active}
+                            disabled={loading()}
                             onClick={() =>
                               setConfirm({
                                 action: 'delete',
@@ -335,15 +345,21 @@ export function Collection() {
                           >
                             {t('collection-delete')}
                           </button>
-                        </div>
-                        <Show when={!isPlayableAvatar(avatar().template_id)}>
-                          <p>{t('collection-locked')}</p>
                         </Show>
-                        <details
-                          class="collection-character-details"
-                          open={avatar().unspent > 0 || avatar().level >= 20}
+                      </div>
+                      <Show when={!isPlayableAvatar(avatar().template_id)}>
+                        <p>{t('collection-locked')}</p>
+                      </Show>
+                      <details
+                        class="collection-character-details"
+                        open={avatar().unspent > 0 || avatar().level >= 20}
+                      >
+                        <summary>{t('collection-character-development')}</summary>
+                        {/* Point fields only when there is something to spend; otherwise the stats. */}
+                        <Show
+                          when={avatar().unspent > 0}
+                          fallback={<Stats values={avatar().stats} />}
                         >
-                          <summary>{t('collection-character-development')}</summary>
                           <fieldset disabled={loading() || !isPlayableAvatar(avatar().template_id)}>
                             <legend>{t('collection-points', { count: avatar().unspent })}</legend>
                             <div class="collection-points">
@@ -392,103 +408,105 @@ export function Collection() {
                               {t('collection-spend')}
                             </button>
                           </fieldset>
-                          <Show when={!guest()}>
-                            <Progression
-                              avatar={avatar()}
-                              accountLevel={snapshot().recruitment?.level ?? 1}
-                              disabled={loading()}
-                              confirm={setConfirm}
-                            />
-                          </Show>
-                        </details>
-                        <section aria-label={t('collection-deck')}>
-                          <Show when={!guest() && (snapshot().recruitment?.level ?? 1) < 2}>
-                            <p>
-                              {t('collection-deck-lesson')}{' '}
-                              <A href="/lobby">{t('collection-start-lesson')}</A>
-                            </p>
-                          </Show>
-                          <div class="collection-heading collection-deck-heading">
-                            <h2>
-                              {t('collection-deck')} ({draft().length}/{content.rules.deck.size})
-                            </h2>
-                            <Show when={isPlayableAvatar(avatar().template_id)}>
-                              <A
-                                href={`/duel?avatar=${avatar().path_id ?? avatar().template_id}&bot=novice&custom=1`}
-                                onClick={() =>
-                                  setTrainingPlayer({
-                                    avatar: avatar().path_id ?? avatar().template_id,
-                                    specialization: avatar().specialization ?? undefined,
-                                    gift_id: avatar().gift_id ?? undefined,
-                                    level: avatar().level,
-                                    spent: avatar().spent,
-                                    deck: draft(),
-                                  })
-                                }
-                              >
-                                {t('collection-test-deck')}
-                              </A>
-                            </Show>
-                            <button
-                              type="button"
-                              class="primary"
-                              disabled={
-                                loading() ||
-                                !changed() ||
-                                !isPlayableAvatar(avatar().template_id) ||
-                                (!guest() && (snapshot().recruitment?.level ?? 1) < 2)
-                              }
+                        </Show>
+                        {/* Reincarnation concerns a character at level 20 or one that has already been reborn. */}
+                        <Show when={!guest() && (avatar().level >= 20 || avatar().tier > 0)}>
+                          <Progression
+                            avatar={avatar()}
+                            accountLevel={snapshot().recruitment?.level ?? 1}
+                            disabled={loading()}
+                            confirm={setConfirm}
+                          />
+                        </Show>
+                      </details>
+                      <section aria-label={t('collection-deck')}>
+                        <Show when={!guest() && (snapshot().recruitment?.level ?? 1) < 2}>
+                          <p>
+                            {t('collection-deck-lesson')}{' '}
+                            <A href="/lobby">{t('collection-start-lesson')}</A>
+                          </p>
+                        </Show>
+                        <div class="collection-heading collection-deck-heading">
+                          <h2>
+                            {t('collection-deck')} ({draft().length}/{content.rules.deck.size})
+                          </h2>
+                          <Show when={isPlayableAvatar(avatar().template_id)}>
+                            <A
+                              href={`/duel?avatar=${avatar().path_id ?? avatar().template_id}&bot=novice&custom=1`}
                               onClick={() =>
-                                void mutate({
-                                  action: 'deck',
-                                  id: avatar().id,
-                                  revision: avatar().deck_revision,
-                                  cards: draft(),
+                                setTrainingPlayer({
+                                  avatar: avatar().path_id ?? avatar().template_id,
+                                  specialization: avatar().specialization ?? undefined,
+                                  gift_id: avatar().gift_id ?? undefined,
+                                  level: avatar().level,
+                                  spent: avatar().spent,
+                                  deck: draft(),
                                 })
                               }
                             >
-                              {t('collection-save-deck')}
-                            </button>
-                            <button
-                              type="button"
-                              disabled={!guest() && (snapshot().recruitment?.level ?? 1) < 2}
-                              onClick={() => setDraft([])}
-                            >
-                              {t('collection-clear')}
-                            </button>
-                          </div>
-                          <p>{t('collection-fill')}</p>
-                          <Show when={avatar().id} keyed>
-                            {(_id) => (
-                              <DeckWorkbench
-                                draft={draft()}
-                                change={setDraft}
-                                collection={snapshot().collection}
-                                schools={avatar().schools}
-                                mastery={
-                                  (snapshot().recruitment?.level ?? 0) >= 7
-                                    ? snapshot().advancement?.mastery
-                                    : undefined
-                                }
-                                pictures={pictures()}
-                                disabled={
-                                  loading() ||
-                                  (!guest() && (snapshot().recruitment?.level ?? 1) < 2)
-                                }
-                              />
-                            )}
+                              {t('collection-test-deck')}
+                            </A>
                           </Show>
-                          <div class="collection-presets">
-                            <Show when={!guest() && (snapshot().recruitment?.level ?? 1) < 7}>
-                              <p>{t('collection-presets-locked')}</p>
-                            </Show>
-                            <For each={avatar().archived_decks ?? []}>
-                              {(deck, index) => (
-                                <button type="button" onClick={() => setDraft([...deck])}>
-                                  {t('collection-archived-deck', { tier: index() + 1 })}
-                                </button>
-                              )}
-                            </For>
+                          <button
+                            type="button"
+                            class="primary"
+                            disabled={
+                              loading() ||
+                              !changed() ||
+                              !isPlayableAvatar(avatar().template_id) ||
+                              (!guest() && (snapshot().recruitment?.level ?? 1) < 2)
+                            }
+                            onClick={() =>
+                              void mutate({
+                                action: 'deck',
+                                id: avatar().id,
+                                revision: avatar().deck_revision,
+                                cards: draft(),
+                              })
+                            }
+                          >
+                            {t('collection-save-deck')}
+                          </button>
+                          <button
+                            type="button"
+                            disabled={!guest() && (snapshot().recruitment?.level ?? 1) < 2}
+                            onClick={() => setDraft([])}
+                          >
+                            {t('collection-clear')}
+                          </button>
+                        </div>
+                        <Show when={draft().length < content.rules.deck.size}>
+                          <p>{t('collection-fill')}</p>
+                        </Show>
+                        <Show when={avatar().id} keyed>
+                          {(_id) => (
+                            <DeckWorkbench
+                              draft={draft()}
+                              change={setDraft}
+                              collection={snapshot().collection}
+                              schools={avatar().schools}
+                              mastery={
+                                (snapshot().recruitment?.level ?? 0) >= 7
+                                  ? snapshot().advancement?.mastery
+                                  : undefined
+                              }
+                              pictures={pictures()}
+                              disabled={
+                                loading() || (!guest() && (snapshot().recruitment?.level ?? 1) < 2)
+                              }
+                            />
+                          )}
+                        </Show>
+                        {/* Saved decks open at account level 7; earlier decks of a reborn character stay. */}
+                        <div class="collection-presets">
+                          <For each={avatar().archived_decks ?? []}>
+                            {(deck, index) => (
+                              <button type="button" onClick={() => setDraft([...deck])}>
+                                {t('collection-archived-deck', { tier: index() + 1 })}
+                              </button>
+                            )}
+                          </For>
+                          <Show when={guest() || (snapshot().recruitment?.level ?? 1) >= 7}>
                             <label>
                               {t('collection-preset-name')}{' '}
                               <input
@@ -501,7 +519,6 @@ export function Collection() {
                               type="button"
                               disabled={
                                 loading() ||
-                                (!guest() && (snapshot().recruitment?.level ?? 1) < 7) ||
                                 !presetName().trim() ||
                                 snapshot().presets.length >= content.rules.deck.saved_presets_max
                               }
@@ -542,12 +559,12 @@ export function Collection() {
                                 </div>
                               )}
                             </For>
-                          </div>
-                        </section>
-                      </>
-                    )}
-                  </Show>
-                </div>
+                          </Show>
+                        </div>
+                      </section>
+                    </>
+                  )}
+                </Show>
               </div>
             </>
           )}

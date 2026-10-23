@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { accessible } from '../accessibility';
+import { chooseLanguage } from '../language';
 
 test('public legal documents, licenses and deletion route work without an installed app', async ({
   page,
@@ -25,7 +26,7 @@ test('public legal documents, licenses and deletion route work without an instal
     }),
   ).toBeVisible();
   expect(api).toBe(0);
-  await page.getByRole('combobox', { name: 'Język' }).selectOption('en');
+  await chooseLanguage(page, 'en');
   await page
     .getByRole('link', { name: 'Delete a Spellgambit: Arcane Class account', exact: true })
     .click();

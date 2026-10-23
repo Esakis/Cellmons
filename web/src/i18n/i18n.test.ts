@@ -7,6 +7,7 @@ import enBase from '../generated/en.ftl?raw';
 import plBase from '../generated/pl.ftl?raw';
 import '../app/cardCatalog';
 import enUi from './en.ftl?raw';
+import { playerName, setLanguage } from './index';
 import plUi from './pl.ftl?raw';
 
 describe('translations', () => {
@@ -28,4 +29,13 @@ describe('translations', () => {
       }
     });
   }
+});
+
+it('names bots in the player language and leaves people as they are', () => {
+  setLanguage('pl');
+  expect(playerName('[AI] Circle Adept 12')).toBe('Adept Kręgu · poz. 12');
+  setLanguage('en');
+  expect(playerName('[AI] Battlemaster 3')).toBe('Battlemaster · lv. 3');
+  expect(playerName('[AI] Unknown 3')).toBe('[AI] Unknown 3');
+  expect(playerName('Alice_7')).toBe('Alice_7');
 });

@@ -98,6 +98,19 @@ export function DeckWorkbench(props: {
       </div>
     );
   }
+  // Focus and stamina costs as two coins on the picture's corner, like the cards on the duel board.
+  function Cost(card: Card) {
+    return (
+      <span
+        class="deck-cost"
+        role="img"
+        aria-label={`${t('focus')} ${card.cost.focus}, ${t('stamina')} ${card.cost.stamina}`}
+      >
+        <b class="deck-cost-focus">{card.cost.focus}K</b>
+        <b class="deck-cost-stamina">{card.cost.stamina}W</b>
+      </span>
+    );
+  }
   function Tile(card: Card) {
     return (
       <article class="deck-card" classList={{ 'deck-card-unusable': !usable(card) }}>
@@ -110,14 +123,13 @@ export function DeckWorkbench(props: {
           <img src={props.pictures.get(card.key)} alt="" width="160" height="100" loading="lazy" />
           <strong>{t(fluentKey(card.key))}</strong>
         </button>
-        <Show when={props.mastery}>
+        {Cost(card)}
+        {/* Every card starts at mastery 1/5; the tile shows only progress beyond it. */}
+        <Show when={props.mastery && masteryLevel(card.id) > 1}>
           <small class="mastery-badge">
             {t('collection-mastery', { level: masteryLevel(card.id) })}
           </small>
         </Show>
-        <small class="deck-cost">
-          K {card.cost.focus} · W {card.cost.stamina}
-        </small>
         <Show when={!usable(card)}>
           <small class="deck-warning">{t('collection-requirements-missing')}</small>
         </Show>
@@ -200,41 +212,45 @@ export function DeckWorkbench(props: {
                 {(name) => <option value={name}>{t(`school-${name}-name`)}</option>}
               </For>
             </select>
-            <select
-              aria-label={t('collection-rarity')}
-              value={rarity()}
-              onChange={(e) => {
-                setRarity(e.currentTarget.value);
-                setLimit(24);
-              }}
-            >
-              <option value="">{t('collection-all')}</option>
-              <For each={['bronze', 'silver', 'gold']}>
-                {(name) => <option value={name}>{t(`collection-rarity-${name}`)}</option>}
-              </For>
-            </select>
-            <label>
-              <input
-                type="checkbox"
-                checked={ownedOnly()}
+            {/* Search and school stay at hand; the rarer filters wait behind one line. */}
+            <details class="collection-more-filters">
+              <summary>{t('collection-more-filters')}</summary>
+              <select
+                aria-label={t('collection-rarity')}
+                value={rarity()}
                 onChange={(e) => {
-                  setOwnedOnly(e.currentTarget.checked);
+                  setRarity(e.currentTarget.value);
                   setLimit(24);
                 }}
-              />
-              {t('collection-owned')}
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={castable()}
-                onChange={(e) => {
-                  setCastable(e.currentTarget.checked);
-                  setLimit(24);
-                }}
-              />
-              {t('collection-castable')}
-            </label>
+              >
+                <option value="">{t('collection-all')}</option>
+                <For each={['bronze', 'silver', 'gold']}>
+                  {(name) => <option value={name}>{t(`collection-rarity-${name}`)}</option>}
+                </For>
+              </select>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={ownedOnly()}
+                  onChange={(e) => {
+                    setOwnedOnly(e.currentTarget.checked);
+                    setLimit(24);
+                  }}
+                />
+                {t('collection-owned')}
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={castable()}
+                  onChange={(e) => {
+                    setCastable(e.currentTarget.checked);
+                    setLimit(24);
+                  }}
+                />
+                {t('collection-castable')}
+              </label>
+            </details>
           </div>
           <div class="collection-cards">
             <For each={visible().slice(0, limit())} fallback={<p>{t('collection-no-cards')}</p>}>
@@ -275,7 +291,7 @@ export function DeckWorkbench(props: {
               </p>
             </Show>
             <p>
-              K {card().cost.focus} · W {card().cost.stamina} ·{' '}
+              {t('focus')} {card().cost.focus} · {t('stamina')} {card().cost.stamina} ·{' '}
               {t(`collection-rarity-${card().rarity}`)}
             </p>
             <ul class="deck-requirements">
@@ -307,9 +323,7 @@ export function DeckWorkbench(props: {
                       <article>
                         <img src={props.pictures.get(card().key)} alt="" width="160" height="100" />
                         <strong>{t(fluentKey(card().key))}</strong>
-                        <small>
-                          K {card().cost.focus} · W {card().cost.stamina}
-                        </small>
+                        {Cost(card())}
                       </article>
                     )}
                   </Show>

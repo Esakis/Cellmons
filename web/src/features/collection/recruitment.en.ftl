@@ -1,7 +1,6 @@
 recruit-title = Character recruitment
 recruit-level = Account level { $level }
 recruit-ready = Ready to claim: { $count }
-recruit-intro = Grow your account and choose more classes. Each reward remains yours even if you claim it later.
 recruit-milestones = Account level rewards
 recruit-pick = Choose a reward
 recruit-locked = Locked

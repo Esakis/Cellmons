@@ -1,7 +1,16 @@
 import { expect, type Page, test } from '@playwright/test';
+import { chooseLanguage } from '../language';
 
 async function checkMap(page: Page, name: string) {
   await expect(page.locator('.town-place')).toHaveCount(10);
+  // After a visit to Settings the map is mounted again; wait for its painting.
+  await expect
+    .poll(() =>
+      page
+        .locator('.town-canvas > img')
+        .evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0),
+    )
+    .toBe(true);
   const geometry = await page.locator('.town').evaluate((town) => {
     const canvas = town.querySelector('.town-canvas') as HTMLElement;
     const image = canvas.querySelector('img') as HTMLImageElement;
@@ -95,32 +104,33 @@ test('all town destinations stay on the painting, fit the screen and open the ri
   await expect(page.getByTestId('connection-status')).toHaveText('Connected');
   for (const size of sizes) {
     await page.setViewportSize(size);
-    for (const language of ['en', 'pl']) {
-      await page.locator('header select').selectOption(language);
+    for (const language of ['en', 'pl'] as const) {
+      await chooseLanguage(page, language);
       await checkMap(page, `${language}-${size.width}`);
     }
   }
-  await page.locator('header select').selectOption('en');
+  await chooseLanguage(page, 'en');
   // The painted training courtyard itself is also a hit target, not just its label.
   await page.locator('.town-shape').nth(8).click();
-  await expect(page.getByRole('heading', { name: 'Training', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Sparring', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Map', exact: true }).click();
   for (const [place, title] of [
-    ['training', 'Training'],
+    ['training', 'Sparring'],
     ['arena', 'Arena'],
     ['ranked', 'Ranked Arena'],
     ['castle', 'Castle'],
     ['portal', 'Portal'],
     ['bazaar', 'Bazaar'],
-    ['shop', 'Shop'],
-    ['tower', 'Tower'],
   ]) {
     await page.locator(`.town-place[data-place=${place}]`).click();
     await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'Map', exact: true }).click();
   }
+  // The library, the shop and the tower (and the clan hall without a clan) are pages.
   for (const [place, route] of [
     ['library', '/collection'],
+    ['shop', '/store'],
+    ['tower', '/clans'],
     ['clan', '/clans'],
   ]) {
     await page.locator(`.town-place[data-place=${place}]`).click();

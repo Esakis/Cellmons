@@ -19,7 +19,7 @@ import type {
   DuelSnapshot,
 } from '../../generated/proto/game/v1/online_duel_pb';
 import type { DuelEvent, DuelMove, TrainingView } from '../../generated/proto/game/v1/training_pb';
-import { hasTranslation, t } from '../../i18n';
+import { hasTranslation, playerName, t } from '../../i18n';
 import type { ClientBody, ServerBody } from '../../net/client';
 // The board comes with the offline bundle the app already keeps, not as a second copy.
 import {
@@ -31,6 +31,7 @@ import {
   DecisionTable,
   errorText,
   eventText,
+  legendOpen,
   loadPictures,
   quietEvents,
   type RoundRecord,
@@ -96,8 +97,8 @@ export function OnlineDuel(props: {
     Math.max(0, Math.ceil((Number(props.snapshot.deadlineMs) - props.now) / 1000)),
   );
   const logins = (): [string, string] => [
-    props.snapshot.you?.login ?? '',
-    props.snapshot.opponent?.login ?? '',
+    playerName(props.snapshot.you?.login ?? ''),
+    playerName(props.snapshot.opponent?.login ?? ''),
   ];
   const avatarIds = (): [number, number] => [
     props.snapshot.you?.pathId || props.snapshot.you?.templateId || 0,
@@ -229,7 +230,7 @@ export function OnlineDuel(props: {
     if (!locked()) setDraft(next);
   };
   useDuelKeys({
-    ignore: () => !!inspect() || showChronicle() || confirm(),
+    ignore: () => !!inspect() || showChronicle() || confirm() || legendOpen(),
     animating: sim.animating,
     skip: sim.skip,
     canReplay: () => events().length > 0 && !sim.animating(),
@@ -263,12 +264,6 @@ export function OnlineDuel(props: {
       data-testid="online-duel"
       ref={root}
     >
-      <Show when={props.tutorial && !finished()}>
-        <aside class="lobby-journey">
-          <strong>{t('online-tutorial-title')}</strong>
-          <p>{t((view()?.round ?? 1) === 1 ? 'online-tutorial-first' : 'online-tutorial-next')}</p>
-        </aside>
-      </Show>
       <Show when={view()}>
         {(state) => (
           <Show
@@ -290,7 +285,7 @@ export function OnlineDuel(props: {
                 previous={state().round > 1}
                 locked={locked()}
                 pending={false}
-                clock={remaining()}
+                clock={`${remaining()} s`}
                 clockLabel={t('online-deadline', { seconds: remaining() })}
                 result={
                   <section class={`${boardStyles.result} online-result`} role="status">
@@ -315,9 +310,12 @@ export function OnlineDuel(props: {
                       {(end) => (
                         <>
                           <p>
-                            +{end().xpGained} PD · {end().ratingDelta >= 0 ? '+' : ''}
-                            {end().ratingDelta} RP · {end().ratingNew} RP · +{end().ducatsGained}{' '}
-                            {t('store-ducats')}
+                            {t('online-reward', {
+                              xp: end().xpGained,
+                              rating: end().ratingNew,
+                              delta: `${end().ratingDelta >= 0 ? '+' : ''}${end().ratingDelta}`,
+                              ducats: end().ducatsGained,
+                            })}
                           </p>
                           <Show when={end().unlockedTemplate}>
                             <p>
@@ -331,6 +329,11 @@ export function OnlineDuel(props: {
                         </>
                       )}
                     </Show>
+                    <Show when={finished() && !props.replay}>
+                      <button type="button" class="primary" onClick={props.close}>
+                        {t('close')}
+                      </button>
+                    </Show>
                   </section>
                 }
                 message={
@@ -341,7 +344,14 @@ export function OnlineDuel(props: {
                         ? errorText(preview()?.preview?.error ?? '')
                         : draft().action
                           ? `${t(draft().action === 1 ? 'cast' : 'discard')}: ${cardName(state().hand[draft().handIndex] ?? 0)}`
-                          : t('choose-sequence')}{' '}
+                          : // The tutorial's single hint replaces the usual prompt, inside the board.
+                            t(
+                              !props.tutorial
+                                ? 'choose-sequence'
+                                : state().round === 1
+                                  ? 'online-tutorial-first'
+                                  : 'online-tutorial-next',
+                            )}{' '}
                     · {opponentStatus()}
                   </Show>
                 }
@@ -357,23 +367,27 @@ export function OnlineDuel(props: {
                         {t('online-forfeit')}
                       </button>
                     </Show>
-                    <button type="button" class="secondary" onClick={() => setShowChronicle(true)}>
-                      {t('chronicle')}
-                    </button>
-                    <button
-                      type="button"
-                      class="secondary"
-                      disabled={!events().length}
-                      onClick={replayRound}
-                    >
-                      {t('replay')}
-                    </button>
+                    {/* The chronicle and the replay exist from the second round on. */}
+                    <Show when={events().length}>
+                      <button
+                        type="button"
+                        class="secondary"
+                        onClick={() => setShowChronicle(true)}
+                      >
+                        {t('chronicle')}
+                      </button>
+                      <button type="button" class="secondary" onClick={replayRound}>
+                        {t('replay')}
+                      </button>
+                    </Show>
                     <Show
                       when={!finished() && !props.replay}
                       fallback={
-                        <button type="button" class="primary" onClick={props.close}>
-                          {t('close')}
-                        </button>
+                        <Show when={props.replay}>
+                          <button type="button" class="primary" onClick={props.close}>
+                            {t('close')}
+                          </button>
+                        </Show>
                       }
                     >
                       <button
@@ -418,7 +432,8 @@ export function OnlineDuel(props: {
           </Show>
         )}
       </Show>
-      <Show when={log().length}>
+      {/* A live duel has its chronicle; the written log belongs to replays. */}
+      <Show when={props.replay && log().length}>
         <details>
           <summary>{t('online-log')}</summary>
           <For each={log()}>

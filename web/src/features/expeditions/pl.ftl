@@ -1,4 +1,5 @@
 exp-title = Wyprawy
+exp-rules = Zasady i nagrody
 exp-help = Na każdym etapie wybierz jednego z trzech przeciwników, a na końcu pokonaj bossa. Postać i talia są zarezerwowane na czas wyprawy. Każda walka zaczyna się z pełnym Ż i W. Przegrana lub remis kończy wyprawę i odbiera zebrane PD. Między walkami można się wycofać, zachowując część PD. Wyprawy nie zmieniają rankingu.
 exp-rewards = Pokonanie bossa daje wszystkie zebrane PD i stałą nagrodę Dukatów, po czym losowany jest jeden rozłączny bonus: { $avatar }% na nieposiadaną postać wskazanej rzadkości, { $card }% na kartę, { $ducats }% na dodatkowe Dukaty. Gdy posiadasz wszystkie pasujące postacie, ich losowanie nie daje dodatkowej nagrody. Cienie i klasy z wysypiska są wyłączone.
 exp-verify = Potwierdź e-mail, aby rozpoczynać wyprawy i wybierać przeciwników.
@@ -11,7 +12,7 @@ exp-error-LEVEL_REQUIRED = Wyprawy wymagają poziomu konta 4, a Męka poziomu 25
 exp-rarity-common = pospolita
 exp-rarity-uncommon = niepospolita
 exp-rarity-rare = rzadka
-exp-offer = { $stages } etapów z bossem · gwarantowane { $fixed } D · możliwa postać ({ $rarity }) lub dodatkowe { $random } D
+exp-offer = { $stages } etapów z bossem · gwarantowane { $fixed } dukatów · możliwa postać ({ $rarity }) lub dodatkowe { $random } dukatów
 exp-start = Rozpocznij wyprawę
 exp-opponent = Przeciwnik
 exp-card = Karta

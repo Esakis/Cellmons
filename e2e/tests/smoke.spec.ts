@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 import { accessible } from '../accessibility';
+import { chooseLanguage } from '../language';
 
 test('strona startowa pokazuje postacie, boty i przełącza język', async ({ page }, info) => {
   await page.addInitScript(() => localStorage.setItem('game.language', 'pl'));
@@ -29,6 +30,6 @@ test('strona startowa pokazuje postacie, boty i przełącza język', async ({ pa
   await expect(page.locator('button[aria-pressed="false"]')).toHaveCount(released.length + 2);
   await expect(page.getByRole('button', { name: /Wampir/ })).toBeVisible();
   await expect(page.getByRole('button', { name: /Runotechnik/ })).toHaveCount(0);
-  await page.getByRole('combobox', { name: 'Język' }).selectOption('en');
+  await chooseLanguage(page, 'en');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Your move. Your magic.');
 });

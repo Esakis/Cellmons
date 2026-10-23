@@ -55,17 +55,21 @@ function snapshot(round: number, damage: number, revision = 7, duelId = 'first')
 it('labels completed rounds correctly, including the final round, and resets for a new duel', () => {
   setLanguage('en');
   const [value, setValue] = createSignal(snapshot(1, 11));
-  const { container } = render(() => (
+  const { container, getByRole } = render(() => (
     <OnlineDuel snapshot={value()} connected={false} now={0} send={vi.fn()} close={vi.fn()} />
   ));
-  const headings = () => [...container.querySelectorAll('details h3')].map((h) => h.textContent);
-  expect(headings()).toEqual(['Round 1 / 5']);
+  // A live duel keeps its rounds in the chronicle; the written log is shown only in replays.
+  expect(container.querySelector('details')).toBeNull();
+  fireEvent.click(getByRole('button', { name: 'Battle chronicle' }));
+  const rounds = () => [...container.querySelectorAll('caption')].map((c) => c.textContent);
+  const log = () => container.querySelector('dialog details')?.textContent;
+  expect(rounds()).toEqual(['Round 1']);
   setValue(snapshot(5, 55, 8));
-  expect(headings()).toEqual(['Round 1 / 5', 'Round 5 / 5']);
+  expect(rounds()).toEqual(['Round 5', 'Round 1']);
   setValue(snapshot(1, 22, 0, 'second'));
-  expect(headings()).toEqual(['Round 1 / 5']);
-  expect(container.querySelector('details')?.textContent).toContain('22 damage');
-  expect(container.querySelector('details')?.textContent).not.toContain('55 damage');
+  expect(rounds()).toEqual(['Round 1']);
+  expect(log()).toContain('22 damage');
+  expect(log()).not.toContain('55 damage');
 });
 
 it('updates replay events in both directions even when all snapshots share a revision', () => {

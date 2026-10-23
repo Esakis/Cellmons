@@ -27,6 +27,7 @@ import {
   DecisionTable,
   errorText,
   eventText,
+  legendOpen,
   loadPictures,
   type RoundRecord,
   SimulationBoard,
@@ -55,7 +56,6 @@ export function Duel() {
   const [history, setHistory] = createSignal<RoundRecord[]>([]);
   const sim = createSimulation();
   let lastRoundStart: TrainingView | undefined;
-  const [seconds, setSeconds] = createSignal(0);
   let client: TrainingClient;
   let previewGeneration = 0;
   let leave: (() => void) | undefined;
@@ -79,7 +79,6 @@ export function Duel() {
       setPreview(reply.preview);
       setCastOptions(reply.castOptions);
       setPendingPreview(false);
-      setSeconds(0);
       setDuelActive(!reply.view?.outcome);
     });
   }
@@ -184,7 +183,7 @@ export function Duel() {
     leave = undefined;
   }
   useDuelKeys({
-    ignore: () => !!inspect() || showChronicle() || confirmLeave(),
+    ignore: () => !!inspect() || showChronicle() || confirmLeave() || legendOpen(),
     animating: sim.animating,
     skip: sim.skip,
     canReplay: () => events().length > 0 && !busy() && !sim.animating(),
@@ -203,10 +202,6 @@ export function Duel() {
     loadPictures();
     client = new TrainingClient();
     void start();
-    const clock = setInterval(() => {
-      if (!locked() && !document.hidden) setSeconds((s) => s + 1);
-    }, 1000);
-    onCleanup(() => clearInterval(clock));
   });
   onCleanup(() => {
     disposed = true;
@@ -257,8 +252,6 @@ export function Duel() {
                   previous={history().length > 0}
                   locked={locked() || demo()}
                   pending={pendingPreview()}
-                  clock={seconds()}
-                  clockLabel={t('elapsed', { seconds: seconds() })}
                   result={
                     <Show when={state().outcome}>
                       {(result) => (
@@ -294,11 +287,13 @@ export function Duel() {
                     </Show>
                   }
                   message={
-                    preview()?.error
-                      ? errorText(preview()?.error ?? '')
-                      : draft().action
-                        ? `${t(draft().action === 1 ? 'cast' : 'discard')}: ${cardName(state().hand[draft().handIndex] ?? 0)}`
-                        : t('choose-sequence')
+                    state().outcome
+                      ? ''
+                      : preview()?.error
+                        ? errorText(preview()?.error ?? '')
+                        : draft().action
+                          ? `${t(draft().action === 1 ? 'cast' : 'discard')}: ${cardName(state().hand[draft().handIndex] ?? 0)}`
+                          : t('choose-sequence')
                   }
                   buttons={
                     <>
@@ -312,21 +307,23 @@ export function Duel() {
                           {t('forfeit')}
                         </button>
                       </Show>
-                      <button
-                        type="button"
-                        class="secondary"
-                        onClick={() => setShowChronicle(true)}
-                      >
-                        {t('chronicle')}
-                      </button>
-                      <button
-                        type="button"
-                        class="secondary"
-                        disabled={busy() || !events().length}
-                        onClick={() => void sim.animate(events(), lastRoundStart)}
-                      >
-                        {t('replay')}
-                      </button>
+                      <Show when={events().length}>
+                        <button
+                          type="button"
+                          class="secondary"
+                          onClick={() => setShowChronicle(true)}
+                        >
+                          {t('chronicle')}
+                        </button>
+                        <button
+                          type="button"
+                          class="secondary"
+                          disabled={busy()}
+                          onClick={() => void sim.animate(events(), lastRoundStart)}
+                        >
+                          {t('replay')}
+                        </button>
+                      </Show>
                       <Show when={!state().outcome}>
                         <button
                           type="button"

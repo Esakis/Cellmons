@@ -7,10 +7,6 @@
   min-width: 0;
   overflow-wrap: anywhere;
 }
-/* A slim strip of the tournament painting heads the panel. */
-.tournaments .scene img {
-  aspect-ratio: 4 / 1;
-}
 .tourney-actions {
   display: flex;
   gap: 0.5rem;
@@ -69,4 +65,9 @@
   cursor: pointer;
   min-height: 44px;
   padding-block: 0.75rem;
+}
+/* The rules behind one line: a comfortable touch target (WCAG 2.5.8). */
+.tournaments > details > summary {
+  padding-block: 10px;
+  cursor: pointer;
 }

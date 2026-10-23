@@ -27,7 +27,6 @@ auth-reset-done = Hasło zmienione. Wszystkie sesje zostały wylogowane. Zaloguj
 auth-confirmed = E-mail potwierdzony
 auth-unconfirmed = E-mail niepotwierdzony
 auth-resend = Ponów link potwierdzenia
-auth-level = Poziom { $level }, PD: { $xp }
 auth-logout = Wyloguj się
 auth-sessions = Aktywne sesje
 auth-current = (ta sesja)

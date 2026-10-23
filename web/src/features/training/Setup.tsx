@@ -1,7 +1,7 @@
 import { A } from '@solidjs/router';
 import { createSignal, For, Show } from 'solid-js';
 import { account, enterGuest } from '../../app/account';
-import { fluentKey, icon, isPlayableAvatar, playableAvatars, portrait } from '../../app/content';
+import { fluentKey, isPlayableAvatar, playableAvatars, portrait } from '../../app/content';
 import { readPreference, writePreference } from '../../app/preferences';
 import { t } from '../../i18n';
 import styles from './Training.module.css';
@@ -37,30 +37,37 @@ export function TrainingSetup() {
         <div>
           <p class="eyebrow">{t('eyebrow')}</p>
           <h1>{t('home-title')}</h1>
-          <p class={styles.intro}>{t('home-intro')}</p>
+          <ol class={styles.rules}>
+            <For each={['how-attack', 'how-defend', 'how-card']}>{(key) => <li>{t(key)}</li>}</For>
+          </ol>
         </div>
-        <div class={styles.sigil} aria-hidden="true">
-          <img src={icon('school-arcane')} alt="" />
-          <span>F · M</span>
+        {/* The way into a duel comes first; the avatar and bot below are remembered between visits. */}
+        <div class={styles.heroActions}>
+          <A class="button primary" href={`/duel?avatar=${avatarId()}&bot=${profile()}`}>
+            {t('start')}
+          </A>
+          <A href={`/duel?avatar=${avatarId()}&bot=${profile()}&demo=1`}>{t('demo')}</A>
+          <p class={styles.localNote}>{t('local-note')}</p>
         </div>
       </section>
-      <aside class="guest-entry">
-        <Show
-          when={account()?.kind === 'guest'}
-          fallback={
-            <>
-              <p>{t('auth-guest-short')}</p>
-              <button type="button" onClick={enterGuest}>
-                {t('auth-play-guest')}
-              </button>
-              <A href="/account">{t('auth-account')}</A>
-            </>
-          }
-        >
-          <p role="status">{t('auth-guest-active')}</p>
-          <A href="/account">{t('auth-account')}</A>
-        </Show>
-      </aside>
+      {/* A signed-in player needs no invitation to play as a guest. */}
+      <Show when={account()?.kind !== 'account'}>
+        <aside class="guest-entry">
+          <Show
+            when={account()?.kind === 'guest'}
+            fallback={
+              <>
+                <p>{t('auth-guest-short')}</p>
+                <button type="button" onClick={enterGuest}>
+                  {t('auth-play-guest')}
+                </button>
+              </>
+            }
+          >
+            <p role="status">{t('auth-guest-active')}</p>
+          </Show>
+        </aside>
+      </Show>
       <div class={styles.setupGrid}>
         <section class={styles.avatarSection} aria-labelledby="avatars-title">
           <div class={styles.sectionHeading}>
@@ -93,7 +100,7 @@ export function TrainingSetup() {
                     {t(`school-${avatar.starter_for ?? Object.keys(avatar.schools)[0]}-name`)}
                   </span>
                   <span class={styles.choiceStats}>
-                    {avatar.base.hp} {t('hp')} · {avatar.base.stamina} W
+                    {t('hp')} {avatar.base.hp} · {t('stamina')} {avatar.base.stamina}
                   </span>
                 </button>
               )}
@@ -126,26 +133,8 @@ export function TrainingSetup() {
               )}
             </For>
           </div>
-          <A class="button primary" href={`/duel?avatar=${avatarId()}&bot=${profile()}`}>
-            {t('start')} <span aria-hidden="true">↗</span>
-          </A>
-          <A class="button secondary" href={`/duel?avatar=${avatarId()}&bot=${profile()}&demo=1`}>
-            {t('demo')}
-          </A>
-          <p class={styles.localNote}>{t('local-note')}</p>
         </section>
       </div>
-      <section class={styles.guide}>
-        <h2>{t('how-title')}</h2>
-        <For each={['how-attack', 'how-defend', 'how-card']}>
-          {(key, index) => (
-            <p>
-              <span>0{index() + 1}</span>
-              {t(key)}
-            </p>
-          )}
-        </For>
-      </section>
     </div>
   );
 }

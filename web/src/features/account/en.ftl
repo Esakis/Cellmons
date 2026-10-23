@@ -27,7 +27,6 @@ auth-reset-done = Password changed. All sessions were signed out. Sign in with y
 auth-confirmed = Email verified
 auth-unconfirmed = Email not verified
 auth-resend = Resend verification link
-auth-level = Level { $level }, XP: { $xp }
 auth-logout = Sign out
 auth-sessions = Active sessions
 auth-current = (this session)

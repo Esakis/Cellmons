@@ -35,6 +35,18 @@ import styles from './Training.module.css';
 // The duel board shared by offline training and online duels: character panels, the decision
 // table, the round simulation and the chronicle. Each screen supplies its own data and actions.
 const cardKeys = ['q', 'w', 'e', 'r', 't'];
+// The board's legend: open while shown, so the duel keys pause (Training.tsx, OnlineDuel.tsx).
+export const [legendOpen, setLegendOpen] = createSignal(false);
+const legendKeys = [
+  'legend-trays',
+  'legend-stats',
+  'legend-health',
+  'legend-stamina',
+  'legend-focus',
+  'legend-initiative',
+  'legend-previous',
+  'shortcuts',
+];
 const attackEvents = ['hit', 'block', 'miss'];
 type Fx = { tone: 'damage' | 'heal' | 'block' | 'miss'; text: string; ms: number; delay: number };
 export type RoundRecord = { round: number; events: DuelEvent[] };
@@ -151,13 +163,10 @@ function HealthGauge(props: { side: DuelSide }) {
 
 // Card face shared by the hand and the played card: name with focus cost, illustration,
 // school requirements with stamina cost and the description.
-function CardFace(props: { card: Card; focus: number; stamina: number; hotkey?: string }) {
+function CardFace(props: { card: Card; focus: number; stamina: number }) {
   return (
     <>
       <span class={styles.cardTop}>
-        <Show when={props.hotkey}>
-          <kbd>{props.hotkey}</kbd>
-        </Show>
         <strong>{cardName(props.card.id)}</strong>
         <b class={styles.focusBadge}>
           {props.focus}
@@ -327,10 +336,7 @@ function SideCard(props: {
         aria-label={t('hp')}
       />
       <section class={styles.enchantments} aria-label={t('enchantments')}>
-        <For
-          each={props.enchanted.filter((e) => e.side === props.owner)}
-          fallback={<small>{t('no-enchantments')}</small>}
-        >
+        <For each={props.enchanted.filter((e) => e.side === props.owner)}>
           {(e) => <span title={cardDescription(cards.get(e.cardId))}>✦ {cardName(e.cardId)}</span>}
         </For>
       </section>
@@ -502,6 +508,7 @@ function Chronicle(props: {
                           {(side) => (
                             <td
                               data-result={attack(side, slot)?.event.kind}
+                              data-side={side}
                               data-active={i() === 0 && attack(side, slot)?.index === props.playing}
                             >
                               <Show when={attack(side, slot)} fallback="…">
@@ -519,7 +526,7 @@ function Chronicle(props: {
                                       )}
                                     />
                                     {cell().event.kind === 'hit'
-                                      ? `−${cell().event.amount}`
+                                      ? `${side === 0 ? '' : '−'}${cell().event.amount}`
                                       : t(cell().event.kind === 'block' ? 'fx-block' : 'fx-miss')}
                                   </>
                                 )}
@@ -871,8 +878,9 @@ export function DecisionTable(props: {
   previous: boolean;
   locked: boolean;
   pending: boolean;
-  clock: number;
-  clockLabel: string;
+  // The online deadline; training rounds have no clock.
+  clock?: string;
+  clockLabel?: string;
   // Shown in the centre instead of the trays once the duel has ended.
   result: JSX.Element;
   message: JSX.Element;
@@ -882,7 +890,11 @@ export function DecisionTable(props: {
 }) {
   let hold: ReturnType<typeof setTimeout> | undefined;
   let held = false;
-  onCleanup(() => clearTimeout(hold));
+  onCleanup(() => {
+    clearTimeout(hold);
+    // A round resolved under an open legend: the next decision starts without it.
+    setLegendOpen(false);
+  });
   const focus = (index: number, card: Card) => {
     const option = props.castOptions[index];
     return option
@@ -951,12 +963,7 @@ export function DecisionTable(props: {
               {props.view.me?.focus}
               <small>K</small>
             </span>
-            <div class={styles.roundTitle}>
-              {props.heading}
-              <small>
-                {t('initiative', { name: props.labels[props.view.initiative === 0 ? 0 : 1] })}
-              </small>
-            </div>
+            <div class={styles.roundTitle}>{props.heading}</div>
             <span class={styles.focusOrb} title={t('stat-Focus')}>
               {props.view.opponent?.focus}
               <small>K</small>
@@ -971,7 +978,9 @@ export function DecisionTable(props: {
                 label={t('opponent-prev-defenses')}
                 kinds={props.previous ? props.view.opponent?.defenses : undefined}
               />
-              <small class={styles.opponentCaption}>{t('opponent-prev')}</small>
+              <Show when={props.previous}>
+                <small class={styles.opponentCaption}>{t('opponent-prev')}</small>
+              </Show>
               <OpponentRow
                 label={t('opponent-prev-attacks')}
                 kinds={props.previous ? props.view.opponent?.attacks : undefined}
@@ -980,19 +989,23 @@ export function DecisionTable(props: {
               <span class={styles.rowLabel}>{t('defense')}</span>
             </div>
             <div class={styles.timerBox}>
-              <strong title={props.clockLabel}>{props.clock}</strong>
+              <Show when={props.clock !== undefined}>
+                <strong title={props.clockLabel}>{props.clock}</strong>
+              </Show>
               <span>
                 {t('focus-cost', {
                   cost: props.preview?.focusCost ?? 0,
                   after: props.preview?.focusAfter ?? 0,
                 })}
               </span>
-              <small>
-                {t('stamina-cost', {
-                  spell: props.preview?.staminaCost ?? 0,
-                  attacks: props.preview?.maxAttackStamina ?? 0,
-                })}
-              </small>
+              <Show when={props.draft.action === 1}>
+                <small>
+                  {t('stamina-cost', {
+                    spell: props.preview?.staminaCost ?? 0,
+                    attacks: props.preview?.maxAttackStamina ?? 0,
+                  })}
+                </small>
+              </Show>
             </div>
           </Show>
         </div>
@@ -1058,7 +1071,6 @@ export function DecisionTable(props: {
                           card={card()}
                           focus={focus(index(), card())}
                           stamina={stamina(index(), card())}
-                          hotkey={cardKeys[index()]?.toUpperCase()}
                         />
                       </button>
                       <div class={styles.cardActions}>
@@ -1108,8 +1120,26 @@ export function DecisionTable(props: {
         <p class={styles.validation} aria-live="polite">
           {props.message}
         </p>
-        <div class={styles.commandButtons}>{props.buttons}</div>
+        <div class={styles.commandButtons}>
+          <button
+            type="button"
+            class="quiet"
+            aria-label={t('legend-title')}
+            title={t('legend-title')}
+            onClick={() => setLegendOpen(true)}
+          >
+            ?
+          </button>
+          {props.buttons}
+        </div>
       </div>
+      <Show when={legendOpen()}>
+        <Modal title={t('legend-title')} close={() => setLegendOpen(false)}>
+          <ul class={styles.legend}>
+            <For each={legendKeys}>{(key) => <li>{t(key)}</li>}</For>
+          </ul>
+        </Modal>
+      </Show>
     </section>
   );
 }

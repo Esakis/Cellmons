@@ -13,6 +13,7 @@ export {
   DecisionTable,
   errorText,
   eventText,
+  legendOpen,
   loadPictures,
   quietEvents,
   type RoundRecord,

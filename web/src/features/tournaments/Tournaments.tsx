@@ -2,7 +2,6 @@ import { createEffect, createSignal, For, lazy, onCleanup, Show, untrack } from 
 import { ApiError, account, accountEpoch, api } from '../../app/account';
 import { avatars, content, fluentKey } from '../../app/content';
 import { Modal } from '../../components/Modal';
-import { Scene } from '../../components/Scene';
 import { addTranslations, hasTranslation, t } from '../../i18n';
 import type { ClientBody, ServerBody } from '../../net/client';
 import en from './en.ftl?raw';
@@ -11,14 +10,6 @@ import type { Mutation, Pair, Profile, Snapshot, Terms } from './types';
 import './tournaments.css';
 
 addTranslations({ pl, en });
-// The tournament painting heads the panel in the Castle (art/paintings/scenes).
-const [painting] = Object.values(
-  import.meta.glob<string>('../../assets/paintings/scenes/tournament.avif', {
-    eager: true,
-    query: '?url',
-    import: 'default',
-  }),
-);
 const TournamentCard = lazy(() =>
   import('../../app/CardCatalogView').then((m) => ({ default: m.TournamentCard })),
 );
@@ -205,16 +196,19 @@ export function Tournaments(props: {
     user()?.email_verified;
   return (
     <section class="tournaments" data-testid="tournaments">
-      <Scene src={painting}>
-        <h2 class="plaque">{t('tourney-title')}</h2>
-      </Scene>
-      <p>
-        {t('tourney-help', {
-          first: data()?.first_fight_s ?? 20,
-          next: data()?.next_fight_s ?? 15,
-          grace: data()?.ready_grace_s ?? 90,
-        })}
-      </p>
+      {/* The Castle's own painting is above; the panel needs only its name. */}
+      <h2>{t('tourney-title')}</h2>
+      {/* The timing rules matter once a tournament runs; until then they wait behind one line. */}
+      <details>
+        <summary>{t('tourney-rules')}</summary>
+        <p>
+          {t('tourney-help', {
+            first: data()?.first_fight_s ?? 20,
+            next: data()?.next_fight_s ?? 15,
+            grace: data()?.ready_grace_s ?? 90,
+          })}
+        </p>
+      </details>
       <Show when={!user()?.email_verified}>
         <p>{t('tourney-verify')}</p>
       </Show>
@@ -348,40 +342,44 @@ export function Tournaments(props: {
         </form>
       </Show>
       <ul class="tourney-catalog">
-        <For each={data()?.catalog}>
+        <For each={data()?.catalog} fallback={<li>{t('tourney-none')}</li>}>
           {(item) => (
             <li>
               <button type="button" onClick={() => select(item.id)}>
                 {item.name}
               </button>{' '}
-              · {t(`tourney-status-${item.status}`)} · {item.enrolled} · {item.balance} D
+              · {t(`tourney-status-${item.status}`)} · {item.enrolled} ·{' '}
+              {t('tourney-pool', { value: item.balance })}
             </li>
           )}
         </For>
       </ul>
-      <div class="tourney-actions">
-        <button
-          type="button"
-          disabled={page() === 0}
-          onClick={() => {
-            setPage((p) => p - 1);
-            void load();
-          }}
-        >
-          {t('tourney-previous')}
-        </button>
-        <span>{page() + 1}</span>
-        <button
-          type="button"
-          disabled={!data()?.has_more}
-          onClick={() => {
-            setPage((p) => p + 1);
-            void load();
-          }}
-        >
-          {t('tourney-next')}
-        </button>
-      </div>
+      {/* Paging only when there is more than one page. */}
+      <Show when={page() > 0 || data()?.has_more}>
+        <div class="tourney-actions">
+          <button
+            type="button"
+            disabled={page() === 0}
+            onClick={() => {
+              setPage((p) => p - 1);
+              void load();
+            }}
+          >
+            {t('tourney-previous')}
+          </button>
+          <span>{page() + 1}</span>
+          <button
+            type="button"
+            disabled={!data()?.has_more}
+            onClick={() => {
+              setPage((p) => p + 1);
+              void load();
+            }}
+          >
+            {t('tourney-next')}
+          </button>
+        </div>
+      </Show>
       <Show when={profile()}>
         {(p) => (
           <article class="tourney-profile">

@@ -27,46 +27,28 @@
 .hero > div:first-child {
   min-width: 0;
 }
-.intro {
+/* The three rules of a round. */
+.rules {
   max-width: 610px;
+  margin: 0;
+  padding-left: 1.3rem;
   color: var(--color-text-muted);
   line-height: 1.8;
-  margin: 0;
-  font-size: 1rem;
 }
-.sigil {
-  width: 160px;
-  height: 160px;
-  flex: 0 0 auto;
-  border: 1px solid var(--gold-dark);
-  border-radius: 50%;
+/* Start and watch, on their own panel so the small note stays readable over the painting. */
+.heroActions {
   display: grid;
-  place-items: center;
-  position: relative;
-  background: radial-gradient(circle, rgb(217 180 90 / 0.28), transparent 70%), var(--inset-bg);
-  box-shadow:
-    0 0 0 6px var(--surface),
-    0 0 0 7px var(--gold),
-    0 0 40px rgb(217 180 90 / 0.35);
+  justify-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+  width: min(100%, 270px);
+  padding: 18px;
+  border-radius: 9px;
+  background: var(--panel-bg);
+  box-shadow: var(--panel-shadow);
 }
-.sigil::before {
-  content: "";
-  position: absolute;
-  inset: 12px;
-  border: 1px dashed var(--gold);
-  border-radius: 50%;
-  opacity: 0.6;
-}
-.sigil img {
-  width: 82px;
-  height: 82px;
-  filter: var(--icon-filter) drop-shadow(0 0 8px rgb(246 221 147 / 0.6));
-}
-.sigil span {
-  position: absolute;
-  bottom: 18px;
-  font-size: 0.6rem;
-  letter-spacing: 0.3em;
+.heroActions > :global(.button) {
+  width: 100%;
 }
 .setupGrid {
   display: grid;
@@ -101,7 +83,7 @@
 }
 .avatars {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
 }
 .avatarChoice {
@@ -130,9 +112,9 @@
     0 0 24px rgb(217 180 90 / 0.3);
 }
 .avatarPortrait {
-  width: min(100%, 112px);
-  height: 112px;
-  margin-bottom: 14px;
+  width: min(100%, 88px);
+  height: 88px;
+  margin-bottom: 12px;
   border-radius: 50%;
   object-fit: cover;
   object-position: 50% 30%;
@@ -220,45 +202,12 @@
   border: 4px solid var(--selected);
   outline: 1px solid var(--accent);
 }
-.botSection > a {
-  display: flex;
-  justify-content: center;
-  margin-top: 10px;
-  gap: 16px;
-}
 .localNote {
-  font-size: 0.71rem;
-  color: var(--color-text-muted);
-  line-height: 1.7;
-  text-align: center;
-}
-.guide {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 20px;
-  margin-top: 34px;
-  padding: 24px 28px;
-  border-radius: 12px;
-  background: var(--panel-bg);
-  box-shadow: var(--panel-shadow);
-}
-.guide h2 {
-  grid-column: 1 / -1;
-  font-size: 1rem;
   margin: 0;
-}
-.guide p {
-  display: flex;
-  gap: 12px;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
   line-height: 1.6;
-  color: var(--color-text-muted);
-  margin: 0;
-}
-.guide :where(p) > span {
-  color: var(--accent);
-  font-size: 0.7rem;
-  padding-top: 2px;
+  text-align: center;
 }
 @media (max-width: 900px) {
   .setup,
@@ -268,6 +217,9 @@
   .setupGrid {
     gap: 24px;
     grid-template-columns: 1.4fr 1fr;
+  }
+  .avatars {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .avatarChoice strong {
     font-size: 0.72rem;
@@ -283,12 +235,9 @@
     padding: 20px 16px;
   }
   .hero {
+    flex-direction: column;
     padding: 24px 18px;
-    justify-content: center;
     text-align: center;
-  }
-  .sigil {
-    display: none;
   }
   .hero h1 {
     font-size: clamp(1.65rem, 7.5vw, 2.4rem);
@@ -296,7 +245,9 @@
     text-wrap: balance;
     overflow-wrap: break-word;
   }
-  .hero .intro {
+  .rules {
+    padding: 0;
+    list-style-position: inside;
     font-size: 0.875rem;
     line-height: 1.65;
     text-wrap: pretty;
@@ -320,15 +271,12 @@
     font-size: 0.57rem;
   }
   .avatars {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
   }
   .sectionHeading {
     flex-wrap: wrap;
     align-items: flex-start;
-  }
-  .guide {
-    grid-template-columns: 1fr;
-    gap: 16px;
   }
 }
 
@@ -670,6 +618,12 @@
   border: 1px solid var(--duel-panel-line);
   box-shadow: inset 0 2px 6px rgb(0 0 0 / 0.4);
 }
+/* Without enchantments the box keeps its place in the panel but shows nothing. */
+.enchantments:empty {
+  background: none;
+  border-color: transparent;
+  box-shadow: none;
+}
 .enchantments > span {
   padding: 2px 6px;
   color: var(--color-text);
@@ -729,10 +683,6 @@
   font-size: 1.3rem;
   letter-spacing: 0.06em;
   white-space: nowrap;
-}
-.roundTitle small {
-  font-size: 0.64rem;
-  color: var(--color-text-muted);
 }
 .focusOrb,
 .slotOrb {
@@ -1480,11 +1430,6 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.cardTop > kbd {
-  font-family: inherit;
-  font-size: 0.68rem;
-  color: rgb(241 223 180 / 0.6);
-}
 .focusBadge,
 .staminaBadge {
   display: inline-flex;
@@ -1814,6 +1759,24 @@
 .chronicleRound td[data-result="hit"] {
   color: var(--hit);
 }
+/* Your own hits are damage dealt, not a loss. */
+.chronicleRound td[data-side="0"][data-result="hit"] {
+  color: var(--heading);
+}
+/* The board's legend (Board.tsx). */
+.legend {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding-left: 1.1rem;
+  line-height: 1.55;
+}
+/* Touch screens have no keys: the slot numbers would only be clutter. */
+@media (hover: none) {
+  .slot kbd {
+    display: none;
+  }
+}
 .chronicleRound td[data-result="block"] {
   color: var(--block);
 }
@@ -2004,10 +1967,6 @@
     letter-spacing: 0.02em;
     white-space: normal;
   }
-  /* The badge on the name strip already marks initiative. */
-  .roundTitle small {
-    display: none;
-  }
   .focusOrb {
     width: 24px;
     height: 24px;
@@ -2057,7 +2016,7 @@
     height: 10px;
   }
   .opponentCaption {
-    font-size: 0.46rem;
+    font-size: 0.55rem;
     line-height: 1.2;
   }
   .timerBox {
@@ -2074,7 +2033,7 @@
     font-size: 0.54rem;
   }
   .timerBox small {
-    font-size: 0.45rem;
+    font-size: 0.52rem;
   }
   .result {
     padding: 8px 4px;
@@ -2127,11 +2086,9 @@
     height: 24px;
     padding: 1px 17px 1px 3px;
   }
-  .cardTop > kbd {
-    display: none;
-  }
+  /* The space the key letters used goes to readable names (two lines when needed). */
   .cardTop > strong {
-    font-size: 0.5rem;
+    font-size: 0.58rem;
     letter-spacing: 0;
   }
   .focusBadge,
@@ -2172,7 +2129,7 @@
   .card .cardActions button {
     min-height: 24px;
     padding: 1px 2px;
-    font-size: 0.5rem;
+    font-size: 0.56rem;
   }
   /* Details: a small medallion on the corner of the illustration. */
   .card .cardActions button:last-child {

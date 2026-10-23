@@ -207,35 +207,6 @@ export function Clans() {
           {(snapshot) => (
             <>
               <Show when={!snapshot().own}>
-                <form
-                  class="clan-panel"
-                  onSubmit={(event) => {
-                    event.preventDefault();
-                    void mutate({ action: 'create', id: creationId, name: name() });
-                  }}
-                >
-                  <h2>{t('clan-create')}</h2>
-                  <p>{t('clan-create-level')}</p>
-                  <p>{t('clan-founding-help', { min: snapshot().limits.min_members })}</p>
-                  <label>
-                    {t('clan-name')}
-                    <input
-                      required
-                      minLength={3}
-                      maxLength={40}
-                      value={name()}
-                      onInput={(e) => setName(e.currentTarget.value)}
-                    />
-                  </label>
-                  <button
-                    type="submit"
-                    disabled={
-                      loading() || (snapshot().account_level ?? 1) < 15 || name().trim().length < 3
-                    }
-                  >
-                    {t('clan-create')}
-                  </button>
-                </form>
                 <Show when={snapshot().applications.length}>
                   <section class="clan-panel">
                     <h2>{t('clan-applications')}</h2>
@@ -267,7 +238,8 @@ export function Clans() {
                   </section>
                 </Show>
               </Show>
-              <div class="clan-layout">
+              {/* Two columns only with a clan open; until then the list has the whole width. */}
+              <div class="clan-layout" classList={{ 'clan-layout-split': Boolean(profile()) }}>
                 <section class="clan-panel">
                   <h2>{t('clan-catalog')}</h2>
                   <form
@@ -319,29 +291,32 @@ export function Clans() {
                   <Show when={!snapshot().clans.length}>
                     <p>{t('clan-empty')}</p>
                   </Show>
-                  <div class="clans-toolbar">
-                    <button
-                      type="button"
-                      disabled={loading() || page() === 0}
-                      onClick={() => {
-                        setPage((v) => v - 1);
-                        void load();
-                      }}
-                    >
-                      {t('clan-previous')}
-                    </button>
-                    <span>{page() + 1}</span>
-                    <button
-                      type="button"
-                      disabled={loading() || !snapshot().has_more}
-                      onClick={() => {
-                        setPage((v) => v + 1);
-                        void load();
-                      }}
-                    >
-                      {t('clan-next')}
-                    </button>
-                  </div>
+                  {/* Paging only when there is more than one page. */}
+                  <Show when={page() > 0 || snapshot().has_more}>
+                    <div class="clans-toolbar">
+                      <button
+                        type="button"
+                        disabled={loading() || page() === 0}
+                        onClick={() => {
+                          setPage((v) => v - 1);
+                          void load();
+                        }}
+                      >
+                        {t('clan-previous')}
+                      </button>
+                      <span>{page() + 1}</span>
+                      <button
+                        type="button"
+                        disabled={loading() || !snapshot().has_more}
+                        onClick={() => {
+                          setPage((v) => v + 1);
+                          void load();
+                        }}
+                      >
+                        {t('clan-next')}
+                      </button>
+                    </div>
+                  </Show>
                 </section>
                 <Show when={profile()}>
                   {(p) => (
@@ -551,6 +526,41 @@ export function Clans() {
                   )}
                 </Show>
               </div>
+              {/* Founding a clan is the rarer path (account level 15); joining comes first. */}
+              <Show when={!snapshot().own}>
+                <details class="clan-panel">
+                  <summary>{t('clan-create-own')}</summary>
+                  <form
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      void mutate({ action: 'create', id: creationId, name: name() });
+                    }}
+                  >
+                    <p>{t('clan-create-level')}</p>
+                    <p>{t('clan-founding-help', { min: snapshot().limits.min_members })}</p>
+                    <label>
+                      {t('clan-name')}
+                      <input
+                        required
+                        minLength={3}
+                        maxLength={40}
+                        value={name()}
+                        onInput={(e) => setName(e.currentTarget.value)}
+                      />
+                    </label>
+                    <button
+                      type="submit"
+                      disabled={
+                        loading() ||
+                        (snapshot().account_level ?? 1) < 15 ||
+                        name().trim().length < 3
+                      }
+                    >
+                      {t('clan-create')}
+                    </button>
+                  </form>
+                </details>
+              </Show>
             </>
           )}
         </Show>

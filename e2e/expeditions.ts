@@ -3,6 +3,8 @@ import { accessible } from './accessibility';
 
 export async function expeditions(a: Page, b: Page, project: string) {
   for (const page of [a, b]) {
+    // A building has only the way back to the map; the portal is entered from there.
+    await page.getByRole('button', { name: 'Map', exact: true }).click();
     await page.getByRole('button', { name: 'Portal', exact: true }).click();
     await expect(page.getByTestId('expeditions')).toBeVisible();
   }

@@ -7,8 +7,11 @@
 }
 .advancement summary {
   cursor: pointer;
-  min-height: 44px;
+  padding-block: 10px;
   font-weight: bold;
+}
+.advancement:not([open]) {
+  padding-block: 0;
 }
 .contract-grid {
   display: grid;
