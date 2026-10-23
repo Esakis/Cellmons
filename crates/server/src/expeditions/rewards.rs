@@ -1,6 +1,6 @@
 use super::*;
 use crate::{
-    duel::{record::Record, result},
+    duel::record::Record,
     economy::{self, Account},
 };
 use sqlx::PgConnection;
@@ -28,7 +28,11 @@ pub(super) async fn grant_xp(
     if actual == 0 {
         return Ok(0);
     }
-    let new_level = result::level_for_xp(updated).max(level);
+    let tier: i16 = sqlx::query_scalar("SELECT tier FROM avatars WHERE id=$1")
+        .bind(avatar)
+        .fetch_one(&mut *connection)
+        .await?;
+    let new_level = crate::advancement::level_for_xp(updated, tier).max(level);
     let definition =
         engine_content::avatar(u16::try_from(template).map_err(|_| Error("CONTENT_MISMATCH"))?)
             .ok_or(Error("CONTENT_MISMATCH"))?;
@@ -67,21 +71,10 @@ pub(crate) async fn settle_fight(
     .bind(user)
     .fetch_one(&mut *connection)
     .await?;
-    let human = record.seats[0].public()?;
-    let npc = record.seats[1].public()?;
     let won = winner == 1 && allowed;
-    let nominal = if won {
-        result::xp_award(
-            human.level,
-            result::xp_tier(human.template_id as u16, human.tier as i16),
-            npc.level,
-            result::xp_tier(npc.template_id as u16, npc.tier as i16),
-            true,
-            false,
-        )
-    } else {
-        0
-    };
+    // Expedition progression preserves its escrow/retreat rules. NPCs cannot resign through
+    // the client API; rejected/aborted human fights never advance the expedition.
+    let nominal = if won { 120_u32 } else { 0 };
     sqlx::query("UPDATE expedition_fights SET winner=$2,xp_nominal=$3 WHERE duel_id=$1")
         .bind(record.id)
         .bind(winner)

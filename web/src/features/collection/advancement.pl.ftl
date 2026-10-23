@@ -1,0 +1,16 @@
+advancement-title = Kontrakty i opanowanie kart
+advancement-master-title = Tytuł kolekcji: Mistrz Spellgambit
+advancement-lock = Dostępne od poziomu konta { $level }.
+advancement-daily = Zadanie dzienne: ukończ 3 walki online — { $count }/3. Nagroda: 5 Dukatów. Nowy dzień o 00:00 UTC.
+advancement-daily-done = Nagroda odebrana automatycznie.
+contract-title = Kontrakt na postać
+contract-help = Wybierz klasę i zbierz 30 fragmentów. Ukończona walka daje 1, zwycięstwo kolejny 1, wygrany etap wyprawy jeszcze 1. Wymagane 2 rundy; trening, poddanie, rozłączenie i bezczynność nie dają fragmentów. Zmiana celu zachowuje postęp poprzedniego. Odbiór daje postać i jej pakiet kart.
+contract-full = Wszystkie miejsca są zajęte. Zwolnij miejsce przed odbiorem; fragmenty pozostaną.
+contract-complete = Masz już wszystkie dostępne klasy.
+contract-progress = Fragmenty: { $count }/30
+contract-select = Wybierz kontrakt
+contract-active = Aktywny kontrakt
+contract-claim = Odbierz postać
+mastery-title = Opanowanie kart
+mastery-help = Od poziomu konta 7: karta w talii dostaje 1 PD za kwalifikującą walkę, a poprawnie zagrana dodatkowo 2. Wszystkie kopie mają wspólny postęp. Progi poziomów: 0 / 15 / 45 / 100 / 200 PD. Każdy awans daje jednorazowo 2 Dukaty i odznakę, bez zmiany obrażeń. Postęp znajdziesz na miniaturze i w podglądzie karty.
+mastery-locked = Opanowanie kart otwiera się na poziomie konta 7.

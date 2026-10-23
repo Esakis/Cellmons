@@ -42,7 +42,7 @@ pub fn xp_award(
         draw,
     )
 }
-/// The same policy calculation is used by settlement and the pacing audit's what-if scenarios.
+/// Archived XP policy retained for historical rule comparisons; live matches use 80/120 XP.
 pub fn xp_award_using(
     rules: &crate::rules::Experience,
     level: u32,
@@ -166,7 +166,9 @@ pub async fn settle(
     }
     let mentor_won = winner != 0 && mentors[(winner - 1) as usize];
     let reason = protocol::duel::outcome(outcome, Side::A).reason;
-    let rated = ["arena", "tournament"].contains(&record.kind.as_str())
+    let completed = !["forfeit", "disconnect", "timeout"].contains(&reason.as_str());
+    let qualified = completed && record.moves.len() >= 2;
+    let rated = ["ranked", "tournament"].contains(&record.kind.as_str())
         && !mentor_won
         && verified.iter().all(|v| *v)
         && record.seats.iter().all(|s| s.user.is_some());
@@ -190,7 +192,11 @@ pub async fn settle(
             let draw = winner == 0;
             let lost = !won && !draw;
             let disconnect = normal && reason == "disconnect" && lost;
-            if record.kind == "arena" && won {
+            if ["arena", "ranked"].contains(&record.kind.as_str())
+                && won
+                && qualified
+                && !mentor_won
+            {
                 reward.ducats[i] = crate::economy::award_arena(&mut tx, user, record.id).await?;
                 let wins=sqlx::query_scalar!("INSERT INTO arena_progress(user_id,wins) VALUES ($1,1) ON CONFLICT(user_id) DO UPDATE SET wins=arena_progress.wins+1 RETURNING wins",user).fetch_one(&mut *tx).await?;
                 let owned = sqlx::query_scalar!(
@@ -207,16 +213,10 @@ pub async fn settle(
             if normal {
                 if record.kind != "expedition"
                     && !mentor_won
+                    && qualified
                     && let Some((avatar, xp, level, template)) = avatars[i]
                 {
-                    let gained = xp_award(
-                        profiles[i].level,
-                        tiers[i],
-                        profiles[1 - i].level,
-                        tiers[1 - i],
-                        won,
-                        draw,
-                    );
+                    let gained = if won { 120_u32 } else { 80 };
                     let cap = if verified[i] {
                         crate::rules::RULES.xp.cap
                     } else {
@@ -224,7 +224,7 @@ pub async fn settle(
                     };
                     let updated = xp.saturating_add(gained as i32).min(cap).max(xp);
                     reward.xp[i] = (updated - xp) as u32;
-                    let new_level = level_for_xp(updated).max(level);
+                    let new_level = crate::advancement::level_for_xp(updated, tiers[i]).max(level);
                     let definition = engine_content::avatar(
                         u16::try_from(template).map_err(|_| Error("CONTENT_MISMATCH"))?,
                     )
@@ -259,7 +259,12 @@ pub async fn settle(
     let second = record.seats[1].user;
     let second_avatar = record.seats[1].avatar;
     let rounds = record.moves.len() as i16;
-    if !["forfeit", "disconnect", "timeout"].contains(&reason.as_str()) {
+    if completed {
+        let played = if qualified && normal {
+            crate::advancement::casts(record)?
+        } else {
+            Default::default()
+        };
         for (index, seat) in record.seats.iter().enumerate() {
             if let Some(user) = seat.user {
                 crate::journey::award(
@@ -270,6 +275,16 @@ pub async fn settle(
                     record.moves.len(),
                 )
                 .await?;
+                if qualified && normal && !mentor_won {
+                    crate::advancement::award(
+                        &mut tx,
+                        record,
+                        index,
+                        winner == index as i16 + 1,
+                        &played[index],
+                    )
+                    .await?;
+                }
             }
         }
     }
@@ -350,8 +365,8 @@ mod tests {
         assert_eq!(xp_award(10, 0, 10, 3, false, true), 95);
         assert_eq!(xp_award(1, 0, 20, 3, false, false), 0);
         assert_eq!(level_for_xp(0), 1);
-        assert_eq!(level_for_xp(49999), 19);
-        assert_eq!(level_for_xp(50000), 20);
+        assert_eq!(level_for_xp(5999), 19);
+        assert_eq!(level_for_xp(6000), 20);
         assert_eq!(level_for_xp(65000), 20);
     }
 }

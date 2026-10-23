@@ -13,6 +13,8 @@ export type AvatarState = {
   level: number;
   xp: number;
   tier: number;
+  advancement?: { permanent_points: number; permanent_unspent: number; trial_wins: number };
+  archived_decks?: number[][];
   active: boolean;
   revision: number;
   unspent: number;
@@ -25,6 +27,7 @@ export type AvatarState = {
 export type Snapshot = {
   content_version: string;
   recruitment?: RecruitmentState;
+  advancement?: AdvancementState;
   templates: number[];
   avatars: AvatarState[];
   collection: { card_id: number; qty: number }[];
@@ -40,7 +43,14 @@ export type RecruitmentState = {
     avatar_id: string | null;
   }[];
 };
+export type AdvancementState = {
+  contracts: { template_id: number; fragments: number; active: boolean; claimed: boolean }[];
+  mastery: { card_id: number; xp: number }[];
+  daily_fights: number;
+  daily_rewarded: boolean;
+};
 export type Mutation =
+  | { action: 'contract'; template_id: number; claim: boolean }
   | { action: 'recruit'; level: number; template_id: number | null }
   | {
       action: 'reincarnate';
@@ -137,6 +147,7 @@ export function guestMutation(mutation: Mutation): Snapshot {
     return [...ids];
   };
   switch (mutation.action) {
+    case 'contract':
     case 'recruit':
       throw new Error('NOT_READY');
     case 'reincarnate':

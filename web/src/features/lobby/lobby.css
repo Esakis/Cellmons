@@ -102,8 +102,17 @@
 .lobby-value {
   white-space: nowrap;
 }
-/* The full painting stays in view. Phones arrange its destinations in a touch grid. */
+/* One map, including its buildings and labels, fits both available dimensions. */
+.town {
+  container-type: size;
+  display: grid;
+  place-items: center;
+  flex: 1;
+  min-height: 0;
+}
 .town-view {
+  width: min(100cqw, 100cqh);
+  aspect-ratio: 1;
   overflow: hidden;
   border: 3px solid transparent;
   border-radius: 4px;
@@ -111,7 +120,7 @@
   box-shadow:
     0 0 0 1px #000,
     0 10px 22px rgb(0 0 0 / 0.55);
-  margin-bottom: 1rem;
+  margin: 0;
 }
 .town-canvas {
   position: relative;
@@ -144,22 +153,20 @@
   mix-blend-mode: soft-light;
 }
 .town-shape.locked {
-  backdrop-filter: grayscale(1);
-  background: rgb(10 12 16 / 0.5);
+  background: rgb(10 12 16 / 0.18);
 }
 .town-edge.locked {
   stroke: #999;
   stroke-opacity: 0.3;
 }
 .town-place.locked {
-  filter: grayscale(1);
-  opacity: 0.8;
-  color: #d0d0d0;
+  opacity: 1;
+  color: #ded5c3;
 }
 .town-lock {
   display: block;
   font:
-    500 0.65rem / 1.4 system-ui,
+    500 0.6rem / 1.1 system-ui,
     sans-serif;
   letter-spacing: 0;
   text-transform: none;
@@ -189,7 +196,7 @@
 .town-edge {
   fill: none;
   stroke: #f3cf73;
-  stroke-opacity: 0.45;
+  stroke-opacity: 0;
   stroke-width: 1.4;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
@@ -221,50 +228,58 @@
   top: var(--place-y);
   z-index: 1;
   display: inline-flex;
-  min-height: 0;
-  gap: 7px;
-  padding: 2px 13px 2px 2px;
-  border-radius: 22px;
-  transform: translate(-50%, calc(-100% - 9px));
-  font-size: 0.8rem;
-  text-align: left;
+  width: 26%;
+  max-width: 148px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #f5e4bc;
+  box-shadow: none;
+  transform: translate(-50%, -50%);
+  font:
+    600 clamp(0.625rem, 2.5cqw, 0.8rem) / 1.15 system-ui,
+    sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+  text-align: center;
   text-decoration: none;
-  white-space: nowrap;
-  transition: transform 0.15s;
+  white-space: normal;
 }
-.town-place::after {
+.town-label {
+  position: relative;
+  display: block;
+  padding: 3px 5px;
+  border: 1px solid #bc9c5d;
+  border-radius: 4px;
+  background: linear-gradient(#211c15ed, #15130fe8);
+  box-shadow: 0 2px 6px #0009;
+}
+.town-place.locked .town-label {
+  border-color: #827461;
+}
+.town-label::before {
   content: "";
   position: absolute;
   left: 50%;
-  bottom: -7px;
-  width: 11px;
-  height: 11px;
-  background: #110e0b;
+  top: -4px;
+  width: 6px;
+  height: 6px;
+  background: #211c15;
   transform: translateX(-50%) rotate(45deg);
-  box-shadow: 1px 1px 0 var(--gold);
+  border-left: 1px solid #bc9c5d;
+  border-top: 1px solid #bc9c5d;
 }
 .town-place.hot,
 .town-place:focus-visible {
   z-index: 2;
-  transform: translate(-50%, calc(-100% - 9px)) scale(1.08);
-  box-shadow: 0 0 22px rgb(240 200 110 / 0.7);
 }
-.town-place .medal {
-  width: 30px;
-  height: 30px;
-}
-/* The one-line hint only on hover or keyboard focus: at rest the town shows names alone. */
-.town-hint {
-  display: none;
-  font:
-    500 0.68rem "Inter Variable",
-    system-ui,
-    sans-serif;
-  text-transform: none;
-}
-.town-place.hot .town-hint,
-.town-place:focus-visible .town-hint {
-  display: block;
+.town-place.hot .town-label,
+.town-place:focus-visible .town-label {
+  box-shadow: 0 0 12px rgb(240 200 110 / 0.7);
+  border-color: #ffe1a0;
 }
 .town-badge {
   position: absolute;
@@ -443,6 +458,50 @@
 .lobby-offer {
   border-color: var(--gold);
 }
+/* Fit the map to the live viewport (including browser bars and Android safe areas).
+   The rest of the app keeps its normal document scrolling. */
+body:has(.lobby-map-mode) #root {
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+}
+body:has(.lobby-map-mode) #main {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+.lobby-map-mode {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  margin: 0 auto;
+  padding: 8px 16px;
+}
+.lobby-map-mode .lobby-layout {
+  flex: 1;
+  min-height: 0;
+  margin-top: 8px;
+}
+.lobby-map-mode .lobby-main {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.lobby-map-mode .lobby-sidebar {
+  min-height: 0;
+  overflow: auto;
+}
+.lobby-map-mode .lobby-menu,
+.lobby-map-mode .lobby-journey {
+  flex-shrink: 0;
+  margin-bottom: 8px;
+}
+.lobby-map-mode .lobby-chat,
+.lobby-map-mode > .lobby-hint {
+  display: none;
+}
 @media (max-width: 760px) {
   .lobby-layout {
     grid-template-columns: 1fr;
@@ -451,57 +510,6 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 1rem;
-  }
-  .town-view {
-    overflow: hidden;
-    margin-bottom: 0;
-  }
-  .town-canvas {
-    width: 100%;
-    aspect-ratio: auto;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-    padding: 12px;
-    isolation: isolate;
-  }
-  .town-canvas > img {
-    object-fit: cover;
-    opacity: 0.55;
-    z-index: -1;
-  }
-  .town-canvas > svg,
-  .town-shape {
-    display: none;
-  }
-  .town-place {
-    position: relative;
-    inset: auto;
-    transform: none;
-    min-width: 0;
-    min-height: 48px;
-    padding: 8px;
-    gap: 8px;
-    font-size: 0.68rem;
-    letter-spacing: 0.02em;
-    white-space: normal;
-    border-radius: 8px;
-    align-items: center;
-    justify-content: flex-start;
-  }
-  .town-place.hot,
-  .town-place:focus-visible {
-    transform: none;
-  }
-  .town-place::after,
-  .town-hint,
-  .town-place.hot .town-hint,
-  .town-place:focus-visible .town-hint {
-    display: none;
-  }
-  .town-place .medal {
-    width: 24px;
-    height: 24px;
   }
   .lobby-menu {
     gap: 0.35rem;
@@ -599,7 +607,30 @@
   }
   .lobby-journey {
     font-size: 0.75rem;
-    padding: 10px;
+    padding: 6px 8px;
+  }
+  .lobby-map-mode .lobby-journey:has(button) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 2px 8px;
+    line-height: 1.25;
+  }
+  .lobby-map-mode .lobby-journey > strong,
+  .lobby-map-mode .lobby-journey:has(button) > p {
+    grid-column: 1;
+    margin: 0;
+  }
+  .lobby-map-mode .lobby-journey > button {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    min-height: 44px;
+    max-width: 92px;
+    padding: 6px;
+    font-size: 0.7rem;
+  }
+  .lobby-map-mode .lobby-journey > a {
+    grid-column: 1 / -1;
+    margin: 0;
   }
   .lobby-chat-form {
     display: grid;
@@ -611,6 +642,101 @@
   }
   .lobby-chat-form > button:last-child {
     grid-column: 1 / -1;
+  }
+}
+@media (max-width: 650px) {
+  body:has(.lobby-map-mode) #root {
+    height: calc(100dvh - 64px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  }
+}
+@media (max-width: 650px) and (max-height: 700px) {
+  .lobby-map-mode .lobby-menu button {
+    min-height: 44px;
+    padding-block: 2px;
+  }
+  .lobby-map-mode .lobby-menu .icon {
+    display: none;
+  }
+}
+/* A short landscape screen puts the controls beside the same uncut map. */
+@media (min-width: 560px) and (max-height: 500px) {
+  body:has(.lobby-map-mode) {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  body:has(.lobby-map-mode) #root {
+    height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  }
+  .lobby-map-mode {
+    display: grid;
+    grid-template-columns: 190px minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
+    gap: 6px;
+    padding: 4px 8px;
+  }
+  .lobby-map-mode .lobby-layout,
+  .lobby-map-mode .lobby-main {
+    display: contents;
+  }
+  .lobby-map-mode .lobby-sidebar,
+  .lobby-map-mode .lobby-hud > label,
+  .lobby-map-mode .lobby-hud > button,
+  .lobby-map-mode .lobby-hud > span:not(.lobby-account-level),
+  .lobby-map-mode .lobby-connection {
+    display: none;
+  }
+  .lobby-map-mode .lobby-hud {
+    grid-area: 1 / 1;
+    display: flex;
+    padding: 4px 6px;
+    gap: 4px 6px;
+  }
+  .lobby-map-mode .lobby-hud .portrait {
+    width: 28px;
+    height: 28px;
+  }
+  .lobby-map-mode .lobby-hud > strong {
+    font:
+      600 0.65rem system-ui,
+      sans-serif;
+    letter-spacing: 0;
+  }
+  .lobby-map-mode .lobby-account-level {
+    font-size: 0.65rem;
+  }
+  .lobby-map-mode .lobby-menu {
+    grid-area: 2 / 1;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin: 0;
+    gap: 4px;
+  }
+  .lobby-map-mode .lobby-menu button {
+    min-height: 44px;
+    font:
+      600 0.65rem system-ui,
+      sans-serif;
+    text-transform: none;
+    letter-spacing: 0;
+    padding: 4px;
+  }
+  .lobby-map-mode .lobby-menu .icon {
+    display: none;
+  }
+  .lobby-map-mode .lobby-journey {
+    grid-area: 3 / 1;
+    align-self: start;
+    padding: 4px 6px;
+    font-size: 0.65rem;
+    line-height: 1.25;
+    margin: 0;
+  }
+  .lobby-map-mode .lobby-journey button {
+    min-height: 44px;
+    padding: 4px;
+    font-size: 0.65rem;
+  }
+  .lobby-map-mode .town {
+    grid-area: 1 / 2 / 4 / 3;
+    height: 100%;
   }
 }
 .lobby-hud [aria-pressed="true"] .icon {

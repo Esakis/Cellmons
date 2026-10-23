@@ -26,6 +26,6 @@ recruit-role-5 = Nekromantka osłabia przeciwnika i wykorzystuje nekromancję. P
 recruit-role-11 = Żniwiarz wywiera fizyczną presję i wspiera ją nekromancją. Łączy walkę bronią z wyniszczaniem.
 recruit-role-13 = Mędrzec korzysta z ochrony i magii żywiołów. Jego talia nagradza cierpliwe gospodarowanie zasobami.
 recruit-role-32 = Wampir odzyskuje życie dzięki wybranym czarom. Może rozwijać się w stronę walki fizycznej albo magii krwi.
-collection-error-LEVEL_REQUIRED = Ta nagroda wymaga wyższego poziomu konta.
+collection-error-LEVEL_REQUIRED = Ta funkcja wymaga wyższego poziomu konta.
 collection-error-RECRUIT_UNAVAILABLE = Ta klasa została już zdobyta albo nie jest dostępna. Wybierz inną z aktualnej listy.
 collection-error-RECRUIT_CHOICE_REQUIRED = Wybierz postać, którą chcesz zrekrutować.

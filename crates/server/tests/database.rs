@@ -371,6 +371,69 @@ async fn permission_denied(connection: &mut PgConnection, sql: &'static str) {
 }
 
 #[sqlx::test(migrations = false)]
+#[ignore = "requires PostgreSQL"]
+async fn progression_upgrade_keeps_legacy_gifts_stats_decks_and_refunds_separate_points(
+    pool: PgPool,
+) {
+    db::MIGRATOR.run_to(202610200030, &pool).await.unwrap();
+    basic(&pool).await;
+    sqlx::query("UPDATE users SET tutorial_step=1 WHERE id=$1::text::uuid")
+        .bind(USER)
+        .execute(&pool)
+        .await
+        .unwrap();
+    let path = engine_content::PATHS
+        .iter()
+        .find(|p| p.base_avatar == 1)
+        .unwrap();
+    sqlx::query("UPDATE avatars SET tier=1,path_id=$2,level=5,xp=4000,dev_points_unspent=2,dp_hp=1 WHERE id=$1::text::uuid").bind(AVATAR).bind(i32::from(path.avatar.id)).execute(&pool).await.unwrap();
+    sqlx::query("INSERT INTO decks(avatar_id,cards) VALUES($1::text::uuid,ARRAY[1,1]::smallint[])")
+        .bind(AVATAR)
+        .execute(&pool)
+        .await
+        .unwrap();
+    let gold = uuid::Uuid::now_v7();
+    sqlx::query("INSERT INTO avatars(id,user_id,slot,template_id,tier,path_id,specialization,gift_id,level,xp,dev_points_unspent,dp_phys_atk) VALUES($1,$2::text::uuid,1,1,3,$3,$4,$5,20,65000,6,6)").bind(gold).bind(USER).bind(i32::from(path.avatar.id)).bind(server::progression::specialization_name(path.specializations[0])).bind(i32::from(path.gifts[0])).execute(&pool).await.unwrap();
+    db::migrate(&pool).await.unwrap();
+    let user = uuid::Uuid::parse_str(USER).unwrap();
+    let snapshot = server::game::load(&mut pool.acquire().await.unwrap(), user)
+        .await
+        .unwrap();
+    let silver = &snapshot.avatars[0];
+    assert_eq!(silver.advancement.permanent_points, 3);
+    assert_eq!(silver.advancement.permanent_unspent, 3);
+    assert_eq!(silver.spent[4], 1);
+    assert_eq!(silver.deck, vec![1, 1]);
+    assert_eq!(silver.xp, 4000);
+    assert!(silver.level >= 5);
+    let legacy = &snapshot.avatars[1];
+    assert_eq!(
+        (legacy.tier, legacy.gift_id, legacy.spent[0]),
+        (3, Some(i32::from(path.gifts[0])), 6)
+    );
+    assert_eq!(legacy.advancement.permanent_points, 6);
+    let before = serde_json::to_value(snapshot).unwrap();
+    db::migrate(&pool).await.unwrap();
+    assert_eq!(
+        serde_json::to_value(
+            server::game::load(&mut pool.acquire().await.unwrap(), user)
+                .await
+                .unwrap()
+        )
+        .unwrap(),
+        before
+    );
+    let archived: serde_json::Value =
+        sqlx::query_scalar("SELECT profile FROM legacy_progression WHERE avatar_id=$1::text::uuid")
+            .bind(AVATAR)
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+    assert_eq!(archived["level"], 5);
+    assert_eq!(before["recruitment"]["level"], 2);
+}
+
+#[sqlx::test(migrations = false)]
 #[ignore = "requires PostgreSQL superuser and CREATEDB; check.bat runs this suite"]
 async fn runtime_and_readonly_roles_cannot_change_schema_or_migration_history(pool: PgPool) {
     // Role creation and all grants are rolled back, leaving no cluster-wide test roles behind.

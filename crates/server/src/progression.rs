@@ -36,7 +36,7 @@ fn ready(avatar: &Avatar, revision: i32) -> Result<()> {
     if avatar.revision != revision {
         return Err(Error("CONFLICT"));
     }
-    if avatar.level != 20 || avatar.xp < crate::rules::RULES.progression.reincarnation_xp {
+    if avatar.level != 20 {
         return Err(Error("NOT_READY"));
     }
     profile(avatar)?;
@@ -155,8 +155,12 @@ pub async fn reincarnate(
 ) -> Result<()> {
     let avatar = load(tx, user, id).await?;
     ready(&avatar, revision)?;
-    if !(0..3).contains(&avatar.tier) {
+    if !(0..2).contains(&avatar.tier) {
         return Err(Error("FINAL_TIER"));
+    }
+    crate::advancement::require(tx, user, if avatar.tier == 0 { 12 } else { 18 }).await?;
+    if crate::advancement::character(tx, id).await?.trial_wins < 3 {
+        return Err(Error("TRIAL_REQUIRED"));
     }
     let mut path_id = avatar.path_id;
     let mut specialization = avatar.specialization.clone();
@@ -204,8 +208,17 @@ pub async fn reincarnate(
         false
     };
     let next_tier = avatar.tier + 1;
-    let bonus = crate::rules::RULES.progression.reincarnation_bonus_dp[avatar.tier as usize];
-    sqlx::query("UPDATE avatars SET path_id=$2,specialization=$3,gift_id=$4,tier=$5,level=1,xp=0,dev_points_unspent=$6,dp_phys_atk=0,dp_phys_def=0,dp_mag_atk=0,dp_mag_def=0,dp_hp=0,dp_stamina=0,is_active=(is_active OR $7),revision=revision+1 WHERE id=$1").bind(id).bind(path_id).bind(&specialization).bind(gift).bind(next_tier).bind(bonus).bind(activate).execute(&mut *tx).await?;
+    let bonus = next_tier * 3;
+    sqlx::query("INSERT INTO avatar_advancement(avatar_id,permanent_points,permanent_unspent) VALUES($1,$2,$2) ON CONFLICT(avatar_id) DO UPDATE SET permanent_points=$2,permanent_unspent=$2").bind(id).bind(bonus).execute(&mut *tx).await?;
+    sqlx::query("INSERT INTO incarnation_decks(avatar_id,tier,cards) SELECT avatar_id,$2,cards FROM decks WHERE avatar_id=$1").bind(id).bind(next_tier).execute(&mut *tx).await?;
+    sqlx::query("UPDATE avatars SET path_id=$2,specialization=$3,gift_id=$4,tier=$5,level=1,xp=0,dev_points_unspent=0,dp_phys_atk=0,dp_phys_def=0,dp_mag_atk=0,dp_mag_def=0,dp_hp=0,dp_stamina=0,is_active=(is_active OR $6),revision=revision+1 WHERE id=$1").bind(id).bind(path_id).bind(&specialization).bind(gift).bind(next_tier).bind(activate).execute(&mut *tx).await?;
+    grant_path(
+        tx,
+        user,
+        id,
+        path_id.ok_or(Error("CONTENT_MISMATCH"))? as u16,
+    )
+    .await?;
     sqlx::query("INSERT INTO reincarnation_history(avatar_id,to_tier,previous_xp,path_id,specialization,gift_id,content_version) VALUES ($1,$2,$3,$4,$5,$6,$7)").bind(id).bind(next_tier).bind(avatar.xp).bind(path_id).bind(specialization).bind(gift).bind(&engine_content::CONTENT_VERSION[..]).execute(tx).await?;
     Ok(())
 }
@@ -217,6 +230,13 @@ pub async fn create_shade(
     new_id: Uuid,
     school: &str,
 ) -> Result<()> {
+    // Retired shades are never a valid destination, including from new two-stage gold.
+    if !engine_content::AVATARS
+        .iter()
+        .any(|a| a.playable && a.rarity == AvatarRarity::Shade)
+    {
+        return Err(Error("AVATAR_LOCKED"));
+    }
     let source = load(tx, user, id).await?;
     ready(&source, revision)?;
     if source.tier != 3 || source.is_shade || id == new_id {
@@ -242,4 +262,119 @@ pub async fn create_shade(
         .await?;
     sqlx::query("INSERT INTO avatar_sacrifices(consumed_avatar,beneficiary_avatar,user_id,kind,content_version) VALUES ($1,$2,$3,'shade_create',$4)").bind(id).bind(new_id).bind(user).bind(&engine_content::CONTENT_VERSION[..]).execute(tx).await?;
     Ok(())
+}
+
+/// Prefer the class starter; replace spells unavailable on the chosen level-one path.
+pub fn path_deck(id: u16) -> Result<Vec<i16>> {
+    let path = engine_content::path(id)
+        .filter(|p| engine_content::is_playable(p.avatar.id))
+        .ok_or(Error("AVATAR_LOCKED"))?;
+    let starter = engine_content::starter(path.base_avatar).ok_or(Error("CONTENT_MISMATCH"))?;
+    let content = engine_content::content();
+    let mut deck = Vec::new();
+    for card in starter.deck.iter().copied().chain(
+        engine_content::STARTERS
+            .iter()
+            .flat_map(|s| s.deck.iter().copied()),
+    ) {
+        if deck.len() == 20 {
+            break;
+        }
+        if content
+            .get(card)
+            .is_some_and(|c| path.avatar.schools.meets(&c.requires))
+            && deck.iter().filter(|n| **n == card as i16).count() < 4
+        {
+            deck.push(card as i16);
+        }
+    }
+    if deck.len() != 20 {
+        return Err(Error("CONTENT_MISMATCH"));
+    }
+    Ok(deck)
+}
+async fn grant_path(db: &mut PgConnection, user: Uuid, avatar: Uuid, path: u16) -> Result<()> {
+    let pack = path_deck(path)?;
+    let claimed = sqlx::query(
+        "INSERT INTO path_packs(user_id,path_id,cards) VALUES($1,$2,$3) ON CONFLICT DO NOTHING",
+    )
+    .bind(user)
+    .bind(i32::from(path))
+    .bind(&pack)
+    .execute(&mut *db)
+    .await?
+    .rows_affected()
+        == 1;
+    if claimed {
+        for card in &pack {
+            sqlx::query("INSERT INTO collection(user_id,card_id,qty) VALUES($1,$2,1) ON CONFLICT(user_id,card_id) DO UPDATE SET qty=least(collection.qty::bigint+1,2147483647)::integer").bind(user).bind(*card).execute(&mut *db).await?;
+        }
+    }
+    let owned: Vec<(i16, i32)> = sqlx::query_as(
+        "SELECT card_id,qty FROM collection WHERE user_id=$1 AND qty>0 ORDER BY card_id",
+    )
+    .bind(user)
+    .fetch_all(&mut *db)
+    .await?;
+    let mut deck = Vec::new();
+    let schools = engine_content::path(path)
+        .ok_or(Error("CONTENT_MISMATCH"))?
+        .avatar
+        .schools;
+    let content = engine_content::content();
+    for card in pack.iter().copied().chain(
+        owned
+            .iter()
+            .flat_map(|(id, qty)| std::iter::repeat_n(*id, (*qty).min(4) as usize)),
+    ) {
+        if deck.len() == 20 {
+            break;
+        }
+        let quantity = owned
+            .iter()
+            .find(|(id, _)| *id == card)
+            .map_or(0, |(_, qty)| *qty);
+        if deck.iter().filter(|id| **id == card).count() < (quantity.min(4) as usize)
+            && content
+                .get(card as u16)
+                .is_some_and(|c| schools.meets(&c.requires))
+        {
+            deck.push(card);
+        }
+    }
+    if deck.len() != 20 {
+        return Err(Error("PATH_DECK_REQUIRED"));
+    }
+    sqlx::query(
+        "UPDATE decks SET cards=$2,revision=revision+1,updated_at=now() WHERE avatar_id=$1",
+    )
+    .bind(avatar)
+    .bind(deck)
+    .execute(db)
+    .await?;
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn all_sixteen_released_paths_have_legal_level_one_decks() {
+        let paths: Vec<_> = engine_content::PATHS
+            .iter()
+            .filter(|p| engine_content::is_playable(p.avatar.id))
+            .collect();
+        assert_eq!(paths.len(), 16);
+        for path in paths {
+            let deck = super::path_deck(path.avatar.id).unwrap();
+            assert_eq!(deck.len(), 20);
+            for id in &deck {
+                assert!(
+                    path.avatar
+                        .schools
+                        .meets(&engine_content::content().get(*id as u16).unwrap().requires)
+                );
+                assert!(deck.iter().filter(|c| *c == id).count() <= 4);
+            }
+        }
+    }
 }

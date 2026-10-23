@@ -95,6 +95,38 @@ pub async fn export(
                 "SELECT to_jsonb(c)::text FROM collection c WHERE user_id=$1 ORDER BY card_id"
             );
             section!(
+                "class_contracts",
+                "SELECT to_jsonb(c)::text FROM class_contracts c WHERE user_id=$1 ORDER BY template_id"
+            );
+            section!(
+                "card_mastery",
+                "SELECT to_jsonb(c)::text FROM card_mastery c WHERE user_id=$1 ORDER BY card_id"
+            );
+            section!(
+                "daily_quests",
+                "SELECT to_jsonb(c)::text FROM daily_quests c WHERE user_id=$1 ORDER BY day"
+            );
+            section!(
+                "path_packs",
+                "SELECT to_jsonb(c)::text FROM path_packs c WHERE user_id=$1 ORDER BY path_id"
+            );
+            section!(
+                "incarnation_decks",
+                "SELECT to_jsonb(c)::text FROM incarnation_decks c JOIN avatars a ON a.id=c.avatar_id WHERE a.user_id=$1 ORDER BY c.avatar_id,c.tier"
+            );
+            section!(
+                "class_trials",
+                "SELECT to_jsonb(c)::text FROM class_trials c JOIN avatars a ON a.id=c.avatar_id WHERE a.user_id=$1 ORDER BY c.avatar_id,c.tier"
+            );
+            section!(
+                "permanent_points",
+                "SELECT to_jsonb(c)::text FROM avatar_advancement c JOIN avatars a ON a.id=c.avatar_id WHERE a.user_id=$1 ORDER BY c.avatar_id"
+            );
+            section!(
+                "legacy_progression",
+                "SELECT to_jsonb(c)::text FROM legacy_progression c JOIN avatars a ON a.id=c.avatar_id WHERE a.user_id=$1 ORDER BY c.avatar_id"
+            );
+            section!(
                 "decks",
                 "SELECT to_jsonb(d)::text FROM decks d JOIN avatars a ON a.id=d.avatar_id WHERE a.user_id=$1 ORDER BY d.avatar_id"
             );

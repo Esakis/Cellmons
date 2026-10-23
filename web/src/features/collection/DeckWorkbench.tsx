@@ -11,6 +11,7 @@ export function DeckWorkbench(props: {
   schools: number[];
   pictures: Map<string, string>;
   disabled: boolean;
+  mastery?: { card_id: number; xp: number }[];
 }) {
   const [pane, setPane] = createSignal('library');
   const [query, setQuery] = createSignal('');
@@ -23,6 +24,9 @@ export function DeckWorkbench(props: {
   const [limit, setLimit] = createSignal(24);
   const [undo, setUndo] = createSignal<number[]>();
   const quantity = (id: number) => props.collection.find((stack) => stack.card_id === id)?.qty ?? 0;
+  const masteryXP = (id: number) => props.mastery?.find((c) => c.card_id === id)?.xp ?? 0;
+  const masteryLevel = (id: number) =>
+    [0, 15, 45, 100, 200].filter((n) => n <= masteryXP(id)).length;
   const copies = (id: number) => props.draft.filter((value) => value === id).length;
   const usable = (card: Card) =>
     Object.entries(card.requires).every(
@@ -106,6 +110,11 @@ export function DeckWorkbench(props: {
           <img src={props.pictures.get(card.key)} alt="" width="160" height="100" loading="lazy" />
           <strong>{t(fluentKey(card.key))}</strong>
         </button>
+        <Show when={props.mastery}>
+          <small class="mastery-badge">
+            {t('collection-mastery', { level: masteryLevel(card.id) })}
+          </small>
+        </Show>
         <small class="deck-cost">
           K {card.cost.focus} · W {card.cost.stamina}
         </small>
@@ -256,6 +265,15 @@ export function DeckWorkbench(props: {
               height="300"
             />
             <p>{t(fluentKey(card().key, 'text'), cardArgs(card()))}</p>
+            <Show when={props.mastery}>
+              <p>
+                {t('collection-mastery-detail', {
+                  level: masteryLevel(card().id),
+                  xp: masteryXP(card().id),
+                  target: [0, 15, 45, 100, 200][masteryLevel(card().id)] ?? 200,
+                })}
+              </p>
+            </Show>
             <p>
               K {card().cost.focus} · W {card().cost.stamina} ·{' '}
               {t(`collection-rarity-${card().rarity}`)}

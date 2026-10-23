@@ -57,6 +57,7 @@ export function offlinePlugin(): Plugin {
         'src/app/pathCatalog.ts',
         'src/features/collection/Progression.tsx',
         'src/features/collection/Recruitment.tsx',
+        'src/features/collection/Advancement.tsx',
       ];
       const offline = new Set<string>();
       for (const [key, entry] of Object.entries(manifest)) {

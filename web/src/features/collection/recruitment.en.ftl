@@ -26,6 +26,6 @@ recruit-role-5 = The Necromancer weakens opponents through necromancy. Plan acro
 recruit-role-11 = The Reaper adds necromancy to physical pressure, combining weapons with attrition.
 recruit-role-13 = The Sage uses protection and elemental magic. Its deck rewards patient resource management.
 recruit-role-32 = The Vampire recovers health with selected spells. It can develop toward physical combat or blood magic.
-collection-error-LEVEL_REQUIRED = This reward requires a higher account level.
+collection-error-LEVEL_REQUIRED = This feature requires a higher account level.
 collection-error-RECRUIT_UNAVAILABLE = That class is already owned or unavailable. Choose another from the updated list.
 collection-error-RECRUIT_CHOICE_REQUIRED = Choose the character you want to recruit.

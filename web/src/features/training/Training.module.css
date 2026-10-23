@@ -498,6 +498,11 @@
 .error {
   color: var(--error);
 }
+/* The online duel sits inside the lobby page, which already provides the side margins. */
+.duel.embedded {
+  margin-block: 1rem;
+  padding: 0;
+}
 
 /* Decision screen: character panels, health gauges and the sequence in the middle. */
 .tableGrid {
@@ -719,7 +724,7 @@
   min-width: 0;
   text-align: center;
 }
-.roundTitle h1 {
+.roundTitle :is(h1, h2) {
   margin: 0;
   font-size: 1.3rem;
   letter-spacing: 0.06em;
@@ -1831,16 +1836,18 @@
   color: var(--color-text-muted);
 }
 
+/* Narrow windows keep the desktop arrangement (you, the trays, the opponent, the hand below),
+   only smaller, so the opponent's previous round stays between your own trays. */
 @media (max-width: 900px) {
   .tableGrid {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: 6px;
   }
   .gauge {
     display: none;
   }
-  .command {
-    grid-column: 1 / -1;
-    order: 3;
+  .pills {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .portrait {
     width: 96px;
@@ -1861,97 +1868,446 @@
     -webkit-line-clamp: 2;
   }
 }
+/* Phones: the same board at a smaller scale. Card descriptions open with ⓘ or a long press. */
 @media (max-width: 650px) {
   .duel {
     padding: 12px 8px 20px;
   }
   .table,
   .board {
-    padding: 0 8px 10px;
+    padding: 0 5px 8px;
   }
   .table::before,
   .board::before {
-    --corner: 18px;
-    inset: 6px;
+    --corner: 16px;
+    inset: 4px;
+    border-width: 1px;
+  }
+  .sideCard::before,
+  .command::before,
+  .combatant::before {
+    display: none;
   }
   /* The title gets its own row; each name plate sits above its panel. */
   .titleBar {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 6px 8px;
-    margin: 0 4px 8px;
+    gap: 4px 6px;
+    margin: 0 4px 6px;
   }
   .namePlate {
     min-width: 0;
     margin-top: 0;
-    padding: 3px 8px;
-    font-size: 0.66rem;
+    padding: 2px 6px;
+    font-size: 0.6rem;
   }
   .boardTitle {
     grid-row: 1;
     grid-column: 1 / -1;
     justify-self: center;
-    padding: 4px 16px 5px;
-    font-size: 0.78rem;
-    letter-spacing: 0.16em;
+    max-width: 100%;
+    padding: 3px 10px 4px;
+    overflow: hidden;
+    font-size: 0.66rem;
+    letter-spacing: 0.1em;
+    text-overflow: ellipsis;
   }
   .boardTitle::before,
   .boardTitle::after {
     display: none;
   }
+  .tableGrid {
+    grid-template-columns: minmax(0, 1fr) minmax(112px, 1.35fr) minmax(0, 1fr);
+    gap: 4px;
+  }
   .sideCard,
   .combatant {
-    gap: 6px;
-    padding: 8px;
+    gap: 4px;
+    padding: 4px;
   }
   .nameStrip {
-    padding: 3px 24px;
-    font-size: 0.74rem;
-    letter-spacing: 0.08em;
+    padding: 2px 4px;
+    font-size: 0.54rem;
+    letter-spacing: 0.04em;
+  }
+  .initiativeBadge {
+    top: 1px;
+    right: 1px;
+    width: 16px;
+    height: 16px;
+    font-size: 0.45rem;
+    box-shadow: 0 0 0 1px var(--duel-line);
+  }
+  .portraitFrame {
+    padding: 2px;
+    border-width: 3px;
   }
   .sidePortrait {
-    width: min(100%, 110px);
+    width: 100%;
+  }
+  .schools {
+    gap: 1px 5px;
+    padding: 2px 3px;
+    font-size: 0.5rem;
+  }
+  .schools img {
+    width: 10px;
+    height: 10px;
+  }
+  .strike {
+    width: 30px;
+    height: 30px;
+    margin: -15px 0 0 -15px;
+  }
+  .strike img {
+    width: 16px;
+    height: 16px;
+  }
+  .strike b {
+    right: -5px;
+    bottom: -5px;
+    width: 14px;
+    height: 14px;
+    font-size: 0.5rem;
   }
   .pills {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 3px;
+  }
+  .pill {
+    padding: 3px 1px 2px;
+    border-radius: 8px 8px 2px 2px;
+  }
+  .pill dd {
+    font-size: 0.8rem;
+  }
+  .medalIcon {
+    width: 12px;
+    height: 12px;
+  }
+  .enchantments {
+    min-height: 16px;
+    padding: 2px 3px;
+    font-size: 0.48rem;
+  }
+  .enchantments > span {
+    padding: 1px 3px;
+  }
+  .command {
+    gap: 4px;
+    padding: 5px 3px;
+  }
+  .roundTop {
+    gap: 2px;
+  }
+  .roundTitle :is(h1, h2) {
+    font-size: 0.72rem;
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+    white-space: normal;
+  }
+  /* The badge on the name strip already marks initiative. */
+  .roundTitle small {
+    display: none;
+  }
+  .focusOrb {
+    width: 24px;
+    height: 24px;
+    font-size: 0.78rem;
+    box-shadow:
+      0 0 0 1px var(--duel-edge),
+      0 0 0 2px var(--duel-line);
+  }
+  .focusOrb small {
+    font-size: 0.38rem;
   }
   .sequence {
-    --coin: 48px;
+    --coin: clamp(28px, calc(12vw - 12px), 40px);
+    gap: 3px;
   }
-  .fighters {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-areas:
-      "me opponent"
-      "statsMe statsOpponent"
-      "exchange exchange";
-    grid-template-rows: auto;
+  .rowLabel {
+    font-size: 0.5rem;
+    letter-spacing: 0.16em;
   }
-  .portrait {
-    width: 72px;
-    height: 72px;
+  .slots,
+  .opponentRow {
+    gap: 3px;
+    padding: 0 4px;
   }
-  .statColumn {
-    flex-flow: row wrap;
-    justify-content: center;
+  .slots {
+    padding: 4px 6px;
+  }
+  .slots::before,
+  .slots::after {
+    display: none;
+  }
+  .slot kbd {
+    right: -4px;
+    bottom: -4px;
+    width: 14px;
+    height: 14px;
+    font-size: 0.5rem;
+  }
+  .ghostSlot {
+    width: 16px;
+    height: 16px;
+    margin: 0 calc((var(--coin) - 16px) / 2);
+    font-size: 0.55rem;
+  }
+  .ghostSlot .ghostIcon {
+    width: 10px;
+    height: 10px;
+  }
+  .opponentCaption {
+    font-size: 0.46rem;
+    line-height: 1.2;
+  }
+  .timerBox {
+    column-gap: 4px;
+    padding: 3px 4px 3px 3px;
+  }
+  .timerBox strong {
+    min-width: 26px;
+    height: 24px;
+    padding: 0 3px;
+    font-size: 0.84rem;
+  }
+  .timerBox span {
+    font-size: 0.54rem;
+  }
+  .timerBox small {
+    font-size: 0.45rem;
+  }
+  .result {
     padding: 8px 4px;
   }
-  .statDealt {
-    width: auto;
-    padding-top: 0;
-    border-top: 0;
+  .result h2 {
+    font-size: 1.1rem;
+  }
+  .result p {
+    font-size: 0.6rem;
+  }
+  .result button,
+  .result a {
+    min-height: 30px;
+    padding: 4px 8px;
+    font-size: 0.62rem;
+  }
+  .hand {
+    margin-top: 6px;
+  }
+  .hand .sectionHeading {
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: flex-start;
+    gap: 8px;
+    margin: 0 0 4px 2px;
+  }
+  .hand .sectionHeading h2 {
+    font-size: 0.6rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .hand .sectionHeading > span {
+    font-size: 0.56rem;
   }
   .cards {
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x proximity;
-    padding: 12px 8px 10px;
-    margin: -12px -8px 0;
+    gap: 3px;
   }
   .card {
-    flex: 0 0 160px;
-    scroll-snap-align: start;
+    border-width: 2px;
+  }
+  .card[data-selected="true"] {
+    transform: translateY(-2px);
+  }
+  .cardMain {
+    gap: 2px;
+    padding: 2px;
+  }
+  .cardTop {
+    min-height: 0;
+    height: 24px;
+    padding: 1px 17px 1px 3px;
+  }
+  .cardTop > kbd {
+    display: none;
+  }
+  .cardTop > strong {
+    font-size: 0.5rem;
+    letter-spacing: 0;
+  }
+  .focusBadge,
+  .staminaBadge {
+    width: 16px;
+    height: 16px;
+    border-width: 1px;
+    font-size: 0.6rem;
+  }
+  .focusBadge {
+    right: 1px;
+    margin-top: -8px;
+  }
+  .focusBadge small,
+  .staminaBadge small {
+    display: none;
+  }
+  .cardStrip {
+    min-height: 18px;
+    gap: 2px;
+    padding: 1px 1px 1px 3px;
+  }
+  .requirements {
+    gap: 2px;
+    font-size: 0.55rem;
+  }
+  .cardStrip .requirements img {
+    width: 10px;
+    height: 10px;
+  }
+  .card .cardText {
+    display: none;
+  }
+  .cardActions {
+    gap: 2px;
+    padding: 0 2px 2px;
+  }
+  .card .cardActions button {
+    min-height: 24px;
+    padding: 1px 2px;
+    font-size: 0.5rem;
+  }
+  /* Details: a small medallion on the corner of the illustration. */
+  .card .cardActions button:last-child {
+    position: absolute;
+    top: 31px;
+    right: 3px;
+    width: 24px;
+    height: 24px;
+    min-height: 0;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 0.62rem;
+  }
+  .cardUnavailable {
+    padding: 0 2px 2px;
+    font-size: 0.45rem;
+  }
+  .commandBar {
+    gap: 4px;
+    margin-top: 6px;
+  }
+  .validation {
+    flex-basis: 100%;
+    padding: 4px 6px;
+    font-size: 0.62rem;
   }
   .commandButtons {
     width: 100%;
+    gap: 4px;
+  }
+  .commandBar .commandButtons button {
+    flex: 1 1 auto;
+    min-height: 32px;
+    padding: 4px 6px;
+    font-size: 0.62rem;
+  }
+  /* Simulation: both fighters with their stat columns in one row, as on a wide screen. */
+  .fighters {
+    grid-template-columns: minmax(0, 1fr) 44px 44px minmax(0, 1fr);
+    gap: 4px;
+  }
+  .portrait {
+    width: 64px;
+    height: 64px;
+  }
+  .healthLabel {
+    font-size: 0.56rem;
+  }
+  .healthLabel strong {
+    font-size: 0.78rem;
+  }
+  .health {
+    height: 6px;
+  }
+  .playedLabel {
+    font-size: 0.46rem;
+    letter-spacing: 0.08em;
+  }
+  .playedEmpty {
+    padding: 6px;
+    font-size: 0.5rem;
+  }
+  .playedCard {
+    padding: 2px;
+    border-width: 2px;
+  }
+  .playedCard .cardText {
+    padding: 2px 3px;
+    font-size: 0.5rem;
+  }
+  .statColumn {
+    gap: 2px;
+    padding: 4px 1px;
+  }
+  .medal {
+    width: 20px;
+    height: 20px;
+  }
+  .medal .medalIcon {
+    width: 11px;
+    height: 11px;
+  }
+  .statRow dd {
+    font-size: 0.74rem;
+  }
+  .statDealt {
+    padding-top: 3px;
+  }
+  .statDealt dt {
+    font-size: 0.4rem;
+  }
+  .statDealt dd {
+    width: 26px;
+    height: 26px;
+    font-size: 0.8rem;
+  }
+  .exchange {
+    min-height: 40px;
+    gap: 2px;
+    padding: 4px;
+  }
+  .slotOrb {
+    width: 22px;
+    height: 22px;
+    font-size: 0.7rem;
+  }
+  .exchangeHit {
+    font-size: 0.66rem;
+  }
+  .exchangeIcon {
+    width: 14px;
+    height: 14px;
+  }
+  .arena {
+    min-height: 30px;
+    margin-top: 6px;
+    padding: 4px 6px;
+    gap: 2px 6px;
+  }
+  .arenaStrike {
+    font-size: 0.8rem;
+  }
+  .arenaIcon {
+    width: 16px;
+    height: 16px;
+  }
+  .arenaText {
+    font-size: 0.62rem;
+  }
+  .popup {
+    font-size: 1.2rem;
+  }
+  .popup[data-tone="block"],
+  .popup[data-tone="miss"] {
+    font-size: 0.7rem;
   }
   .chronicleRound {
     grid-template-columns: 1fr;
@@ -2107,7 +2463,7 @@
   .opponentCaption {
     display: none;
   }
-  .roundTitle h1 {
+  .roundTitle :is(h1, h2) {
     font-size: 1.1rem;
   }
   .focusOrb {
@@ -2133,7 +2489,8 @@
     margin-top: 8px;
   }
 }
-@media (pointer: coarse) {
+/* Phones keep their smaller buttons so the whole board fits on about one screen. */
+@media (pointer: coarse) and (min-width: 651px) {
   .commandBar .commandButtons button {
     min-height: 44px;
   }

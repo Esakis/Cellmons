@@ -56,9 +56,10 @@ reward_threshold = 1000
 fallback_ducats = 40
 
 [progression]
-level_xp = [0, 1000, 2000, 3000, 4000, 5000, 6000, 8000, 10000, 12000, 14000, 17000, 20000, 23000, 27000, 31000, 35000, 40000, 45000, 50000]
-reincarnation_xp = 65000
-reincarnation_bonus_dp = [2, 4, 6]
+level_xp = [0, 100, 220, 360, 520, 700, 900, 1120, 1360, 1620, 1900, 2200, 2520, 2860, 3220, 3620, 4080, 4620, 5260, 6000]
+# Bronze thresholds; silver is x1.5 and gold x2. No additional XP gate at level 20.
+reincarnation_xp = 6000
+reincarnation_bonus_dp = [3, 6, 6]
 
 [clan]
 min_members = 5

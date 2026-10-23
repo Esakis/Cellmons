@@ -1,6 +1,8 @@
 clan-refresh = Refresh
 clan-own = Your clan
 clan-create = Create clan
+clan-create-level = Creating a clan requires account level 15. Joining opens at level 10.
+clan-error-LEVEL_REQUIRED = Creating a clan requires account level 15.
 clan-founding-help = A clan becomes established after accepting at least { $min } members, including its master.
 clan-name = Clan name
 clan-applications = Your applications

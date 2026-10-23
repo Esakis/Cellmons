@@ -7,13 +7,17 @@ import { get, createServer as httpsServer } from 'node:https';
 import { isIP } from 'node:net';
 import { resolve } from 'node:path';
 
-// This helper exposes only the game API and a single APK, never the repository or mail.
+// Only the game API, APK and an explicit preview allowlist are exposed; never the repository or mail.
 const directory = resolve('target/phone-test');
 const configuration = `${directory}/connection.json`;
 const certificate = `${directory}/cert.pem`;
 const privateKey = `${directory}/key.pem`;
 const apk = `${directory}/Spellgambit-test.apk`;
 const credentials = `${directory}/konto-testowe.json`;
+const previews = new Map([
+  ['/podglad/wampir.png', resolve('target/map-redesign/vampire-final.png')],
+  ['/podglad/mapa.png', resolve('target/map-redesign/pl-390.png')],
+]);
 const upstreamPort = 8090;
 const headers = {
   'Content-Type': 'application/json',
@@ -165,7 +169,10 @@ async function serve() {
   const download = httpServer(async (req, res) => {
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'");
+    res.setHeader(
+      'Content-Security-Policy',
+      "default-src 'none'; style-src 'unsafe-inline'; img-src 'self'",
+    );
     if (!allowed(req) || req.method !== 'GET') {
       res.writeHead(404).end();
       return;
@@ -186,6 +193,36 @@ async function serve() {
       }
       return;
     }
+    const preview = previews.get(req.url);
+    if (preview) {
+      try {
+        const file = await stat(preview);
+        res.writeHead(200, {
+          'Content-Type': 'image/png',
+          'Content-Length': file.size,
+          'Cache-Control': 'no-store',
+          'X-Content-Type-Options': 'nosniff',
+        });
+        createReadStream(preview)
+          .on('error', () => res.destroy())
+          .pipe(res);
+      } catch {
+        res.writeHead(404).end('Podgląd nie jest jeszcze dostępny.');
+      }
+      return;
+    }
+    if (req.url === '/podglad') {
+      res
+        .writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' })
+        .end(`<!doctype html>
+<html lang="pl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spellgambit — nowy wygląd</title>
+<style>body{font:16px/1.5 system-ui;background:#14131a;color:#f5e4bc;margin:24px auto;padding:0 16px;max-width:800px}a{color:#e6bf73}img{display:block;max-width:100%;height:auto;border:1px solid #bc9c5d;border-radius:8px}figure{margin:24px 0}.phone{max-width:390px}figcaption{margin-bottom:8px}</style>
+<h1>Nowy Wampir i mapa miasta</h1><a href="/">Pobierz aktualną aplikację</a>
+<figure><figcaption>Portret Wampira</figcaption><a href="/podglad/wampir.png"><img src="/podglad/wampir.png" alt="Malarski portret Wampira"></a></figure>
+<figure class="phone"><figcaption>Rzeczywisty zrzut gry w widoku telefonu. Konto testowe z odblokowanymi miejscami.</figcaption><a href="/podglad/mapa.png"><img src="/podglad/mapa.png" alt="Mapa miasta z dziesięcioma miejscami przy budynkach"></a></figure></html>`);
+      return;
+    }
     if (req.url !== '/') {
       res.writeHead(404).end();
       return;
@@ -196,6 +233,7 @@ async function serve() {
 <style>body{font:18px/1.6 system-ui;max-width:620px;margin:40px auto;padding:0 22px;background:#141823;color:#f5efe1}h1{line-height:1.2}a{display:block;background:#e6bf73;color:#171a24;padding:16px;text-align:center;border-radius:12px;font-weight:bold;text-decoration:none}li{margin:12px 0}small{color:#bac2cf}</style>
 <h1>Spellgambit na telefonie</h1><p>Wersja do testów w domowej sieci.</p>
 <a href="/Spellgambit-test.apk">Pobierz APK</a>
+<p><a href="/podglad">Zobacz nowy portret i mapę</a></p>
 <ol><li>Zainstaluj pobrany plik. Jeśli Android zapyta, zezwól tej przeglądarce na instalację aplikacji.</li>
 <li>Otwórz aplikację i zaloguj się danymi z pliku <b>konto-testowe.json</b> na komputerze.</li>
 <li>Wejdź do Lobby → Arena, wybierz wolnego gracza i wyślij wyzwanie.</li></ol>

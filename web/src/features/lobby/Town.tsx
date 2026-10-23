@@ -7,9 +7,8 @@ import layout from '../../generated/town.json';
 import { t } from '../../i18n';
 import { canEnter, type Journey, requiredLevel } from './journey';
 
-// The lobby map is one painting of the town (art/paintings/scenes/town.avif). Its clickable
-// buildings are already lit in the picture (art/paintings/town.json holds their outlines), so a
-// gilt rim and a name plaque mark them at rest; hovering or focusing a building brightens it.
+// The complete town and its building hit areas use the same coordinates on every screen.
+// Resizing fits the painting to the available space; it never rearranges destinations.
 const [painting] = Object.values(
   import.meta.glob<string>('../../assets/paintings/scenes/town.avif', {
     eager: true,
@@ -24,6 +23,7 @@ const icons: Record<string, () => string | undefined> = {
   castle: () => icon('nav-lobby'),
   portal: () => icon('attack-mag'),
   arena: () => icon('school-combat'),
+  ranked: () => icon('school-combat'),
   clan: () => icon('stat-phys-def'),
   training: () => icon('nav-training'),
   bazaar: () => onlineIcon('ducats'),
@@ -67,11 +67,6 @@ export function Town(props: {
   const locked = (id: string) => !canEnter(props.journey, id);
   const waiting = (id: string) =>
     props.alert === id || (id === 'library' && (props.journey?.recruits ?? 0) > 0);
-  const visible = () =>
-    layout.places.filter(
-      (p) =>
-        (props.journey?.tutorial_step ?? 0) >= 3 || ['training', 'library', 'arena'].includes(p.id),
-    );
   const link = (id: string) =>
     locked(id)
       ? ''
@@ -112,7 +107,7 @@ export function Town(props: {
                 </feMerge>
               </filter>
             </defs>
-            <For each={visible()}>
+            <For each={layout.places}>
               {(p) => (
                 <polygon
                   class="town-edge"
@@ -129,7 +124,7 @@ export function Town(props: {
           </svg>
           {/* The building itself, for the pointer (it brightens what is under it); keyboards and
               screen readers use its plaque. */}
-          <For each={visible()}>
+          <For each={layout.places}>
             {(p) => (
               <button
                 type="button"
@@ -145,7 +140,7 @@ export function Town(props: {
               />
             )}
           </For>
-          <For each={visible()}>
+          <For each={layout.places}>
             {(p) => (
               // The library and the clan list are pages; the other buildings are lobby rooms.
               <Dynamic
@@ -153,20 +148,19 @@ export function Town(props: {
                 type={link(p.id) ? undefined : 'button'}
                 href={link(p.id) || undefined}
                 disabled={locked(p.id) || (!link(p.id) && !props.connected)}
-                class="town-place plaque"
+                class="town-place"
+                data-place={p.id}
                 classList={{ hot: hot() === p.id, locked: locked(p.id) }}
                 style={{ '--place-x': `${p.at[0]}%`, '--place-y': `${p.at[1]}%` }}
                 aria-describedby={`town-hint-${p.id}`}
+                title={hint(p.id)}
                 onClick={() => link(p.id) || go(p.id)}
                 onPointerEnter={() => setHot(p.id)}
                 onPointerLeave={() => setHot('')}
                 onFocus={() => setHot(p.id)}
                 onBlur={() => setHot('')}
               >
-                <span class="medal">
-                  <img src={placeIcon(p.id)} alt="" width="20" height="20" />
-                </span>
-                <span>
+                <span class="town-label">
                   {t(`lobby-room-${p.id}`)}
                   <Show when={locked(p.id)}>
                     <small class="town-lock">
@@ -175,7 +169,7 @@ export function Town(props: {
                       })}
                     </small>
                   </Show>
-                  <small class="town-hint" id={`town-hint-${p.id}`} aria-hidden="true">
+                  <small class="visually-hidden" id={`town-hint-${p.id}`} aria-hidden="true">
                     {hint(p.id)}
                   </small>
                 </span>

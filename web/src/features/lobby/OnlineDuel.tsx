@@ -3,21 +3,14 @@ import {
   createEffect,
   createMemo,
   createSignal,
+  createUniqueId,
   For,
-  Index,
   onCleanup,
   onMount,
   Show,
+  untrack,
 } from 'solid-js';
-import {
-  avatars,
-  type Card,
-  cardArgs,
-  cards,
-  content,
-  fluentKey,
-  portrait,
-} from '../../app/content';
+import { avatars, type Card, fluentKey } from '../../app/content';
 import { setDuelActive, setOnlineDuelActive } from '../../app/session';
 import { Modal } from '../../components/Modal';
 import type {
@@ -25,10 +18,37 @@ import type {
   DuelMovePreview,
   DuelSnapshot,
 } from '../../generated/proto/game/v1/online_duel_pb';
-import type { DuelEvent, DuelMove, DuelSide } from '../../generated/proto/game/v1/training_pb';
+import type { DuelEvent, DuelMove, TrainingView } from '../../generated/proto/game/v1/training_pb';
 import { hasTranslation, t } from '../../i18n';
 import type { ClientBody, ServerBody } from '../../net/client';
+// The board comes with the offline bundle the app already keeps, not as a second copy.
+import {
+  boardStyles,
+  CardDialog,
+  ChronicleDialog,
+  cardName,
+  createSimulation,
+  DecisionTable,
+  errorText,
+  eventText,
+  loadPictures,
+  quietEvents,
+  type RoundRecord,
+  SimulationBoard,
+  useDuelKeys,
+} from '../offline';
 
+const move = (value: Partial<DuelMove>): DuelMove => ({
+  $typeName: 'game.v1.DuelMove',
+  attacks: [],
+  defenses: [],
+  action: 0,
+  handIndex: 0,
+  ...value,
+});
+
+// The same board as offline training, driven by the server: every resolved round is simulated
+// from the view at its start, and the opponent's previous settings sit between the trays.
 export function OnlineDuel(props: {
   snapshot: DuelSnapshot;
   end?: DuelEnd;
@@ -40,105 +60,121 @@ export function OnlineDuel(props: {
   tutorial?: boolean;
 }) {
   const view = () => props.snapshot.view;
-  const [attacks, setAttacks] = createSignal<number[]>([]);
-  const [defenses, setDefenses] = createSignal<number[]>([]);
-  const [action, setAction] = createSignal(0);
-  const [handIndex, setHandIndex] = createSignal(0);
+  const [draft, setDraft] = createSignal(move({}));
   const [preview, setPreview] = createSignal<DuelMovePreview>();
   const [sending, setSending] = createSignal(false);
   const [confirm, setConfirm] = createSignal(false);
-  const [chronicle, setChronicle] = createSignal<{ round: number; events: DuelEvent[] }[]>([]);
-  const [pictures, setPictures] = createSignal(new Map<string, string>());
-  let current = '';
+  const [inspect, setInspect] = createSignal<Card>();
+  const [showChronicle, setShowChronicle] = createSignal(false);
+  // Resolved rounds, newest first; `events` is the newest one and `start` the view before it.
+  const [history, setHistory] = createSignal<RoundRecord[]>([]);
+  const [events, setEvents] = createSignal<DuelEvent[]>([]);
+  const [start, setStart] = createSignal<TrainingView>();
+  const sim = createSimulation();
+  const titleId = createUniqueId();
+  let root!: HTMLElement;
+  let currentRound = '';
   let currentDuel = '';
+  let lastResolved = 0;
+  let lastView: TrainingView | undefined;
   let disposed = false;
   let generation = 0;
-  let lastRevision = -1;
   onMount(() => {
-    void import('../../app/cardArt')
-      .then((module) => {
-        if (!disposed) setPictures(module.cardPictures);
-      })
-      .catch(() => {});
+    loadPictures();
+    if (!props.replay) root.scrollIntoView({ block: 'start' });
   });
   const finished = () => !!view()?.outcome;
   const locked = () =>
-    !props.connected || props.snapshot.submitted || finished() || sending() || !!props.replay;
+    !props.connected ||
+    props.snapshot.submitted ||
+    finished() ||
+    sending() ||
+    !!props.replay ||
+    sim.animating();
   const canSubmit = () => !locked() && !!preview()?.preview && !preview()?.preview?.error;
-  const move = (): DuelMove => ({
-    $typeName: 'game.v1.DuelMove',
-    attacks: attacks(),
-    defenses: defenses(),
-    action: action(),
-    handIndex: handIndex(),
-  });
   const remaining = createMemo(() =>
     Math.max(0, Math.ceil((Number(props.snapshot.deadlineMs) - props.now) / 1000)),
   );
+  const logins = (): [string, string] => [
+    props.snapshot.you?.login ?? '',
+    props.snapshot.opponent?.login ?? '',
+  ];
+  const avatarIds = (): [number, number] => [
+    props.snapshot.you?.pathId || props.snapshot.you?.templateId || 0,
+    props.snapshot.opponent?.pathId || props.snapshot.opponent?.templateId || 0,
+  ];
+  const text = (event: DuelEvent) => eventText(event, logins());
+  const log = () =>
+    [...history()]
+      .reverse()
+      .map((record) => ({
+        round: record.round,
+        events: record.events.filter(
+          (e) => !quietEvents.includes(e.kind) && hasTranslation(`event-${e.kind}`),
+        ),
+      }))
+      .filter((record) => record.events.length);
   createEffect(() => {
     const snapshot = props.snapshot;
+    const current = snapshot.view;
     if (snapshot.duelId !== currentDuel) {
       currentDuel = snapshot.duelId;
-      lastRevision = -1;
-      setChronicle([]);
+      lastResolved = 0;
+      lastView = undefined;
+      sim.skip();
+      setHistory([]);
+      setEvents([]);
+      setStart(undefined);
       setConfirm(false);
     }
-    const key = `${snapshot.duelId}:${snapshot.view?.round}`;
-    if (key !== current) {
-      current = key;
-      setAttacks([...(snapshot.yourMove?.attacks ?? snapshot.view?.me?.attacks ?? [])]);
-      setDefenses([...(snapshot.yourMove?.defenses ?? snapshot.view?.me?.defenses ?? [])]);
-      setAction(snapshot.yourMove?.action ?? 0);
-      setHandIndex(snapshot.yourMove?.handIndex ?? 0);
+    const key = `${snapshot.duelId}:${current?.round}`;
+    if (key !== currentRound) {
+      currentRound = key;
+      setDraft(
+        move({
+          attacks: [...(snapshot.yourMove?.attacks ?? current?.me?.attacks ?? [])],
+          defenses: [...(snapshot.yourMove?.defenses ?? current?.me?.defenses ?? [])],
+          action: snapshot.yourMove?.action ?? 0,
+          handIndex: snapshot.yourMove?.handIndex ?? 0,
+        }),
+      );
       setPreview(undefined);
     }
-    if (props.replay || snapshot.revision > lastRevision) {
-      lastRevision = snapshot.revision;
-      const events = snapshot.events.filter(
-        (e) =>
-          !['draw', 'round', 'reveal', 'end'].includes(e.kind) && hasTranslation(`event-${e.kind}`),
-      );
-      const nextRound = snapshot.events.find((e) => e.kind === 'round')?.amount;
-      const resolvedRound = Math.max(
-        1,
-        nextRound === undefined ? (snapshot.view?.round ?? 1) : nextRound - 1,
-      );
-      if (props.replay) setChronicle(events.length ? [{ round: resolvedRound, events }] : []);
-      else if (events.length)
-        setChronicle((rows) =>
-          [
-            ...rows.filter((r) => r.round !== resolvedRound),
-            { round: resolvedRound, events },
-          ].slice(-10),
+    // Every resolution starts with the reveal; a forfeit alone only appends the end of the duel.
+    if (snapshot.events.some((e) => e.kind === 'reveal')) {
+      const next = snapshot.events.find((e) => e.kind === 'round')?.amount;
+      const round = Math.max(1, next === undefined ? (current?.round ?? 1) : next - 1);
+      if (props.replay || round > lastResolved) {
+        lastResolved = round;
+        // The previous snapshot is the round start when the duel (or a replay) moved one round on.
+        // After a reload there is none: the round can still be replayed, without the health drop.
+        const begin = lastView?.round === round ? lastView : undefined;
+        setHistory((rows) =>
+          props.replay
+            ? [{ round, events: snapshot.events }]
+            : [{ round, events: snapshot.events }, ...rows.filter((r) => r.round !== round)],
         );
+        setEvents(snapshot.events);
+        setStart(begin);
+        untrack(() => (begin ? void sim.animate(snapshot.events, begin) : sim.skip()));
+      }
+    } else if (props.replay) {
+      sim.skip();
+      setHistory([]);
+      setEvents([]);
     }
+    lastView = current;
     if (!props.replay) {
       setDuelActive(!finished());
       setOnlineDuelActive(!finished());
     }
   });
-  function eventText(event: DuelEvent) {
-    const card = cards.get(event.cardId);
-    return t(`event-${event.kind}`, {
-      amount: event.amount,
-      slot: event.slot + 1,
-      old: event.oldValue,
-      new: event.newValue,
-      card: card ? t(fluentKey(card.key)) : '',
-      name:
-        event.side === 0
-          ? (props.snapshot.you?.login ?? '')
-          : (props.snapshot.opponent?.login ?? ''),
-      detail: event.detail,
-      kind: t(event.attackKind === 0 ? 'online-physical' : 'online-magical'),
-    });
-  }
   createEffect(() => {
-    const mv = move();
+    const mv = draft();
     const snapshot = props.snapshot;
     const request = ++generation;
     setPreview(undefined);
-    if (locked() || attacks().length !== 3) return;
+    if (locked() || mv.attacks.length !== 3) return;
     const timer = setTimeout(async () => {
       const reply = await props.send({
         case: 'duelPreviewMove',
@@ -176,7 +212,7 @@ export function OnlineDuel(props: {
           $typeName: 'game.v1.DuelSubmitMove',
           duelId: props.snapshot.duelId,
           round: view()?.round ?? 1,
-          move: move(),
+          move: draft(),
         },
       });
       if (response)
@@ -188,39 +224,44 @@ export function OnlineDuel(props: {
       if (!disposed) setSending(false);
     }
   }
-  function cardCost(index: number, card: Card) {
-    const option = preview()?.castOptions[index];
-    return option
-      ? [option.focusCost - option.changes * content.rules.duel.change_cost, option.staminaCost]
-      : [card.cost.focus, card.cost.stamina];
-  }
-  function side(data: DuelSide | undefined, login: string, template: number) {
-    return (
-      <article class="online-side">
-        <Show when={avatars.get(template)}>
-          {(a) => <img width="72" height="72" alt="" src={portrait(a().key)} />}
-        </Show>
-        <h3>{login}</h3>
-        <p>
-          HP {data?.hp} / {data?.hpStart} · W {data?.stamina} · K {data?.focus}
-        </p>
-        <progress
-          aria-label={`${login} HP`}
-          max={Math.max(1, data?.hpStart ?? 1)}
-          value={Math.max(0, data?.hp ?? 0)}
-        />
-        <p>
-          {t('online-deck', { count: data?.deckLen ?? 0 })} ·{' '}
-          {t('online-hand', { count: data?.handLen ?? 0 })}
-        </p>
-      </article>
-    );
-  }
+  const replayRound = () => void sim.animate(events(), start());
+  const change = (next: DuelMove) => {
+    if (!locked()) setDraft(next);
+  };
+  useDuelKeys({
+    ignore: () => !!inspect() || showChronicle() || confirm(),
+    animating: sim.animating,
+    skip: sim.skip,
+    canReplay: () => events().length > 0 && !sim.animating(),
+    replay: replayRound,
+    locked,
+    fixed: () => false,
+    pending: () => false,
+    view,
+    draft,
+    castOptions: () => preview()?.castOptions ?? [],
+    change,
+    inspect: setInspect,
+    submit: () => void submit(),
+  });
+  const opponentStatus = () =>
+    !props.snapshot.opponentConnected
+      ? t('online-opponent-offline', {
+          seconds: Math.max(0, Math.ceil((Number(props.snapshot.graceUntilMs) - props.now) / 1000)),
+        })
+      : t(props.snapshot.opponentReady ? 'online-opponent-ready' : 'online-opponent-thinking');
+  const title = (round: number) => (
+    <h2 id={titleId} class={boardStyles.boardTitle}>
+      {t(props.replay ? 'online-replay' : 'online-duel')} ·{' '}
+      {t('online-round', { round, total: view()?.totalRounds ?? 5 })}
+    </h2>
+  );
   return (
     <section
-      class="online-duel lobby-panel"
+      class={`${boardStyles.duel} ${boardStyles.embedded}`}
       aria-label={t('online-duel')}
       data-testid="online-duel"
+      ref={root}
     >
       <Show when={props.tutorial && !finished()}>
         <aside class="lobby-journey">
@@ -228,205 +269,200 @@ export function OnlineDuel(props: {
           <p>{t((view()?.round ?? 1) === 1 ? 'online-tutorial-first' : 'online-tutorial-next')}</p>
         </aside>
       </Show>
-      <div class="lobby-chat-heading">
-        <h2>
-          {t(props.replay ? 'online-replay' : 'online-duel')} ·{' '}
-          {t('online-round', { round: view()?.round ?? 1, total: view()?.totalRounds ?? 5 })}
-        </h2>
-        <Show when={finished() || props.replay}>
-          <button type="button" onClick={props.close}>
-            {t('close')}
-          </button>
-        </Show>
-      </div>
-      <div class="online-sides">
-        {side(
-          view()?.me,
-          props.snapshot.you?.login ?? '',
-          props.snapshot.you?.pathId || props.snapshot.you?.templateId || 0,
-        )}
-        {side(
-          view()?.opponent,
-          props.snapshot.opponent?.login ?? '',
-          props.snapshot.opponent?.pathId || props.snapshot.opponent?.templateId || 0,
-        )}
-      </div>
-      <Show when={!finished() && !props.replay}>
-        <p role="status">
-          {t(props.snapshot.submitted ? 'online-waiting' : 'online-deadline', {
-            seconds: remaining(),
-          })}{' '}
-          · {t(props.snapshot.opponentReady ? 'online-opponent-ready' : 'online-opponent-thinking')}
-        </p>
-        <Show when={!props.snapshot.opponentConnected}>
-          <p role="status">
-            {t('online-opponent-offline', {
-              seconds: Math.max(
-                0,
-                Math.ceil((Number(props.snapshot.graceUntilMs) - props.now) / 1000),
-              ),
-            })}
-          </p>
-        </Show>
-        <fieldset disabled={locked()} class="online-controls">
-          <legend>{t('online-slots')}</legend>
-          <For each={['attacks', 'defenses'] as const}>
-            {(kind) => (
-              <div>
-                <strong>{t(`online-${kind}`)}</strong>
-                <Index each={kind === 'attacks' ? attacks() : defenses()}>
-                  {(value, index) => (
-                    <button
-                      type="button"
-                      aria-label={t(`online-${kind}-slot`, { slot: index + 1 })}
-                      aria-pressed={value() === 1}
-                      onClick={() => {
-                        const update = (rows: number[]) =>
-                          rows.map((v, i) => (i === index ? 1 - v : v));
-                        if (kind === 'attacks') setAttacks(update);
-                        else setDefenses(update);
-                      }}
+      <Show when={view()}>
+        {(state) => (
+          <Show
+            when={sim.animating()}
+            fallback={
+              <DecisionTable
+                view={state()}
+                plates={logins()}
+                title={title(state().round)}
+                heading={
+                  <h2>{t('online-round', { round: state().round, total: state().totalRounds })}</h2>
+                }
+                labelledBy={titleId}
+                avatars={avatarIds()}
+                labels={logins()}
+                draft={draft()}
+                preview={preview()?.preview}
+                castOptions={preview()?.castOptions ?? []}
+                previous={state().round > 1}
+                locked={locked()}
+                pending={false}
+                clock={remaining()}
+                clockLabel={t('online-deadline', { seconds: remaining() })}
+                result={
+                  <section class={`${boardStyles.result} online-result`} role="status">
+                    <h2>
+                      {t(
+                        state().outcome?.winner === 0
+                          ? 'online-draw'
+                          : state().outcome?.winner === 1
+                            ? 'online-win'
+                            : 'online-loss',
+                      )}
+                    </h2>
+                    <p>{t(`online-reason-${state().outcome?.reason}`)}</p>
+                    <Show
+                      when={props.end}
+                      fallback={
+                        <Show when={!props.replay}>
+                          <p>{t('online-settling')}</p>
+                        </Show>
+                      }
                     >
-                      {t(value() === 0 ? 'online-physical' : 'online-magical')}
-                    </button>
-                  )}
-                </Index>
-              </div>
-            )}
-          </For>
-        </fieldset>
-        <fieldset disabled={locked()}>
-          <legend>{t('online-card-action')}</legend>
-          <label>
-            {t('online-action')}{' '}
-            <select value={action()} onChange={(e) => setAction(Number(e.currentTarget.value))}>
-              <option value="0">{t('online-none')}</option>
-              <option value="1">{t('online-cast')}</option>
-              <option value="2">{t('online-discard')}</option>
-            </select>
-          </label>
-          <div class="online-hand">
-            <For each={view()?.hand}>
-              {(id, index) => {
-                const card = cards.get(id);
-                return (
-                  <button
-                    type="button"
-                    aria-pressed={handIndex() === index()}
-                    onClick={() => setHandIndex(index())}
-                  >
-                    <strong>{card ? t(fluentKey(card.key)) : id}</strong>
-                    <Show when={card && pictures().get(card.key)}>
-                      {(source) => <img src={source()} width="128" height="96" alt="" />}
-                    </Show>
-                    <Show when={card}>
-                      {(selected) => (
+                      {(end) => (
                         <>
-                          <p>{t(fluentKey(selected().key, 'text'), cardArgs(selected()))}</p>
-                          <small>
-                            K {cardCost(index(), selected())[0]} · W{' '}
-                            {cardCost(index(), selected())[1]}
-                          </small>
+                          <p>
+                            +{end().xpGained} PD · {end().ratingDelta >= 0 ? '+' : ''}
+                            {end().ratingDelta} RP · {end().ratingNew} RP · +{end().ducatsGained}{' '}
+                            {t('store-ducats')}
+                          </p>
+                          <Show when={end().unlockedTemplate}>
+                            <p>
+                              {t('online-unlocked', {
+                                avatar: t(
+                                  fluentKey(avatars.get(end().unlockedTemplate)?.key ?? ''),
+                                ),
+                              })}
+                            </p>
+                          </Show>
                         </>
                       )}
                     </Show>
-                  </button>
-                );
-              }}
-            </For>
-          </div>
-        </fieldset>
-        <Show when={preview()?.preview}>
-          {(p) => (
-            <p role="status">
-              {t('online-cost', { focus: p().focusCost, stamina: p().staminaCost })}{' '}
-              <Show when={p().error}>
-                {t(hasTranslation(`error-${p().error}`) ? `error-${p().error}` : 'error-generic')}
-              </Show>
-            </p>
-          )}
-        </Show>
-        <div class="lobby-actions">
-          <button
-            class="primary"
-            type="button"
-            disabled={!canSubmit()}
-            onClick={() => void submit()}
-          >
-            {t('online-submit')}
-          </button>
-          <button type="button" disabled={locked()} onClick={() => setConfirm(true)}>
-            {t('online-forfeit')}
-          </button>
-        </div>
-      </Show>
-      <Show when={finished()}>
-        <div class="online-result" role="status">
-          <h3>
-            {t(
-              view()?.outcome?.winner === 0
-                ? 'online-draw'
-                : view()?.outcome?.winner === 1
-                  ? 'online-win'
-                  : 'online-loss',
-            )}
-          </h3>
-          <p>{t(`online-reason-${view()?.outcome?.reason}`)}</p>
-          <Show
-            when={props.end}
-            fallback={
-              <Show when={!props.replay}>
-                <p>{t('online-settling')}</p>
-              </Show>
+                  </section>
+                }
+                message={
+                  <Show when={!finished() && !props.replay}>
+                    {props.snapshot.submitted
+                      ? t('online-waiting')
+                      : preview()?.preview?.error
+                        ? errorText(preview()?.preview?.error ?? '')
+                        : draft().action
+                          ? `${t(draft().action === 1 ? 'cast' : 'discard')}: ${cardName(state().hand[draft().handIndex] ?? 0)}`
+                          : t('choose-sequence')}{' '}
+                    · {opponentStatus()}
+                  </Show>
+                }
+                buttons={
+                  <>
+                    <Show when={!finished() && !props.replay}>
+                      <button
+                        type="button"
+                        class="quiet"
+                        disabled={locked()}
+                        onClick={() => setConfirm(true)}
+                      >
+                        {t('online-forfeit')}
+                      </button>
+                    </Show>
+                    <button type="button" class="secondary" onClick={() => setShowChronicle(true)}>
+                      {t('chronicle')}
+                    </button>
+                    <button
+                      type="button"
+                      class="secondary"
+                      disabled={!events().length}
+                      onClick={replayRound}
+                    >
+                      {t('replay')}
+                    </button>
+                    <Show
+                      when={!finished() && !props.replay}
+                      fallback={
+                        <button type="button" class="primary" onClick={props.close}>
+                          {t('close')}
+                        </button>
+                      }
+                    >
+                      <button
+                        type="button"
+                        class="primary"
+                        disabled={!canSubmit()}
+                        onClick={() => void submit()}
+                      >
+                        {t('online-submit')}
+                        <span aria-hidden="true">✓</span>
+                      </button>
+                    </Show>
+                  </>
+                }
+                onChange={change}
+                onInspect={setInspect}
+              />
             }
           >
-            {(end) => (
-              <>
-                <p>
-                  +{end().xpGained} PD · {end().ratingDelta >= 0 ? '+' : ''}
-                  {end().ratingDelta} RP · {end().ratingNew} RP · +{end().ducatsGained}{' '}
-                  {t('store-ducats')}
-                </p>
-                <Show when={end().unlockedTemplate}>
-                  <p>
-                    {t('online-unlocked', {
-                      avatar: t(fluentKey(avatars.get(end().unlockedTemplate)?.key ?? '')),
-                    })}
-                  </p>
-                </Show>
-              </>
-            )}
+            <SimulationBoard
+              sim={sim}
+              view={start() ?? state()}
+              start={start()}
+              plates={logins()}
+              title={title(history()[0]?.round ?? state().round)}
+              labelledBy={titleId}
+              avatars={avatarIds()}
+              labels={logins()}
+              events={events()}
+              history={history()}
+              text={text}
+              message={
+                <>
+                  {t('simulation')}
+                  <Show when={!finished() && !props.replay}>
+                    {' · '}
+                    {t('online-deadline', { seconds: remaining() })}
+                  </Show>
+                </>
+              }
+            />
           </Show>
-        </div>
+        )}
       </Show>
-      <Show when={chronicle().length}>
+      <Show when={log().length}>
         <details>
           <summary>{t('online-log')}</summary>
-          <For each={chronicle()}>
+          <For each={log()}>
             {(r) => (
               <div>
                 <h3>{t('online-round', { round: r.round, total: view()?.totalRounds ?? 5 })}</h3>
-                <For each={r.events}>{(event) => <p>{eventText(event)}</p>}</For>
+                <For each={r.events}>{(event) => <p>{text(event)}</p>}</For>
               </div>
             )}
           </For>
         </details>
       </Show>
+      <Show when={showChronicle()}>
+        <ChronicleDialog
+          history={history()}
+          events={events()}
+          text={text}
+          close={() => setShowChronicle(false)}
+        />
+      </Show>
+      <Show when={inspect()}>
+        {(card) => <CardDialog card={card()} close={() => setInspect(undefined)} />}
+      </Show>
       <Show when={confirm()}>
         <Modal title={t('online-forfeit')} close={() => setConfirm(false)}>
           <p>{t('online-forfeit-confirm')}</p>
-          <button
-            type="button"
-            onClick={async () => {
-              setConfirm(false);
-              await props.send({
-                case: 'duelForfeit',
-                value: { $typeName: 'game.v1.DuelTarget', duelId: props.snapshot.duelId },
-              });
-            }}
-          >
-            {t('online-forfeit')}
-          </button>
+          <div class="modal-actions">
+            <button type="button" class="secondary" onClick={() => setConfirm(false)}>
+              {t('cancel')}
+            </button>
+            <button
+              type="button"
+              class="primary"
+              onClick={async () => {
+                setConfirm(false);
+                await props.send({
+                  case: 'duelForfeit',
+                  value: { $typeName: 'game.v1.DuelTarget', duelId: props.snapshot.duelId },
+                });
+              }}
+            >
+              {t('online-forfeit')}
+            </button>
+          </div>
         </Modal>
       </Show>
     </section>

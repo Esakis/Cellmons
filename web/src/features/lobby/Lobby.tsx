@@ -40,7 +40,7 @@ const OnlineRecords = lazy(() =>
 );
 const Trade = lazy(() => import('./Trade').then((m) => ({ default: m.Trade })));
 
-const rooms = ['arena', 'training', 'castle', 'portal', 'bazaar', 'shop', 'tower'];
+const rooms = ['arena', 'ranked', 'training', 'castle', 'portal', 'bazaar', 'shop', 'tower'];
 // Every clan room shares one place: its name, description and painting (art/paintings/scenes);
 // outside the rooms the player looks at the town (Town.tsx).
 const place = (room: string) => (room.startsWith('clan:') ? 'clan' : room);
@@ -48,7 +48,8 @@ const scenes = import.meta.glob<string>(
   '../../assets/paintings/scenes/{arena,training,castle,portal,expedition,bazaar,shop,tower,clan}.avif',
   { eager: true, query: '?url', import: 'default' },
 );
-const scene = (room: string) => scenes[`../../assets/paintings/scenes/${place(room)}.avif`];
+const scene = (room: string) =>
+  scenes[`../../assets/paintings/scenes/${room === 'ranked' ? 'arena' : place(room)}.avif`];
 
 // A number with an icon in place of its text label; the label stays as the alt text and tooltip.
 function Value(props: { icon: string | undefined; label: string; value: number }) {
@@ -1064,7 +1065,11 @@ export function Lobby() {
                           <button
                             type="button"
                             disabled={
-                              !connected() || room() !== 'arena' || p.busy || self().busy || p.afk
+                              !connected() ||
+                              !['arena', 'ranked'].includes(room()) ||
+                              p.busy ||
+                              self().busy ||
+                              p.afk
                             }
                             onClick={() =>
                               void send({

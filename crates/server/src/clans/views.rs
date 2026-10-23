@@ -78,6 +78,7 @@ pub struct Limits {
 #[derive(Serialize)]
 pub struct Snapshot {
     pub content_version: String,
+    pub account_level: u8,
     pub own: Option<Uuid>,
     pub own_role: Option<String>,
     pub clans: Vec<Summary>,
@@ -177,10 +178,16 @@ pub async fn load(tx: &mut PgConnection, user: Uuid, query: &Query) -> Result<Sn
         None
     };
     let applications=sqlx::query_as::<_,Application>("SELECT a.clan_id AS clan,c.name::text AS name FROM clan_applications a JOIN clans c ON c.id=a.clan_id WHERE a.user_id=$1 AND c.status<>'disbanded' ORDER BY a.created_at,a.clan_id")
-        .bind(user).fetch_all(tx).await?;
+        .bind(user).fetch_all(&mut *tx).await?;
     let rules = &crate::rules::RULES.clan;
     Ok(Snapshot {
         content_version: crate::auth::crypto::hex(&engine_content::CONTENT_VERSION),
+        account_level: crate::journey::level(
+            sqlx::query_scalar("SELECT account_xp FROM users WHERE id=$1")
+                .bind(user)
+                .fetch_one(&mut *tx)
+                .await?,
+        ),
         own,
         own_role,
         clans,

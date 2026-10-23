@@ -293,6 +293,7 @@ pub async fn mutate(db: &PgPool, actor: Uuid, mutation: Mutation) -> Result<Chan
         {
             return Err(Error("ALREADY_MEMBER"));
         }
+        crate::advancement::require(&mut tx, actor, 15).await?;
         let inserted = sqlx::query("INSERT INTO clans(id,name) VALUES ($1,$2::citext)")
             .bind(clan)
             .bind(&name)

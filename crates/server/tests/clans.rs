@@ -8,6 +8,11 @@ async fn user(db: &PgPool, index: u128) -> Uuid {
     let mut tx = db.begin().await.unwrap();
     sqlx::query("INSERT INTO users(id,login,email,password_hash,start_school) VALUES ($1,$2::citext,$3::citext,'$argon2id$v=19$m=19456,t=2,p=1$fixture$fixture','combat')")
         .bind(id).bind(format!("ClanUser{index}")).bind(format!("clan{index}@example.test")).execute(&mut *tx).await.unwrap();
+    sqlx::query("UPDATE users SET account_xp=8000 WHERE id=$1")
+        .bind(id)
+        .execute(&mut *tx)
+        .await
+        .unwrap();
     sqlx::query("INSERT INTO ratings(user_id) VALUES ($1)")
         .bind(id)
         .execute(&mut *tx)

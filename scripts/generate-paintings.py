@@ -192,6 +192,14 @@ def review_page(entries: dict) -> None:
             f'{html.escape(entry["painter"])} · <a href="{html.escape(entry["page"])}">'
             f'{html.escape(entry["license"])}</a></figcaption></figure>'
         )
+    generated = json.loads((OUTPUT / "generated-assets.json").read_text("utf-8"))
+    for entry in generated["assets"]:
+        figures.append(
+            f'<figure><img src="paintings/{html.escape(entry["path"])}" alt="" loading="lazy">'
+            f'<figcaption><b>{html.escape(entry["path"])}</b><br>'
+            '<a href="paintings/generated-assets.json">AI · image_gen · prompt / source</a>'
+            '</figcaption></figure>'
+        )
     page = (
         '<!doctype html>\n<html lang="pl"><head><meta charset="utf-8">'
         "<title>Obrazy kart i postaci</title><style>"

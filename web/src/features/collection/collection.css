@@ -325,3 +325,9 @@
     padding: 10px;
   }
 }
+.mastery-badge {
+  display: block;
+  color: #edcf88;
+  font-size: 0.8rem;
+  padding: 0.2rem 0.4rem;
+}

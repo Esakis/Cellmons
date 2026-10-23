@@ -847,7 +847,7 @@ impl State {
             return Ok(Some(users.into_iter().map(|id| id.to_string()).collect()));
         }
         if [
-            "square", "arena", "training", "castle", "portal", "bazaar", "shop", "tower",
+            "square", "arena", "ranked", "training", "castle", "portal", "bazaar", "shop", "tower",
         ]
         .contains(&name)
         {
@@ -1321,7 +1321,7 @@ impl State {
         }
         let from = &self.players[&user];
         let to = &self.players[&other];
-        if from.room != "arena" || to.room != "arena" {
+        if !["arena", "ranked"].contains(&from.room.as_str()) || to.room != from.room {
             return Err(Error("FORBIDDEN"));
         }
         if self.is_busy(user)
@@ -1336,7 +1336,8 @@ impl State {
             return Err(Error("CONFLICT"));
         }
         if to.info.challenge_filter == "none"
-            || (to.info.challenge_filter == "level_pm2"
+            || (from.room != "ranked"
+                && to.info.challenge_filter == "level_pm2"
                 && to.info.level.abs_diff(from.info.level) > 2)
         {
             return Err(Error("FORBIDDEN"));
@@ -1391,10 +1392,11 @@ impl State {
         }
         let a = &self.players[&from].info;
         let b = &self.players[&to].info;
-        if self.players[&from].room != "arena"
-            || self.players[&to].room != "arena"
+        let ranked = self.players[&from].room == "ranked";
+        if !["arena", "ranked"].contains(&self.players[&from].room.as_str())
+            || self.players[&to].room != self.players[&from].room
             || b.challenge_filter == "none"
-            || (b.challenge_filter == "level_pm2" && b.level.abs_diff(a.level) > 2)
+            || (!ranked && b.challenge_filter == "level_pm2" && b.level.abs_diff(a.level) > 2)
             || a.afk
             || b.afk
         {
@@ -1415,8 +1417,22 @@ impl State {
             .await?
             .ok_or(Error("CONFLICT"))?;
         }
-        let first = repo::prepare_player(&mut tx, from, &expected[0]).await?;
-        let second = repo::prepare_player(&mut tx, to, &expected[1]).await?;
+        let mut first = repo::prepare_player(&mut tx, from, &expected[0]).await?;
+        let mut second = repo::prepare_player(&mut tx, to, &expected[1]).await?;
+        let mut first_profile = self.players[&from].info.clone();
+        let mut second_profile = self.players[&to].info.clone();
+        if ranked {
+            for user in [from, to] {
+                crate::advancement::require(&mut tx, user, 15).await?;
+            }
+            first_profile = repo::player_on(&mut tx, from).await?;
+            second_profile = repo::player_on(&mut tx, to).await?;
+            if !first_profile.verified || !second_profile.verified {
+                return Err(Error("VERIFY_REQUIRED"));
+            }
+            repo::normalize_ranked(&mut first, &mut first_profile)?;
+            repo::normalize_ranked(&mut second, &mut second_profile)?;
+        }
         let mut seed = [0; 32];
         getrandom::fill(&mut seed).map_err(|_| Error("INTERNAL"))?;
         let setup = engine::DuelSetup {
@@ -1428,22 +1444,18 @@ impl State {
         let duel = Uuid::now_v7();
         let runtime = if self.settings.run_duels {
             let mut seats = [
-                Seat::player(
-                    first.user,
-                    first.avatar,
-                    &first.setup,
-                    &self.players[&from].info,
-                ),
-                Seat::player(
-                    second.user,
-                    second.avatar,
-                    &second.setup,
-                    &self.players[&to].info,
-                ),
+                Seat::player(first.user, first.avatar, &first.setup, &first_profile),
+                Seat::player(second.user, second.avatar, &second.setup, &second_profile),
             ];
             let exhibition = crate::bots::configure_seats(&mut tx, &mut seats).await?;
             // Autonomous exhibitions do not mint rewards or manufacture ranked results.
-            let kind = if exhibition { "training" } else { "arena" };
+            let kind = if exhibition {
+                "training"
+            } else if ranked {
+                "ranked"
+            } else {
+                "arena"
+            };
             let record = Record::new(duel, kind, seats, seed, &self.settings.duels)?;
             duel::journal::create(
                 &mut tx,
@@ -1577,7 +1589,7 @@ async fn duel_request(db: PgPool, manager: Manager, user: Uuid, body: Client) ->
 
 fn public_room(name: &str) -> bool {
     [
-        "square", "arena", "training", "castle", "portal", "bazaar", "shop", "tower",
+        "square", "arena", "ranked", "training", "castle", "portal", "bazaar", "shop", "tower",
     ]
     .contains(&name)
 }

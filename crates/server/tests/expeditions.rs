@@ -16,6 +16,11 @@ async fn user(db: &PgPool, index: usize) -> (Uuid, Uuid) {
     let mut tx = db.begin().await.unwrap();
     sqlx::query("INSERT INTO users(id,login,email,password_hash,start_school,email_verified_at) VALUES ($1,$2,$3,'$argon2id$v=19$m=19456,t=2,p=1$fixture$fixture','combat',now())")
         .bind(user).bind(format!("Explorer{index}")).bind(format!("explorer{index}@example.test")).execute(&mut *tx).await.unwrap();
+    sqlx::query("UPDATE users SET account_xp=450 WHERE id=$1")
+        .bind(user)
+        .execute(&mut *tx)
+        .await
+        .unwrap();
     sqlx::query("INSERT INTO ratings(user_id) VALUES ($1)")
         .bind(user)
         .execute(&mut *tx)
@@ -166,7 +171,7 @@ async fn expedition_xp_is_escrowed_and_retreat_pays_the_exact_fraction_once(db: 
         .fetch_one(&db)
         .await
         .unwrap();
-    assert_eq!(accumulated, 200);
+    assert_eq!(accumulated, 240);
     let revision = revision(&db, id).await;
     let request = Uuid::now_v7();
     let mut jobs = vec![];
@@ -179,7 +184,7 @@ async fn expedition_xp_is_escrowed_and_retreat_pays_the_exact_fraction_once(db: 
     for job in jobs {
         job.await.unwrap().unwrap();
     }
-    assert_eq!(xp(&db, avatar).await, 80);
+    assert_eq!(xp(&db, avatar).await, 96);
     assert_eq!(status(&db, id).await, "retreated");
     let rating: (i32, i32) = sqlx::query_as("SELECT rating,games FROM ratings WHERE user_id=$1")
         .bind(user)

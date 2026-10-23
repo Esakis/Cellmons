@@ -47,6 +47,7 @@ pub struct Difficulty {
 #[derive(Serialize)]
 pub struct Snapshot {
     content_version: String,
+    account_level: u8,
     run: Option<View>,
     difficulties: Vec<Difficulty>,
     avatar_chance_bps: u32,
@@ -112,6 +113,12 @@ pub async fn load(connection: &mut PgConnection, user: Uuid, id: Option<Uuid>) -
     };
     Ok(Snapshot {
         content_version: crate::auth::crypto::hex(&engine_content::CONTENT_VERSION),
+        account_level: crate::journey::level(
+            sqlx::query_scalar("SELECT account_xp FROM users WHERE id=$1")
+                .bind(user)
+                .fetch_one(&mut *connection)
+                .await?,
+        ),
         run,
         difficulties: CONFIG
             .difficulties

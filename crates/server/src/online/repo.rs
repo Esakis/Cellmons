@@ -332,6 +332,31 @@ pub struct PreparedPlayer {
     pub avatar: Uuid,
     pub setup: engine::PlayerSetup,
 }
+/// Ranked fights compare class/deck choices at base level 20, without accumulated bonuses.
+pub fn normalize_ranked(player: &mut PreparedPlayer, profile: &mut pb::PublicPlayer) -> Result<()> {
+    let definition = engine_content::AVATARS
+        .iter()
+        .find(|a| u32::from(a.id) == profile.template_id && a.playable)
+        .ok_or(Error("AVATAR_LOCKED"))?;
+    player.setup.avatar = definition.snapshot(20);
+    profile.level = 20;
+    profile.tier = 0;
+    profile.path_id = 0;
+    profile.specialization.clear();
+    profile.gift_id = 0;
+    profile.stats = engine::Stat::ALL
+        .map(|s| player.setup.avatar.stats.get(s))
+        .to_vec();
+    profile.schools = player
+        .setup
+        .avatar
+        .schools
+        .0
+        .into_iter()
+        .map(u32::from)
+        .collect();
+    Ok(())
+}
 pub async fn prepare_player(
     connection: &mut PgConnection,
     user: Uuid,

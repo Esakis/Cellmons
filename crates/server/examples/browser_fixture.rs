@@ -129,6 +129,16 @@ async fn run(options: PgConnectOptions) -> anyhow::Result<()> {
             }
         })));
         let progression_db = db.clone();
+        let contract_db = db.clone();
+        let app = app.merge(Router::new().route("/__fragments", post(move |Json(input):Json<serde_json::Value>| {
+            let db=contract_db.clone();
+            async move {
+                let login=input["login"].as_str().ok_or(axum::http::StatusCode::BAD_REQUEST)?;
+                let template=input["template"].as_i64().ok_or(axum::http::StatusCode::BAD_REQUEST)?;
+                sqlx::query("UPDATE class_contracts SET fragments=30 WHERE user_id=(SELECT id FROM users WHERE login=$1::citext) AND template_id=$2 AND active AND claimed_at IS NULL").bind(login).bind(template as i32).execute(&db).await.map_err(|_|axum::http::StatusCode::SERVICE_UNAVAILABLE)?;
+                Ok::<_,axum::http::StatusCode>(axum::http::StatusCode::NO_CONTENT)
+            }
+        })));
         let app = app.merge(Router::new().route("/__advance", post(move |Json(input): Json<Advance>| {
             let db = progression_db.clone();
             async move {
@@ -136,6 +146,8 @@ async fn run(options: PgConnectOptions) -> anyhow::Result<()> {
                 let user = sqlx::query_scalar::<_, uuid::Uuid>("SELECT id FROM users WHERE login=$1::citext FOR UPDATE").bind(input.login).fetch_one(&mut *tx).await.map_err(|_| axum::http::StatusCode::NOT_FOUND)?;
                 let result = sqlx::query("UPDATE avatars SET level=20,xp=65000,revision=revision+1 WHERE id=$1 AND user_id=$2 AND deleted_at IS NULL").bind(input.avatar).bind(user).execute(&mut *tx).await.map_err(|_| axum::http::StatusCode::SERVICE_UNAVAILABLE)?;
                 if result.rows_affected() != 1 { return Err(axum::http::StatusCode::NOT_FOUND); }
+                sqlx::query("UPDATE users SET account_xp=greatest(account_xp,12000) WHERE id=$1").bind(user).execute(&mut *tx).await.map_err(|_| axum::http::StatusCode::SERVICE_UNAVAILABLE)?;
+                sqlx::query("INSERT INTO class_trials(avatar_id,tier,wins) SELECT id,tier,3 FROM avatars WHERE id=$1 AND tier<2 ON CONFLICT(avatar_id,tier) DO UPDATE SET wins=3").bind(input.avatar).execute(&mut *tx).await.map_err(|_| axum::http::StatusCode::SERVICE_UNAVAILABLE)?;
                 tx.commit().await.map_err(|_| axum::http::StatusCode::SERVICE_UNAVAILABLE)?;
                 Ok(axum::http::StatusCode::NO_CONTENT)
             }

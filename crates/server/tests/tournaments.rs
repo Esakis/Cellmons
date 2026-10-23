@@ -343,7 +343,8 @@ async fn thirty_two_bots_finish_a_durable_tournament_and_pay_the_whole_pot_once(
     let bracket: tournaments::bracket::Bracket = serde_json::from_slice(&raw).unwrap();
     let champion = bracket.champion.unwrap();
     assert!((62..=93).contains(&games), "{games}");
-    assert_eq!(balance(&db, champion).await, 71);
+    // 40 starting Dukats - 1 entry + 32 prize + 5 daily quest.
+    assert_eq!(balance(&db, champion).await, 76);
     assert_eq!(escrow(&db, id).await, 0);
     let rating: i64 = sqlx::query_scalar("SELECT sum(rating) FROM ratings")
         .fetch_one(&db)
@@ -367,7 +368,7 @@ async fn thirty_two_bots_finish_a_durable_tournament_and_pay_the_whole_pot_once(
     tournaments::tick(&db, id, instance, &settings, now + 1000)
         .await
         .unwrap();
-    assert_eq!(balance(&db, champion).await, 71);
+    assert_eq!(balance(&db, champion).await, 76);
     assert!(server::economy::reconcile(&db).await.unwrap().is_ok());
 }
 
@@ -442,7 +443,16 @@ async fn clan_rosters_advance_together_and_share_every_ducat(db: PgPool) {
     assert_eq!(winners.len(), 4);
     assert!((56..=84).contains(&games), "{games}");
     for winner in winners {
-        assert_eq!(balance(&db, winner).await, 47);
+        // Teams advance together: a champion may have played too few qualifying duels
+        // after account level 4 to earn the daily quest. Its reward is separate from the pot.
+        let daily: i64 =
+            sqlx::query_scalar("SELECT count(*)*5 FROM daily_quests WHERE user_id=$1 AND rewarded")
+                .bind(winner)
+                .fetch_one(&db)
+                .await
+                .unwrap();
+        assert!(daily == 0 || daily == 5);
+        assert_eq!(balance(&db, winner).await, 47 + daily);
     }
     assert_eq!(escrow(&db, id).await, 0);
     assert!(server::economy::reconcile(&db).await.unwrap().is_ok());
@@ -544,7 +554,7 @@ async fn readiness_lease_keeps_first_return_time_and_one_absence_is_a_real_walko
     let rewards = duel::result::settle(&db, instance, record, &state)
         .await
         .unwrap();
-    assert_eq!(rewards.xp.iter().sum::<u32>(), 100);
+    assert_eq!(rewards.xp, [0, 0]);
     assert_eq!(rewards.delta.iter().sum::<i32>(), 0);
     let mut wrong = record.clone();
     wrong.id = Uuid::now_v7();

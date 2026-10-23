@@ -588,7 +588,8 @@ async fn all_system_prize_types_settle_once_and_cancelled_cash_reconciles(db: Pg
             assert_eq!(rewards.xp, [0, 0]);
             assert_eq!(rewards.delta, [0, 0]);
         } else {
-            assert_eq!(rewards.xp.iter().sum::<u32>(), 100);
+            // The absent opponent loses rating, but a walkover grants no played-match XP.
+            assert_eq!(rewards.xp, [0, 0]);
             assert!(rewards.delta.iter().any(|d| *d > 0));
         }
         tournaments::tick(&db, id, instance, &settings, now + 111001)

@@ -92,7 +92,13 @@ export function OnlineRecords(props: {
             <article class="online-match">
               <p>
                 <time>{new Date(Number(m.atMs)).toLocaleString()}</time> ·{' '}
-                {t(m.kind === 'training' ? 'training' : 'lobby-room-arena')}
+                {t(
+                  m.kind === 'training'
+                    ? 'training'
+                    : m.kind === 'ranked'
+                      ? 'lobby-room-ranked'
+                      : 'lobby-room-arena',
+                )}
               </p>
               <strong>
                 {m.first} / {m.second}

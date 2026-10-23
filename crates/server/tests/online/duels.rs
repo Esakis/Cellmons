@@ -176,8 +176,16 @@ async fn retired_shade_cannot_start_a_duel_or_change_its_progress(pool: PgPool) 
 }
 
 async fn begin(one: &mut ClientSocket, two: &mut ClientSocket, name: &str) -> String {
-    one.join("arena").await;
-    two.join("arena").await;
+    begin_in(one, two, name, "arena").await
+}
+async fn begin_in(
+    one: &mut ClientSocket,
+    two: &mut ClientSocket,
+    name: &str,
+    room: &str,
+) -> String {
+    one.join(room).await;
+    two.join(room).await;
     let Body::ChallengeReceived(offer) = one
         .call(Client::ChallengeSend(pb::ChallengeSend {
             target: name.into(),
@@ -196,6 +204,54 @@ async fn begin(one: &mut ClientSocket, two: &mut ClientSocket, name: &str) -> St
         panic!("accept")
     };
     update.duel_id
+}
+
+#[sqlx::test(migrator = "server::db::MIGRATOR")]
+#[ignore = "requires PostgreSQL"]
+async fn ranked_normalizes_legacy_and_new_characters_and_preserves_saved_profiles(pool: PgPool) {
+    let a = player(&pool, 701, true).await;
+    let b = player(&pool, 702, true).await;
+    let path = engine_content::PATHS
+        .iter()
+        .find(|p| p.base_avatar == 1)
+        .unwrap();
+    sqlx::query("UPDATE avatars SET level=20,tier=3,path_id=$2,specialization=$3,gift_id=$4,dp_hp=6,dp_phys_atk=6 WHERE user_id=$1").bind(a.id).bind(i32::from(path.avatar.id)).bind(server::progression::specialization_name(path.specializations[0])).bind(i32::from(path.gifts[0])).execute(&pool).await.unwrap();
+    let server = Server::new(pool.clone(), Settings::default()).await;
+    let mut one = server.connect(&a, None).await;
+    let mut two = server.connect(&b, None).await;
+    let id = begin_in(&mut one, &mut two, &b.login, "ranked").await;
+    let record = server::duel::journal::load(&pool, Uuid::parse_str(&id).unwrap())
+        .await
+        .unwrap();
+    assert_eq!(record.kind, "ranked");
+    assert_eq!(record.seats[0].stats, record.seats[1].stats);
+    assert_eq!(record.seats[0].schools, record.seats[1].schools);
+    for seat in &record.seats {
+        let p = seat.public().unwrap();
+        assert_eq!(
+            (p.level, p.tier, p.path_id, p.gift_id, seat.specialization),
+            (20, 0, 0, 0, 0)
+        );
+        assert!(seat.gift.is_none());
+    }
+    assert_ok(
+        one.call(Client::DuelForfeit(pb::DuelTarget { duel_id: id }))
+            .await,
+    );
+    let Body::DuelEnd(end) = one.event(|b| matches!(b, Body::DuelEnd(_))).await else {
+        panic!()
+    };
+    assert_eq!((end.rating_delta, end.xp_gained), (-10, 0));
+    let saved: (i16, i16, i16) =
+        sqlx::query_as("SELECT level,tier,dp_hp FROM avatars WHERE user_id=$1")
+            .bind(a.id)
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+    assert_eq!(saved, (20, 3, 6));
+    drop(one);
+    drop(two);
+    server.stop().await;
 }
 async fn snapshot(client: &mut ClientSocket, id: &str) -> pb::DuelSnapshot {
     match client
@@ -306,7 +362,7 @@ async fn f7_full_fight_private_views_results_history_and_replay(pool: PgPool) {
         current.seed_commitment
     );
     assert_eq!(end.rating_delta, 0);
-    assert_eq!(end.xp_gained, 50);
+    assert_eq!(end.xp_gained, 80);
     let Body::MatchHistory(history) = one
         .call(Client::MatchHistoryGet(pb::MatchHistoryGet {
             limit: 10,
@@ -381,7 +437,7 @@ async fn f7_forfeit_exactly_once_and_historical_reward(pool: PgPool) {
     };
     assert_eq!(
         (end.rating_new, end.rating_delta, end.xp_gained),
-        (990, -10, 0)
+        (1000, 0, 0)
     );
     let record = server::duel::journal::load(&pool, Uuid::parse_str(&id).unwrap())
         .await
@@ -396,8 +452,8 @@ async fn f7_forfeit_exactly_once_and_historical_reward(pool: PgPool) {
         let reward = server::duel::result::settle(&pool, Uuid::nil(), &record, &state)
             .await
             .unwrap();
-        assert_eq!(reward.rating, [990, 1010]);
-        assert_eq!(reward.xp, [0, 100]);
+        assert_eq!(reward.rating, [1000, 1000]);
+        assert_eq!(reward.xp, [0, 0]);
     }
     assert_eq!(
         sqlx::query_scalar::<_, i32>("SELECT games FROM ratings WHERE user_id=$1")
@@ -698,7 +754,7 @@ async fn f7_stale_owner_cannot_acknowledge_or_persist_a_move(pool: PgPool) {
 
 #[sqlx::test(migrator = "server::db::MIGRATOR")]
 #[ignore = "requires PostgreSQL; check.bat runs this suite"]
-async fn f8_foreign_school_deck_challenge_lock_and_guaranteed_arena_unlock(pool: PgPool) {
+async fn foreign_school_decks_lock_during_challenges_and_forfeits_never_mint_rewards(pool: PgPool) {
     let a = player(&pool, 1, true).await;
     let b = player(&pool, 2, true).await;
     let server = Server::new(pool.clone(), Settings::default()).await;
@@ -772,15 +828,14 @@ async fn f8_foreign_school_deck_challenge_lock_and_guaranteed_arena_unlock(pool:
     let Body::DuelEnd(end) = one.event(|b| matches!(b, Body::DuelEnd(_))).await else {
         panic!()
     };
-    assert_ne!(end.unlocked_template, 0);
-    assert_ne!(end.unlocked_template, 1);
+    assert_eq!(end.unlocked_template, 0);
     let unlocks =
         sqlx::query_scalar::<_, i64>("SELECT count(*) FROM unlocked_templates WHERE user_id=$1")
             .bind(a.id)
             .fetch_one(&pool)
             .await
             .unwrap();
-    assert_eq!(unlocks, 2);
+    assert_eq!(unlocks, 1);
     let record = server::duel::journal::load(&pool, Uuid::parse_str(&accepted.duel_id).unwrap())
         .await
         .unwrap();
@@ -788,17 +843,14 @@ async fn f8_foreign_school_deck_challenge_lock_and_guaranteed_arena_unlock(pool:
     let repeated = server::duel::result::settle(&pool, Uuid::nil(), &record, &state)
         .await
         .unwrap();
-    assert_eq!(
-        repeated.unlock[0].map(u32::from),
-        Some(end.unlocked_template)
-    );
+    assert_eq!(repeated.unlock[0].map(u32::from), None);
     assert_eq!(
         sqlx::query_scalar::<_, i32>("SELECT wins FROM arena_progress WHERE user_id=$1")
             .bind(a.id)
             .fetch_one(&pool)
             .await
             .unwrap(),
-        5
+        4
     );
     let mut obsolete = record.clone();
     obsolete.engine_version = "previous-release".into();

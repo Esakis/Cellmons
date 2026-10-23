@@ -134,6 +134,51 @@ impl Fixture {
     }
 }
 
+async fn advancement_fixture(db: &PgPool, user: Uuid) {
+    let avatar: Uuid = sqlx::query_scalar("SELECT id FROM avatars WHERE user_id=$1 AND is_active")
+        .bind(user)
+        .fetch_one(db)
+        .await
+        .unwrap();
+    sqlx::query(
+        "INSERT INTO class_contracts(user_id,template_id,fragments,active) VALUES($1,4,14,true)",
+    )
+    .bind(user)
+    .execute(db)
+    .await
+    .unwrap();
+    sqlx::query("INSERT INTO card_mastery(user_id,card_id,xp) VALUES($1,1,45)")
+        .bind(user)
+        .execute(db)
+        .await
+        .unwrap();
+    sqlx::query("INSERT INTO daily_quests(user_id,day,fights) VALUES($1,CURRENT_DATE,2)")
+        .bind(user)
+        .execute(db)
+        .await
+        .unwrap();
+    sqlx::query(
+        "INSERT INTO path_packs(user_id,path_id,cards) VALUES($1,1002,ARRAY[1]::smallint[])",
+    )
+    .bind(user)
+    .execute(db)
+    .await
+    .unwrap();
+    sqlx::query("INSERT INTO class_trials(avatar_id,tier,wins) VALUES($1,0,2)")
+        .bind(avatar)
+        .execute(db)
+        .await
+        .unwrap();
+    sqlx::query("INSERT INTO avatar_advancement(avatar_id,permanent_points,permanent_unspent) VALUES($1,3,2)").bind(avatar).execute(db).await.unwrap();
+    sqlx::query(
+        "INSERT INTO incarnation_decks(avatar_id,tier,cards) VALUES($1,1,ARRAY[1]::smallint[])",
+    )
+    .bind(avatar)
+    .execute(db)
+    .await
+    .unwrap();
+    sqlx::query("INSERT INTO legacy_progression(avatar_id,profile) SELECT id,to_jsonb(a) FROM avatars a WHERE id=$1").bind(avatar).execute(db).await.unwrap();
+}
 #[sqlx::test(migrator = "server::db::MIGRATOR")]
 #[ignore = "requires PostgreSQL"]
 async fn export_is_a_complete_snapshot_of_own_data_without_credentials_or_other_mail(db: PgPool) {
@@ -141,6 +186,8 @@ async fn export_is_a_complete_snapshot_of_own_data_without_credentials_or_other_
     let a = f.user("PrivacyAlice").await;
     let b = f.user("PrivacyBob").await;
     let c = f.user("PrivacyCarol").await;
+    advancement_fixture(&db, a.id).await;
+    advancement_fixture(&db, b.id).await;
     sqlx::query("UPDATE users SET account_xp=700 WHERE id=$1")
         .bind(a.id)
         .execute(&db)
@@ -206,6 +253,18 @@ async fn export_is_a_complete_snapshot_of_own_data_without_credentials_or_other_
     assert_eq!(data["account_progress"][0]["xp"], 700);
     assert_eq!(data["recruitment_rewards"].as_array().unwrap().len(), 1);
     assert_eq!(data["recruitment_rewards"][0]["template_id"], 2);
+    for section in [
+        "class_contracts",
+        "card_mastery",
+        "daily_quests",
+        "path_packs",
+        "class_trials",
+        "permanent_points",
+        "incarnation_decks",
+        "legacy_progression",
+    ] {
+        assert_eq!(data[section].as_array().unwrap().len(), 1, "{section}");
+    }
     assert_eq!(data["mail"].as_array().unwrap().len(), 2);
     assert_eq!(data["wallet"][0]["balance"], "40");
     assert!(!data["collection"].as_array().unwrap().is_empty());
@@ -448,6 +507,7 @@ async fn erasure_is_exactly_once_and_preserves_the_currency_ledger(db: PgPool) {
     let f = Fixture::new(db.clone());
     let a = f.user("EraseAlice").await;
     let b = f.user("UntouchedBob").await;
+    advancement_fixture(&db, a.id).await;
     sqlx::query("UPDATE users SET account_xp=700 WHERE id=$1")
         .bind(a.id)
         .execute(&db)
@@ -520,6 +580,8 @@ async fn erasure_is_exactly_once_and_preserves_the_currency_ledger(db: PgPool) {
             .await
             .unwrap();
     assert_eq!(claims, 0);
+    let advancement:i64=sqlx::query_scalar("SELECT (SELECT count(*) FROM class_contracts WHERE user_id=$1)+(SELECT count(*) FROM card_mastery WHERE user_id=$1)+(SELECT count(*) FROM daily_quests WHERE user_id=$1)+(SELECT count(*) FROM path_packs WHERE user_id=$1)+(SELECT count(*) FROM class_trials c JOIN avatars a ON a.id=c.avatar_id WHERE a.user_id=$1)+(SELECT count(*) FROM avatar_advancement c JOIN avatars a ON a.id=c.avatar_id WHERE a.user_id=$1)+(SELECT count(*) FROM incarnation_decks c JOIN avatars a ON a.id=c.avatar_id WHERE a.user_id=$1)+(SELECT count(*) FROM legacy_progression c JOIN avatars a ON a.id=c.avatar_id WHERE a.user_id=$1)").bind(a.id).fetch_one(&db).await.unwrap();
+    assert_eq!(advancement, 0);
     assert_eq!(server::auth::privacy::cleanup(&db).await.unwrap(), 0);
 }
 

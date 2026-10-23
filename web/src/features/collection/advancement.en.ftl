@@ -1,0 +1,16 @@
+advancement-title = Contracts and card mastery
+advancement-master-title = Collection title: Spellgambit Master
+advancement-lock = Available at account level { $level }.
+advancement-daily = Daily quest: complete 3 online fights — { $count }/3. Reward: 5 Ducats. Resets at 00:00 UTC.
+advancement-daily-done = Reward collected automatically.
+contract-title = Character contract
+contract-help = Choose a class and collect 30 fragments. A completed fight grants 1, a win another 1, and a won expedition stage another 1. Requires 2 rounds; training, forfeits, disconnects and timeouts grant no fragments. Switching targets keeps previous progress. Claim the character with its card pack.
+contract-full = All slots are occupied. Free a slot before claiming; your fragments remain.
+contract-complete = You own every released class.
+contract-progress = Fragments: { $count }/30
+contract-select = Choose contract
+contract-active = Active contract
+contract-claim = Claim character
+mastery-title = Card mastery
+mastery-help = From account level 7: a card in your deck gains 1 XP per qualifying fight, plus 2 if successfully cast. All copies share progress. Level thresholds: 0 / 15 / 45 / 100 / 200 XP. Each level grants 2 Ducats once and a badge, without changing damage. See progress on card thumbnails and previews.
+mastery-locked = Card mastery opens at account level 7.

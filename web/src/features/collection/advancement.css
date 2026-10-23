@@ -1,0 +1,46 @@
+.advancement {
+  margin-block: 1rem;
+  padding: 1rem;
+  border: 1px solid #796347;
+  border-radius: 0.6rem;
+  background: #201c18;
+}
+.advancement summary {
+  cursor: pointer;
+  min-height: 44px;
+  font-weight: bold;
+}
+.contract-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr));
+  gap: 0.75rem;
+}
+.contract-grid article {
+  display: grid;
+  justify-items: center;
+  padding: 0.75rem;
+  border: 1px solid #796347;
+  border-radius: 0.4rem;
+  text-align: center;
+}
+.contract-grid article.active {
+  border-color: #e3bd72;
+  background: #32291b;
+}
+.contract-grid h3,
+.contract-grid p {
+  margin: 0.4rem 0;
+}
+.contract-grid progress {
+  width: 100%;
+  margin-block: 0.4rem;
+  accent-color: #d4b277;
+}
+.contract-grid button {
+  width: 100%;
+  min-height: 44px;
+  white-space: normal;
+}
+.contract-grid img {
+  border-radius: 50%;
+}

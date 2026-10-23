@@ -103,6 +103,7 @@ pub async fn start(
         return Err(Error("CONFLICT"));
     }
     crate::activity::ensure_idle(&mut tx, user).await?;
+    crate::advancement::require(&mut tx, user, if difficulty == "ordeal" { 25 } else { 4 }).await?;
     let prepared = repo::prepare_player(&mut tx, user, &avatar.to_string()).await?;
     let profile = repo::player_on(&mut tx, user).await?;
     let owned: Vec<i32> =

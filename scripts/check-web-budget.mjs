@@ -61,7 +61,12 @@ const administration = new Set(
 );
 const lobbyRoute = new Set([...startup, ...graph('src/features/lobby/Lobby.tsx')]);
 const recruitment = new Set(
-  [...graph('src/features/collection/Recruitment.tsx')]
+  [
+    ...new Set([
+      ...graph('src/features/collection/Recruitment.tsx'),
+      ...graph('src/features/collection/Advancement.tsx'),
+    ]),
+  ]
     .filter((f) => onlineAssets.has(join(output, f)) && !coreOnline.has(join(output, f)))
     .map((f) => join(output, f)),
 );
@@ -114,7 +119,8 @@ const rows = [
     await sum(
       [...duel].filter((f) => f.endsWith('.js') && !startup.has(f)).map((f) => join(output, f)),
     ),
-    40,
+    // The duel board is shared with online duels (~0.7 KiB); raised from 40 KiB by the owner.
+    41,
   ],
   [
     'Fonts (WOFF2)',

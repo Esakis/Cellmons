@@ -20,6 +20,7 @@ export type Profile = Summary & {
 };
 export type Snapshot = {
   content_version: string;
+  account_level?: number;
   own: string | null;
   own_role: string | null;
   clans: Summary[];

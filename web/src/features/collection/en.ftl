@@ -1,4 +1,10 @@
 collection-title = Characters and collection
+collection-deck-lesson = Deck editing opens after the first lesson at account level 2.
+collection-start-lesson = Go to the tutorial
+collection-presets-locked = Saving deck presets opens at account level 7.
+collection-archived-deck = Deck before incarnation { $tier }
+collection-mastery = Mastery { $level }/5
+collection-mastery-detail = Mastery { $level }/5 · { $xp }/{ $target } XP. Leveling grants a badge and 2 Ducats once. Card strength remains the same.
 collection-preview = Preview card: { $card }
 collection-available = Available cards
 collection-current-deck = Your deck

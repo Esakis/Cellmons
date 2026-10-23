@@ -1,5 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 import { administration } from '../admin';
+import { advancement } from '../advancement';
 import { clans } from '../clans';
 import { expeditions } from '../expeditions';
 import { privacy } from '../privacy';
@@ -11,7 +12,11 @@ import { tournaments } from '../tournaments';
 test.describe.configure({ retries: 0 });
 
 async function register(page: Page, login: string, build = false) {
-  await page.addInitScript(() => localStorage.setItem('game.language', 'en'));
+  // Round simulations take seconds; these flows check the server rounds, not the animation.
+  await page.addInitScript(() => {
+    localStorage.setItem('game.language', 'en');
+    localStorage.setItem('game.speed', 'instant');
+  });
   await page.goto('/#/account');
   await page.getByRole('button', { name: 'Register', exact: true }).click();
   await page.getByLabel('Login (3–20 letters, digits, _ or -)').fill(login);
@@ -41,8 +46,8 @@ async function register(page: Page, login: string, build = false) {
   await page.locator('header nav').getByRole('link', { name: 'Lobby', exact: true }).click();
   await expect(page.getByTestId('connection-status')).toHaveText('Connected');
   await expect(page.locator('.lobby-journey')).toContainText('First steps');
-  await expect(page.locator('.town-place')).toHaveCount(3);
-  await expect(page.locator('.town-place').filter({ hasText: 'Arena' })).toBeDisabled();
+  await expect(page.locator('.town-place')).toHaveCount(10);
+  await expect(page.locator('.town-place[data-place=arena]')).toBeDisabled();
   await page.getByRole('button', { name: 'Chat', exact: true }).click();
   await page
     .getByRole('textbox', { name: 'Message', exact: true })
@@ -74,7 +79,7 @@ async function register(page: Page, login: string, build = false) {
     await training.getByRole('button', { name: 'Close', exact: true }).click();
     await expect(page.locator('.lobby-account-level')).toContainText('level 3');
     await page.getByRole('button', { name: 'Map', exact: true }).click();
-    await expect(page.locator('.town-place')).toHaveCount(9);
+    await expect(page.locator('.town-place')).toHaveCount(10);
     await expect(page.locator('.town-place').filter({ hasText: 'Castle' })).toBeDisabled();
     if ((page.viewportSize()?.width ?? 1000) <= 650) {
       await page.screenshot({ path: '../target/phone-menu-level3.png', fullPage: true });
@@ -83,7 +88,7 @@ async function register(page: Page, login: string, build = false) {
   // The remainder exercises endgame features on established accounts.
   await page.request.post('http://127.0.0.1:18092/__journey', { data: { login, xp: 42000 } });
   await page.reload();
-  await expect(page.locator('.town-place')).toHaveCount(9);
+  await expect(page.locator('.town-place')).toHaveCount(10);
   if ((page.viewportSize()?.width ?? 1000) <= 650) {
     for (const size of [
       { width: 320, height: 640 },
@@ -173,7 +178,7 @@ test('real registration, two-client chat, contacts, mail, challenges and reconne
     await b.getByRole('button', { name: 'Mark as read' }).click();
     await expect(b.getByRole('button', { name: 'Mark as read' })).toHaveCount(0);
     await a.getByRole('button', { name: 'Map', exact: true }).click();
-    await a.locator('.town-place').filter({ hasText: 'Arena' }).click();
+    await a.locator('.town-place[data-place=arena]').click();
     await a.locator('.lobby-player-list button').filter({ hasText: bob }).click();
     await a.getByRole('button', { name: 'Challenge', exact: true }).click();
     await expect(b.locator('.lobby-offer')).toContainText(alice);
@@ -238,8 +243,8 @@ test('real registration, two-client chat, contacts, mail, challenges and reconne
       await duelB.getByRole('button', { name: 'Submit move', exact: true }).click();
     }
     await expect(duelA.locator('.online-result')).toContainText('Draw');
-    await expect(duelA.locator('.online-result')).toContainText('+50 PD');
-    await expect(duelB.locator('.online-result')).toContainText('+50 PD');
+    await expect(duelA.locator('.online-result')).toContainText('+80 PD');
+    await expect(duelB.locator('.online-result')).toContainText('+80 PD');
     await duelA.getByRole('button', { name: 'Close', exact: true }).click();
     await a.getByRole('button', { name: 'Match history', exact: true }).click();
     await expect(a.locator('.online-match').first()).toContainText(alice);
@@ -342,6 +347,7 @@ test('real registration, two-client chat, contacts, mail, challenges and reconne
     ).toBe(false);
     await progression(a, alice, info.project.name);
     await recruitment(a, info.project.name);
+    await advancement(a, alice, info.project.name);
     await clans(a, b, alice, bob, info.project.name);
     await tournaments(a, b, alice, info.project.name);
     await expeditions(a, b, info.project.name);

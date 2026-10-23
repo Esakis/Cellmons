@@ -44,7 +44,7 @@ Katalog `target` jest ignorowany przez Git. Klucz TLS i hasło konta nie trafiaj
 
 Wymagania budowania: narzędzia z `CONTRIBUTING.md`, Android SDK i JDK co najmniej 21. Skrypt sprawdza `JAVA_HOME`, JDK Android Studio i lokalne `target/android-tools/jdk-*`. Działający serwer na porcie 8090 jest używany ponownie; powinien być uruchomiony z `LOBBY_BOTS_ENABLED=true` i tą samą lokalną bazą. Zatrzymywanie kończy wyłącznie procesy zapisane przez skrypt, z kontrolą czasu startu i ścieżki.
 
-Nowa propozycja poziomów konta, odblokowań i inkarnacji znajduje się w [planie progresji](41-plan-progresji-i-sciezek.md). Nie jest częścią obecnych zasad w APK.
+Aktualne zasady poziomów konta, odblokowań i inkarnacji znajdują się w [dokumencie progresji](41-plan-progresji-i-sciezek.md). Dokument oddziela wdrożone mechaniki od propozycji przyszłych nazw specjalizacji.
 
 ## Weryfikacja z 20 października 2026
 
@@ -85,3 +85,17 @@ Przeszło 47 testów PostgreSQL (39 konta i 8 prywatności), w tym progi, nieakt
 Zbudowany APK ma wersję **1.0.3 / 10003**, rozmiar 12 767 128 bajtów i SHA-256 `bba82a930fe5f07538549e41e3da19fda4f08356e2213518f8f992431bbe3665`. Serwer lokalny został przebudowany, migracja 30 zastosowana, a kontrola TLS, gotowości bazy i pobrania APK przeszła. Typy, lint i budżety pakietów także przeszły. Ta aktualizacja ma testy przeglądarkowe i kompilację Androida; nie wykonano nowego testu na fizycznym telefonie.
 
 Logi: `target/recruitment-server-tests.log`, `target/recruitment-export-test.log`, `target/recruitment-erasure-test.log`, `target/recruitment-e2e.log`, `target/recruitment-mobile-final.log`, `target/recruitment-budget.log`, `target/recruitment-phone-build.log`. Zrzuty: `target/recruitment-pl-320.png` i `target/recruitment-preview-mobile-chromium.png`.
+
+## Pełny pakiet progresji i przegląd — 2026-10-20, APK 1.0.4
+
+Nowy APK zawiera wszystkie poprzednie poprawki telefonu oraz kontrakty na postacie, opanowanie kart, zadanie dzienne, dwie inkarnacje i osobną Arenę rankingową. Start to jedna postać: Mag, Wojownik albo Kapłan. Wprowadzenie daje 100 PD konta, pierwszy trening 150 PD; łącznie otwierają Arenę na poziomie 3. Edycja talii otwiera się na poziomie konta 2, kontrakty i zadanie dzienne na 4, opanowanie kart i zestawy na 7. Próby srebra i złota wymagają konta 12/18 oraz postaci 20; ranking i utworzenie klanu — konta 15.
+
+Kontrakt wymaga 30 fragmentów i pozwala wybrać brakującą klasę niezależnie od nagród poziomowych. Opanowanie kart 1–5 jest wspólne dla kopii i daje odznaki oraz małe nagrody w Dukatach. Srebro i złoto przyznają łącznie 3/6 trwałych PR; stare talie trafiają do archiwum, a pakiet drogi jest jednorazowy. Migracja 31 zachowuje stare postacie, przydzielone parametry i dary. W rankingu parametry bazowej klasy są wyrównane do poziomu 20, a talia pozostaje własna.
+
+Przegląd kodu i testów opisuje [raport aktualizacji](42-przeglad-progresji-i-telefonu.md), łącznie z poprawionymi błędami i otwartym problemem hierarchii botów. Zaliczone: 135 testów PostgreSQL, 38 testów klienta, wszystkie 26 scenariuszy przeglądarkowych w przebiegu głównym i uzupełniającym, testy workspace i WASM, Clippy, typy, Biome oraz SQLx. Lighthouse w pełnym przebiegu: 97/100/100/100. Nie oznacza to zielonego `check.bat`: dwa porównania siły AI nadal nie spełniają progów.
+
+APK: **1.0.4 / 10004**, pakiet `dev.game.training.phone`, **12 772 317 bajtów**, poprawny podpis v2. SHA-256: `e447916d48b1045b03450857d6fda7131a04b9de13000cb0764e3f8b6534292d`. Lokalny backend przebudowano, zastosowano migrację i uruchomiono 40 dotychczasowych kont automatycznych. Sprawdzono TLS, gotowość bazy oraz identyczność pobranego APK. Konto testowe i jego dane zachowano.
+
+Pobieranie w tej samej sieci: `http://192.168.33.103:18080`. Zainstaluj nowy APK. Nie było podłączonego urządzenia ADB; tej wersji nie sprawdzono na fizycznym telefonie. Pełny samouczek i wybór jednej klasy należy oglądać na nowym koncie, ponieważ stare konto testowe zachowuje swoją kolekcję.
+
+Log budowania: `target/advancement-phone-build.log`. Końcowy budżet przeglądarki: `target/advancement-budget-final.log` — konto/lobby 55,325/56 KiB, rekrutacja i kontrakty 6,195/10 KiB, pełny pakiet offline 207,733/210 KiB. Zrzuty: `target/advancement-pl-320.png`, `target/reincarnation-mobile-chromium.png`, `target/phone-menu-pl-320.png`.

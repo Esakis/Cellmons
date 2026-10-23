@@ -39,6 +39,9 @@ const Progression = lazy(() =>
 const Recruitment = lazy(() =>
   import('./Recruitment').then((module) => ({ default: module.Recruitment })),
 );
+const Advancement = lazy(() =>
+  import('./Advancement').then((module) => ({ default: module.Advancement })),
+);
 // The collection's painting (art/paintings/scenes) and the card illustrations, which load with
 // their own module as in the duel (app/cardArt.ts).
 const [painting] = Object.values(
@@ -133,7 +136,11 @@ export function Collection() {
   });
   async function mutate(mutation: Mutation) {
     if (loading()) return false;
-    if (mutation.action === 'recruit' && changed() && !window.confirm(t('collection-unsaved')))
+    if (
+      ['recruit', 'contract', 'reincarnate'].includes(mutation.action) &&
+      changed() &&
+      !window.confirm(t('collection-unsaved'))
+    )
       return false;
     const epoch = accountEpoch();
     setLoading(true);
@@ -214,6 +221,21 @@ export function Collection() {
                     pictures={pictures()}
                     claim={mutate}
                   />
+                )}
+              </Show>
+              <Show when={!guest() && snapshot().advancement && snapshot().recruitment}>
+                {(recruitment) => (
+                  <Show when={snapshot().advancement}>
+                    {(state) => (
+                      <Advancement
+                        state={state()}
+                        recruitment={recruitment()}
+                        disabled={loading()}
+                        full={snapshot().avatars.length >= 10}
+                        mutate={mutate}
+                      />
+                    )}
+                  </Show>
                 )}
               </Show>
               <fieldset disabled={loading()} class="collection-create">
@@ -373,13 +395,19 @@ export function Collection() {
                           <Show when={!guest()}>
                             <Progression
                               avatar={avatar()}
-                              avatars={snapshot().avatars}
+                              accountLevel={snapshot().recruitment?.level ?? 1}
                               disabled={loading()}
                               confirm={setConfirm}
                             />
                           </Show>
                         </details>
                         <section aria-label={t('collection-deck')}>
+                          <Show when={!guest() && (snapshot().recruitment?.level ?? 1) < 2}>
+                            <p>
+                              {t('collection-deck-lesson')}{' '}
+                              <A href="/lobby">{t('collection-start-lesson')}</A>
+                            </p>
+                          </Show>
                           <div class="collection-heading collection-deck-heading">
                             <h2>
                               {t('collection-deck')} ({draft().length}/{content.rules.deck.size})
@@ -405,7 +433,10 @@ export function Collection() {
                               type="button"
                               class="primary"
                               disabled={
-                                loading() || !changed() || !isPlayableAvatar(avatar().template_id)
+                                loading() ||
+                                !changed() ||
+                                !isPlayableAvatar(avatar().template_id) ||
+                                (!guest() && (snapshot().recruitment?.level ?? 1) < 2)
                               }
                               onClick={() =>
                                 void mutate({
@@ -418,7 +449,11 @@ export function Collection() {
                             >
                               {t('collection-save-deck')}
                             </button>
-                            <button type="button" onClick={() => setDraft([])}>
+                            <button
+                              type="button"
+                              disabled={!guest() && (snapshot().recruitment?.level ?? 1) < 2}
+                              onClick={() => setDraft([])}
+                            >
                               {t('collection-clear')}
                             </button>
                           </div>
@@ -430,12 +465,30 @@ export function Collection() {
                                 change={setDraft}
                                 collection={snapshot().collection}
                                 schools={avatar().schools}
+                                mastery={
+                                  (snapshot().recruitment?.level ?? 0) >= 7
+                                    ? snapshot().advancement?.mastery
+                                    : undefined
+                                }
                                 pictures={pictures()}
-                                disabled={loading()}
+                                disabled={
+                                  loading() ||
+                                  (!guest() && (snapshot().recruitment?.level ?? 1) < 2)
+                                }
                               />
                             )}
                           </Show>
                           <div class="collection-presets">
+                            <Show when={!guest() && (snapshot().recruitment?.level ?? 1) < 7}>
+                              <p>{t('collection-presets-locked')}</p>
+                            </Show>
+                            <For each={avatar().archived_decks ?? []}>
+                              {(deck, index) => (
+                                <button type="button" onClick={() => setDraft([...deck])}>
+                                  {t('collection-archived-deck', { tier: index() + 1 })}
+                                </button>
+                              )}
+                            </For>
                             <label>
                               {t('collection-preset-name')}{' '}
                               <input
@@ -448,6 +501,7 @@ export function Collection() {
                               type="button"
                               disabled={
                                 loading() ||
+                                (!guest() && (snapshot().recruitment?.level ?? 1) < 7) ||
                                 !presetName().trim() ||
                                 snapshot().presets.length >= content.rules.deck.saved_presets_max
                               }

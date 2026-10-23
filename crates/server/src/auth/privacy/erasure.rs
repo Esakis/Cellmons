@@ -192,6 +192,22 @@ async fn erase_one(db: &PgPool, user: Uuid) -> Result<bool> {
     delete!("DELETE FROM daily_counters WHERE user_id=$1");
     delete!("DELETE FROM arena_progress WHERE user_id=$1");
     delete!("DELETE FROM recruitment_claims WHERE user_id=$1");
+    delete!("DELETE FROM class_contracts WHERE user_id=$1");
+    delete!("DELETE FROM card_mastery WHERE user_id=$1");
+    delete!("DELETE FROM daily_quests WHERE user_id=$1");
+    delete!("DELETE FROM path_packs WHERE user_id=$1");
+    delete!(
+        "DELETE FROM incarnation_decks WHERE avatar_id IN (SELECT id FROM avatars WHERE user_id=$1)"
+    );
+    delete!(
+        "DELETE FROM class_trials WHERE avatar_id IN (SELECT id FROM avatars WHERE user_id=$1)"
+    );
+    delete!(
+        "DELETE FROM avatar_advancement WHERE avatar_id IN (SELECT id FROM avatars WHERE user_id=$1)"
+    );
+    delete!(
+        "DELETE FROM legacy_progression WHERE avatar_id IN (SELECT id FROM avatars WHERE user_id=$1)"
+    );
     delete!("DELETE FROM idempotency_keys WHERE user_id=$1");
     delete!("DELETE FROM user_notices WHERE user_id=$1");
     delete!("DELETE FROM abuse_signals WHERE user_id=$1");

@@ -823,6 +823,8 @@ mod economy;
 #[path = "auth/store.rs"]
 mod store;
 
+#[path = "auth/advancement.rs"]
+mod advancement;
 #[path = "auth/clans.rs"]
 mod clans;
 #[path = "auth/expeditions.rs"]
@@ -831,10 +833,10 @@ mod expeditions;
 mod journey;
 #[path = "auth/progression.rs"]
 mod progression;
-#[path = "auth/release_roster.rs"]
-mod release_roster;
 #[path = "auth/recruitment.rs"]
 mod recruitment;
+#[path = "auth/release_roster.rs"]
+mod release_roster;
 #[path = "auth/tournaments.rs"]
 mod tournaments;
 

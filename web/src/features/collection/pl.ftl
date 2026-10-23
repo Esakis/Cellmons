@@ -1,4 +1,10 @@
 collection-title = Postacie i kolekcja
+collection-deck-lesson = Edycja talii otwiera się po pierwszej lekcji na poziomie konta 2.
+collection-start-lesson = Przejdź do samouczka
+collection-presets-locked = Zapis własnych zestawów otworzy się na poziomie konta 7.
+collection-archived-deck = Talia sprzed inkarnacji { $tier }
+collection-mastery = Opanowanie { $level }/5
+collection-mastery-detail = Opanowanie { $level }/5 · { $xp }/{ $target } PD. Awans daje odznakę i jednorazowo 2 Dukaty. Siła karty się nie zmienia.
 collection-preview = Podgląd karty: { $card }
 collection-available = Dostępne karty
 collection-current-deck = Twoja talia

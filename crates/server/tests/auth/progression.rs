@@ -6,6 +6,14 @@ async fn post(f: &Fixture, token: &str, body: Value) -> Reply {
 }
 async fn advance(pool: &PgPool, id: Uuid) {
     sqlx::query("UPDATE avatars SET level=20,xp=65000,dev_points_unspent=7,dp_phys_atk=2,dp_hp=1 WHERE id=$1").bind(id).execute(pool).await.unwrap();
+    sqlx::query(
+        "UPDATE users SET account_xp=42000 WHERE id=(SELECT user_id FROM avatars WHERE id=$1)",
+    )
+    .bind(id)
+    .execute(pool)
+    .await
+    .unwrap();
+    sqlx::query("INSERT INTO class_trials(avatar_id,tier,wins) SELECT id,tier,3 FROM avatars WHERE id=$1 AND tier<2 ON CONFLICT(avatar_id,tier) DO UPDATE SET wins=3").bind(id).execute(pool).await.unwrap();
 }
 
 async fn fixture_tier(pool: &PgPool, id: Uuid, base: u16, tier: i16) {
@@ -116,9 +124,7 @@ async fn retired_shades_cannot_consume_a_ready_gold_character(pool: PgPool) {
 
 #[sqlx::test(migrator = "server::db::MIGRATOR")]
 #[ignore = "requires PostgreSQL; check.bat runs this suite"]
-async fn f10_reincarnation_resets_progress_keeps_deck_and_permanently_selects_path_spec_gift(
-    pool: PgPool,
-) {
+async fn reincarnation_archives_decks_and_grants_three_then_six_permanent_points(pool: PgPool) {
     let f = Fixture::new(pool.clone());
     f.register().await;
     let token = cookie(&f.login(false).await);
@@ -143,11 +149,13 @@ async fn f10_reincarnation_resets_progress_keeps_deck_and_permanently_selects_pa
     assert_eq!(avatar["tier"], 1);
     assert_eq!(avatar["level"], 1);
     assert_eq!(avatar["xp"], 0);
-    assert_eq!(avatar["unspent"], 2);
+    assert_eq!(avatar["unspent"], 3);
+    assert_eq!(avatar["advancement"]["permanent_points"], 3);
     assert_eq!(avatar["spent"], json!([0, 0, 0, 0, 0, 0]));
     assert_eq!(avatar["path_id"], path.avatar.id);
-    assert_eq!(avatar["deck"], before["deck"]);
-    assert_eq!(first.body["collection"], initial.body["collection"]);
+    assert_eq!(avatar["archived_decks"][0], before["deck"]);
+    assert_eq!(avatar["deck"].as_array().unwrap().len(), 20);
+    assert_ne!(first.body["collection"], initial.body["collection"]);
     assert_eq!(avatar["stats"][0], path.avatar.base.phys_atk);
     assert_eq!(post(&f, &token, request).await.body["error"], "CONFLICT");
     advance(&pool, id).await;
@@ -158,7 +166,12 @@ async fn f10_reincarnation_resets_progress_keeps_deck_and_permanently_selects_pa
     assert_eq!(second.status, StatusCode::OK, "{}", second.body);
     assert_eq!(second.body["avatars"][0]["tier"], 2);
     assert_eq!(second.body["avatars"][0]["specialization"], spec);
-    assert_eq!(second.body["avatars"][0]["unspent"], 4);
+    assert_eq!(second.body["avatars"][0]["unspent"], 6);
+    assert_eq!(
+        second.body["avatars"][0]["advancement"]["permanent_points"],
+        6
+    );
+    assert_eq!(second.body["collection"], first.body["collection"]);
     advance(&pool, id).await;
     let invalid = post(
         &f,
@@ -166,20 +179,15 @@ async fn f10_reincarnation_resets_progress_keeps_deck_and_permanently_selects_pa
         json!({"action":"reincarnate","id":id,"revision":2,"choice":{"kind":"gift","card_id":1}}),
     )
     .await;
-    assert_eq!(invalid.body["error"], "INVALID_CHOICE");
+    assert_eq!(invalid.body["error"], "FINAL_TIER");
     let third=post(&f,&token,json!({"action":"reincarnate","id":id,"revision":2,"choice":{"kind":"gift","card_id":path.gifts[0]}})).await;
-    assert_eq!(third.status, StatusCode::OK, "{}", third.body);
-    assert_eq!(third.body["avatars"][0]["tier"], 3);
-    assert_eq!(third.body["avatars"][0]["gift_id"], path.gifts[0]);
-    assert_eq!(third.body["avatars"][0]["unspent"], 6);
-    advance(&pool, id).await;
-    assert_eq!(post(&f,&token,json!({"action":"reincarnate","id":id,"revision":3,"choice":{"kind":"gift","card_id":path.gifts[1]}})).await.body["error"],"FINAL_TIER");
+    assert_eq!(third.body["error"], "FINAL_TIER");
     assert_eq!(
         sqlx::query_scalar::<_, i64>("SELECT count(*) FROM reincarnation_history")
             .fetch_one(&pool)
             .await
             .unwrap(),
-        3
+        2
     );
 }
 

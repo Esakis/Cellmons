@@ -18,6 +18,7 @@ use uuid::Uuid;
 pub struct Snapshot {
     pub content_version: String,
     pub recruitment: crate::recruitment::Snapshot,
+    pub advancement: crate::advancement::Snapshot,
     pub templates: Vec<i32>,
     pub avatars: Vec<Avatar>,
     pub collection: Vec<Stack>,
@@ -31,6 +32,8 @@ pub struct Avatar {
     pub level: i16,
     pub xp: i32,
     pub tier: i16,
+    pub advancement: crate::advancement::Character,
+    pub archived_decks: Vec<Vec<i16>>,
     pub path_id: Option<i32>,
     pub specialization: Option<String>,
     pub gift_id: Option<i32>,
@@ -61,6 +64,10 @@ pub struct Preset {
 #[derive(Deserialize)]
 #[serde(tag = "action", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Mutation {
+    Contract {
+        template_id: u16,
+        claim: bool,
+    },
     Recruit {
         level: u8,
         template_id: Option<u16>,
@@ -213,6 +220,13 @@ pub async fn load(connection: &mut PgConnection, user: Uuid) -> Result<Snapshot>
         stats.mag_def += i32::from(spent[3]);
         stats.hp_max += 7 * i32::from(spent[4]);
         stats.stamina_max += 7 * i32::from(spent[5]);
+        let advancement = crate::advancement::character(connection, a.id).await?;
+        let archived_decks = sqlx::query_scalar(
+            "SELECT cards FROM incarnation_decks WHERE avatar_id=$1 ORDER BY tier",
+        )
+        .bind(a.id)
+        .fetch_all(&mut *connection)
+        .await?;
         avatars.push(Avatar {
             id: a.id,
             slot: a.slot,
@@ -227,7 +241,9 @@ pub async fn load(connection: &mut PgConnection, user: Uuid) -> Result<Snapshot>
             shade_school: a.shade_school,
             active: a.is_active,
             revision: a.revision,
-            unspent: a.dev_points_unspent,
+            unspent: a.dev_points_unspent + advancement.permanent_unspent,
+            advancement,
+            archived_decks,
             spent,
             stats: engine::Stat::ALL.map(|s| stats.get(s)),
             schools: schools.0,
@@ -253,6 +269,7 @@ pub async fn load(connection: &mut PgConnection, user: Uuid) -> Result<Snapshot>
     Ok(Snapshot {
         content_version: crate::auth::crypto::hex(&engine_content::CONTENT_VERSION),
         recruitment,
+        advancement: crate::advancement::load(connection, user).await?,
         templates,
         avatars,
         collection,
@@ -271,6 +288,9 @@ pub async fn mutate(db: &PgPool, user: Uuid, mutation: Mutation) -> Result<Snaps
     crate::activity::ensure_idle(&mut tx, user).await?;
     let mut snapshot = load(&mut tx, user).await?;
     match mutation {
+        Mutation::Contract { template_id, claim } => {
+            crate::advancement::contract(&mut tx, user, &snapshot, template_id, claim).await?
+        }
         Mutation::Recruit { level, template_id } => {
             crate::recruitment::claim(&mut tx, user, &snapshot, level, template_id).await?
         }
@@ -344,13 +364,16 @@ pub async fn mutate(db: &PgPool, user: Uuid, mutation: Mutation) -> Result<Snaps
                     .checked_add(i16::try_from(points[i]).map_err(|_| Error("INVALID_POINTS"))?)
                     .ok_or(Error("INVALID_POINTS"))?;
             }
-            sqlx::query!("UPDATE avatars SET dev_points_unspent=dev_points_unspent-$3,dp_phys_atk=$4,dp_phys_def=$5,dp_mag_atk=$6,dp_mag_def=$7,dp_hp=$8,dp_stamina=$9,revision=revision+1 WHERE id=$1 AND user_id=$2",id,user,sum as i16,added[0],added[1],added[2],added[3],added[4],added[5]).execute(&mut *tx).await?;
+            let permanent = (sum as i16).min(avatar.advancement.permanent_unspent);
+            sqlx::query("UPDATE avatar_advancement SET permanent_unspent=permanent_unspent-$2 WHERE avatar_id=$1").bind(id).bind(permanent).execute(&mut *tx).await?;
+            sqlx::query!("UPDATE avatars SET dev_points_unspent=dev_points_unspent-$3,dp_phys_atk=$4,dp_phys_def=$5,dp_mag_atk=$6,dp_mag_def=$7,dp_hp=$8,dp_stamina=$9,revision=revision+1 WHERE id=$1 AND user_id=$2",id,user,sum as i16-permanent,added[0],added[1],added[2],added[3],added[4],added[5]).execute(&mut *tx).await?;
         }
         Mutation::Deck {
             id,
             revision,
             cards,
         } => {
+            crate::advancement::require(&mut tx, user, 2).await?;
             let avatar = find(&snapshot, id)?;
             ensure_playable(avatar.template_id)?;
             version(avatar.deck_revision, revision)?;
@@ -363,6 +386,7 @@ pub async fn mutate(db: &PgPool, user: Uuid, mutation: Mutation) -> Result<Snaps
             name,
             cards,
         } => {
+            crate::advancement::require(&mut tx, user, 7).await?;
             let name = crate::online::text(&name, 40)?;
             let cards = validate_deck(&cards, &snapshot.collection)?;
             if let Some(preset) = snapshot.presets.iter().find(|p| p.id == id) {

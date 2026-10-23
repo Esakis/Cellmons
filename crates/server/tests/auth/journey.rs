@@ -30,7 +30,7 @@ async fn account_journey_enforces_locations_and_tutorial_rewards(pool: PgPool) {
             .call("POST", "/api/journey", json!({"step":step}), &headers)
             .await;
         assert_eq!(result.body["tutorial_step"], step + 1);
-        assert_eq!(result.body["xp"], 0);
+        assert_eq!(result.body["xp"], 100);
     }
     let user: Uuid = sqlx::query_scalar("SELECT id FROM users")
         .fetch_one(&pool)
@@ -40,7 +40,7 @@ async fn account_journey_enforces_locations_and_tutorial_rewards(pool: PgPool) {
     server::journey::award(&mut tx, user, true, false, 0)
         .await
         .unwrap();
-    assert_eq!(server::journey::load(&mut tx, user).await.unwrap().xp, 0);
+    assert_eq!(server::journey::load(&mut tx, user).await.unwrap().xp, 100);
     server::journey::award(&mut tx, user, true, false, 5)
         .await
         .unwrap();
@@ -70,6 +70,7 @@ async fn account_journey_enforces_locations_and_tutorial_rewards(pool: PgPool) {
         ("shop", 1000),
         ("clan", 3050),
         ("tower", 3050),
+        ("ranked", 8000),
         ("castle", 16000),
         ("bazaar", 20000),
     ] {

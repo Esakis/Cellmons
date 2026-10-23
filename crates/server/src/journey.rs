@@ -13,11 +13,12 @@ const LEVEL_XP: [i64; 30] = [
     0, 100, 250, 450, 700, 1000, 1400, 1850, 2400, 3050, 3800, 4700, 5700, 6800, 8000, 9250, 10600,
     12000, 14000, 16000, 18000, 20000, 22250, 24500, 27000, 29750, 32500, 35500, 38750, 42000,
 ];
-const LOCATIONS: [(&str, u8); 11] = [
+const LOCATIONS: [(&str, u8); 12] = [
     ("square", 1),
     ("training", 1),
     ("library", 1),
     ("arena", 3),
+    ("ranked", 15),
     ("portal", 4),
     ("expedition", 4),
     ("shop", 6),
@@ -90,7 +91,7 @@ pub async fn award(
         return Ok(());
     }
     if training {
-        sqlx::query("UPDATE users SET account_xp=account_xp+250,tutorial_step=3 WHERE id=$1 AND tutorial_step<3 AND NOT EXISTS(SELECT 1 FROM bot_accounts WHERE user_id=$1)")
+        sqlx::query("UPDATE users SET account_xp=account_xp+CASE WHEN tutorial_step>=1 THEN 150 ELSE 250 END,tutorial_step=3 WHERE id=$1 AND tutorial_step<3 AND NOT EXISTS(SELECT 1 FROM bot_accounts WHERE user_id=$1)")
             .bind(user).execute(connection).await?;
     } else {
         sqlx::query("UPDATE users SET account_xp=account_xp+$2 WHERE id=$1 AND NOT EXISTS(SELECT 1 FROM bot_accounts WHERE user_id=$1)")
@@ -131,7 +132,7 @@ pub async fn post(
     if !(0..=1).contains(&input.step) {
         return Err(crate::game::response(Error("INVALID_MESSAGE")));
     }
-    sqlx::query("UPDATE users SET tutorial_step=tutorial_step+1 WHERE id=$1 AND tutorial_step=$2")
+    sqlx::query("UPDATE users SET tutorial_step=tutorial_step+1,account_xp=account_xp+CASE WHEN tutorial_step=0 THEN 100 ELSE 0 END WHERE id=$1 AND tutorial_step=$2")
         .bind(session.user)
         .bind(input.step)
         .execute(&state.db)

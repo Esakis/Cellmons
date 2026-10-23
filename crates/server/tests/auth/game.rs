@@ -11,10 +11,44 @@ async fn get(f: &Fixture, token: &str) -> Reply {
 }
 
 #[sqlx::test(migrator = "server::db::MIGRATOR")]
+#[ignore = "requires PostgreSQL"]
+async fn deck_and_preset_unlocks_use_account_level_and_reject_direct_api_bypass(pool: PgPool) {
+    let f = Fixture::new(pool.clone());
+    f.register().await;
+    let token = cookie(&f.login(false).await);
+    let initial = get(&f, &token).await;
+    let avatar = &initial.body["avatars"][0];
+    let deck = json!({"action":"deck","id":avatar["id"],"revision":avatar["deck_revision"],"cards":avatar["deck"]});
+    let preset = json!({"action":"preset_save","id":Uuid::now_v7(),"revision":null,"name":"First deck","cards":avatar["deck"]});
+    for (xp, request, allowed) in [
+        (99, &deck, false),
+        (100, &deck, true),
+        (1399, &preset, false),
+        (1400, &preset, true),
+    ] {
+        sqlx::query("UPDATE users SET account_xp=$1")
+            .bind(xp as i64)
+            .execute(&pool)
+            .await
+            .unwrap();
+        let result = post(&f, &token, request.clone()).await;
+        if allowed {
+            assert_eq!(result.status, StatusCode::OK, "{}", result.body);
+        } else {
+            assert_eq!(result.body["error"], "LEVEL_REQUIRED");
+        }
+    }
+}
+
+#[sqlx::test(migrator = "server::db::MIGRATOR")]
 #[ignore = "requires PostgreSQL; check.bat runs this suite"]
 async fn f8_pool_slots_activation_soft_delete_and_serialized_creation(pool: PgPool) {
     let f = Fixture::new(pool.clone());
     f.register().await;
+    sqlx::query("UPDATE users SET account_xp=1400,tutorial_step=3")
+        .execute(&pool)
+        .await
+        .unwrap();
     let token = cookie(&f.login(false).await);
     assert_eq!(get(&f, "").await.status, StatusCode::UNAUTHORIZED);
     let current = get(&f, &token).await;
@@ -135,6 +169,10 @@ async fn f8_pool_slots_activation_soft_delete_and_serialized_creation(pool: PgPo
 async fn f8_points_stale_retries_and_deck_ownership_rules(pool: PgPool) {
     let f = Fixture::new(pool.clone());
     f.register().await;
+    sqlx::query("UPDATE users SET account_xp=1400,tutorial_step=3")
+        .execute(&pool)
+        .await
+        .unwrap();
     let token = cookie(&f.login(false).await);
     sqlx::query("UPDATE avatars SET level=5,xp=4000,dev_points_unspent=3")
         .execute(&pool)
@@ -249,6 +287,10 @@ async fn f8_points_stale_retries_and_deck_ownership_rules(pool: PgPool) {
 async fn f8_inventory_reduction_prunes_all_decks_and_presets_atomically(pool: PgPool) {
     let f = Fixture::new(pool.clone());
     f.register().await;
+    sqlx::query("UPDATE users SET account_xp=1400,tutorial_step=3")
+        .execute(&pool)
+        .await
+        .unwrap();
     let user = sqlx::query_scalar::<_, Uuid>("SELECT id FROM users")
         .fetch_one(&pool)
         .await

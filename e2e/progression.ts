@@ -10,7 +10,7 @@ export async function progression(page: Page, login: string, project: string) {
   const source = state.avatars.find((a) => a.active);
   expect(source).toBeTruthy();
   const id = source?.id ?? '';
-  for (const stage of ['path', 'specialization', 'gift']) {
+  for (const stage of ['path', 'specialization']) {
     expect(
       (
         await page.request.post('http://127.0.0.1:18092/__advance', { data: { login, avatar: id } })
@@ -28,7 +28,9 @@ export async function progression(page: Page, login: string, project: string) {
     const current = data.avatars.find((a: { id: string }) => a.id === id);
     expect(current.level).toBe(1);
     expect(current.xp).toBe(0);
-    expect(current.deck).toEqual(source?.deck);
+    expect(current.deck).toHaveLength(20);
+    expect(current.archived_decks[0]).toEqual(source?.deck);
+    expect(current.advancement.permanent_points).toBe(stage === 'path' ? 3 : 6);
   }
   await page
     .locator('.collection-progression')

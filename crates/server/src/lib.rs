@@ -1,6 +1,7 @@
 //! Shared server components and database migrations, also used by integration tests.
 pub mod activity;
 pub mod admin;
+pub mod advancement;
 pub mod auth;
 pub mod bots;
 pub mod clans;

@@ -1,0 +1,17 @@
+{
+  "generator": "Built-in image_gen",
+  "date": "2026-10-21",
+  "assets": [
+    {
+      "path": "avatars/vampire.avif",
+      "source": "generated/vampire.png",
+      "prompt": "Use case: stylized-concept. Create a new production character portrait for the dark fantasy card game Spellgambit, replacing a cartoon vampire. Reference images are style references ONLY, not characters to copy. Match their traditional oil-painted realism, expressive face, visible fine brushwork, restrained ochre highlights, rich near-black shadows and historical costume. Landscape 3:2 composition, head and shoulders, adult male vampire noble in his thirties with very pale ivory skin, dark swept-back shoulder-length hair, subtle crimson eyes, severe intelligent expression, lips slightly parted revealing a discreet fang. Worn black velvet Renaissance doublet, aged silver clasp, muted wine-red cloak. Dim ruined Gothic interior softly out of focus. Face centered, large and clearly legible in a small round avatar crop, head fully within frame. Dramatic warm candlelight from the left, dark teal ambient shadow. Dignified and threatening, grounded anatomical realism. No modern clothing, no cartoon/anime, no plastic 3D, no exaggerated fangs, no blood, no text, no border, no watermark. Opaque background.",
+      "referenceRole": "Oil-painted portrait style only"
+    },
+    {
+      "path": "scenes/town.avif",
+      "source": "generated/town.png",
+      "prompt": "Use case: stylized-concept. Create a complete SQUARE aerial painted fantasy town map background for a mobile dark fantasy card game. Production artwork only: NO text, labels, typography, numbers, UI, pins, frames, legend or watermarks. The entire town must fit within the image with all ten distinct destination landmarks visible simultaneously. Elevated near top-down isometric bird's-eye view, rich traditional oil/gouache painting, dark romantic medieval fantasy, aged limestone, slate roofs, bronze and warm amber window lights against desaturated forest greens, a little purple magic. Beautiful legible large buildings separated by winding cobbled roads, trees and small plazas; sparse tiny filler houses so landmarks dominate. Continuous believable terrain and connecting paths, not a tile grid. Landmarks at these approximate centers in percent of image width/height, reserve some quiet ground just below each for code-rendered labels: 1 slender scholar tower top-left (18,12); 2 royal fortified castle top-center (49,12); 3 grand circular tournament colosseum with red banners top-right (81,22); 4 broad library with columns and slate-blue roofs middle-left (20,37); 5 smaller open oval combat arena with sandy floor center (56,40); 6 fortified guild hall with heraldic banner middle-right (83,57); 7 ancient stone magical portal with restrained violet glow lower-left center (22,62); 8 colorful cloth market stalls lower-center (52,72); 9 training courtyard with wooden sparring dummies bottom-left (20,85); 10 merchant shop with gold lit windows bottom-right (81,85). Make all ten buildings clearly different in silhouette and large enough for mobile use. Castle and tower separated. No horizon or sky, no perspective foreground occlusion. Composition uses all edges with a narrow natural forest/stone perimeter, each destination well inside the image. This is an atmospheric hand-painted explorable town, not a schematic diagram. Square 1:1 image, opaque background."
+    }
+  ]
+}

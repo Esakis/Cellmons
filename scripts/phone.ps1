@@ -131,7 +131,7 @@ if ($needsBuild) {
     $env:JAVA_HOME = $selectedJava
     if (-not $env:ANDROID_HOME) { $env:ANDROID_HOME = Join-Path $env:LOCALAPPDATA 'Android\Sdk' }
     $env:ANDROID_APPLICATION_ID = $connection.packageId
-    $env:ANDROID_VERSION = '1.0.3'
+    $env:ANDROID_VERSION = '1.0.5'
     $env:VITE_API_ORIGIN = $connection.apiOrigin
     $env:E2E_TLS_CERT = Join-Path $phoneDirectory 'cert.pem'
     $env:WEB_BUNDLE_VERSION = '0'

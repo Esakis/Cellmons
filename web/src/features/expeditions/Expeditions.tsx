@@ -162,6 +162,7 @@ export function Expeditions(props: {
                   name="difficulty"
                   type="radio"
                   value={option.id}
+                  disabled={option.id === 'ordeal' && (data()?.account_level ?? 1) < 25}
                   checked={difficulty() === option.id}
                   onChange={() => setDifficulty(option.id)}
                 />

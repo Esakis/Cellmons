@@ -15,6 +15,7 @@ export type Run = {
 };
 export type Snapshot = {
   content_version: string;
+  account_level?: number;
   run: Run | null;
   difficulties: {
     id: string;

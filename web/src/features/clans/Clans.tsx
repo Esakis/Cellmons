@@ -215,6 +215,7 @@ export function Clans() {
                   }}
                 >
                   <h2>{t('clan-create')}</h2>
+                  <p>{t('clan-create-level')}</p>
                   <p>{t('clan-founding-help', { min: snapshot().limits.min_members })}</p>
                   <label>
                     {t('clan-name')}
@@ -226,7 +227,12 @@ export function Clans() {
                       onInput={(e) => setName(e.currentTarget.value)}
                     />
                   </label>
-                  <button type="submit" disabled={loading() || name().trim().length < 3}>
+                  <button
+                    type="submit"
+                    disabled={
+                      loading() || (snapshot().account_level ?? 1) < 15 || name().trim().length < 3
+                    }
+                  >
                     {t('clan-create')}
                   </button>
                 </form>
