@@ -36,7 +36,7 @@ async function walk(dir) {
     else if (stat.isFile()) {
       const name = path.slice(root.length + 1).replaceAll('\\', '/');
       if (
-        !/^[A-Za-z0-9_./-]+\.(html|js|mjs|css|wasm|json|svg|png|jpg|webp|ico|woff2|txt|webmanifest)$/.test(
+        !/^[A-Za-z0-9_./-]+\.(html|js|mjs|css|wasm|json|svg|png|jpg|webp|avif|ico|woff2|txt|webmanifest)$/.test(
           name,
         )
       )

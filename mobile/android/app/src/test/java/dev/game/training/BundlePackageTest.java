@@ -91,6 +91,30 @@ public class BundlePackageTest {
   }
 
   @Test
+  public void paintedAvifAssetsAreAccepted() throws Exception {
+    File parent = Files.createTempDirectory("web-package-avif-").toFile();
+    File archive = new File(parent, "bundle.zip");
+    try {
+      try (ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(archive))) {
+        for (String name : new String[] {"index.html", "assets/town.avif"}) {
+          zip.putNextEntry(new ZipEntry(name));
+          zip.write("painted asset".getBytes(java.nio.charset.StandardCharsets.UTF_8));
+          zip.closeEntry();
+        }
+      }
+      File target = new File(parent, "unpacked");
+      BundlePackage.unpack(archive, target);
+      assertEquals(
+          "painted asset",
+          new String(
+              Files.readAllBytes(new File(target, "assets/town.avif").toPath()),
+              java.nio.charset.StandardCharsets.UTF_8));
+    } finally {
+      BundlePackage.delete(parent);
+    }
+  }
+
+  @Test
   public void traversalAndNativeCodeAreRejectedAndCleaned() throws Exception {
     File parent = Files.createTempDirectory("web-package-").toFile();
     try {

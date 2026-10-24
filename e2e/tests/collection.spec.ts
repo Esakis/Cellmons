@@ -44,6 +44,14 @@ test('guest builds a RAM-only collection and tests its deck offline', async ({
     .getByRole('button', { name: 'Remove from deck: Bronze Blade', exact: true })
     .click();
   await expect(page.getByRole('heading', { name: 'Deck (19/20)', exact: true })).toBeVisible();
+  // Creating another character must ask before switching away from an unsaved deck.
+  page.once('dialog', (dialog) => void dialog.dismiss());
+  await Promise.all([
+    page.waitForEvent('dialog'),
+    page.getByRole('button', { name: 'Create character', exact: true }).click(),
+  ]);
+  await expect(page.locator('.collection-avatars button')).toHaveCount(2);
+  await expect(page.getByRole('heading', { name: 'Deck (19/20)', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Undo change', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Deck (20/20)', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Clear', exact: true }).click();

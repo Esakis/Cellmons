@@ -111,7 +111,7 @@ final class BundlePackage {
           continue;
         }
         if (!name.matches(
-            "[A-Za-z0-9_./-]+\\.(html|js|mjs|css|wasm|json|svg|png|jpg|webp|ico|woff2|txt|webmanifest)"))
+            "[A-Za-z0-9_./-]+\\.(html|js|mjs|css|wasm|json|svg|png|jpg|webp|avif|ico|woff2|txt|webmanifest)"))
           throw new IOException("UNSUPPORTED_ASSET");
         File parent = file.getParentFile();
         if (!parent.mkdirs() && !parent.isDirectory()) throw new IOException("DIRECTORY_FAILED");

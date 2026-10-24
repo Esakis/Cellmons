@@ -185,6 +185,26 @@ test('real registration, two-client chat, contacts, mail, challenges and reconne
     await expect(b.locator('.lobby-offer')).toContainText(alice);
     await b.getByRole('button', { name: 'Decline', exact: true }).click();
     await expect(a.locator('.lobby-offer')).toHaveCount(0);
+    // The map must point back to the room that owns the challenge, also on phones where
+    // the offer panel is hidden until the player enters the marked building.
+    for (const page of [a, b]) {
+      await page.getByRole('button', { name: 'Map', exact: true }).click();
+      await page.locator('.town-place[data-place=ranked]').click();
+      await expect(page.getByRole('heading', { name: 'Ranked Arena', exact: true })).toBeVisible();
+    }
+    await b.getByRole('button', { name: 'Map', exact: true }).click();
+    await a.getByRole('button', { name: `Challenge ${bob}`, exact: true }).click();
+    await expect(b.locator('.town-place[data-place=ranked] .town-badge')).toBeVisible();
+    await expect(b.locator('.town-place[data-place=arena] .town-badge')).toHaveCount(0);
+    await b.locator('.town-place[data-place=ranked]').click();
+    await expect(b.getByRole('button', { name: 'Accept', exact: true })).toBeEnabled();
+    await b.getByRole('button', { name: 'Decline', exact: true }).click();
+    await expect(a.locator('.lobby-offer')).toHaveCount(0);
+    for (const page of [a, b]) {
+      await page.getByRole('button', { name: 'Map', exact: true }).click();
+      await page.locator('.town-place[data-place=arena]').click();
+      await expect(page.getByRole('heading', { name: 'Arena', exact: true })).toBeVisible();
+    }
     await first.setOffline(true);
     await expect(a.getByTestId('connection-status')).toHaveText('Offline');
     await first.setOffline(false);

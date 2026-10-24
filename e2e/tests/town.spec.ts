@@ -65,15 +65,19 @@ test('all town destinations stay on the painting, fit the screen and open the ri
   test.setTimeout(120000);
   const login = `Map_${info.project.name[0]}${Date.now().toString(36)}`;
   await page.addInitScript(() => localStorage.setItem('game.language', 'en'));
+  const created = await page.request.post('http://127.0.0.1:18092/__account', {
+    data: {
+      login,
+      email: `${login}@example.test`,
+      password: 'Map integration password!',
+      school: 'combat',
+      template_id: 1,
+      terms_version: '2026-10-16',
+      age_confirmed: true,
+    },
+  });
+  expect(created.status()).toBe(201);
   await page.goto('/#/account');
-  await page.getByRole('button', { name: 'Register', exact: true }).click();
-  await page.locator('input[name=login]').fill(login);
-  await page.getByLabel('Email', { exact: true }).fill(`${login}@example.test`);
-  await page.getByLabel('Password', { exact: true }).fill('Map integration password!');
-  await page.locator('select[name=template]').selectOption('1');
-  await page.locator('input[name=agreement]').check();
-  await page.getByRole('button', { name: 'Create account', exact: true }).click();
-  await expect(page.getByRole('status').filter({ hasText: 'Account created.' })).toBeVisible();
   await page.getByLabel('Login or email').fill(login);
   await page.getByLabel('Password', { exact: true }).fill('Map integration password!');
   await page.getByRole('button', { name: 'Sign in', exact: true }).last().click();

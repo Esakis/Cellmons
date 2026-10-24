@@ -762,7 +762,7 @@ export function Lobby() {
                         connected={connected()}
                         journey={journey()}
                         clan={self().clanId}
-                        alert={challenged() ? 'arena' : ''}
+                        alert={challenged() ? room() : ''}
                         enter={enter}
                       />
                     }

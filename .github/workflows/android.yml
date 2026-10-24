@@ -62,6 +62,11 @@ jobs:
         env:
           VITE_API_ORIGIN: https://10.0.2.2:18443
         run: pnpm --filter mobile sync
+      - name: Verify signed web asset bundle
+        env:
+          WEB_BUNDLE_VERSION: '1'
+          WEB_BUNDLE_SIGNING_KEY: ${{ github.workspace }}/target/android-fixture/bundle-private.pem
+        run: node scripts/pack-web-bundle.mjs
       - name: Debug APK, update verification tests and lint
         env:
           E2E_TLS_CERT: ${{ github.workspace }}/target/android-fixture/cert.pem

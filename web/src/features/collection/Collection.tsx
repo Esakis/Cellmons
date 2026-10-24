@@ -138,7 +138,7 @@ export function Collection() {
   async function mutate(mutation: Mutation) {
     if (loading()) return false;
     if (
-      ['recruit', 'contract', 'reincarnate'].includes(mutation.action) &&
+      ['create', 'recruit', 'contract', 'reincarnate'].includes(mutation.action) &&
       changed() &&
       !window.confirm(t('collection-unsaved'))
     )

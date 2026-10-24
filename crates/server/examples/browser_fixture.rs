@@ -20,6 +20,7 @@ use std::{
     sync::{Arc, Mutex},
 };
 use tokio::sync::watch;
+use tower::ServiceExt as _;
 
 #[derive(serde::Deserialize)]
 struct Advance {
@@ -81,6 +82,31 @@ async fn run(options: PgConnectOptions) -> anyhow::Result<()> {
                 let shutdown = shutdown.clone();
                 async move {
                     let _ = shutdown.send(true);
+                }
+            }),
+        ));
+        // Map tests need their own accounts, not the shared IP budget exercised by registration
+        // tests. Use the real registration handler with a synthetic peer, only in this local fixture.
+        let registration = server::gateway::router(state.clone());
+        let app = app.merge(Router::new().route(
+            "/__account",
+            post(move |Json(input): Json<serde_json::Value>| {
+                let registration = registration.clone();
+                async move {
+                    let peer = SocketAddr::new(
+                        IpAddr::V6(std::net::Ipv6Addr::from(*uuid::Uuid::now_v7().as_bytes())),
+                        0,
+                    );
+                    let request = axum::http::Request::builder()
+                        .method("POST")
+                        .uri("/api/auth/register")
+                        .header("Content-Type", "application/json")
+                        .header("X-Requested-With", "app")
+                        .header("Origin", "http://localhost:4173")
+                        .extension(axum::extract::ConnectInfo(peer))
+                        .body(axum::body::Body::from(input.to_string()))
+                        .expect("fixture registration request");
+                    registration.oneshot(request).await.unwrap()
                 }
             }),
         ));
