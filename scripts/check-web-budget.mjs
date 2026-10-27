@@ -95,7 +95,9 @@ const files = await walk(output);
 const paintings = files.filter((f) => f.endsWith('.avif'));
 const paintingSizes = await Promise.all(paintings.map(async (f) => (await stat(f)).size));
 const isTown = (f) => /[\\/]town-[\w-]+\.avif$/.test(f);
-const townSize = paintingSizes.find((_, i) => isTown(paintings[i]));
+// Portrait and wide variants of the town each have the same cap; the largest one is measured.
+const townSizes = paintingSizes.filter((_, i) => isTown(paintings[i]));
+const townSize = townSizes.length ? Math.max(...townSizes) : undefined;
 // A renamed or missing town would otherwise pass its own cap unmeasured.
 if (townSize === undefined)
   throw new Error('The town painting (town-*.avif) is missing from the build.');
@@ -138,7 +140,7 @@ const rows = [
     Math.max(0, ...paintingSizes.filter((_, i) => !isTown(paintings[i]))),
     32,
   ],
-  ['Town painting (AVIF)', townSize, 64],
+  ['Town painting, largest variant (AVIF)', townSize, 64],
   // Account progression, tutorial and level gates add ~1 KiB over the former 53 KiB cap.
   ['Online account and lobby on demand (Brotli)', await sum([...coreOnline]), 56],
   ['Tournaments on demand (Brotli)', await sum([...tournaments]), 20],

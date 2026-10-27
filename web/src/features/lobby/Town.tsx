@@ -1,22 +1,49 @@
 import { A, useNavigate } from '@solidjs/router';
-import { createSignal, For, Show } from 'solid-js';
+import { createMemo, createSignal, For, onCleanup, onMount, Show } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
-import layout from '../../generated/town.json';
 import { t } from '../../i18n';
 import { canEnter, type Journey, requiredLevel } from './journey';
 
-// The complete town and its building hit areas use the same coordinates on every screen.
-// Resizing fits the painting to the available space; it never rearranges destinations.
-const [painting] = Object.values(
-  import.meta.glob<string>('../../assets/paintings/scenes/town.avif', {
-    eager: true,
-    query: '?url',
-    import: 'default',
-  }),
-);
-const [width, height] = layout.size as [number, number];
-const points = (shape: number[][]) =>
-  shape.map(([x = 0, y = 0]) => `${(x * width) / 100},${(y * height) / 100}`).join(' ');
+// The town comes in several shapes: town.json/town.avif (square) and optional variants such as
+// town-portrait (phones) and town-wide (wide screens), each with its own building coordinates.
+// The view picks the variant whose proportions best match the space it has, then fits it whole.
+type Layout = {
+  size: number[];
+  places: { id: string; at: number[]; shape: number[][] }[];
+};
+const layouts = import.meta.glob<Layout>('../../generated/town*.json', {
+  eager: true,
+  import: 'default',
+});
+const paintings = import.meta.glob<string>('../../assets/paintings/scenes/town*.avif', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+});
+const variants = Object.entries(layouts)
+  .map(([path, layout]) => {
+    const name = path.slice(path.lastIndexOf('/') + 1, -'.json'.length);
+    const src = Object.entries(paintings).find(([p]) => p.endsWith(`/${name}.avif`))?.[1];
+    const [width = 1, height = 1] = layout.size;
+    return src ? { name, src, width, height, places: layout.places } : undefined;
+  })
+  .filter((v): v is NonNullable<typeof v> => v !== undefined);
+type Variant = (typeof variants)[number];
+const square = variants.find((v) => v.name === 'town') ?? (variants[0] as Variant);
+/** The variant closest in shape to the available box (compared on a log scale). */
+export function pickVariant<T extends { width: number; height: number }>(
+  options: T[],
+  box: { width: number; height: number },
+): T | undefined {
+  if (!(box.width > 0 && box.height > 0)) return undefined;
+  const target = Math.log(box.width / box.height);
+  let best: T | undefined;
+  for (const option of options) {
+    const distance = Math.abs(Math.log(option.width / option.height) - target);
+    if (!best || distance < Math.abs(Math.log(best.width / best.height) - target)) best = option;
+  }
+  return best;
+}
 // A building's box on the canvas and its outline inside the box, both in per cent.
 function outline(shape: number[][]) {
   const xs = shape.map(([x = 0]) => x);
@@ -47,6 +74,21 @@ export function Town(props: {
 }) {
   const navigate = useNavigate();
   const [hot, setHot] = createSignal('');
+  const [box, setBox] = createSignal({ width: 0, height: 0 });
+  const town = createMemo(() => pickVariant(variants, box()) ?? square);
+  const points = (shape: number[][]) =>
+    shape
+      .map(([x = 0, y = 0]) => `${(x * town().width) / 100},${(y * town().height) / 100}`)
+      .join(' ');
+  let section: HTMLElement | undefined;
+  onMount(() => {
+    if (!section || variants.length < 2 || typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry) setBox({ width: entry.contentRect.width, height: entry.contentRect.height });
+    });
+    observer.observe(section);
+    onCleanup(() => observer.disconnect());
+  });
   const locked = (id: string) => !canEnter(props.journey, id);
   const waiting = (id: string) =>
     props.alert === id || (id === 'library' && (props.journey?.recruits ?? 0) > 0);
@@ -76,14 +118,22 @@ export function Town(props: {
           : `lobby-room-${id}-hint`,
     );
   return (
-    <section class="town" aria-labelledby="town-title">
+    <section class="town" aria-labelledby="town-title" ref={section}>
       <h2 id="town-title" class="visually-hidden">
         {t('lobby-tab-map')}
       </h2>
-      <div class="town-view">
-        <div class="town-canvas" style={{ '--town-w': width, '--town-h': height }}>
-          <img src={painting} alt="" width={width} height={height} />
-          <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" aria-hidden="true">
+      <div
+        class="town-view"
+        data-variant={town().name}
+        style={{ '--town-w': town().width, '--town-h': town().height }}
+      >
+        <div class="town-canvas">
+          <img src={town().src} alt="" width={town().width} height={town().height} />
+          <svg
+            viewBox={`0 0 ${town().width} ${town().height}`}
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
             <defs>
               <filter id="town-glow" x="-10%" y="-10%" width="120%" height="120%">
                 <feGaussianBlur stdDeviation="5" result="blur" />
@@ -94,7 +144,7 @@ export function Town(props: {
                 </feMerge>
               </filter>
             </defs>
-            <For each={layout.places}>
+            <For each={town().places}>
               {(p) => (
                 <polygon
                   class="town-edge"
@@ -111,7 +161,7 @@ export function Town(props: {
           </svg>
           {/* The building itself, for the pointer (it brightens what is under it); keyboards and
               screen readers use its plaque. */}
-          <For each={layout.places}>
+          <For each={town().places}>
             {(p) => (
               <button
                 type="button"
@@ -127,7 +177,7 @@ export function Town(props: {
               />
             )}
           </For>
-          <For each={layout.places}>
+          <For each={town().places}>
             {(p) => (
               // The library and the clan list are pages; the other buildings are lobby rooms.
               <Dynamic

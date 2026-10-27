@@ -155,8 +155,9 @@
   min-height: 0;
 }
 .town-view {
-  width: min(100cqw, 100cqh);
-  aspect-ratio: 1;
+  /* Town.tsx sets --town-w and --town-h from the chosen variant; the painting fits whole. */
+  width: min(100cqw, 100cqh * var(--town-w) / var(--town-h));
+  aspect-ratio: var(--town-w) / var(--town-h);
   overflow: hidden;
   border: 3px solid transparent;
   border-radius: 4px;
@@ -168,7 +169,6 @@
 }
 .town-canvas {
   position: relative;
-  /* Town.tsx sets --town-w and --town-h from town.json. */
   aspect-ratio: var(--town-w) / var(--town-h);
 }
 .town-canvas > img,

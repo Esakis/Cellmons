@@ -20,7 +20,12 @@ await writeFile('web/src/generated/content.json', JSON.stringify(core));
 await writeFile('web/src/generated/cards.json', JSON.stringify({ version: core.version, cards }));
 await writeFile('web/src/generated/paths.json', JSON.stringify({ version: core.version, paths }));
 await cp('art/path-overlays.json', 'web/src/generated/path-overlays.json');
-await cp('art/paintings/town.json', 'web/src/generated/town.json');
+// The town map: town.json (square) plus optional town-portrait.json / town-wide.json variants.
+for (const name of (await readdir('art/paintings')).filter((n) =>
+  /^town(-[\w-]+)?\.json$/.test(n),
+)) {
+  await cp(`art/paintings/${name}`, `web/src/generated/${name}`);
+}
 for (const locale of ['pl', 'en']) {
   const source = await readFile(`target/content/i18n.${locale}.ftl`, 'utf8');
   const pathNames = new Set(paths.map((p) => `${p.key.replace('.', '-')}-name`));
