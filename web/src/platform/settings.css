@@ -3,10 +3,12 @@
   display: grid;
   gap: 1rem;
 }
-.native-settings label {
+/* Stronger than `.settings-page label`, whose spacing is meant for the select fields. */
+.settings-page .native-settings label {
   display: flex;
   align-items: center;
   gap: 0.8rem;
+  margin: 0;
 }
 .native-settings input[type="checkbox"] {
   width: 1.4rem;
