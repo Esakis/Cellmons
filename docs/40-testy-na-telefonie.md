@@ -13,9 +13,9 @@
 
 Większość z 40 kont jest obecna na Arenie. Część może być w pojedynku lub odwiedzać inne lokacje. Zwykła walka z nimi zapisuje postęp gracza. Gość i trening offline nie łączą się z tymi kontami.
 
-W aktualnie przygotowanym koncie testowym dostępne są **Mag, Wojownik, Kapłan, Druid, Nekromantka, Wampir, Żniwiarz i Mędrzec**, każda z gotową talią 20 kart. Postać przełącza się w Kolekcji przyciskiem „Aktywuj”. Pozostałe 24 klasy pozostają zablokowane. Zwykła rejestracja daje jedną klasę wybraną z trzech: Mag, Wojownik lub Kapłan, a następnie prowadzi przez samouczek. Pierwszy ukończony trening otwiera Arenę na poziomie konta 3; pozostałe lokacje mają własne progi.
+Konto testowe podlega tym samym zasadom co każde inne. Rejestruje się jako Mag z gotową talią 20 kart, a kolejne klasy zdobywa na poziomach konta 5, 8, 12… albo przez kontrakt. Nie ma skryptu przyznającego mu całą pulę. Zwykła rejestracja w aplikacji daje jedną klasę wybraną z trzech: Mag, Wojownik lub Kapłan, a następnie prowadzi przez samouczek. Pierwszy ukończony trening otwiera Arenę na poziomie konta 3; pozostałe lokacje mają własne progi.
 
-Przy odtwarzaniu środowiska można przed logowaniem na Androidzie uruchomić `node e2e/prepare-phone-roster.mjs`. Przyznaje ósemkę wyłącznie wygenerowanemu kontu `Telefon_*` w lokalnej bazie Dockera, tworzy brakujące postacie przez API i aktywuje Wampira. Ponowienie nie powiela pakietów. Polecenie zmienia sesję konta testowego, więc po nim trzeba zalogować się ponownie w aplikacji.
+Konto przygotowane wcześniej skryptem `prepare-phone-roster.mjs` zachowuje w lokalnej bazie przyznane klasy. Aby zacząć od zera, usuń `target/phone-test/konto-testowe.json` i uruchom `phone.bat`; skrypt utworzy nowe konto `Telefon_*`.
 
 Komputer i Docker muszą działać podczas gry. Po ponownym uruchomieniu komputera wykonaj `phone.bat`. Zatrzymanie: `phone.bat -Stop`; dane pozostają. Po zmianach źródeł wykonaj `phone.bat -Rebuild`: przebuduje i uruchomi ponownie własny serwer oraz przygotuje nowy APK. Skrypt odmawia zatrzymywania serwera uruchomionego poza nim. Zainstaluj ponownie przygotowany APK na telefonie, aby otrzymać nowy interfejs.
 

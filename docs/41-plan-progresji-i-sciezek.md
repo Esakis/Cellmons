@@ -146,7 +146,7 @@ Każda droga otrzymuje legalną talię i pakiet 20 dopasowanych kart, raz na kon
 
 ## Poziom konta i odblokowania — wdrożone
 
-Poziom konta 1–30 jest wspólny, trwały i nie podnosi siły w pojedynku. Osiem klas jest pulą całego wydania: na początku gracz wybiera jedną, potem zdobywa pozostałe. W testach telefonu można przyznać całą pulę dedykowanemu kontu, bez zmiany nagród wszystkich graczy.
+Poziom konta 1–30 jest wspólny, trwały i nie podnosi siły w pojedynku. Osiem klas jest pulą całego wydania: na początku gracz wybiera jedną, potem zdobywa pozostałe. Konto testowe z telefonu podlega tym samym zasadom.
 
 | Poziom konta | Funkcja lub nagroda |
 |---:|---|
