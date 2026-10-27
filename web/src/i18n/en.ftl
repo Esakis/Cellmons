@@ -70,6 +70,7 @@ reason-conditional = A spell condition ended the duel.
 reason-timeout = The duel ended due to missed moves.
 reason-disconnect = The duel ended due to disconnection.
 log = Round log
+card-info-hint = Tap a card to see what it does.
 legend-title = How to read the board
 legend-trays = Attacks and defenses: in each of the three slots choose an attack and a defense, physical or magical. A defense of the same type blocks the attack.
 legend-stats = The "4/3" and "3/0" tiles: physical attack/defense and magical attack/defense. Damage is the attack minus the opponent's defense; further hits in a round count ×2 and ×4.

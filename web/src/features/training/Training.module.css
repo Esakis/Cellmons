@@ -1336,6 +1336,10 @@
 .hand {
   margin-top: 10px;
 }
+/* The text of the card last touched; only phones need it (their cards show no text). */
+.cardInfo {
+  display: none;
+}
 .cards {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -2121,6 +2125,35 @@
   }
   .card .cardText {
     display: none;
+  }
+  .cardInfo {
+    display: block;
+    min-height: calc(3 * 1.35em + 30px);
+    margin-bottom: 6px;
+    padding: 6px 8px;
+    font-size: 0.78rem;
+    line-height: 1.35;
+    color: var(--duel-text-box-color);
+    background: var(--duel-text-box);
+    border: 1px solid var(--duel-edge);
+    border-radius: 4px;
+  }
+  .cardInfo p {
+    margin: 2px 0 0;
+  }
+  .cardInfoTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .cardInfoTop .requirements img {
+    width: 12px;
+    height: 12px;
+  }
+  .cardInfoHint {
+    opacity: 0.75;
+    font-style: italic;
   }
   .cardActions {
     gap: 2px;

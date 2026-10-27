@@ -1,8 +1,10 @@
 import {
+  createEffect,
   createSignal,
   For,
   Index,
   type JSX,
+  on,
   onCleanup,
   onMount,
   type ParentProps,
@@ -890,6 +892,21 @@ export function DecisionTable(props: {
 }) {
   let hold: ReturnType<typeof setTimeout> | undefined;
   let held = false;
+  // The card last touched, hovered or focused; its full text is shown above the hand, because
+  // phones have no room for card text on the cards themselves.
+  const [looked, setLooked] = createSignal<number>();
+  createEffect(
+    on(
+      () => props.view.hand,
+      () => setLooked(undefined),
+      { defer: true },
+    ),
+  );
+  const shown = () => {
+    const index = looked() ?? (props.draft.action !== 0 ? props.draft.handIndex : undefined);
+    const id = index === undefined ? undefined : props.view.hand[index];
+    return id === undefined ? undefined : cards.get(id);
+  };
   onCleanup(() => {
     clearTimeout(hold);
     // A round resolved under an open legend: the next decision starts without it.
@@ -1031,6 +1048,23 @@ export function DecisionTable(props: {
             <h2 id="hand-title">{t('hand')}</h2>
             <span>{props.view.me?.deckLen} / 20</span>
           </div>
+          {/* Screen readers hear the same text in each card's label. */}
+          <div class={styles.cardInfo} aria-hidden="true">
+            <Show
+              when={shown()}
+              fallback={<p class={styles.cardInfoHint}>{t('card-info-hint')}</p>}
+            >
+              {(card) => (
+                <>
+                  <div class={styles.cardInfoTop}>
+                    <strong>{cardName(card().id)}</strong>
+                    <Requirements card={card()} />
+                  </div>
+                  <p>{cardDescription(card())}</p>
+                </>
+              )}
+            </Show>
+          </div>
           <div class={styles.cards}>
             <For each={props.view.hand}>
               {(id, index) => (
@@ -1046,10 +1080,16 @@ export function DecisionTable(props: {
                         type="button"
                         class={styles.cardMain}
                         disabled={props.locked || props.pending}
+                        title={cardDescription(card())}
                         onClick={() => {
+                          setLooked(index());
                           if (!held)
                             props.onChange(cycled(props.draft, index(), props.castOptions));
                           held = false;
+                        }}
+                        onFocus={() => setLooked(index())}
+                        onPointerEnter={(event) => {
+                          if (event.pointerType === 'mouse') setLooked(index());
                         }}
                         onContextMenu={(event) => {
                           event.preventDefault();
@@ -1081,7 +1121,10 @@ export function DecisionTable(props: {
                           disabled={
                             props.locked || props.pending || !!props.castOptions[index()]?.error
                           }
-                          onClick={() => choose(index(), 1)}
+                          onClick={() => {
+                            setLooked(index());
+                            choose(index(), 1);
+                          }}
                         >
                           {t('cast')}
                         </button>
@@ -1090,7 +1133,10 @@ export function DecisionTable(props: {
                           class="quiet"
                           aria-pressed={chosen(index(), 2)}
                           disabled={props.locked || props.pending}
-                          onClick={() => choose(index(), 2)}
+                          onClick={() => {
+                            setLooked(index());
+                            choose(index(), 2);
+                          }}
                         >
                           {t('discard')}
                         </button>

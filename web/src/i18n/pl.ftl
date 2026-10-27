@@ -70,6 +70,7 @@ reason-conditional = Pojedynek zakończony warunkiem czaru.
 reason-timeout = Pojedynek zakończony brakiem ruchu.
 reason-disconnect = Pojedynek zakończony rozłączeniem.
 log = Przebieg rundy
+card-info-hint = Dotknij karty, aby zobaczyć, co robi.
 legend-title = Jak czytać planszę
 legend-trays = Ataki i obrony: w każdym z trzech pól wybierz atak i obronę, fizyczne albo magiczne. Obrona tego samego typu blokuje atak.
 legend-stats = Kafelki „4/3” i „3/0”: atak/obrona fizyczna oraz atak/obrona magiczna. Obrażenia to atak minus obrona przeciwnika; kolejne trafienia w rundzie liczą się ×2 i ×4.
