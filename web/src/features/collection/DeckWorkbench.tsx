@@ -123,6 +123,8 @@ export function DeckWorkbench(props: {
           <img src={props.pictures.get(card.key)} alt="" width="160" height="100" loading="lazy" />
           <strong>{t(fluentKey(card.key))}</strong>
         </button>
+        {/* What the card does, readable while building the deck without opening the preview. */}
+        <p class="deck-text">{t(fluentKey(card.key, 'text'), cardArgs(card))}</p>
         {Cost(card)}
         {/* Every card starts at mastery 1/5; the tile shows only progress beyond it. */}
         <Show when={props.mastery && masteryLevel(card.id) > 1}>

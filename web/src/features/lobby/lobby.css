@@ -294,6 +294,10 @@
   text-decoration: none;
   white-space: normal;
 }
+/* The wide town has five buildings in a row: its plaques stay narrower than the gap between them. */
+.town-view[data-variant="town-wide"] .town-place {
+  width: 17%;
+}
 .town-label {
   position: relative;
   display: block;

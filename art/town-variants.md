@@ -8,13 +8,13 @@ Obecna mapa (`paintings/scenes/town.avif`) jest kwadratowa, więc na telefonie z
 | `town-portrait` | telefon w pionie | `generated/town-portrait.png` (9:16, np. 1024 × 1792) | 864 × 1536 |
 | `town-wide` | przeglądarka na komputerze | `generated/town-wide.png` (16:9, np. 1792 × 1024) | 1536 × 864 |
 
-Dopóki nie ma pliku wariantu i jego układu (`paintings/town-portrait.json`, `paintings/town-wide.json`), gra pokazuje kwadratową mapę jak dotąd.
+Dopóki nie ma pliku wariantu i jego układu (`paintings/town-portrait.json`, `paintings/town-wide.json`), gra pokazuje kwadratową mapę jak dotąd. Obie wersje są w grze od 2026-10-28.
 
 ## Jak dodać wariant
 
 1. Wygeneruj obraz z promptu poniżej, w podanych proporcjach. Budynki muszą stać mniej więcej w podanych miejscach.
 2. Zapisz go jako `art/paintings/generated/town-portrait.png` albo `town-wide.png`.
-3. Obrysuj budynki w `art/paintings/town-portrait.json` (format jak `town.json`: `size`, a dla każdego miejsca `at` – punkt tabliczki i `shape` – obrys, w procentach obrazu).
+3. Obrysuj budynki w `art/paintings/town-portrait.json` (format jak `town.json`: `size`, a dla każdego miejsca `at` – punkt tabliczki i `shape` – obrys, w procentach obrazu). Na szerokiej mapie tabliczka ma 17% szerokości (`lobby.css`), więc punkty `at` w jednym rzędzie leżą co najmniej 18% od siebie i 9% od krawędzi.
 4. `python scripts/prepare-town.py town-portrait` tworzy `paintings/scenes/town-portrait.avif` w limicie 64 KB.
 5. Dopisz wpis z promptem do `paintings/generated-assets.json`.
 

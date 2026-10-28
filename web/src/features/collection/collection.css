@@ -240,6 +240,14 @@
   line-height: 1.4;
   min-height: 2.8em;
 }
+/* The card's effect under its name (more specific than `.collection-cards p`). */
+.deck-card .deck-text {
+  margin: -2px 0 8px;
+  padding-inline: 8px;
+  overflow-wrap: break-word;
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
 /* Focus and stamina coins on the picture's corner, coloured like the duel board's coins. */
 .deck-cost {
   position: absolute;
